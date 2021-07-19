@@ -9,30 +9,29 @@ use tokio_rustls::{TlsConnector, rustls::ClientConfig, webpki::DNSNameRef, clien
 use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::ReadHalf, io::WriteHalf};
 
 use crate::config::{CONFIG, EppClientConnection};
-use tokio::time::{sleep, Duration};
 use crate::error;
-use crate::epp::request::EppRequest;
+use crate::epp::request::{EppRequest, Login};
+use crate::epp::xml::EppXml;
 
-struct ConnectionStream {
+pub struct ConnectionStream {
     reader: ReadHalf<TlsStream<TcpStream>>,
     writer: WriteHalf<TlsStream<TcpStream>>,
 }
 
-struct EppConnection {
+pub struct EppConnection {
     registry: String,
-    credentials: (String, String),
     stream: ConnectionStream,
     pub greeting: String,
 }
 
 pub struct EppClient {
+    credentials: (String, String),
     connection: EppConnection,
 }
 
 impl EppConnection {
     pub async fn new(
         registry: String,
-        credentials: (String, String),
         mut stream: ConnectionStream) -> Result<EppConnection, Box<dyn Error>> {
         let mut buf = vec![0u8; 4096];
         stream.reader.read(&mut buf).await?;
@@ -40,7 +39,6 @@ impl EppConnection {
 
         Ok(EppConnection {
             registry: registry,
-            credentials: credentials,
             stream: stream,
             greeting: greeting
         })
@@ -65,9 +63,6 @@ impl EppConnection {
 
         buf[..4].clone_from_slice(&len_u32);
         buf[4..].clone_from_slice(&content.as_bytes());
-
-        let conv = str::from_utf8(&buf[4..])?;
-        println!("reconverted: {}", conv);
 
         self.write(&buf).await
     }
@@ -141,8 +136,22 @@ impl Drop for EppConnection {
 }
 
 impl EppClient {
+    pub async fn new(connection: EppConnection, credentials: (String, String)) -> Result<EppClient, Box<dyn Error>> {
+        let mut client = EppClient {
+            connection: connection,
+            credentials: credentials
+        };
+
+        let client_trid = EppRequest::generate_client_trid(&client.credentials.0)?;
+        let login_request = Login::new(&client.credentials.0, &client.credentials.1, client_trid.as_str());
+
+        client.transact(&login_request).await?;
+
+        Ok(client)
+    }
+
     pub async fn transact(&mut self, request: &EppRequest) -> Result<String, Box<dyn Error>> {
-        let epp_xml = request.to_epp_xml()?;
+        let epp_xml = request.serialize()?;
 
         println!("Request:\r\n{}", epp_xml);
 
@@ -207,11 +216,10 @@ pub async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>
 
         let connection = EppConnection::new(
             registry.to_string(),
-            credentials,
             stream
         ).await.unwrap();
 
-        let client = EppClient { connection: connection };
+        let client = EppClient::new(connection, credentials).await.unwrap();
 
         tx.send(client).unwrap();
     });

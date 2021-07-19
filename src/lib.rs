@@ -1,11 +1,12 @@
 // pub mod config;
 // pub mod connection;
+// pub mod epp;
+// pub mod error;
 
 // #[cfg(test)]
 // mod tests {
-//     use super::config;
+// 	use super::config;
 //     use super::connection;
-//     use std::str;
 
 //     #[test]
 //     fn config() {
@@ -22,14 +23,12 @@
 
 //     #[test]
 //     fn connect() {
-//         let mut cn = aw!(connection::connect("hexonet")).unwrap();
-//         println!("lol");
-//         let contents = aw!(cn.read()).unwrap();
-
-//         match str::from_utf8(&contents) {
-//             Ok(v) => println!("{}", v),
-//             Err(e) => panic!("Error: {}", e)
-//         }
-//         aw!(cn.close());
+//         let mut client = match aw!(connection::connect("hexonet")) {
+// 			Ok(client) => {
+// 				println!("{}", client.greeting());
+// 				client
+// 			},
+// 			Err(e) => panic!("Error: {}",  e)
+// 		};
 //     }
 // }

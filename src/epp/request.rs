@@ -1,8 +1,7 @@
-use quick_xml::se;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use std::error::Error;
+use std::time::SystemTime;
 
-const EPP_XML_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
 const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
 const EPP_XMLNS_XSI: &str = "http://www.w3.org/2001/XMLSchema-instance";
 const EPP_XSI_SCHEMA_LOCATION: &str = "urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd";
@@ -61,10 +60,9 @@ impl EppObject {
         }
     }
 
-    pub fn to_epp_xml(&self) -> Result<String, Box<dyn Error>> {
-        let epp_xml = format!("{}\r\n{}", EPP_XML_HEADER, se::to_string(self)?);
-
-        Ok(epp_xml)
+    pub fn generate_client_trid(username: &str) -> Result<String, Box<dyn Error>> {
+        let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
+        Ok(format!("{}:{}", username, timestamp.as_secs()))
     }
 }
 
