@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
 
+use crate::epp::object::EppObject;
+
 const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
 const EPP_XMLNS_XSI: &str = "http://www.w3.org/2001/XMLSchema-instance";
 const EPP_XSI_SCHEMA_LOCATION: &str = "urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd";
@@ -37,21 +39,16 @@ pub enum RequestType {
         #[serde(rename = "clTRID")]
         client_tr_id: StringValue,
     },
+    #[serde(rename = "command")]
+    CommandLogout {
+        logout: Logout,
+        #[serde(rename = "clTRID")]
+        client_tr_id: StringValue,
+    },
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-#[serde(rename = "epp")]
-pub struct EppObject {
-    xmlns: String,
-    #[serde(rename = "xmlns:xsi")]
-    xmlns_xsi: String,
-    #[serde(rename = "xsi:schemaLocation")]
-    xsi_schema_location: String,
-    data: RequestType,
-}
-
-impl EppObject {
-    pub fn new(data: RequestType) -> EppObject {
+impl<RequestType> EppObject<RequestType> {
+    pub fn new(data: RequestType) -> EppObject<RequestType> {
         EppObject {
             data: data,
             xmlns: EPP_XMLNS.to_string(),
@@ -60,13 +57,13 @@ impl EppObject {
         }
     }
 
-    pub fn generate_client_trid(username: &str) -> Result<String, Box<dyn Error>> {
+    pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
         let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
         Ok(format!("{}:{}", username, timestamp.as_secs()))
     }
 }
 
-pub type EppRequest = EppObject;
+pub type EppRequest = EppObject<RequestType>;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -163,5 +160,18 @@ impl Login {
 
     pub fn set_services(&mut self, services: Services) {
         self.services = services;
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub struct Logout;
+
+impl Logout {
+    pub fn new(client_tr_id: &str) -> EppRequest {
+        EppRequest::new(RequestType::CommandLogout {
+            logout: Logout,
+            client_tr_id: client_tr_id.to_string_value(),
+        })
     }
 }

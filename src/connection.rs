@@ -10,7 +10,7 @@ use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::
 
 use crate::config::{CONFIG, EppClientConnection};
 use crate::error;
-use crate::epp::request::{EppRequest, Login};
+use crate::epp::request::{EppRequest, Login, Logout};
 use crate::epp::xml::EppXml;
 
 pub struct ConnectionStream {
@@ -142,8 +142,8 @@ impl EppClient {
             credentials: credentials
         };
 
-        let client_trid = EppRequest::generate_client_trid(&client.credentials.0)?;
-        let login_request = Login::new(&client.credentials.0, &client.credentials.1, client_trid.as_str());
+        let client_tr_id = EppRequest::generate_client_tr_id(&client.credentials.0)?;
+        let login_request = Login::new(&client.credentials.0, &client.credentials.1, client_tr_id.as_str());
 
         client.transact(&login_request).await?;
 
@@ -167,6 +167,19 @@ impl EppClient {
 
     pub fn greeting(&self) -> String {
         return String::from(&self.connection.greeting)
+    }
+
+    pub async fn logout(&mut self) {
+        let client_tr_id = EppRequest::generate_client_tr_id(&self.credentials.0).unwrap();
+        let epp_logout = Logout::new(client_tr_id.as_str());
+
+        self.transact(&epp_logout).await;
+    }
+}
+
+impl Drop for EppClient {
+    fn drop(&mut self) {
+        block_on(self.logout());
     }
 }
 
