@@ -35,7 +35,7 @@ pub enum RequestType {
     Hello,
     Command {
         login: Login,
-        #[serde(rename = "clTRIDv")]
+        #[serde(rename = "clTRID")]
         client_tr_id: StringValue,
     },
 }

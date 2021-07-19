@@ -1,20 +1,27 @@
 use std::sync::Arc;
 use std::sync::mpsc;
 use std::{str, u32};
+use bytes::BytesMut;
 use std::convert::TryInto;
 use futures::executor::block_on;
 use std::{error::Error, net::ToSocketAddrs, io as stdio};
 use tokio_rustls::{TlsConnector, rustls::ClientConfig, webpki::DNSNameRef, client::TlsStream};
-use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt};
+use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::ReadHalf, io::WriteHalf};
 
 use crate::config::{CONFIG, EppClientConnection};
+use tokio::time::{sleep, Duration};
 use crate::error;
 use crate::epp::request::EppRequest;
+
+struct ConnectionStream {
+    reader: ReadHalf<TlsStream<TcpStream>>,
+    writer: WriteHalf<TlsStream<TcpStream>>,
+}
 
 struct EppConnection {
     registry: String,
     credentials: (String, String),
-    stream: TlsStream<TcpStream>,
+    stream: ConnectionStream,
     pub greeting: String,
 }
 
@@ -26,9 +33,9 @@ impl EppConnection {
     pub async fn new(
         registry: String,
         credentials: (String, String),
-        mut stream: TlsStream<TcpStream>) -> Result<EppConnection, Box<dyn Error>> {
+        mut stream: ConnectionStream) -> Result<EppConnection, Box<dyn Error>> {
         let mut buf = vec![0u8; 4096];
-        stream.read(&mut buf).await?;
+        stream.reader.read(&mut buf).await?;
         let greeting = str::from_utf8(&buf)?.to_string();
 
         Ok(EppConnection {
@@ -40,7 +47,10 @@ impl EppConnection {
     }
 
     async fn write(&mut self, buf: &Vec<u8>) -> Result<(), Box<dyn Error>> {
-        self.stream.write_all(buf).await?;
+        let wrote = self.stream.writer.write(buf).await?;
+
+        println!("Wrote {} bytes", wrote);
+
         Ok(())
     }
 
@@ -50,37 +60,60 @@ impl EppConnection {
         let buf_size = len + 4;
         let mut buf: Vec<u8> = vec![0u8; buf_size];
 
+        let len = len + 4;
         let len_u32: [u8; 4] = u32::to_be_bytes(len.try_into()?);
 
         buf[..4].clone_from_slice(&len_u32);
         buf[4..].clone_from_slice(&content.as_bytes());
+
+        let conv = str::from_utf8(&buf[4..])?;
+        println!("reconverted: {}", conv);
 
         self.write(&buf).await
     }
 
     async fn read(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut buf = vec![0u8; 4096];
-        self.stream.read(&mut buf).await?;
+        self.stream.reader.read(&mut buf).await?;
         Ok(buf)
     }
 
     async fn read_epp_response(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut buf = [0u8; 4];
-        self.stream.read_exact(&mut buf).await?;
+        self.stream.reader.read_exact(&mut buf).await?;
 
         let buf_size :usize = u32::from_be_bytes(buf).try_into()?;
 
-        println!("Response buffer size: {}", buf_size);
+        let message_size = buf_size - 4;
+        println!("Message buffer size: {}", message_size);
 
-        let mut buf = vec![0u8; buf_size - 4];
+        let mut buf = BytesMut::with_capacity(4096);
+        let mut read_buf = vec![0u8; 4096];
 
-        self.stream.read(&mut buf).await?;
+        let mut read_size :usize = 0;
 
-        Ok(buf)
+        loop {
+            let read = self.stream.reader.read(&mut read_buf).await?;
+            println!("Read: {} bytes", read);
+            buf.extend_from_slice(&read_buf[0..read]);
+
+            read_size = read_size + read;
+            println!("Total read: {} bytes", read_size);
+
+            if read == 0 {
+                panic!("Unexpected eof")
+            } else if read_size >= message_size {
+                break;
+            }
+        }
+
+        let data = buf.to_vec();
+
+        Ok(data)
     }
 
     pub async fn get_epp_response(&mut self) -> Result<String, Box<dyn Error>> {
-        let contents = self.read().await?;
+        let contents = self.read_epp_response().await?;
 
         let response = str::from_utf8(&contents)?.to_string();
 
@@ -88,16 +121,15 @@ impl EppConnection {
     }
 
     pub async fn transact(&mut self, content: &str) -> Result<String, Box<dyn Error>> {
-        let content = format!("{}\r\n\r\n", content);
-
         self.send_epp_request(&content).await?;
+
         self.get_epp_response().await
     }
 
     async fn close(&mut self) -> Result<(), Box<dyn Error>> {
         println!("Closing ...");
 
-        self.stream.shutdown().await?;
+        self.stream.writer.shutdown().await?;
         Ok(())
     }
 }
@@ -129,7 +161,7 @@ impl EppClient {
     }
 }
 
-async fn epp_connect(registry_creds: &EppClientConnection) -> Result<TlsStream<TcpStream>, error::Error> {
+async fn epp_connect(registry_creds: &EppClientConnection) -> Result<ConnectionStream, error::Error> {
     let (host, port) = registry_creds.connection_details();
 
     println!("{}: {}", host, port);
@@ -153,7 +185,12 @@ async fn epp_connect(registry_creds: &EppClientConnection) -> Result<TlsStream<T
 
     let stream = connector.connect(domain, stream).await?;
 
-    Ok(stream)
+    let (reader, writer) = split(stream);
+
+    Ok(ConnectionStream {
+        reader: reader,
+        writer: writer,
+    })
 }
 
 pub async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
