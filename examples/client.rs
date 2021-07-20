@@ -1,4 +1,5 @@
-use epp_client::{epp::request, connection, epp::xml::EppXml, epp::response::EppGreeting};
+use epp_client::{epp::request, epp::request::generate_client_tr_id, epp::request::domain, connection, epp::xml::EppXml, epp::response::EppGreeting, epp::object::ElementName};
+use epp_client::epp::response;
 
 #[tokio::main]
 async fn main() {
@@ -12,7 +13,8 @@ async fn main() {
         Err(e) => panic!("Error: {}",  e)
     };
 
-    let epp_hello = request::Hello::new();
+    let domains = vec!["eppdev.com", "hexonet.net"];
+    let domain_check = domain::DomainCheck::epp_new(domains, generate_client_tr_id("eppdev").unwrap().as_str());
 
-    client.transact::<EppGreeting>(&epp_hello).await.unwrap();
+    let response = client.transact::<domain::EppDomainCheck, response::domain::EppDomainCheckResponse>(&domain_check).await.unwrap();
 }

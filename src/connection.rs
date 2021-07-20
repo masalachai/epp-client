@@ -10,8 +10,7 @@ use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::
 
 use crate::config::{CONFIG, EppClientConnection};
 use crate::error;
-use crate::epp::object::EppObject;
-use crate::epp::request::{EppRequest, Login, Logout};
+use crate::epp::request::{generate_client_tr_id, Login, EppLogin, Logout, EppLogout};
 use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EppXml;
 
@@ -144,15 +143,15 @@ impl EppClient {
             credentials: credentials
         };
 
-        let client_tr_id = EppRequest::generate_client_tr_id(&client.credentials.0)?;
-        let login_request = Login::new(&client.credentials.0, &client.credentials.1, client_tr_id.as_str());
+        let client_tr_id = generate_client_tr_id(&client.credentials.0)?;
+        let login_request = Login::epp_new(&client.credentials.0, &client.credentials.1, client_tr_id.as_str());
 
-        client.transact::<EppCommandResponse>(&login_request).await?;
+        client.transact::<EppLogin, EppCommandResponse>(&login_request).await?;
 
         Ok(client)
     }
 
-    pub async fn transact<E: EppXml + Debug>(&mut self, request: &EppRequest) -> Result<E::Output, Box<dyn Error>> {
+    pub async fn transact<T: EppXml + Debug, E: EppXml + Debug>(&mut self, request: &T) -> Result<E::Output, Box<dyn Error>> {
         let epp_xml = request.serialize()?;
 
         println!("Request:\r\n{}", epp_xml);
@@ -177,10 +176,10 @@ impl EppClient {
     }
 
     pub async fn logout(&mut self) {
-        let client_tr_id = EppRequest::generate_client_tr_id(&self.credentials.0).unwrap();
-        let epp_logout = Logout::new(client_tr_id.as_str());
+        let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
+        let epp_logout = Logout::epp_new(client_tr_id.as_str());
 
-        self.transact::<EppCommandResponse>(&epp_logout).await;
+        self.transact::<EppLogout, EppCommandResponse>(&epp_logout).await;
     }
 }
 

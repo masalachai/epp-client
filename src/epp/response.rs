@@ -1,15 +1,13 @@
+pub mod domain;
+
 use serde::{Deserialize, Deserializer, Serialize};
-use std::error::Error;
 
-use crate::epp::object::{EppObject, Options, ServiceExtension, Services, StringValue};
-use crate::epp::xml::{EPP_XMLNS, EPP_XMLNS_XSI, EPP_XSI_SCHEMA_LOCATION};
+use crate::epp::object::{
+    ElementName, EppObject, Options, ServiceExtension, Services, StringValue,
+};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-#[serde(rename_all = "lowercase")]
-pub struct ResponseType<T>(T);
-
-pub type EppGreeting = EppObject<ResponseType<Greeting>>;
-pub type EppCommandResponse = EppObject<ResponseType<CommandResponse>>;
+pub type EppGreeting = EppObject<Greeting>;
+pub type EppCommandResponse = EppObject<CommandResponse<String>>;
 
 #[derive(Serialize, Debug, PartialEq)]
 pub struct ServiceMenu {
@@ -131,8 +129,22 @@ pub struct ResponseTRID {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
-pub struct CommandResponse {
+pub struct CommandResponse<T> {
     pub result: EppResult,
+    #[serde(rename = "resData")]
+    pub res_data: Option<T>,
     #[serde(rename = "trID")]
     pub tr_ids: ResponseTRID,
+}
+
+impl ElementName for Greeting {
+    fn element_name(&self) -> &'static str {
+        "greeting"
+    }
+}
+
+impl<T> ElementName for CommandResponse<T> {
+    fn element_name(&self) -> &'static str {
+        "command"
+    }
 }

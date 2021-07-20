@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
 use crate::epp::xml::{EPP_XMLNS, EPP_XMLNS_XSI, EPP_XSI_SCHEMA_LOCATION};
 
@@ -21,9 +21,13 @@ impl StringValueTrait for &str {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub trait ElementName {
+    fn element_name(&self) -> &'static str;
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename = "epp")]
-pub struct EppObject<T> {
+pub struct EppObject<T: ElementName> {
     pub xmlns: String,
     #[serde(rename = "xmlns:xsi")]
     pub xmlns_xsi: String,
@@ -31,6 +35,21 @@ pub struct EppObject<T> {
     pub xsi_schema_location: String,
     #[serde(alias = "greeting", alias = "response")]
     pub data: T,
+}
+
+impl<T: ElementName + Serialize> Serialize for EppObject<T> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let data_name = self.data.element_name();
+        let mut state = serializer.serialize_struct("epp", 4)?;
+        state.serialize_field("xmlns", &self.xmlns)?;
+        state.serialize_field("xmlns:xsi", &self.xmlns_xsi)?;
+        state.serialize_field("xsi:schemaLocation", &self.xsi_schema_location)?;
+        state.serialize_field(data_name, &self.data)?;
+        state.end()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -64,7 +83,7 @@ pub struct Services {
     pub svc_ext: Option<ServiceExtension>,
 }
 
-impl<T> EppObject<T> {
+impl<T: ElementName> EppObject<T> {
     pub fn new(data: T) -> EppObject<T> {
         EppObject {
             data: data,

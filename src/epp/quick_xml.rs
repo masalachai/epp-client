@@ -3,10 +3,10 @@ use quick_xml::se;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{error::Error, fmt::Debug};
 
-use crate::epp::object::EppObject;
+use crate::epp::object::{ElementName, EppObject};
 use crate::epp::xml::{EppXml, EPP_XML_HEADER};
 
-impl<T: Serialize + DeserializeOwned + Debug> EppXml for EppObject<T> {
+impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject<T> {
     type Output = EppObject<T>;
 
     fn serialize(&self) -> Result<String, Box<dyn Error>> {

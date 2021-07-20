@@ -1,54 +1,38 @@
+pub mod domain;
+
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
 
+pub use crate::epp::command::Command;
 use crate::epp::object::{
-    EppObject, Options, ServiceExtension, Services, StringValue, StringValueTrait,
+    ElementName, EppObject, Options, ServiceExtension, Services, StringValue, StringValueTrait,
 };
-use crate::epp::xml::{EPP_LANG, EPP_VERSION, EPP_XMLNS, EPP_XMLNS_XSI, EPP_XSI_SCHEMA_LOCATION};
+use crate::epp::xml::{EPP_LANG, EPP_VERSION};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-#[serde(rename_all = "lowercase")]
-pub enum RequestType {
-    Hello,
-    #[serde(rename = "command")]
-    CommandLogin {
-        login: Login,
-        #[serde(rename = "clTRID")]
-        client_tr_id: StringValue,
-    },
-    #[serde(rename = "command")]
-    CommandLogout {
-        logout: Logout,
-        #[serde(rename = "clTRID")]
-        client_tr_id: StringValue,
-    },
+pub type EppHello = EppObject<Hello>;
+pub type EppLogin = EppObject<Command<Login>>;
+pub type EppLogout = EppObject<Command<Logout>>;
+
+pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
+    let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
+    Ok(format!("{}:{}", username, timestamp.as_secs()))
 }
 
-impl<RequestType> EppObject<RequestType> {
-    pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
-        let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
-        Ok(format!("{}:{}", username, timestamp.as_secs()))
-    }
-}
-
-pub type EppRequest = EppObject<RequestType>;
-
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename = "hello")]
 pub struct Hello;
 
-impl Hello {
-    pub fn new() -> EppRequest {
-        EppRequest::new(RequestType::Hello)
+impl ElementName for Hello {
+    fn element_name(&self) -> &'static str {
+        "hello"
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct Command {
-    login: Login,
-    #[serde(rename = "clTRID")]
-    client_tr_id: StringValue,
+impl Hello {
+    pub fn epp_new() -> EppHello {
+        EppObject::new(Hello {})
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -63,8 +47,14 @@ pub struct Login {
     services: Services,
 }
 
+impl ElementName for Login {
+    fn element_name(&self) -> &'static str {
+        "login"
+    }
+}
+
 impl Login {
-    pub fn new(username: &str, password: &str, client_tr_id: &str) -> EppRequest {
+    pub fn epp_new(username: &str, password: &str, client_tr_id: &str) -> EppLogin {
         let login = Login {
             username: username.to_string_value(),
             password: password.to_string_value(),
@@ -86,8 +76,8 @@ impl Login {
             },
         };
 
-        EppRequest::new(RequestType::CommandLogin {
-            login: login,
+        EppObject::new(Command::<Login> {
+            command: login,
             client_tr_id: client_tr_id.to_string_value(),
         })
     }
@@ -106,10 +96,16 @@ impl Login {
 pub struct Logout;
 
 impl Logout {
-    pub fn new(client_tr_id: &str) -> EppRequest {
-        EppRequest::new(RequestType::CommandLogout {
-            logout: Logout,
+    pub fn epp_new(client_tr_id: &str) -> EppLogout {
+        EppObject::new(Command::<Logout> {
+            command: Logout,
             client_tr_id: client_tr_id.to_string_value(),
         })
+    }
+}
+
+impl ElementName for Logout {
+    fn element_name(&self) -> &'static str {
+        "logout"
     }
 }
