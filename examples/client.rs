@@ -30,7 +30,7 @@ async fn main() {
         Err(e) => panic!("Error: {}",  e)
     };
 
-    check_domains(&client);
+    check_domains(&mut client).await;
 
     check_contacts(&mut client).await;
 }
