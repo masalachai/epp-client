@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, fmt::Debug};
 
 // use crate::epp::object::EppObject;
 
@@ -11,8 +11,8 @@ pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
 
 pub trait EppXml {
-    type Object;
+    type Output: Debug;
 
     fn serialize(&self) -> Result<String, Box<dyn Error>>;
-    fn deserialize(epp_xml: &str) -> Result<Self::Object, Box<dyn Error>>;
+    fn deserialize(epp_xml: &str) -> Result<Self::Output, Box<dyn Error>>;
 }

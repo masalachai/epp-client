@@ -14,5 +14,5 @@ async fn main() {
 
     let epp_hello = request::Hello::new();
 
-    client.transact(&epp_hello).await.unwrap();
+    client.transact::<EppGreeting>(&epp_hello).await.unwrap();
 }

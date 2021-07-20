@@ -4,12 +4,13 @@ use std::{str, u32};
 use bytes::BytesMut;
 use std::convert::TryInto;
 use futures::executor::block_on;
-use std::{error::Error, net::ToSocketAddrs, io as stdio};
+use std::{error::Error, fmt::Debug, net::ToSocketAddrs, io as stdio};
 use tokio_rustls::{TlsConnector, rustls::ClientConfig, webpki::DNSNameRef, client::TlsStream};
 use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::ReadHalf, io::WriteHalf};
 
 use crate::config::{CONFIG, EppClientConnection};
 use crate::error;
+use crate::epp::object::EppObject;
 use crate::epp::request::{EppRequest, Login, Logout};
 use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EppXml;
@@ -146,12 +147,12 @@ impl EppClient {
         let client_tr_id = EppRequest::generate_client_tr_id(&client.credentials.0)?;
         let login_request = Login::new(&client.credentials.0, &client.credentials.1, client_tr_id.as_str());
 
-        client.transact(&login_request).await?;
+        client.transact::<EppCommandResponse>(&login_request).await?;
 
         Ok(client)
     }
 
-    pub async fn transact(&mut self, request: &EppRequest) -> Result<String, Box<dyn Error>> {
+    pub async fn transact<E: EppXml + Debug>(&mut self, request: &EppRequest) -> Result<E::Output, Box<dyn Error>> {
         let epp_xml = request.serialize()?;
 
         println!("Request:\r\n{}", epp_xml);
@@ -160,11 +161,11 @@ impl EppClient {
 
         println!("Response:\r\n{}", response);
 
-        let response_obj = EppCommandResponse::deserialize(&response).unwrap();
+        let response_obj = E::deserialize(&response)?;
 
         println!("Response:\r\n{:?}", response_obj);
 
-        Ok(response)
+        Ok(response_obj)
     }
 
     pub async fn transact_xml(&mut self, xml: &str) -> Result<String, Box<dyn Error>> {
@@ -179,7 +180,7 @@ impl EppClient {
         let client_tr_id = EppRequest::generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = Logout::new(client_tr_id.as_str());
 
-        self.transact(&epp_logout).await;
+        self.transact::<EppCommandResponse>(&epp_logout).await;
     }
 }
 
