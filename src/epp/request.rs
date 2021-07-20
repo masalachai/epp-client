@@ -1,3 +1,4 @@
+pub mod contact;
 pub mod domain;
 
 use serde::{Deserialize, Serialize};
@@ -29,9 +30,9 @@ impl ElementName for Hello {
     }
 }
 
-impl Hello {
-    pub fn epp_new() -> EppHello {
-        EppObject::new(Hello {})
+impl EppHello {
+    pub fn new() -> EppHello {
+        EppObject::build(Hello {})
     }
 }
 
@@ -53,8 +54,8 @@ impl ElementName for Login {
     }
 }
 
-impl Login {
-    pub fn epp_new(username: &str, password: &str, client_tr_id: &str) -> EppLogin {
+impl EppLogin {
+    pub fn new(username: &str, password: &str, client_tr_id: &str) -> EppLogin {
         let login = Login {
             username: username.to_string_value(),
             password: password.to_string_value(),
@@ -76,18 +77,18 @@ impl Login {
             },
         };
 
-        EppObject::new(Command::<Login> {
+        EppObject::build(Command::<Login> {
             command: login,
             client_tr_id: client_tr_id.to_string_value(),
         })
     }
 
     pub fn set_options(&mut self, options: Options) {
-        self.options = options;
+        self.data.command.options = options;
     }
 
     pub fn set_services(&mut self, services: Services) {
-        self.services = services;
+        self.data.command.services = services;
     }
 }
 
@@ -95,9 +96,9 @@ impl Login {
 #[serde(rename_all = "lowercase")]
 pub struct Logout;
 
-impl Logout {
-    pub fn epp_new(client_tr_id: &str) -> EppLogout {
-        EppObject::new(Command::<Logout> {
+impl EppLogout {
+    pub fn new(client_tr_id: &str) -> EppLogout {
+        EppObject::build(Command::<Logout> {
             command: Logout,
             client_tr_id: client_tr_id.to_string_value(),
         })

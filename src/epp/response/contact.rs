@@ -3,30 +3,30 @@ use serde::{Deserialize, Serialize};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 
-pub type EppDomainCheckResponse = EppObject<CommandResponse<DomainCheckResult>>;
+pub type EppContactCheckResponse = EppObject<CommandResponse<ContactCheckResult>>;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DomainCheck {
+pub struct ContactCheck {
     #[serde(rename = "$value")]
-    pub name: StringValue,
+    pub id: StringValue,
     #[serde(rename = "avail")]
     pub available: u16,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DomainCheckDataItem {
-    pub name: DomainCheck,
+pub struct ContactCheckDataItem {
+    pub id: ContactCheck,
     pub reason: Option<StringValue>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DomainCheckData {
+pub struct ContactCheckData {
     #[serde(rename = "cd")]
-    pub domain_list: Vec<DomainCheckDataItem>,
+    pub contact_list: Vec<ContactCheckDataItem>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DomainCheckResult {
+pub struct ContactCheckResult {
     #[serde(rename = "chkData")]
-    pub check_data: DomainCheckData,
+    pub check_data: ContactCheckData,
 }

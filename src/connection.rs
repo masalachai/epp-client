@@ -144,7 +144,7 @@ impl EppClient {
         };
 
         let client_tr_id = generate_client_tr_id(&client.credentials.0)?;
-        let login_request = Login::epp_new(&client.credentials.0, &client.credentials.1, client_tr_id.as_str());
+        let login_request = EppLogin::new(&client.credentials.0, &client.credentials.1, client_tr_id.as_str());
 
         client.transact::<EppLogin, EppCommandResponse>(&login_request).await?;
 
@@ -177,7 +177,7 @@ impl EppClient {
 
     pub async fn logout(&mut self) {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
-        let epp_logout = Logout::epp_new(client_tr_id.as_str());
+        let epp_logout = EppLogout::new(client_tr_id.as_str());
 
         self.transact::<EppLogout, EppCommandResponse>(&epp_logout).await;
     }

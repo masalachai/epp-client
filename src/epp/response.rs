@@ -1,3 +1,4 @@
+pub mod contact;
 pub mod domain;
 
 use serde::{Deserialize, Deserializer, Serialize};

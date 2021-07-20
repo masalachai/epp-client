@@ -84,7 +84,7 @@ pub struct Services {
 }
 
 impl<T: ElementName> EppObject<T> {
-    pub fn new(data: T) -> EppObject<T> {
+    pub fn build(data: T) -> EppObject<T> {
         EppObject {
             data: data,
             xmlns: EPP_XMLNS.to_string(),

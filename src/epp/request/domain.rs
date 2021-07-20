@@ -25,8 +25,8 @@ impl ElementName for DomainCheck {
     }
 }
 
-impl DomainCheck {
-    pub fn epp_new(domains: Vec<&str>, client_tr_id: &str) -> EppDomainCheck {
+impl EppDomainCheck {
+    pub fn new(domains: Vec<&str>, client_tr_id: &str) -> EppDomainCheck {
         let domains = domains
             .iter()
             .filter_map(|d| Some(d.to_string_value()))
@@ -39,7 +39,7 @@ impl DomainCheck {
             },
         };
 
-        EppObject::new(Command::<DomainCheck> {
+        EppObject::build(Command::<DomainCheck> {
             command: domain_check,
             client_tr_id: client_tr_id.to_string_value(),
         })
