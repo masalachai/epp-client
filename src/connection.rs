@@ -11,6 +11,7 @@ use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::
 use crate::config::{CONFIG, EppClientConnection};
 use crate::error;
 use crate::epp::request::{EppRequest, Login, Logout};
+use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EppXml;
 
 pub struct ConnectionStream {
@@ -156,7 +157,12 @@ impl EppClient {
         println!("Request:\r\n{}", epp_xml);
 
         let response = self.connection.transact(&epp_xml).await?;
+
         println!("Response:\r\n{}", response);
+
+        let response_obj = EppCommandResponse::deserialize(&response).unwrap();
+
+        println!("Response:\r\n{:?}", response_obj);
 
         Ok(response)
     }

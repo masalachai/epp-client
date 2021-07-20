@@ -28,8 +28,8 @@ pub struct EppObject<T> {
     #[serde(rename = "xmlns:xsi")]
     pub xmlns_xsi: String,
     #[serde(rename = "xsi:schemaLocation")]
-	pub xsi_schema_location: String,
-	#[serde(alias = "greeting")]
+    pub xsi_schema_location: String,
+    #[serde(alias = "greeting", alias = "response")]
     pub data: T,
 }
 

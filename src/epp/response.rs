@@ -1,4 +1,3 @@
-// use chrono::{DateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::error::Error;
 
@@ -7,12 +6,10 @@ use crate::epp::xml::{EPP_XMLNS, EPP_XMLNS_XSI, EPP_XSI_SCHEMA_LOCATION};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
-pub enum ResponseType {
-    #[serde(rename = "greeting")]
-    Greeting(Greeting),
-}
+pub struct ResponseType<T>(T);
 
-pub type EppResponse = EppObject<ResponseType>;
+pub type EppGreeting = EppObject<ResponseType<Greeting>>;
+pub type EppCommandResponse = EppObject<ResponseType<CommandResponse>>;
 
 #[derive(Serialize, Debug, PartialEq)]
 pub struct ServiceMenu {
@@ -115,4 +112,27 @@ pub struct Greeting {
     #[serde(rename = "svcMenu")]
     svc_menu: ServiceMenu,
     dcp: Dcp,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct EppResult {
+    pub code: String,
+    #[serde(rename = "msg")]
+    pub message: StringValue,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct ResponseTRID {
+    #[serde(rename = "clTRID")]
+    pub client_tr_id: StringValue,
+    #[serde(rename = "svTRID")]
+    pub server_tr_id: StringValue,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub struct CommandResponse {
+    pub result: EppResult,
+    #[serde(rename = "trID")]
+    pub tr_ids: ResponseTRID,
 }
