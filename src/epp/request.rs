@@ -2,39 +2,17 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
 
-use crate::epp::object::EppObject;
-
-const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
-const EPP_XMLNS_XSI: &str = "http://www.w3.org/2001/XMLSchema-instance";
-const EPP_XSI_SCHEMA_LOCATION: &str = "urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd";
-
-const EPP_VERSION: &str = "1.0";
-const EPP_LANG: &str = "en";
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct StringValue(String);
-
-impl Default for StringValue {
-    fn default() -> Self {
-        Self(String::from(""))
-    }
-}
-
-pub trait StringValueTrait {
-    fn to_string_value(&self) -> StringValue;
-}
-
-impl StringValueTrait for &str {
-    fn to_string_value(&self) -> StringValue {
-        StringValue(self.to_string())
-    }
-}
+use crate::epp::object::{
+    EppObject, Options, ServiceExtension, Services, StringValue, StringValueTrait,
+};
+use crate::epp::xml::{EPP_LANG, EPP_VERSION, EPP_XMLNS, EPP_XMLNS_XSI, EPP_XSI_SCHEMA_LOCATION};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum RequestType {
     Hello,
-    Command {
+    #[serde(rename = "command")]
+    CommandLogin {
         login: Login,
         #[serde(rename = "clTRID")]
         client_tr_id: StringValue,
@@ -48,15 +26,6 @@ pub enum RequestType {
 }
 
 impl<RequestType> EppObject<RequestType> {
-    pub fn new(data: RequestType) -> EppObject<RequestType> {
-        EppObject {
-            data: data,
-            xmlns: EPP_XMLNS.to_string(),
-            xmlns_xsi: EPP_XMLNS_XSI.to_string(),
-            xsi_schema_location: EPP_XSI_SCHEMA_LOCATION.to_string(),
-        }
-    }
-
     pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
         let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
         Ok(format!("{}:{}", username, timestamp.as_secs()))
@@ -76,37 +45,6 @@ impl Hello {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-#[serde(rename = "options")]
-pub struct LoginOptions {
-    version: StringValue,
-    lang: StringValue,
-}
-
-impl LoginOptions {
-    pub fn build(version: &str, lang: &str) -> LoginOptions {
-        LoginOptions {
-            version: version.to_string_value(),
-            lang: lang.to_string_value(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-#[serde(rename = "svcExtension")]
-pub struct ServiceExtension {
-    #[serde(rename = "extURI")]
-    ext_uris: Option<Vec<StringValue>>,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct Services {
-    #[serde(rename = "objURI")]
-    obj_uris: Vec<StringValue>,
-    #[serde(rename = "svcExtension")]
-    svc_ext: Option<ServiceExtension>,
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Command {
     login: Login,
     #[serde(rename = "clTRID")]
@@ -120,7 +58,7 @@ pub struct Login {
     username: StringValue,
     #[serde(rename = "pw", default)]
     password: StringValue,
-    options: LoginOptions,
+    options: Options,
     #[serde(rename = "svcs")]
     services: Services,
 }
@@ -130,7 +68,7 @@ impl Login {
         let login = Login {
             username: username.to_string_value(),
             password: password.to_string_value(),
-            options: LoginOptions {
+            options: Options {
                 version: EPP_VERSION.to_string_value(),
                 lang: EPP_LANG.to_string_value(),
             },
@@ -148,13 +86,13 @@ impl Login {
             },
         };
 
-        EppRequest::new(RequestType::Command {
+        EppRequest::new(RequestType::CommandLogin {
             login: login,
             client_tr_id: client_tr_id.to_string_value(),
         })
     }
 
-    pub fn set_options(&mut self, options: LoginOptions) {
+    pub fn set_options(&mut self, options: Options) {
         self.options = options;
     }
 

@@ -1,17 +1,12 @@
-pub mod config;
-pub mod connection;
-pub mod epp;
-pub mod error;
-
-use std::time::SystemTime;
-use tokio::time::{sleep, Duration};
-use crate::{epp::request};
+use epp_client::{epp::request, connection, epp::xml::EppXml, epp::response::EppResponse};
 
 #[tokio::main]
 async fn main() {
     let mut client = match connection::connect("hexonet").await {
         Ok(client) => {
-            println!("{}", client.greeting());
+            let greeting = client.greeting();
+            let greeting_object = EppResponse::deserialize(&greeting).unwrap();
+            println!("{:?}", greeting_object);
             client
         },
         Err(e) => panic!("Error: {}",  e)
