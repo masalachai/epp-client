@@ -1,8 +1,9 @@
+use epp_client_macros::*;
+
 use crate::epp::command::Command;
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
-
-const EPP_DOMAIN_XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
 
 pub type EppDomainCheck = EppObject<Command<DomainCheck>>;
 
@@ -13,16 +14,11 @@ pub struct DomainList {
     pub domains: Vec<StringValue>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ElementName)]
+#[element_name(name = "check")]
 pub struct DomainCheck {
     #[serde(rename = "check")]
     list: DomainList,
-}
-
-impl ElementName for DomainCheck {
-    fn element_name(&self) -> &'static str {
-        "check"
-    }
 }
 
 impl EppDomainCheck {

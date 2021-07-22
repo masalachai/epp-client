@@ -1,8 +1,9 @@
+use epp_client_macros::*;
+
 use crate::epp::command::Command;
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
-
-const EPP_CONTACT_XMLNS: &str = "urn:ietf:params:xml:ns:contact-1.0";
 
 pub type EppContactCheck = EppObject<Command<ContactCheck>>;
 
@@ -13,16 +14,11 @@ pub struct ContactList {
     pub contact_ids: Vec<StringValue>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, ElementName)]
+#[element_name(name = "check")]
 pub struct ContactCheck {
     #[serde(rename = "check")]
     list: ContactList,
-}
-
-impl ElementName for ContactCheck {
-    fn element_name(&self) -> &'static str {
-        "check"
-    }
 }
 
 impl EppContactCheck {

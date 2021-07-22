@@ -5,11 +5,12 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
 
-pub use crate::epp::command::Command;
+use crate::epp::command::Command;
 use crate::epp::object::{
     ElementName, EppObject, Options, ServiceExtension, Services, StringValue, StringValueTrait,
 };
 use crate::epp::xml::{EPP_LANG, EPP_VERSION};
+use epp_client_macros::*;
 
 pub type EppHello = EppObject<Hello>;
 pub type EppLogin = EppObject<Command<Login>>;
@@ -20,15 +21,10 @@ pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
     Ok(format!("{}:{}", username, timestamp.as_secs()))
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[serde(rename = "hello")]
+#[element_name(name = "hello")]
 pub struct Hello;
-
-impl ElementName for Hello {
-    fn element_name(&self) -> &'static str {
-        "hello"
-    }
-}
 
 impl EppHello {
     pub fn new() -> EppHello {
@@ -36,8 +32,9 @@ impl EppHello {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[serde(rename = "login")]
+#[element_name(name = "login")]
 pub struct Login {
     #[serde(rename(serialize = "clID", deserialize = "clID"))]
     username: StringValue,
@@ -46,12 +43,6 @@ pub struct Login {
     options: Options,
     #[serde(rename = "svcs")]
     services: Services,
-}
-
-impl ElementName for Login {
-    fn element_name(&self) -> &'static str {
-        "login"
-    }
 }
 
 impl EppLogin {
@@ -92,8 +83,8 @@ impl EppLogin {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-#[serde(rename_all = "lowercase")]
+#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
+#[element_name(name = "logout")]
 pub struct Logout;
 
 impl EppLogout {
@@ -102,11 +93,5 @@ impl EppLogout {
             command: Logout,
             client_tr_id: client_tr_id.to_string_value(),
         })
-    }
-}
-
-impl ElementName for Logout {
-    fn element_name(&self) -> &'static str {
-        "logout"
     }
 }

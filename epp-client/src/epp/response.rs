@@ -1,6 +1,7 @@
 pub mod contact;
 pub mod domain;
 
+use epp_client_macros::*;
 use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::epp::object::{
@@ -101,8 +102,9 @@ pub struct Dcp {
     statement: Statement,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[serde(rename_all = "lowercase")]
+#[element_name(name = "greeting")]
 pub struct Greeting {
     #[serde(rename = "svID")]
     service_id: String,
@@ -128,24 +130,13 @@ pub struct ResponseTRID {
     pub server_tr_id: StringValue,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[serde(rename_all = "lowercase")]
+#[element_name(name = "response")]
 pub struct CommandResponse<T> {
     pub result: EppResult,
     #[serde(rename = "resData")]
     pub res_data: Option<T>,
     #[serde(rename = "trID")]
     pub tr_ids: ResponseTRID,
-}
-
-impl ElementName for Greeting {
-    fn element_name(&self) -> &'static str {
-        "greeting"
-    }
-}
-
-impl<T> ElementName for CommandResponse<T> {
-    fn element_name(&self) -> &'static str {
-        "command"
-    }
 }

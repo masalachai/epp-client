@@ -1,3 +1,5 @@
+pub mod data;
+
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
 use crate::epp::xml::{EPP_XMLNS, EPP_XMLNS_XSI, EPP_XSI_SCHEMA_LOCATION};

@@ -10,7 +10,7 @@ use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::
 
 use crate::config::{CONFIG, EppClientConnection};
 use crate::error;
-use crate::epp::request::{generate_client_tr_id, Login, EppLogin, Logout, EppLogout};
+use crate::epp::request::{generate_client_tr_id, EppLogin, EppLogout};
 use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EppXml;
 
@@ -159,6 +159,8 @@ impl EppClient {
         let response = self.connection.transact(&epp_xml).await?;
 
         println!("Response:\r\n{}", response);
+
+        // let result_object = EppCommandResponse::deserialize(&response);
 
         let response_obj = E::deserialize(&response)?;
 

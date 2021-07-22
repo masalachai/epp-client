@@ -1,3 +1,4 @@
 /target
-/misc
+**/target
+/epp-client/misc
 Cargo.lock
