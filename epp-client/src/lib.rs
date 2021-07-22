@@ -6,7 +6,7 @@ pub mod error;
 #[cfg(test)]
 mod tests {
     use super::config;
-    use super::connection;
+    use super::connection::client::EppClient;
 
     #[test]
     fn config() {
@@ -23,9 +23,9 @@ mod tests {
 
     #[test]
     fn connect() {
-        let mut client = match aw!(connection::connect("hexonet")) {
+        let mut client = match aw!(EppClient::new("hexonet")) {
             Ok(client) => {
-                println!("{}", client.greeting());
+                println!("{}", client.xml_greeting());
                 client
             },
             Err(e) => panic!("Error: {}",  e)

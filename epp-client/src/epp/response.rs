@@ -9,6 +9,9 @@ use crate::epp::object::{
 };
 
 pub type EppGreeting = EppObject<Greeting>;
+pub type EppCommandResponseStatus = EppObject<CommandResponseStatus>;
+type CommandResponseError = CommandResponseStatus;
+pub type EppCommandResponseError = EppObject<CommandResponseError>;
 pub type EppCommandResponse = EppObject<CommandResponse<String>>;
 
 #[derive(Serialize, Debug, PartialEq)]
@@ -116,16 +119,40 @@ pub struct Greeting {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct Undef;
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct ResultValue {
+    #[serde(rename = "xmlns:epp")]
+    xmlns: String,
+    pub undef: Undef,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct ExtValue {
+    value: ResultValue,
+    reason: StringValue,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct EppResult {
-    pub code: String,
+    pub code: u16,
     #[serde(rename = "msg")]
     pub message: StringValue,
+    #[serde(rename = "extValue")]
+    pub ext_value: Option<ExtValue>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ResponseTRID {
     #[serde(rename = "clTRID")]
-    pub client_tr_id: StringValue,
+    pub client_tr_id: Option<StringValue>,
+    #[serde(rename = "svTRID")]
+    pub server_tr_id: StringValue,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct ErrorResponseTRID {
     #[serde(rename = "svTRID")]
     pub server_tr_id: StringValue,
 }
@@ -137,6 +164,14 @@ pub struct CommandResponse<T> {
     pub result: EppResult,
     #[serde(rename = "resData")]
     pub res_data: Option<T>,
+    #[serde(rename = "trID")]
+    pub tr_ids: ResponseTRID,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
+#[element_name(name = "response")]
+pub struct CommandResponseStatus {
+    pub result: EppResult,
     #[serde(rename = "trID")]
     pub tr_ids: ResponseTRID,
 }

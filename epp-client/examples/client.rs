@@ -1,5 +1,4 @@
-use epp_client::{epp::request::generate_client_tr_id, connection::EppClient, connection, epp::xml::EppXml};
-use epp_client::epp::request::EppHello;
+use epp_client::{epp::request::generate_client_tr_id, connection::client::EppClient, connection, epp::xml::EppXml};
 use epp_client::epp::response::EppGreeting;
 use epp_client::epp::request::domain::check::EppDomainCheck;
 use epp_client::epp::response::domain::check::EppDomainCheckResponse;
@@ -40,16 +39,16 @@ async fn create_contact() {
 }
 
 async fn hello(client: &mut EppClient) {
-    let hello = EppHello::new();
+    let greeting = client.hello().await.unwrap();
 
-    client.transact::<_, EppGreeting>(&hello).await.unwrap();
+    println!("{:?}", greeting);
 }
 
 #[tokio::main]
 async fn main() {
-    let mut client = match connection::connect("hexonet").await {
+    let mut client = match EppClient::new("hexonet").await {
         Ok(client) => {
-            let greeting = client.greeting();
+            let greeting = client.xml_greeting();
             let greeting_object = EppGreeting::deserialize(&greeting).unwrap();
             println!("{:?}", greeting_object);
             client
@@ -57,9 +56,9 @@ async fn main() {
         Err(e) => panic!("Error: {}",  e)
     };
 
-    hello(&mut client).await;
+    // hello(&mut client).await;
 
-    // check_domains(&mut client).await;
+    check_domains(&mut client).await;
 
     // check_contacts(&mut client).await;
 

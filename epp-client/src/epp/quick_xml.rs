@@ -16,9 +16,11 @@ impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject
     }
 
     fn deserialize(epp_xml: &str) -> Result<Self::Output, Box<dyn Error>> {
-        match from_str(epp_xml) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(format!("epp-client Deserialization Error: {}", e).into()),
-        }
+        let mut object: Self::Output = match from_str(epp_xml) {
+            Ok(v) => v,
+            Err(e) => return Err(format!("epp-client Deserialization Error: {}", e).into()),
+        };
+        // object.xml = Some(epp_xml.to_string());
+        Ok(object)
     }
 }
