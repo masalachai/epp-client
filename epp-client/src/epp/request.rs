@@ -22,7 +22,6 @@ pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[serde(rename = "hello")]
 #[element_name(name = "hello")]
 pub struct Hello;
 
@@ -33,7 +32,6 @@ impl EppHello {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[serde(rename = "login")]
 #[element_name(name = "login")]
 pub struct Login {
     #[serde(rename(serialize = "clID", deserialize = "clID"))]

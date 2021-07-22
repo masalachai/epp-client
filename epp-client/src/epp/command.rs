@@ -1,18 +1,14 @@
 use crate::epp::object::{ElementName, StringValue};
+use epp_client_macros::*;
 use serde::ser::{SerializeStruct, Serializer};
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq, ElementName)]
+#[element_name(name = "command")]
 pub struct Command<T: ElementName> {
     pub command: T,
     #[serde(rename = "clTRID")]
     pub client_tr_id: StringValue,
-}
-
-impl<T: ElementName> ElementName for Command<T> {
-    fn element_name(&self) -> &'static str {
-        "command"
-    }
 }
 
 impl<T: ElementName + Serialize> Serialize for Command<T> {
