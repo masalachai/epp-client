@@ -7,6 +7,8 @@ pub type EppContactCreateResponse = EppObject<CommandResponse<ContactCreateResul
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactCreateData {
+    #[serde(rename = "xmlns:contact")]
+    xmlns: String,
     pub id: StringValue,
     #[serde(rename = "crDate")]
     pub created_at: StringValue,

@@ -2,6 +2,12 @@ use crate::epp::object::{StringValue, StringValueTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ContactStatus {
+    #[serde(rename = "s")]
+    pub status: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Phone {
     #[serde(rename = "$value")]
     pub number: String,
@@ -9,7 +15,7 @@ pub struct Phone {
     extension: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Address {
     street: Vec<StringValue>,
     city: StringValue,
@@ -21,7 +27,7 @@ pub struct Address {
     country_code: StringValue,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PostalInfo {
     #[serde(rename = "type")]
     info_type: String,
@@ -32,10 +38,10 @@ pub struct PostalInfo {
     address: Address,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AuthInfo {
     #[serde(rename = "pw")]
-    password: StringValue,
+    pub password: StringValue,
 }
 
 impl Phone {
