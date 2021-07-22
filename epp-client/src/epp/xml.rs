@@ -1,6 +1,6 @@
 use std::{error::Error, fmt::Debug};
 
-// use crate::epp::object::EppObject;
+use crate::error;
 
 pub const EPP_XML_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
 pub const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
@@ -17,5 +17,5 @@ pub trait EppXml {
     type Output: Debug;
 
     fn serialize(&self) -> Result<String, Box<dyn Error>>;
-    fn deserialize(epp_xml: &str) -> Result<Self::Output, Box<dyn Error>>;
+    fn deserialize(epp_xml: &str) -> Result<Self::Output, error::Error>;
 }

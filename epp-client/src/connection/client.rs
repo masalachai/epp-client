@@ -66,6 +66,8 @@ impl EppClient {
 
         let response = self.connection.transact(&hello_xml).await?;
 
+        println!("hello response: {}", response);
+
         Ok(EppGreeting::deserialize(&response)?)
     }
 
@@ -86,8 +88,7 @@ impl EppClient {
             Ok(response)
         } else {
             let epp_error = EppCommandResponseError::deserialize(&response)?;
-            let epp_error = error::Error::EppCommandError(error::EppCommandError::new(epp_error));
-            Err(epp_error)
+            Err(error::Error::EppCommandError(epp_error))
         }
     }
 

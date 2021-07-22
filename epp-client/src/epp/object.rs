@@ -1,7 +1,7 @@
 pub mod data;
 
-use std::fmt::Display;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
+use std::fmt::Display;
 
 use crate::epp::xml::{EPP_XMLNS, EPP_XMLNS_XSI, EPP_XSI_SCHEMA_LOCATION};
 

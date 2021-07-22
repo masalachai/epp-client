@@ -5,6 +5,7 @@ use std::{error::Error, fmt::Debug};
 
 use crate::epp::object::{ElementName, EppObject};
 use crate::epp::xml::{EppXml, EPP_XML_HEADER};
+use crate::error;
 
 impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject<T> {
     type Output = EppObject<T>;
@@ -15,10 +16,14 @@ impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject
         Ok(epp_xml)
     }
 
-    fn deserialize(epp_xml: &str) -> Result<Self::Output, Box<dyn Error>> {
+    fn deserialize(epp_xml: &str) -> Result<Self::Output, error::Error> {
         let mut object: Self::Output = match from_str(epp_xml) {
             Ok(v) => v,
-            Err(e) => return Err(format!("epp-client Deserialization Error: {}", e).into()),
+            Err(e) => {
+                return Err(error::Error::EppDeserializationError(
+                    format!("epp-client Deserialization Error: {}", e).to_string(),
+                ))
+            }
         };
         // object.xml = Some(epp_xml.to_string());
         Ok(object)

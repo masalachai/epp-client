@@ -15,7 +15,7 @@ pub struct DomainList {
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "checkr")]
+#[element_name(name = "check")]
 pub struct DomainCheck {
     #[serde(rename = "check")]
     list: DomainList,

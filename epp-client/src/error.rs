@@ -4,7 +4,8 @@ use std::fmt::Display;
 #[derive(Debug)]
 pub enum Error {
     EppConnectionError(std::io::Error),
-    EppCommandError(EppCommandError),
+    EppCommandError(EppCommandResponseError),
+    EppDeserializationError(String),
     Other(String),
 }
 
@@ -15,35 +16,21 @@ pub struct EppCommandError {
 
 impl std::error::Error for Error {}
 
-impl std::error::Error for EppCommandError {}
-
-impl Display for EppCommandError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "epp-client EppCommandError: {}",
-            self.epp_error.data.result.message
-        )
-    }
-}
-
-impl EppCommandError {
-    pub fn new(epp_error: EppCommandResponseError) -> EppCommandError {
-        EppCommandError {
-            epp_error: epp_error,
-        }
-    }
-}
-
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "epp-client Exception: {:?}", self)
+        match self {
+            Error::EppCommandError(e) => {
+                write!(f, "epp-client EppCommandError: {}", e.data.result.message)
+            }
+            Error::Other(e) => write!(f, "epp-client Exception: {}", e),
+            _ => write!(f, "epp-client Exception: {:?}", self),
+        }
     }
 }
 
 impl From<std::boxed::Box<dyn std::error::Error>> for Error {
     fn from(e: std::boxed::Box<dyn std::error::Error>) -> Self {
-        Self::Other(format!("{}", e).to_string())
+        Self::Other(format!("{:?}", e).to_string())
     }
 }
 
