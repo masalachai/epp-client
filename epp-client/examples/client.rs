@@ -1,4 +1,5 @@
 use epp_client::{epp::request::generate_client_tr_id, connection::client::EppClient, connection, epp::xml::EppXml};
+use epp_client::epp::object::StringValueTrait;
 use epp_client::epp::object::data::ContactStatus;
 use epp_client::epp::request::domain::check::EppDomainCheck;
 use epp_client::epp::response::domain::check::EppDomainCheckResponse;
@@ -13,6 +14,10 @@ use epp_client::epp::request::contact::update::EppContactUpdate;
 use epp_client::epp::response::contact::update::EppContactUpdateResponse;
 use epp_client::epp::request::contact::delete::EppContactDelete;
 use epp_client::epp::response::contact::delete::EppContactDeleteResponse;
+use epp_client::epp::request::domain::create::DomainContact;
+use epp_client::epp::request::domain::create::{HostObjList, HostAttrList};
+use epp_client::epp::request::domain::create::EppDomainCreate;
+//use epp_client::epp::response::domain::create::EppDomainCreateResponse;
 
 async fn check_domains(client: &mut EppClient) {
     let domains = vec!["eppdev.com", "hexonet.net"];
@@ -72,6 +77,22 @@ async fn delete_contact(client: &mut EppClient) {
     client.transact::<_, EppContactDeleteResponse>(&contact_delete).await.unwrap();
 }
 
+async fn create_domain() {
+    let contacts = vec![
+        DomainContact {
+            contact_type: "tech".to_string(),
+            id: "eppdev-contact-1".to_string()
+        },
+        DomainContact {
+            contact_type: "billing".to_string(),
+            id: "eppdev-contact-1".to_string()
+        }
+    ];
+    let domain_create = EppDomainCreate::<HostAttrList>::new("eppdev.com", 1, vec!["ns1.test.com", "ns2.test.com"], "eppdev-contact-1", "eppdevauth123", contacts, generate_client_tr_id("eppdev").unwrap().as_str());
+
+    println!("{}", domain_create.serialize().unwrap());
+}
+
 async fn hello(client: &mut EppClient) {
     let greeting = client.hello().await.unwrap();
 
@@ -80,13 +101,13 @@ async fn hello(client: &mut EppClient) {
 
 #[tokio::main]
 async fn main() {
-    let mut client = match EppClient::new("hexonet").await {
-        Ok(client) => {
-            println!("{:?}", client.greeting());
-            client
-        },
-        Err(e) => panic!("Error: {}",  e)
-    };
+    // let mut client = match EppClient::new("hexonet").await {
+    //     Ok(client) => {
+    //         println!("{:?}", client.greeting());
+    //         client
+    //     },
+    //     Err(e) => panic!("Error: {}",  e)
+    // };
 
     // hello(&mut client).await;
 
@@ -101,4 +122,6 @@ async fn main() {
     // update_contact(&mut client).await;
 
     // delete_contact(&mut client).await;
+
+    // create_domain().await;
 }

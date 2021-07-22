@@ -3,18 +3,20 @@ use serde::{Deserialize, Serialize};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 
-pub type EppContactCreateResponse = EppObject<CommandResponse<ContactCreateResult>>;
+pub type EppDomainCheckResponse = EppObject<CommandResponse<DomainCheckResult>>;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ContactCreateData {
+pub struct DomainCreateData {
     xmlns: String,
-    pub id: StringValue,
+    name: StringValue,
     #[serde(rename = "crDate")]
-    pub created_at: StringValue,
+    created_at: StringValue,
+    #[serde(rename = "exDate")]
+    expiry_date: StringValue,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ContactCreateResult {
+pub struct DomainCreateResult {
     #[serde(rename = "creData")]
-    pub check_data: ContactCreateData,
+    pub create_data: DomainCreateData,
 }

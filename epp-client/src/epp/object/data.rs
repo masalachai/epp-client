@@ -2,6 +2,26 @@ use crate::epp::object::{StringValue, StringValueTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct Period {
+    unit: String,
+    #[serde(rename = "$value")]
+    length: u16,
+}
+
+impl Period {
+    pub fn new(length: u16) -> Period {
+        Period {
+            unit: "y".to_string(),
+            length: length,
+        }
+    }
+
+    pub fn set_unit(&mut self, unit: &str) {
+        self.unit = unit.to_string();
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ContactStatus {
     #[serde(rename = "s")]
     pub status: String,
