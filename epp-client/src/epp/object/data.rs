@@ -1,6 +1,9 @@
 use crate::epp::object::{StringValue, StringValueTrait};
 use serde::{Deserialize, Serialize};
 
+pub type DomainStatus = ContactStatus;
+pub type HostStatus = ContactStatus;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub enum DomainNsList {
     HostAttrList(HostAttrList),
@@ -36,6 +39,13 @@ impl HostAddr {
             address: address.to_string(),
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Host {
+    pub name: StringValue,
+    #[serde(rename = "addr")]
+    pub addresses: Option<Vec<HostAddr>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -84,12 +94,6 @@ impl Period {
     pub fn set_unit(&mut self, unit: &str) {
         self.unit = unit.to_string();
     }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DomainStatus {
-    #[serde(rename = "s")]
-    pub status: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

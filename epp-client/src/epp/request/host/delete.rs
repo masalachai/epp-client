@@ -2,30 +2,30 @@ use epp_client_macros::*;
 
 use crate::epp::command::Command;
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
-use crate::epp::xml::EPP_DOMAIN_XMLNS;
+use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
-pub type EppDomainDelete = EppObject<Command<DomainDelete>>;
+pub type EppHostDelete = EppObject<Command<HostDelete>>;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DomainDeleteData {
+pub struct HostDeleteData {
     xmlns: String,
     name: StringValue,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "delete")]
-pub struct DomainDelete {
+pub struct HostDelete {
     #[serde(rename = "delete")]
-    domain: DomainDeleteData,
+    host: HostDeleteData,
 }
 
-impl EppDomainDelete {
-    pub fn new(name: &str, client_tr_id: &str) -> EppDomainDelete {
-        EppObject::build(Command::<DomainDelete> {
-            command: DomainDelete {
-                domain: DomainDeleteData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+impl EppHostDelete {
+    pub fn new(name: &str, client_tr_id: &str) -> EppHostDelete {
+        EppObject::build(Command::<HostDelete> {
+            command: HostDelete {
+                host: HostDeleteData {
+                    xmlns: EPP_HOST_XMLNS.to_string(),
                     name: name.to_string_value(),
                 },
             },

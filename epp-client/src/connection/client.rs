@@ -22,13 +22,24 @@ async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
     tokio::spawn(async move {
         let stream = epp_connect(&registry_creds).await.unwrap();
         let credentials = registry_creds.credentials();
+        let ext_uris = registry_creds.ext_uris();
+
+        let ext_uris = match ext_uris {
+            Some(uris) => Some(
+                uris
+                    .iter()
+                    .map(|u| u.to_string())
+                    .collect::<Vec<String>>()
+            ),
+            None => None,
+        };
 
         let connection = EppConnection::new(
             registry.to_string(),
             stream
         ).await.unwrap();
 
-        let client = EppClient::build(connection, credentials).await.unwrap();
+        let client = EppClient::build(connection, credentials, ext_uris).await.unwrap();
 
         tx.send(client).unwrap();
     });
@@ -40,6 +51,7 @@ async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
 
 pub struct EppClient {
     credentials: (String, String),
+    ext_uris: Option<Vec<String>>,
     connection: EppConnection,
     // pub client_tr_id_fn: Arc<dyn Fn(&EppClient) -> String + Send + Sync>,
 }
@@ -66,15 +78,16 @@ impl EppClient {
         connect(registry).await
     }
 
-    async fn build(connection: EppConnection, credentials: (String, String)) -> Result<EppClient, Box<dyn Error>> {
+    async fn build(connection: EppConnection, credentials: (String, String), ext_uris: Option<Vec<String>>) -> Result<EppClient, Box<dyn Error>> {
         let mut client = EppClient {
             connection: connection,
             credentials: credentials,
+            ext_uris: ext_uris,
             // client_tr_id_fn: Arc::new(default_client_tr_id_fn),
         };
 
         let client_tr_id = generate_client_tr_id(&client.credentials.0)?;
-        let login_request = EppLogin::new(&client.credentials.0, &client.credentials.1, client_tr_id.as_str());
+        let login_request = EppLogin::new(&client.credentials.0, &client.credentials.1, &client.ext_uris, client_tr_id.as_str());
 
         client.transact::<_, EppCommandResponse>(&login_request).await?;
 

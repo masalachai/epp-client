@@ -1,5 +1,7 @@
 pub mod contact;
 pub mod domain;
+pub mod host;
+pub mod message;
 
 use epp_client_macros::*;
 use serde::{Deserialize, Deserializer, Serialize};
@@ -57,7 +59,7 @@ pub struct All;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Access {
-    all: All,
+    pub all: All,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -68,8 +70,8 @@ pub struct Prov;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Purpose {
-    admin: Admin,
-    prov: Prov,
+    pub admin: Admin,
+    pub prov: Prov,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -80,8 +82,8 @@ pub struct Public;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Recipient {
-    ours: Ours,
-    public: Public,
+    pub ours: Ours,
+    pub public: Public,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -89,20 +91,20 @@ pub struct Stated;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Retention {
-    stated: Stated,
+    pub stated: Stated,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Statement {
-    purpose: Purpose,
-    recipient: Recipient,
-    retention: Retention,
+    pub purpose: Purpose,
+    pub recipient: Recipient,
+    pub retention: Retention,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Dcp {
-    access: Access,
-    statement: Statement,
+    pub access: Access,
+    pub statement: Statement,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
@@ -110,12 +112,12 @@ pub struct Dcp {
 #[element_name(name = "greeting")]
 pub struct Greeting {
     #[serde(rename = "svID")]
-    service_id: String,
+    pub service_id: String,
     #[serde(rename = "svDate")]
-    service_date: String,
+    pub service_date: String,
     #[serde(rename = "svcMenu")]
-    svc_menu: ServiceMenu,
-    dcp: Dcp,
+    pub svc_menu: ServiceMenu,
+    pub dcp: Dcp,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -130,8 +132,8 @@ pub struct ResultValue {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ExtValue {
-    value: ResultValue,
-    reason: StringValue,
+    pub value: ResultValue,
+    pub reason: StringValue,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

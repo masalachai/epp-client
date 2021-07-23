@@ -1,5 +1,7 @@
 pub mod contact;
 pub mod domain;
+pub mod host;
+pub mod message;
 
 use serde::{Deserialize, Serialize};
 use std::error::Error;
@@ -9,7 +11,7 @@ use crate::epp::command::Command;
 use crate::epp::object::{
     ElementName, EppObject, Options, ServiceExtension, Services, StringValue, StringValueTrait,
 };
-use crate::epp::xml::{EPP_LANG, EPP_VERSION};
+use crate::epp::xml::{EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION};
 use epp_client_macros::*;
 
 pub type EppHello = EppObject<Hello>;
@@ -44,7 +46,21 @@ pub struct Login {
 }
 
 impl EppLogin {
-    pub fn new(username: &str, password: &str, client_tr_id: &str) -> EppLogin {
+    pub fn new(
+        username: &str,
+        password: &str,
+        ext_uris: &Option<Vec<String>>,
+        client_tr_id: &str,
+    ) -> EppLogin {
+        let ext_uris = match ext_uris {
+            Some(uris) => Some(
+                uris.iter()
+                    .map(|u| u.to_string_value())
+                    .collect::<Vec<StringValue>>(),
+            ),
+            None => None,
+        };
+
         let login = Login {
             username: username.to_string_value(),
             password: password.to_string_value(),
@@ -54,15 +70,11 @@ impl EppLogin {
             },
             services: Services {
                 obj_uris: vec![
-                    "urn:ietf:params:xml:ns:host-1.0".to_string_value(),
-                    "urn:ietf:params:xml:ns:contact-1.0".to_string_value(),
-                    "urn:ietf:params:xml:ns:domain-1.0".to_string_value(),
+                    EPP_HOST_XMLNS.to_string_value(),
+                    EPP_CONTACT_XMLNS.to_string_value(),
+                    EPP_DOMAIN_XMLNS.to_string_value(),
                 ],
-                svc_ext: Some(ServiceExtension {
-                    ext_uris: Some(vec![
-                        "http://schema.ispapi.net/epp/xml/keyvalue-1.0".to_string_value()
-                    ]),
-                }),
+                svc_ext: Some(ServiceExtension { ext_uris: ext_uris }),
             },
         };
 

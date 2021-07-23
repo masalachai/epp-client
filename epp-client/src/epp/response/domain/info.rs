@@ -53,5 +53,5 @@ pub struct DomainInfoData {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainInfoResult {
     #[serde(rename = "infData")]
-    pub check_data: DomainInfoData,
+    pub info_data: DomainInfoData,
 }

@@ -9,8 +9,8 @@ pub type EppContactDelete = EppObject<Command<ContactDelete>>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactDeleteData {
-    pub xmlns: String,
-    pub id: StringValue,
+    xmlns: String,
+    id: StringValue,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]

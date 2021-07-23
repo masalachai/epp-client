@@ -9,9 +9,9 @@ pub type EppDomainRenewResponse = EppObject<CommandResponse<DomainRenewResult>>;
 pub struct DomainRenewData {
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
-    name: StringValue,
+    pub name: StringValue,
     #[serde(rename = "exDate")]
-    expiry_date: StringValue,
+    pub expiry_date: StringValue,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

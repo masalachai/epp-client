@@ -9,7 +9,7 @@ pub type EppContactCheck = EppObject<Command<ContactCheck>>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactList {
-    pub xmlns: String,
+    xmlns: String,
     #[serde(rename = "id")]
     pub contact_ids: Vec<StringValue>,
 }

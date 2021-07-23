@@ -5,7 +5,8 @@ use epp_client::EppClient;
 use epp_client::epp::object::{StringValueTrait};
 use epp_client::{epp::request, epp::xml::EppXml};
 use epp_client::epp::object::data::{
-    PostalInfo, Address, Phone, DomainContact, ContactStatus, DomainStatus, HostObjList, HostAttrList, HostAttr, HostAddr
+    PostalInfo, Address, Phone, DomainContact, ContactStatus, DomainStatus, HostObjList, HostAttrList, HostAttr, HostAddr,
+    Host, HostStatus
 };
 use epp_client::epp::*;
 
@@ -193,6 +194,72 @@ async fn query_transfer(client: &mut EppClient) {
     println!("{}\n\n", transfer_query.serialize().unwrap());
 }
 
+async fn check_hosts(client: &mut EppClient) {
+    let hosts_check = EppHostCheck::new(vec!["host1.eppdev-1.com", "ns1.testing.com"], gen_client_tr_id("eppdev").unwrap().as_str());
+
+    client.transact::<_, EppHostCheckResponse>(&hosts_check).await.unwrap();
+}
+
+async fn create_host(client: &mut EppClient) {
+    let host = Host {
+        name: "host1.eppdev-1.com".to_string_value(),
+        addresses: Some(vec![
+            HostAddr::new("v4", "29.245.122.14"),
+            HostAddr::new("v6", "2400:6180:100:d0::8d6:4001"),
+        ])
+    };
+
+    let host_create = EppHostCreate::new(host, gen_client_tr_id("eppdev").unwrap().as_str());
+
+    // println!("{}", host_create.serialize().unwrap());
+
+    client.transact::<_, EppHostCreateResponse>(&host_create).await.unwrap();
+}
+
+async fn query_host(client: &mut EppClient) {
+    let host_info = EppHostInfo::new("host2.eppdev-1.com", gen_client_tr_id("eppdev").unwrap().as_str());
+
+    // println!("{}", host_info.serialize().unwrap());
+
+    client.transact::<_, EppHostInfoResponse>(&host_info).await.unwrap();
+}
+
+async fn update_host(client: &mut EppClient) {
+    let addr = vec![
+        HostAddr::new("v6", "2400:6180:100:d0::8d6:4001"),
+    ];
+
+    let add = HostAddRemove {
+        addresses: Some(addr),
+        statuses: None,
+    };
+
+    let remove = HostAddRemove {
+        addresses: None,
+        statuses: Some(vec![
+            HostStatus {
+                status: "clientDeleteProhibited".to_string()
+            }
+        ]),
+    };
+
+    let mut host_update = EppHostUpdate::new("host1.eppdev-1.com", gen_client_tr_id("eppdev").unwrap().as_str());
+
+    host_update.add(add);
+    // host_update.remove(remove);
+    host_update.info(HostChangeInfo { name: "host2.eppdev-1.com".to_string_value() });
+
+    // println!("{}", host_update.serialize().unwrap());
+
+    client.transact::<_, EppHostUpdateResponse>(&host_update).await.unwrap();
+}
+
+async fn delete_host(client: &mut EppClient) {
+    let host_delete = EppHostDelete::new("host2.eppdev-1.com", gen_client_tr_id("eppdev").unwrap().as_str());
+
+    client.transact::<_, EppHostDeleteResponse>(&host_delete).await.unwrap();
+}
+
 async fn hello(client: &mut EppClient) {
     let greeting = client.hello().await.unwrap();
 
@@ -227,7 +294,7 @@ async fn main() {
 
     // create_domain(&mut client).await;
 
-    // query_domain(&mut client).await;
+    query_domain(&mut client).await;
 
     // update_domain(&mut client).await;
 
@@ -244,4 +311,14 @@ async fn main() {
     // reject_transfer(&mut client).await;
 
     // cancel_transfer(&mut client).await;
+
+    // check_hosts(&mut client).await;
+
+    // create_host(&mut client).await;
+
+    // query_host(&mut client).await;
+
+    // update_host(&mut client).await;
+
+    // delete_host(&mut client).await;
 }

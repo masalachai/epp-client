@@ -17,6 +17,7 @@ pub struct EppClientConnection {
     port: u16,
     username: String,
     password: String,
+    ext_uris: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -37,6 +38,9 @@ impl EppClientConnection {
     }
     pub fn credentials(&self) -> (String, String) {
         (self.username.to_string(), self.password.to_string())
+    }
+    pub fn ext_uris(&self) -> Option<&Vec<String>> {
+        self.ext_uris.as_ref()
     }
 }
 

@@ -14,19 +14,19 @@ pub type EppDomainTransferQueryResponse = EppObject<CommandResponse<DomainTransf
 pub struct DomainTransferData {
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
-    name: StringValue,
+    pub name: StringValue,
     #[serde(rename = "trStatus")]
-    transfer_status: StringValue,
+    pub transfer_status: StringValue,
     #[serde(rename = "reID")]
-    requester_id: StringValue,
+    pub requester_id: StringValue,
     #[serde(rename = "reDate")]
-    request_date: StringValue,
+    pub request_date: StringValue,
     #[serde(rename = "acID")]
-    responder_id: StringValue,
+    pub responder_id: StringValue,
     #[serde(rename = "acDate")]
-    respond_by_date: StringValue,
+    pub respond_by_date: StringValue,
     #[serde(rename = "exDate")]
-    expiry_date: StringValue,
+    pub expiry_date: StringValue,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
