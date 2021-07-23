@@ -17,7 +17,7 @@ impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject
     }
 
     fn deserialize(epp_xml: &str) -> Result<Self::Output, error::Error> {
-        let mut object: Self::Output = match from_str(epp_xml) {
+        let object: Self::Output = match from_str(epp_xml) {
             Ok(v) => v,
             Err(e) => {
                 return Err(error::Error::EppDeserializationError(

@@ -2,6 +2,63 @@ use crate::epp::object::{StringValue, StringValueTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+pub enum DomainNsList {
+    HostAttrList(HostAttrList),
+    HostObjList(HostObjList),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostAddr {
+    #[serde(rename = "ip")]
+    ip_version: Option<String>,
+    #[serde(rename = "$value")]
+    address: String,
+}
+
+impl HostAddr {
+    pub fn new(ip_version: &str, address: &str) -> HostAddr {
+        HostAddr {
+            ip_version: Some(ip_version.to_string()),
+            address: address.to_string(),
+        }
+    }
+
+    pub fn new_v4(address: &str) -> HostAddr {
+        HostAddr {
+            ip_version: Some("v4".to_string()),
+            address: address.to_string(),
+        }
+    }
+
+    pub fn new_v6(address: &str) -> HostAddr {
+        HostAddr {
+            ip_version: Some("v6".to_string()),
+            address: address.to_string(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostAttr {
+    #[serde(rename = "hostName")]
+    pub name: StringValue,
+    #[serde(rename = "hostAddr")]
+    pub addresses: Option<Vec<HostAddr>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostAttrList {
+    #[serde(rename = "hostAttr")]
+    pub hosts: Vec<HostAttr>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostObjList {
+    #[serde(rename = "hostObj")]
+    pub hosts: Vec<StringValue>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DomainContact {
     #[serde(rename = "$value")]
     pub id: String,
@@ -27,6 +84,12 @@ impl Period {
     pub fn set_unit(&mut self, unit: &str) {
         self.unit = unit.to_string();
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainStatus {
+    #[serde(rename = "s")]
+    pub status: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

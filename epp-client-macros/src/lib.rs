@@ -6,11 +6,11 @@ use quote::quote;
 fn element_name_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let mut elem_name = ast.ident.to_string();
-    let (impl_generics, type_generics, where_clause) = &ast.generics.split_for_impl();
+    let (impl_generics, type_generics, _) = &ast.generics.split_for_impl();
 
     if ast.attrs.len() > 0 {
         let attribute = &ast.attrs[0];
-        let meta = match attribute.parse_meta() {
+        match attribute.parse_meta() {
             Ok(syn::Meta::List(meta)) => {
                 if meta.nested.len() > 0 {
                     elem_name = match &meta.nested[0] {

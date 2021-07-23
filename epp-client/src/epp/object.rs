@@ -30,6 +30,12 @@ impl StringValueTrait for &str {
     }
 }
 
+impl StringValueTrait for String {
+    fn to_string_value(&self) -> StringValue {
+        StringValue(self.to_string())
+    }
+}
+
 pub trait ElementName {
     fn element_name(&self) -> &'static str;
 }

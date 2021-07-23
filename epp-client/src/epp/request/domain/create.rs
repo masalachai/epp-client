@@ -1,7 +1,9 @@
 use epp_client_macros::*;
 
 use crate::epp::command::Command;
-use crate::epp::object::data::{AuthInfo, DomainContact, Period};
+use crate::epp::object::data::{
+    AuthInfo, DomainContact, HostAttr, HostAttrList, HostObjList, Period,
+};
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -9,59 +11,8 @@ use serde::{Deserialize, Serialize};
 pub type EppDomainCreate = EppObject<Command<DomainCreate<HostObjList>>>;
 pub type EppDomainCreateWithHostAttr = EppObject<Command<DomainCreate<HostAttrList>>>;
 
-pub enum HostType {
-    HostObj,
-    HostAttr,
-}
-
-pub trait HostList {
-    fn new(ns: Vec<&str>) -> Self;
-}
-
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HostAttr {
-    #[serde(rename = "hostName")]
-    host_name: StringValue,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct HostAttrList {
-    #[serde(rename = "hostAttr")]
-    hosts: Vec<HostAttr>,
-}
-
-impl HostList for HostAttrList {
-    fn new(ns: Vec<&str>) -> HostAttrList {
-        let ns_list = ns
-            .iter()
-            .map(|n| HostAttr {
-                host_name: n.to_string_value(),
-            })
-            .collect::<Vec<HostAttr>>();
-
-        HostAttrList { hosts: ns_list }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct HostObjList {
-    #[serde(rename = "hostObj")]
-    hosts: Vec<StringValue>,
-}
-
-impl HostList for HostObjList {
-    fn new(ns: Vec<&str>) -> HostObjList {
-        let ns_list = ns
-            .iter()
-            .map(|n| n.to_string_value())
-            .collect::<Vec<StringValue>>();
-
-        HostObjList { hosts: ns_list }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DomainData<T> {
+pub struct DomainCreateData<T> {
     xmlns: String,
     name: StringValue,
     period: Period,
@@ -77,7 +28,7 @@ pub struct DomainData<T> {
 #[element_name(name = "create")]
 pub struct DomainCreate<T> {
     #[serde(rename = "create")]
-    domain: DomainData<T>,
+    domain: DomainCreateData<T>,
 }
 
 impl EppDomainCreate {
@@ -90,13 +41,18 @@ impl EppDomainCreate {
         contacts: Vec<DomainContact>,
         client_tr_id: &str,
     ) -> EppDomainCreate {
+        let ns_list = ns
+            .iter()
+            .map(|n| n.to_string_value())
+            .collect::<Vec<StringValue>>();
+
         EppObject::build(Command::<DomainCreate<HostObjList>> {
             command: DomainCreate {
-                domain: DomainData {
+                domain: DomainCreateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
                     period: Period::new(period),
-                    ns: Some(HostObjList::new(ns)),
+                    ns: Some(HostObjList { hosts: ns_list }),
                     registrant: Some(registrant_id.to_string_value()),
                     auth_info: AuthInfo::new(auth_password),
                     contacts: Some(contacts),
@@ -116,7 +72,7 @@ impl EppDomainCreate {
     ) -> EppDomainCreate {
         EppObject::build(Command::<DomainCreate<HostObjList>> {
             command: DomainCreate {
-                domain: DomainData {
+                domain: DomainCreateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
                     period: Period::new(period),
@@ -138,7 +94,7 @@ impl EppDomainCreate {
     ) -> EppDomainCreate {
         EppObject::build(Command::<DomainCreate<HostObjList>> {
             command: DomainCreate {
-                domain: DomainData {
+                domain: DomainCreateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
                     period: Period::new(period),
@@ -155,7 +111,7 @@ impl EppDomainCreate {
     pub fn new_with_host_attr(
         name: &str,
         period: u16,
-        ns: Vec<&str>,
+        ns: Vec<HostAttr>,
         registrant_id: &str,
         auth_password: &str,
         contacts: Vec<DomainContact>,
@@ -163,11 +119,11 @@ impl EppDomainCreate {
     ) -> EppDomainCreateWithHostAttr {
         EppObject::build(Command::<DomainCreate<HostAttrList>> {
             command: DomainCreate {
-                domain: DomainData {
+                domain: DomainCreateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
                     period: Period::new(period),
-                    ns: Some(HostAttrList::new(ns)),
+                    ns: Some(HostAttrList { hosts: ns }),
                     registrant: Some(registrant_id.to_string_value()),
                     auth_info: AuthInfo::new(auth_password),
                     contacts: Some(contacts),

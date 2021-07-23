@@ -59,12 +59,6 @@ impl EppConnection {
         self.write(&buf).await
     }
 
-    async fn read(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
-        let mut buf = vec![0u8; 4096];
-        self.stream.reader.read(&mut buf).await?;
-        Ok(buf)
-    }
-
     async fn read_epp_response(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut buf = [0u8; 4];
         self.stream.reader.read_exact(&mut buf).await?;

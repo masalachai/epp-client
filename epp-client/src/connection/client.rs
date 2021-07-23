@@ -1,6 +1,8 @@
 use futures::executor::block_on;
 use std::{error::Error, fmt::Debug};
+// use std::time::SystemTime;
 use std::sync::mpsc;
+// use std::sync::Arc;
 
 use crate::config::CONFIG;
 use crate::connection::registry::{epp_connect, EppConnection};
@@ -8,7 +10,6 @@ use crate::error;
 use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout};
 use crate::epp::response::{EppGreeting, EppCommandResponseStatus, EppCommandResponse, EppCommandResponseError};
 use crate::epp::xml::EppXml;
-use crate::epp::object::{ElementName, EppObject};
 
 async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
     let registry_creds = match CONFIG.registry(registry) {
@@ -40,9 +41,27 @@ async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
 pub struct EppClient {
     credentials: (String, String),
     connection: EppConnection,
+    // pub client_tr_id_fn: Arc<dyn Fn(&EppClient) -> String + Send + Sync>,
 }
 
+// fn default_client_tr_id_fn(client: &EppClient) -> String {
+//     let timestamp = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
+//         Ok(time) => time,
+//         Err(e) => panic!("Error in client TRID gen function: {}", e)
+//     };
+//     format!("{}:{}", &client.username(), timestamp.as_secs())
+// }
+
 impl EppClient {
+    pub fn username(&self) -> String {
+        self.credentials.0.to_string()
+    }
+
+    // pub fn set_client_tr_id_fn<F>(&mut self, func: F)
+    // where F: Fn(&EppClient) -> String + Send + Sync + 'static {
+    //     self.client_tr_id_fn = Arc::new(func);
+    // }
+
     pub async fn new(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
         connect(registry).await
     }
@@ -50,13 +69,14 @@ impl EppClient {
     async fn build(connection: EppConnection, credentials: (String, String)) -> Result<EppClient, Box<dyn Error>> {
         let mut client = EppClient {
             connection: connection,
-            credentials: credentials
+            credentials: credentials,
+            // client_tr_id_fn: Arc::new(default_client_tr_id_fn),
         };
 
         let client_tr_id = generate_client_tr_id(&client.credentials.0)?;
         let login_request = EppLogin::new(&client.credentials.0, &client.credentials.1, client_tr_id.as_str());
 
-        client.transact::<EppLogin, EppCommandResponse>(&login_request).await?;
+        client.transact::<_, EppCommandResponse>(&login_request).await?;
 
         Ok(client)
     }
@@ -109,7 +129,7 @@ impl EppClient {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = EppLogout::new(client_tr_id.as_str());
 
-        self.transact::<EppLogout, EppCommandResponse>(&epp_logout).await;
+        self.transact::<_, EppCommandResponse>(&epp_logout).await;
     }
 }
 

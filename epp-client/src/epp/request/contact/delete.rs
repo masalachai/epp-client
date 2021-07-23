@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 pub type EppContactDelete = EppObject<Command<ContactDelete>>;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ContactData {
+pub struct ContactDeleteData {
     pub xmlns: String,
     pub id: StringValue,
 }
@@ -17,14 +17,14 @@ pub struct ContactData {
 #[element_name(name = "delete")]
 pub struct ContactDelete {
     #[serde(rename = "delete")]
-    contact: ContactData,
+    contact: ContactDeleteData,
 }
 
 impl EppContactDelete {
     pub fn new(id: &str, client_tr_id: &str) -> EppContactDelete {
         EppObject::build(Command::<ContactDelete> {
             command: ContactDelete {
-                contact: ContactData {
+                contact: ContactDeleteData {
                     xmlns: EPP_CONTACT_XMLNS.to_string(),
                     id: id.to_string_value(),
                 },

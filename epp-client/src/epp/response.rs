@@ -151,12 +151,6 @@ pub struct ResponseTRID {
     pub server_tr_id: StringValue,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct ErrorResponseTRID {
-    #[serde(rename = "svTRID")]
-    pub server_tr_id: StringValue,
-}
-
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[serde(rename_all = "lowercase")]
 #[element_name(name = "response")]
