@@ -3,6 +3,8 @@ pub mod connection;
 pub mod epp;
 pub mod error;
 
+pub use connection::client::EppClient;
+
 #[cfg(test)]
 mod tests {
     use super::config;

@@ -8,6 +8,7 @@ pub type EppContactInfoResponse = EppObject<CommandResponse<ContactInfoResult>>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactInfoData {
+    #[serde(rename = "xmlns:contact")]
     xmlns: String,
     pub id: StringValue,
     pub roid: StringValue,

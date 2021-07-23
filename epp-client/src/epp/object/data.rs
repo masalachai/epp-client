@@ -2,6 +2,14 @@ use crate::epp::object::{StringValue, StringValueTrait};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct DomainContact {
+    #[serde(rename = "$value")]
+    pub id: String,
+    #[serde(rename = "type")]
+    pub contact_type: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Period {
     unit: String,
     #[serde(rename = "$value")]

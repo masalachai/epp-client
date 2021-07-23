@@ -8,6 +8,7 @@ use crate::error;
 use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout};
 use crate::epp::response::{EppGreeting, EppCommandResponseStatus, EppCommandResponse, EppCommandResponseError};
 use crate::epp::xml::EppXml;
+use crate::epp::object::{ElementName, EppObject};
 
 async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
     let registry_creds = match CONFIG.registry(registry) {

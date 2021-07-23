@@ -1,29 +1,26 @@
-use epp_client::{epp::request::generate_client_tr_id, connection::client::EppClient, connection, epp::xml::EppXml};
-use epp_client::epp::object::StringValueTrait;
-use epp_client::epp::object::data::ContactStatus;
-use epp_client::epp::request::domain::check::EppDomainCheck;
-use epp_client::epp::response::domain::check::EppDomainCheckResponse;
-use epp_client::epp::request::contact::check::EppContactCheck;
-use epp_client::epp::response::contact::check::EppContactCheckResponse;
-use epp_client::epp::object::data::{PostalInfo, Address, Phone};
-use epp_client::epp::request::contact::create::EppContactCreate;
-use epp_client::epp::response::contact::create::EppContactCreateResponse;
-use epp_client::epp::request::contact::info::EppContactInfo;
-use epp_client::epp::response::contact::info::EppContactInfoResponse;
-use epp_client::epp::request::contact::update::EppContactUpdate;
-use epp_client::epp::response::contact::update::EppContactUpdateResponse;
-use epp_client::epp::request::contact::delete::EppContactDelete;
-use epp_client::epp::response::contact::delete::EppContactDeleteResponse;
-use epp_client::epp::request::domain::create::DomainContact;
-use epp_client::epp::request::domain::create::{HostObjList, HostAttrList};
-use epp_client::epp::request::domain::create::EppDomainCreate;
-//use epp_client::epp::response::domain::create::EppDomainCreateResponse;
+use epp_client::EppClient;
+use epp_client::{epp::request::generate_client_tr_id, epp::xml::EppXml};
+use epp_client::epp::object::data::{PostalInfo, Address, Phone, DomainContact, ContactStatus};
+use epp_client::epp::EppDomainCheck;
+use epp_client::epp::EppDomainCheckResponse;
+use epp_client::epp::EppContactCheck;
+use epp_client::epp::EppContactCheckResponse;
+use epp_client::epp::EppContactCreate;
+use epp_client::epp::EppContactCreateResponse;
+use epp_client::epp::EppContactInfo;
+use epp_client::epp::EppContactInfoResponse;
+use epp_client::epp::EppContactUpdate;
+use epp_client::epp::EppContactUpdateResponse;
+use epp_client::epp::EppContactDelete;
+use epp_client::epp::EppContactDeleteResponse;
+use epp_client::epp::EppDomainCreate;
+use epp_client::epp::EppDomainCreateResponse;
 
 async fn check_domains(client: &mut EppClient) {
     let domains = vec!["eppdev.com", "hexonet.net"];
     let domain_check = EppDomainCheck::new(domains, generate_client_tr_id("eppdev").unwrap().as_str());
 
-    client.transact::<EppDomainCheck, EppDomainCheckResponse>(&domain_check).await.unwrap();
+    client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
 }
 
 async fn check_contacts(client: &mut EppClient) {
@@ -42,7 +39,7 @@ async fn create_contact(client: &mut EppClient) {
     let mut fax = Phone::new("+47.86698799");
     fax.set_extension("677");
 
-    let mut contact_create = EppContactCreate::new("eppdev-contact-1", "contact@eppdev.net", postal_info, voice, "eppdev-387323", generate_client_tr_id("eppdev").unwrap().as_str());
+    let mut contact_create = EppContactCreate::new("eppdev-contact-2", "contact@eppdev.net", postal_info, voice, "eppdev-387323", generate_client_tr_id("eppdev").unwrap().as_str());
     contact_create.set_fax(fax);
 
     // println!("xml: {}", contact_create.serialize().unwrap());
@@ -66,7 +63,7 @@ async fn update_contact(client: &mut EppClient) {
 }
 
 async fn query_contact(client: &mut EppClient) {
-    let mut contact_info = EppContactInfo::new("eppdev-contact-1", "eppdev-387323", generate_client_tr_id("eppdev").unwrap().as_str());
+    let mut contact_info = EppContactInfo::new("eppdev-contact-2", "eppdev-387323", generate_client_tr_id("eppdev").unwrap().as_str());
 
     client.transact::<_, EppContactInfoResponse>(&contact_info).await.unwrap();
 }
@@ -77,20 +74,28 @@ async fn delete_contact(client: &mut EppClient) {
     client.transact::<_, EppContactDeleteResponse>(&contact_delete).await.unwrap();
 }
 
-async fn create_domain() {
+async fn create_domain(client: &mut EppClient) {
     let contacts = vec![
         DomainContact {
+            contact_type: "admin".to_string(),
+            id: "eppdev-contact-2".to_string()
+        },
+        DomainContact {
             contact_type: "tech".to_string(),
-            id: "eppdev-contact-1".to_string()
+            id: "eppdev-contact-2".to_string()
         },
         DomainContact {
             contact_type: "billing".to_string(),
-            id: "eppdev-contact-1".to_string()
+            id: "eppdev-contact-2".to_string()
         }
     ];
-    let domain_create = EppDomainCreate::<HostAttrList>::new("eppdev.com", 1, vec!["ns1.test.com", "ns2.test.com"], "eppdev-contact-1", "eppdevauth123", contacts, generate_client_tr_id("eppdev").unwrap().as_str());
+    // let domain_create = EppDomainCreate::new_with_ns("eppdev.com", 1, vec!["ns1.test.com", "ns2.test.com"], "eppdev-contact-1", "eppdevauth123", contacts, generate_client_tr_id("eppdev").unwrap().as_str());
 
-    println!("{}", domain_create.serialize().unwrap());
+    let domain_create = EppDomainCreate::new("eppdev.com", 1, "eppdev-contact-2", "epP4uthd#v", contacts, generate_client_tr_id("eppdev").unwrap().as_str());
+
+    // println!("{}", domain_create.serialize().unwrap());
+
+    client.transact::<_, EppDomainCreateResponse>(&domain_create).await.unwrap();
 }
 
 async fn hello(client: &mut EppClient) {
@@ -101,13 +106,13 @@ async fn hello(client: &mut EppClient) {
 
 #[tokio::main]
 async fn main() {
-    // let mut client = match EppClient::new("hexonet").await {
-    //     Ok(client) => {
-    //         println!("{:?}", client.greeting());
-    //         client
-    //     },
-    //     Err(e) => panic!("Error: {}",  e)
-    // };
+    let mut client = match EppClient::new("hexonet").await {
+        Ok(client) => {
+            println!("{:?}", client.greeting());
+            client
+        },
+        Err(e) => panic!("Error: {}",  e)
+    };
 
     // hello(&mut client).await;
 
@@ -123,5 +128,5 @@ async fn main() {
 
     // delete_contact(&mut client).await;
 
-    // create_domain().await;
+    // create_domain(&mut client).await;
 }
