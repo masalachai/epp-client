@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+	<command>
+		<update>
+			<update xmlns="urn:ietf:params:xml:ns:host-1.0">
+				<name>host1.eppdev-1.com</name>
+				<add>
+					<addr ip="v6">2404:6800:4001:801::200e</addr>
+				</add>
+				<rem>
+					<status s="clientDeleteProhibited"/>
+				</rem>
+				<chg>
+					<name>host2.eppdev-1.com</name>
+				</chg>
+			</update>
+		</update>
+		<clTRID>cltrid:1626454866</clTRID>
+	</command>
+</epp>

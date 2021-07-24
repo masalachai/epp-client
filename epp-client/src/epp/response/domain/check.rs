@@ -15,7 +15,8 @@ pub struct DomainCheck {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainCheckDataItem {
-    pub name: DomainCheck,
+    #[serde(rename = "name")]
+    pub domain: DomainCheck,
     pub reason: Option<StringValue>,
 }
 

@@ -31,7 +31,7 @@ pub struct ContactInfoData {
     #[serde(rename = "trDate")]
     pub transferred_at: Option<StringValue>,
     #[serde(rename = "authInfo")]
-    pub auth_info: AuthInfo,
+    pub auth_info: Option<AuthInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

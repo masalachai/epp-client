@@ -52,7 +52,7 @@ async fn update_contact(client: &mut EppClient) {
 
     let mut contact_update = EppContactUpdate::new("eppdev-contact-1", gen_client_tr_id("eppdev").unwrap().as_str());
     let contact_info_res_data = contact_info_response.data.res_data.unwrap();
-    contact_update.set_info("newemail@eppdev.net", contact_info_res_data.info_data.postal_info, contact_info_res_data.info_data.voice, contact_info_res_data.info_data.auth_info.password.to_string().as_str());
+    contact_update.set_info("newemail@eppdev.net", contact_info_res_data.info_data.postal_info, contact_info_res_data.info_data.voice, "eppdev-387323");
     let add_statuses = vec![ContactStatus { status: "clientTransferProhibited".to_string() }];
     contact_update.remove_statuses(add_statuses);
 
@@ -284,7 +284,7 @@ async fn hello(client: &mut EppClient) {
 
 #[tokio::main]
 async fn main() {
-    let mut client = match EppClient::new("hexonet").await {
+    let mut client = match EppClient::new("verisign").await {
         Ok(client) => {
             println!("{:?}", client.greeting());
             client
@@ -296,7 +296,7 @@ async fn main() {
 
     // hello(&mut client).await;
 
-    // check_domains(&mut client).await;
+    let response = check_domains(&mut client).await;
 
     // check_contacts(&mut client).await;
 

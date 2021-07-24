@@ -13,12 +13,12 @@ pub type EppContactUpdate = EppObject<Command<ContactUpdate>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactChangeInfo {
     #[serde(rename = "postalInfo")]
-    postal_info: PostalInfo,
-    voice: Phone,
+    postal_info: Option<PostalInfo>,
+    voice: Option<Phone>,
     fax: Option<Phone>,
-    email: StringValue,
+    email: Option<StringValue>,
     #[serde(rename = "authInfo")]
-    auth_info: AuthInfo,
+    auth_info: Option<AuthInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -69,10 +69,10 @@ impl EppContactUpdate {
         auth_password: &str,
     ) {
         self.data.command.contact.change_info = Some(ContactChangeInfo {
-            email: email.to_string_value(),
-            postal_info: postal_info,
-            voice: voice,
-            auth_info: AuthInfo::new(auth_password),
+            email: Some(email.to_string_value()),
+            postal_info: Some(postal_info),
+            voice: Some(voice),
+            auth_info: Some(AuthInfo::new(auth_password)),
             fax: None,
         });
     }
@@ -99,11 +99,11 @@ impl EppContactUpdate {
         match contact_info.data.res_data {
             Some(res_data) => {
                 self.data.command.contact.change_info = Some(ContactChangeInfo {
-                    email: res_data.info_data.email.clone(),
-                    postal_info: res_data.info_data.postal_info.clone(),
-                    voice: res_data.info_data.voice.clone(),
+                    email: Some(res_data.info_data.email.clone()),
+                    postal_info: Some(res_data.info_data.postal_info.clone()),
+                    voice: Some(res_data.info_data.voice.clone()),
                     fax: res_data.info_data.fax.clone(),
-                    auth_info: res_data.info_data.auth_info.clone(),
+                    auth_info: None,
                 });
                 Ok(())
             }

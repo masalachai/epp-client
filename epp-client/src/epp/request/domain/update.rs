@@ -11,9 +11,9 @@ pub type EppDomainUpdateWithHostAttr = EppObject<Command<DomainUpdate<HostAttrLi
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainChangeInfo {
-    registrant: StringValue,
+    pub registrant: Option<StringValue>,
     #[serde(rename = "authInfo")]
-    auth_info: AuthInfo,
+    pub auth_info: Option<AuthInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

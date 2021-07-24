@@ -15,8 +15,11 @@ bytes = "1"
 chrono = "0.4"
 confy = "0.4"
 futures = "0.3"
+log = "0.4"
 lazy_static = "1.4"
 quick-xml = { version = "0.22", features = [ "serialize" ] }
+rustls = "0.19"
+rustls-pemfile = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.0", features = [ "full" ] }
 tokio-rustls = "0.22"
@@ -25,3 +28,4 @@ webpki-roots = "0.21"
 
 [dev-dependencies]
 tokio-test = "*"
+regex = "1.5"

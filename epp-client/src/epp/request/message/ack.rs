@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 pub type EppMessageAck = EppObject<Command<MessageAck>>;
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "ack")]
+#[element_name(name = "poll")]
 pub struct MessageAck {
     op: String,
     #[serde(rename = "msgID")]

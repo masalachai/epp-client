@@ -39,7 +39,7 @@ impl EppConnection {
     async fn write(&mut self, buf: &Vec<u8>) -> Result<(), Box<dyn Error>> {
         let wrote = self.stream.writer.write(buf).await?;
 
-        println!("Wrote {} bytes", wrote);
+        debug!("Wrote {} bytes", wrote);
 
         Ok(())
     }
@@ -66,7 +66,7 @@ impl EppConnection {
         let buf_size :usize = u32::from_be_bytes(buf).try_into()?;
 
         let message_size = buf_size - 4;
-        println!("Message buffer size: {}", message_size);
+        debug!("Message buffer size: {}", message_size);
 
         let mut buf = BytesMut::with_capacity(4096);
         let mut read_buf = vec![0u8; 4096];
@@ -75,11 +75,11 @@ impl EppConnection {
 
         loop {
             let read = self.stream.reader.read(&mut read_buf).await?;
-            println!("Read: {} bytes", read);
+            debug!("Read: {} bytes", read);
             buf.extend_from_slice(&read_buf[0..read]);
 
             read_size = read_size + read;
-            println!("Total read: {} bytes", read_size);
+            debug!("Total read: {} bytes", read_size);
 
             if read == 0 {
                 panic!("Unexpected eof")
@@ -108,7 +108,7 @@ impl EppConnection {
     }
 
     async fn close(&mut self) -> Result<(), Box<dyn Error>> {
-        println!("Closing ...");
+        debug!("Closing {} connection", self.registry);
 
         self.stream.writer.shutdown().await?;
         Ok(())
@@ -124,7 +124,7 @@ impl Drop for EppConnection {
 pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<ConnectionStream, error::Error> {
     let (host, port) = registry_creds.connection_details();
 
-    println!("{}: {}", host, port);
+    debug!("Server: {}\r\nPort: {}", host, port);
 
     let addr = (host.as_str(), port)
         .to_socket_addrs()?
@@ -136,6 +136,12 @@ pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<Connect
     config
         .root_store
         .add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
+
+    if let Some(tls) = registry_creds.tls_files() {
+        if let Err(e) = config.set_single_client_cert(tls.0, tls.1) {
+            return Err(format!("Failed to set client TLS credentials: {}", e).into())
+        }
+    }
 
     let connector = TlsConnector::from(Arc::new(config));
     let stream = TcpStream::connect(&addr).await?;

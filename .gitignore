@@ -1,4 +1,6 @@
 /target
 **/target
+**/certs
+/config
 /epp-client/misc
 Cargo.lock

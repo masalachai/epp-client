@@ -1,3 +1,5 @@
+pub mod quick_xml;
+
 use std::{error::Error, fmt::Debug};
 
 use crate::error;

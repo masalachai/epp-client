@@ -100,25 +100,22 @@ impl EppClient {
 
         let response = self.connection.transact(&hello_xml).await?;
 
-        println!("hello response: {}", response);
-
         Ok(EppGreeting::deserialize(&response)?)
     }
 
     pub async fn transact<T: EppXml + Debug, E: EppXml + Debug>(&mut self, request: &T) -> Result<E::Output, error::Error> {
         let epp_xml = request.serialize()?;
 
-        println!("Request:\r\n{}", epp_xml);
+        debug!("request: {}", epp_xml);
 
         let response = self.connection.transact(&epp_xml).await?;
 
-        println!("Response:\r\n{}", response);
+        debug!("response: {}", response);
 
         let status = EppCommandResponseStatus::deserialize(&response)?;
 
         if status.data.result.code < 2000 {
             let response = E::deserialize(&response)?;
-            println!("Response:\r\n{:?}", response);
             Ok(response)
         } else {
             let epp_error = EppCommandResponseError::deserialize(&response)?;
@@ -134,15 +131,15 @@ impl EppClient {
         return String::from(&self.connection.greeting)
     }
 
-    pub fn greeting(&self) -> Result<EppGreeting, Box<dyn Error>> {
-        Ok(EppGreeting::deserialize(&self.connection.greeting)?)
+    pub fn greeting(&self) -> Result<EppGreeting, error::Error> {
+        EppGreeting::deserialize(&self.connection.greeting)
     }
 
-    pub async fn logout(&mut self) {
+    pub async fn logout(&mut self) -> Result<EppCommandResponse, error::Error> {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = EppLogout::new(client_tr_id.as_str());
 
-        self.transact::<_, EppCommandResponse>(&epp_logout).await;
+        self.transact::<_, EppCommandResponse>(&epp_logout).await
     }
 }
 
