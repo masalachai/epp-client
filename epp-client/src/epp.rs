@@ -22,6 +22,7 @@ pub use request::host::create::*;
 pub use request::host::delete::*;
 pub use request::host::info::*;
 pub use request::host::update::*;
+pub use request::message::ack::*;
 pub use request::message::poll::*;
 
 pub use response::contact::check::*;
@@ -41,4 +42,5 @@ pub use response::host::create::*;
 pub use response::host::delete::*;
 pub use response::host::info::*;
 pub use response::host::update::*;
+pub use response::message::ack::*;
 pub use response::message::poll::*;

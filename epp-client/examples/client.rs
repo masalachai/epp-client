@@ -260,6 +260,22 @@ async fn delete_host(client: &mut EppClient) {
     client.transact::<_, EppHostDeleteResponse>(&host_delete).await.unwrap();
 }
 
+async fn poll_message(client: &mut EppClient) {
+    let message_poll = EppMessagePoll::new(gen_client_tr_id("eppdev").unwrap().as_str());
+
+    // println!("{}", message_poll.serialize().unwrap());
+
+    client.transact::<_, EppMessagePollResponse>(&message_poll).await.unwrap();
+}
+
+async fn ack_message(client: &mut EppClient) {
+    let message_ack = EppMessageAck::new(12345, gen_client_tr_id("eppdev").unwrap().as_str());
+
+    println!("{}", message_ack.serialize().unwrap());
+
+    // client.transact::<_, EppMessageAckResponse>(&message_ack).await.unwrap();
+}
+
 async fn hello(client: &mut EppClient) {
     let greeting = client.hello().await.unwrap();
 
@@ -294,7 +310,7 @@ async fn main() {
 
     // create_domain(&mut client).await;
 
-    query_domain(&mut client).await;
+    // query_domain(&mut client).await;
 
     // update_domain(&mut client).await;
 
@@ -321,4 +337,8 @@ async fn main() {
     // update_host(&mut client).await;
 
     // delete_host(&mut client).await;
+
+    // poll_message(&mut client).await;
+
+    // ack_message(&mut client).await;
 }

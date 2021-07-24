@@ -154,10 +154,22 @@ pub struct ResponseTRID {
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
+pub struct MessageQueue {
+    pub count: u32,
+    pub id: String,
+    #[serde(rename = "qDate")]
+    pub date: StringValue,
+    #[serde(rename = "msg")]
+    pub message: StringValue,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[serde(rename_all = "lowercase")]
 #[element_name(name = "response")]
 pub struct CommandResponse<T> {
     pub result: EppResult,
+    #[serde(rename = "msgQ")]
+    pub message_queue: Option<MessageQueue>,
     #[serde(rename = "resData")]
     pub res_data: Option<T>,
     #[serde(rename = "trID")]
