@@ -1,3 +1,54 @@
+//! Config load module
+//!
+//! Loads the configuration and credentials for each registry connection from
+//! the `$XDG_CONFIG_HOME/epp-client/epp-client.toml` file
+//!
+//! ## Usage
+//!
+//! The config is automatically loaded when the module is initialized
+//! and is available through the `epp_client::config::CONFIG` variable
+//!
+//! ## Sample config
+//!
+//! ```toml
+//! [registry.verisign]
+//! host = 'epp.verisign-grs.com'
+//! port = 700
+//! username = 'username'
+//! password = 'password'
+//! # service extensions
+//! ext_uris = []
+//!
+//! [registry.hexonet.tls_files]
+//! # the full client certificate chain in PEM format
+//! cert_chain = '/path/to/certificate/chain/pemfile'
+//! # the RSA private key for your certificate
+//! key = '/path/to/private/key/pemfile'
+//! ```
+//!
+//! ## Example
+//!
+//! ```rust
+//! use epp_client::config::CONFIG;
+//!
+//! fn main() {
+//!     // Get configuration for the relevant registry section
+//!     let registry = CONFIG.registry("verisign").unwrap();
+//!
+//!     // Get EPP host name and port no.
+//!     let remote = registry.connection_details();
+//!
+//!     // Get username and password
+//!     let credentials = registry.credentials();
+//!
+//!     // Get EPP service extensions
+//!     let service_extensions = registry.ext_uris().unwrap();
+//!
+//!     // Get client certificate and private key
+//!     let tls = registry.tls_files().unwrap();
+//! }
+//! ```
+
 use confy;
 use lazy_static::lazy_static;
 use rustls::{Certificate, PrivateKey};

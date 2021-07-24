@@ -1,3 +1,5 @@
+//! Manages registry connections and reading/writing to them
+
 use std::sync::Arc;
 use std::{str, u32};
 use bytes::BytesMut;
@@ -10,11 +12,13 @@ use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::
 use crate::config::{EppClientConnection};
 use crate::error;
 
+/// Socket stream for the connection to the registry
 pub struct ConnectionStream {
     reader: ReadHalf<TlsStream<TcpStream>>,
     writer: WriteHalf<TlsStream<TcpStream>>,
 }
 
+/// EPP Connection struct with some metadata for the connection
 pub struct EppConnection {
     registry: String,
     stream: ConnectionStream,
@@ -22,6 +26,7 @@ pub struct EppConnection {
 }
 
 impl EppConnection {
+    /// Create an EppConnection instance with the stream to the registry
     pub async fn new(
         registry: String,
         mut stream: ConnectionStream) -> Result<EppConnection, Box<dyn Error>> {
@@ -44,7 +49,7 @@ impl EppConnection {
         Ok(())
     }
 
-    pub async fn send_epp_request(&mut self, content: &str) -> Result<(), Box<dyn Error>> {
+    async fn send_epp_request(&mut self, content: &str) -> Result<(), Box<dyn Error>> {
         let len = content.len();
 
         let buf_size = len + 4;
@@ -93,7 +98,7 @@ impl EppConnection {
         Ok(data)
     }
 
-    pub async fn get_epp_response(&mut self) -> Result<String, Box<dyn Error>> {
+    async fn get_epp_response(&mut self) -> Result<String, Box<dyn Error>> {
         let contents = self.read_epp_response().await?;
 
         let response = str::from_utf8(&contents)?.to_string();
@@ -101,6 +106,8 @@ impl EppConnection {
         Ok(response)
     }
 
+    /// Send an EPP XML request to the registry and return the response
+    /// receieved to the request
     pub async fn transact(&mut self, content: &str) -> Result<String, Box<dyn Error>> {
         self.send_epp_request(&content).await?;
 
@@ -121,6 +128,8 @@ impl Drop for EppConnection {
     }
 }
 
+/// Establish a TLS connection to a registry and return a ConnectionStream instance containing the
+/// socket stream to read/write to the connection
 pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<ConnectionStream, error::Error> {
     let (host, port) = registry_creds.connection_details();
 
