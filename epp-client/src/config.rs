@@ -59,18 +59,21 @@ use std::default;
 use std::{fs, io};
 
 lazy_static! {
+    /// Static reference to the config file
     pub static ref CONFIG: EppClientConfig = match confy::load("epp-client") {
         Ok(cfg) => cfg,
         Err(e) => panic!("Config read error: {}", e),
     };
 }
 
+/// Paths to the client certificate and client key PEM files
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientTlsFiles {
     cert_chain: String,
     key: String,
 }
 
+/// Connection details to connect to and authenticate with a registry
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientConnection {
     host: String,
@@ -81,6 +84,7 @@ pub struct EppClientConnection {
     tls_files: Option<EppClientTlsFiles>,
 }
 
+/// Config that stores settings for multiple registries
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientConfig {
     pub registry: HashMap<String, EppClientConnection>,
@@ -100,7 +104,7 @@ impl default::Default for EppClientConfig {
                 key: "/path/to/private/key/pemfile".to_string(),
             }),
         };
-        registries.insert("hexonet".to_string(), registrar);
+        registries.insert("verisign".to_string(), registrar);
         Self {
             registry: registries,
         }
@@ -108,15 +112,19 @@ impl default::Default for EppClientConfig {
 }
 
 impl EppClientConnection {
+    /// Returns the EPP host and port no as a tuple
     pub fn connection_details(&self) -> (String, u16) {
         (self.host.to_string(), self.port)
     }
+    /// Returns the EPP username and password as a tuple
     pub fn credentials(&self) -> (String, String) {
         (self.username.to_string(), self.password.to_string())
     }
+    /// Returns the service extension URIs to be set in the connection to the registry
     pub fn ext_uris(&self) -> Option<&Vec<String>> {
         self.ext_uris.as_ref()
     }
+    /// Returns the parsed client certificate and private key for client TLS auth
     pub fn tls_files(&self) -> Option<(Vec<Certificate>, PrivateKey)> {
         let certificates = self.client_certificate();
         let key = self.key();
@@ -127,6 +135,7 @@ impl EppClientConnection {
             Some((certificates.unwrap(), key.unwrap()))
         }
     }
+    /// Parses the client certificate chain
     fn client_certificate(&self) -> Option<Vec<Certificate>> {
         match &self.tls_files {
             Some(tls) => Some(
@@ -141,6 +150,7 @@ impl EppClientConnection {
             None => None,
         }
     }
+    /// Parses the client RSA private key
     fn key(&self) -> Option<PrivateKey> {
         match &self.tls_files {
             Some(tls) => Some(rustls::PrivateKey(
@@ -156,6 +166,7 @@ impl EppClientConnection {
 }
 
 impl EppClientConfig {
+    /// Returns the config for a particular registry
     pub fn registry(&self, registry: &str) -> Option<&EppClientConnection> {
         self.registry.get(registry)
     }
