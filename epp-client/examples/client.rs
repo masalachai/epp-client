@@ -1,5 +1,6 @@
 use std::{error::Error, time::SystemTime};
 use chrono::NaiveDate;
+use env_logger;
 
 use epp_client::EppClient;
 use epp_client::epp::object::{StringValueTrait};
@@ -41,8 +42,6 @@ async fn create_contact(client: &mut EppClient) {
     let mut contact_create = EppContactCreate::new("eppdev-contact-3", "contact@eppdev.net", postal_info, voice, "eppdev-387323", gen_client_tr_id("eppdev").unwrap().as_str());
     contact_create.set_fax(fax);
 
-    // println!("xml: {}", contact_create.serialize().unwrap());
-
     client.transact::<_, EppContactCreateResponse>(&contact_create).await.unwrap();
 }
 
@@ -55,8 +54,6 @@ async fn update_contact(client: &mut EppClient) {
     contact_update.set_info("newemail@eppdev.net", contact_info_res_data.info_data.postal_info, contact_info_res_data.info_data.voice, "eppdev-387323");
     let add_statuses = vec![ContactStatus { status: "clientTransferProhibited".to_string() }];
     contact_update.remove_statuses(add_statuses);
-
-    // println!("{}", contact_update.serialize().unwrap());
 
     client.transact::<_, EppContactUpdateResponse>(&contact_update).await.unwrap();
 }
@@ -91,8 +88,6 @@ async fn create_domain(client: &mut EppClient) {
     // let domain_create = EppDomainCreate::new_with_ns("eppdev.com", 1, vec!["ns1.test.com", "ns2.test.com"], "eppdev-contact-1", "eppdevauth123", contacts, gen_client_tr_id("eppdev").unwrap().as_str());
 
     let domain_create = EppDomainCreate::new("eppdev-1.com", 1, "eppdev-contact-2", "epP4uthd#v", contacts, gen_client_tr_id("eppdev").unwrap().as_str());
-
-    // println!("{}", domain_create.serialize().unwrap());
 
     client.transact::<_, EppDomainCreateResponse>(&domain_create).await.unwrap();
 }
@@ -144,8 +139,6 @@ async fn update_domain(client: &mut EppClient) {
 
     domain_update.add(add);
     domain_update.remove(remove);
-
-    // println!("{}", domain_update.serialize().unwrap());
 
     client.transact::<_, EppDomainUpdateResponse>(&domain_update).await.unwrap();
 }
@@ -211,15 +204,11 @@ async fn create_host(client: &mut EppClient) {
 
     let host_create = EppHostCreate::new(host, gen_client_tr_id("eppdev").unwrap().as_str());
 
-    // println!("{}", host_create.serialize().unwrap());
-
     client.transact::<_, EppHostCreateResponse>(&host_create).await.unwrap();
 }
 
 async fn query_host(client: &mut EppClient) {
     let host_info = EppHostInfo::new("host2.eppdev-1.com", gen_client_tr_id("eppdev").unwrap().as_str());
-
-    // println!("{}", host_info.serialize().unwrap());
 
     client.transact::<_, EppHostInfoResponse>(&host_info).await.unwrap();
 }
@@ -249,8 +238,6 @@ async fn update_host(client: &mut EppClient) {
     // host_update.remove(remove);
     host_update.info(HostChangeInfo { name: "host2.eppdev-1.com".to_string_value() });
 
-    // println!("{}", host_update.serialize().unwrap());
-
     client.transact::<_, EppHostUpdateResponse>(&host_update).await.unwrap();
 }
 
@@ -262,8 +249,6 @@ async fn delete_host(client: &mut EppClient) {
 
 async fn poll_message(client: &mut EppClient) {
     let message_poll = EppMessagePoll::new(gen_client_tr_id("eppdev").unwrap().as_str());
-
-    // println!("{}", message_poll.serialize().unwrap());
 
     client.transact::<_, EppMessagePollResponse>(&message_poll).await.unwrap();
 }
@@ -284,11 +269,10 @@ async fn hello(client: &mut EppClient) {
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+
     let mut client = match EppClient::new("verisign").await {
-        Ok(client) => {
-            println!("{:?}", client.greeting());
-            client
-        },
+        Ok(client) => client,
         Err(e) => panic!("Error: {}",  e)
     };
 
@@ -296,7 +280,7 @@ async fn main() {
 
     // hello(&mut client).await;
 
-    let response = check_domains(&mut client).await;
+    check_domains(&mut client).await;
 
     // check_contacts(&mut client).await;
 

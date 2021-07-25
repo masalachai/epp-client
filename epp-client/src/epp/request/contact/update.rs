@@ -1,15 +1,19 @@
+//! Types for EPP contact create request
+
 use epp_client_macros::*;
 
-use crate::epp::command::Command;
 use crate::epp::object::data::{AuthInfo, ContactStatus, Phone, PostalInfo};
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::request::Command;
 use crate::epp::response::contact::info::EppContactInfoResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use crate::error;
 use serde::{Deserialize, Serialize};
 
+/// Type that represents the <epp> request for contact <update> command
 pub type EppContactUpdate = EppObject<Command<ContactUpdate>>;
 
+/// Type for elements under the <chg> tag for contact update request
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactChangeInfo {
     #[serde(rename = "postalInfo")]
@@ -21,11 +25,13 @@ pub struct ContactChangeInfo {
     auth_info: Option<AuthInfo>,
 }
 
+/// Type for list of elements of the <status> tag for contact update request
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StatusList {
     status: Vec<ContactStatus>,
 }
 
+/// Type for elements under the contact <update> tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactUpdateData {
     xmlns: String,
@@ -40,12 +46,15 @@ pub struct ContactUpdateData {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "update")]
+/// Type for EPP XML <update> command for contacts
 pub struct ContactUpdate {
+    /// The data under the <update> tag for the contact update
     #[serde(rename = "update")]
     contact: ContactUpdateData,
 }
 
 impl EppContactUpdate {
+    /// Creates a new EppObject for contact update corresponding to the <epp> tag in EPP XML
     pub fn new(id: &str, client_tr_id: &str) -> EppContactUpdate {
         EppObject::build(Command::<ContactUpdate> {
             command: ContactUpdate {
@@ -61,6 +70,7 @@ impl EppContactUpdate {
         })
     }
 
+    /// Sets the data for the <chg> tag for the contact update request
     pub fn set_info(
         &mut self,
         email: &str,
@@ -77,6 +87,7 @@ impl EppContactUpdate {
         });
     }
 
+    /// Sets the data for the <fax> tag under <chg> for the contact update request
     pub fn set_fax(&mut self, fax: Phone) {
         match &mut self.data.command.contact.change_info {
             Some(ref mut info) => info.fax = Some(fax),
@@ -84,14 +95,17 @@ impl EppContactUpdate {
         }
     }
 
+    /// Sets the data for the <add> tag for the contact update request
     pub fn add_statuses(&mut self, statuses: Vec<ContactStatus>) {
         self.data.command.contact.add_statuses = Some(StatusList { status: statuses });
     }
 
+    /// Sets the data for the <rem> tag for the contact update request
     pub fn remove_statuses(&mut self, statuses: Vec<ContactStatus>) {
         self.data.command.contact.remove_statuses = Some(StatusList { status: statuses });
     }
 
+    /// Loads data into the <chg> tag from an existing EppContactInfoResponse object
     pub fn load_from_epp_contact_info(
         &mut self,
         contact_info: EppContactInfoResponse,

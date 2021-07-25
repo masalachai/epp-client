@@ -5,6 +5,7 @@
 //! ```rust
 //! use epp_client::EppClient;
 //! use epp_client::epp::{EppDomainCheck, EppDomainCheckResponse};
+//! use epp_client::epp::generate_client_tr_id;
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -20,7 +21,7 @@
 //!     println!("{:?}", greeting);
 //!
 //!     // Execute an EPP Command against the registry with distinct request and response objects
-//!     let domain_check = EppDomainCheck::new(vec!["eppdev.com", "eppdev.net"], "client-trid-12345");
+//!     let domain_check = EppDomainCheck::new(vec!["eppdev.com", "eppdev.net"], generate_client_tr_id(&client).as_str());
 //!     let response = client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
 //!     println!("{:?}", response);
 //! }
@@ -28,7 +29,7 @@
 
 use futures::executor::block_on;
 use std::{error::Error, fmt::Debug};
-// use std::time::SystemTime;
+use std::time::SystemTime;
 use std::sync::mpsc;
 // use std::sync::Arc;
 
@@ -39,6 +40,7 @@ use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout};
 use crate::epp::response::{EppGreeting, EppCommandResponseStatus, EppCommandResponse, EppCommandResponseError};
 use crate::epp::xml::EppXml;
 
+/// Connects to the registry and returns an logged-in instance of EppClient for further transactions
 async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
     let registry_creds = match CONFIG.registry(registry) {
         Some(creds) => creds,
@@ -78,9 +80,8 @@ async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
 }
 
 /// Instances of the EppClient type are used to transact with the registry
-/// An instance is first created, then various EPP request and response object
-/// types are converted to EPP XML to be sent to the registry and the responses
-/// from the registry are converted to local types
+/// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
+/// to the registry and deserialize the XML responses from the registry to local types
 pub struct EppClient {
     credentials: (String, String),
     ext_uris: Option<Vec<String>>,
@@ -88,13 +89,15 @@ pub struct EppClient {
     // pub client_tr_id_fn: Arc<dyn Fn(&EppClient) -> String + Send + Sync>,
 }
 
-// fn default_client_tr_id_fn(client: &EppClient) -> String {
-//     let timestamp = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
-//         Ok(time) => time,
-//         Err(e) => panic!("Error in client TRID gen function: {}", e)
-//     };
-//     format!("{}:{}", &client.username(), timestamp.as_secs())
-// }
+/// A function to generate a simple client TRID. Should only be used for testing, library users
+/// should generate a client TRID according to their own requirements
+pub fn default_client_tr_id_fn(client: &EppClient) -> String {
+    let timestamp = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
+        Ok(time) => time,
+        Err(e) => panic!("Error in client TRID gen function: {}", e)
+    };
+    format!("{}:{}", &client.username(), timestamp.as_secs())
+}
 
 impl EppClient {
     /// Fetches the username used in the registry connection
@@ -113,6 +116,7 @@ impl EppClient {
         connect(registry).await
     }
 
+    /// Makes a login request to the registry and initializes an EppClient instance with it
     async fn build(connection: EppConnection, credentials: (String, String), ext_uris: Option<Vec<String>>) -> Result<EppClient, Box<dyn Error>> {
         let mut client = EppClient {
             connection: connection,
@@ -144,11 +148,7 @@ impl EppClient {
     pub async fn transact<T: EppXml + Debug, E: EppXml + Debug>(&mut self, request: &T) -> Result<E::Output, error::Error> {
         let epp_xml = request.serialize()?;
 
-        debug!("request: {}", epp_xml);
-
         let response = self.connection.transact(&epp_xml).await?;
-
-        debug!("response: {}", response);
 
         let status = EppCommandResponseStatus::deserialize(&response)?;
 
@@ -167,17 +167,17 @@ impl EppClient {
         self.connection.transact(&xml).await
     }
 
-    /// Return the greeting received on establishment of the connection in raw xml form
+    /// Returns the greeting received on establishment of the connection in raw xml form
     pub fn xml_greeting(&self) -> String {
         return String::from(&self.connection.greeting)
     }
 
-    /// Return the greeting received on establishment of the connection as an `EppGreeting` instance
+    /// Returns the greeting received on establishment of the connection as an `EppGreeting` instance
     pub fn greeting(&self) -> Result<EppGreeting, error::Error> {
         EppGreeting::deserialize(&self.connection.greeting)
     }
 
-    /// Send the EPP Logout command to log out of the EPP session
+    /// Sends the EPP Logout command to log out of the EPP session
     pub async fn logout(&mut self) -> Result<EppCommandResponse, error::Error> {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = EppLogout::new(client_tr_id.as_str());

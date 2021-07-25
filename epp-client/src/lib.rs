@@ -59,6 +59,7 @@
 //! ```rust
 //! use epp_client::EppClient;
 //! use epp_client::epp::{EppDomainCheck, EppDomainCheckResponse};
+//! use epp_client::epp::generate_client_tr_id;
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -71,7 +72,7 @@
 //!
 //!     // Make a domain check call, which returns an object of type EppDomainCheckResponse
 //!     // that contains the result of the call
-//!     let domain_check = EppDomainCheck::new(vec!["eppdev.com", "eppdev.net"], "client-trid-12345");
+//!     let domain_check = EppDomainCheck::new(vec!["eppdev.com", "eppdev.net"], generate_client_tr_id(&client).as_str());
 //!
 //!     let response = client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
 //!
@@ -84,6 +85,7 @@
 
 #[macro_use]
 extern crate log;
+extern crate epp_client_macros;
 
 pub mod config;
 pub mod connection;

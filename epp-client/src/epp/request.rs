@@ -3,11 +3,10 @@ pub mod domain;
 pub mod host;
 pub mod message;
 
-use serde::{Deserialize, Serialize};
+use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
 
-use crate::epp::command::Command;
 use crate::epp::object::{
     ElementName, EppObject, Options, ServiceExtension, Services, StringValue, StringValueTrait,
 };
@@ -17,6 +16,27 @@ use epp_client_macros::*;
 pub type EppHello = EppObject<Hello>;
 pub type EppLogin = EppObject<Command<Login>>;
 pub type EppLogout = EppObject<Command<Logout>>;
+
+#[derive(Deserialize, Debug, PartialEq, ElementName)]
+#[element_name(name = "command")]
+pub struct Command<T: ElementName> {
+    pub command: T,
+    #[serde(rename = "clTRID")]
+    pub client_tr_id: StringValue,
+}
+
+impl<T: ElementName + Serialize> Serialize for Command<T> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let command_name = self.command.element_name();
+        let mut state = serializer.serialize_struct("command", 2)?;
+        state.serialize_field(command_name, &self.command)?;
+        state.serialize_field("clTRID", &self.client_tr_id)?;
+        state.end()
+    }
+}
 
 pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
     let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
