@@ -22,6 +22,10 @@ pub struct DomainCheckDataItem {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainCheckData {
+    #[serde(rename = "xmlns:domain")]
+    xmlns: String,
+    #[serde(rename = "xsi:schemaLocation")]
+    schema_location: String,
     #[serde(rename = "cd")]
     pub domain_list: Vec<DomainCheckDataItem>,
 }

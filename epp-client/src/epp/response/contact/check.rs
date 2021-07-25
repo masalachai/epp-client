@@ -15,7 +15,8 @@ pub struct ContactCheck {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactCheckDataItem {
-    pub id: ContactCheck,
+    #[serde(rename = "id")]
+    pub contact: ContactCheck,
     pub reason: Option<StringValue>,
 }
 
@@ -23,6 +24,8 @@ pub struct ContactCheckDataItem {
 pub struct ContactCheckData {
     #[serde(rename = "xmlns:contact")]
     xmlns: String,
+    #[serde(rename = "xsi:schemaLocation")]
+    schema_location: String,
     #[serde(rename = "cd")]
     pub contact_list: Vec<ContactCheckDataItem>,
 }

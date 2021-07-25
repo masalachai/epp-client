@@ -11,10 +11,10 @@ use crate::epp::object::{
 };
 
 pub type EppGreeting = EppObject<Greeting>;
-pub type EppCommandResponseStatus = EppObject<CommandResponseStatus>;
-type CommandResponseError = CommandResponseStatus;
-pub type EppCommandResponseError = EppObject<CommandResponseError>;
-pub type EppCommandResponse = EppObject<CommandResponse<String>>;
+pub type EppCommandResponse = EppObject<CommandResponseStatus>;
+pub type EppCommandResponseError = EppCommandResponse;
+pub type EppLoginResponse = EppCommandResponse;
+pub type EppLogoutResponse = EppCommandResponse;
 
 #[derive(Serialize, Debug, PartialEq)]
 pub struct ServiceMenu {
@@ -182,4 +182,13 @@ pub struct CommandResponseStatus {
     pub result: EppResult,
     #[serde(rename = "trID")]
     pub tr_ids: ResponseTRID,
+}
+
+impl<T> CommandResponse<T> {
+    pub fn results(&self) -> Option<&T> {
+        match &self.res_data {
+            Some(res_data) => Some(&res_data),
+            None => None,
+        }
+    }
 }

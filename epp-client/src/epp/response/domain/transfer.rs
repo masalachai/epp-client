@@ -14,6 +14,8 @@ pub type EppDomainTransferQueryResponse = EppObject<CommandResponse<DomainTransf
 pub struct DomainTransferData {
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
+    #[serde(rename = "xsi:schemaLocation")]
+    schema_location: String,
     pub name: StringValue,
     #[serde(rename = "trStatus")]
     pub transfer_status: StringValue,

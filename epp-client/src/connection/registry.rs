@@ -32,7 +32,9 @@ impl EppConnection {
         mut stream: ConnectionStream) -> Result<EppConnection, Box<dyn Error>> {
         let mut buf = vec![0u8; 4096];
         stream.reader.read(&mut buf).await?;
-        let greeting = str::from_utf8(&buf)?.to_string();
+        let greeting = str::from_utf8(&buf[4..])?.to_string();
+
+        debug!("{}: greeting: {}", registry, greeting);
 
         Ok(EppConnection {
             registry: registry,
@@ -113,7 +115,7 @@ impl EppConnection {
         self.send_epp_request(&content).await?;
 
         let response = self.get_epp_response().await?;
-        debug!("{}: request: {}", self.registry, response);
+        debug!("{}: response: {}", self.registry, response);
 
         Ok(response)
     }

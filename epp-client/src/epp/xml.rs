@@ -13,6 +13,9 @@ pub const EPP_DOMAIN_XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
 pub const EPP_CONTACT_XMLNS: &str = "urn:ietf:params:xml:ns:contact-1.0";
 pub const EPP_HOST_XMLNS: &str = "urn:ietf:params:xml:ns:host-1.0";
 
+pub const EPP_CONTACT_SCHEMA_LOCATION: &str = "urn:ietf:params:xml:ns:contact-1.0 contact-1.0.xsd";
+pub const EPP_DOMAIN_SCHEMA_LOCATION: &str = "urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd";
+
 pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
 

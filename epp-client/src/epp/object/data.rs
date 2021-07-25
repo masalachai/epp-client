@@ -139,25 +139,25 @@ pub struct Phone {
     pub number: String,
     /// The value of the 'x' attr on <voice> and <fax> tags
     #[serde(rename = "x")]
-    extension: Option<String>,
+    pub extension: Option<String>,
 }
 
 /// The <addr> type on contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Address {
     /// The <street> tags under <addr>
-    street: Vec<StringValue>,
+    pub street: Vec<StringValue>,
     /// The <city> tag under <addr>
-    city: StringValue,
+    pub city: StringValue,
     /// The <sp> tag under <addr>
     #[serde(rename = "sp")]
-    province: StringValue,
+    pub province: StringValue,
     /// The <pc> tag under <addr>
     #[serde(rename = "pc")]
-    postal_code: StringValue,
+    pub postal_code: StringValue,
     /// The <cc> tag under <addr>
     #[serde(rename = "cc")]
-    country_code: StringValue,
+    pub country_code: StringValue,
 }
 
 /// The <postalInfo> type on contact transactions
@@ -165,15 +165,15 @@ pub struct Address {
 pub struct PostalInfo {
     /// The 'type' attr on <postalInfo>
     #[serde(rename = "type")]
-    info_type: String,
+    pub info_type: String,
     /// The <name> tag under <postalInfo>
-    name: StringValue,
+    pub name: StringValue,
     /// The <org> tag under <postalInfo>
     #[serde(rename = "org")]
-    organization: StringValue,
+    pub organization: StringValue,
     /// The <addr> tag under <postalInfo>
     #[serde(rename = "addr")]
-    address: Address,
+    pub address: Address,
 }
 
 /// The <authInfo> tag for domain and contact transactions

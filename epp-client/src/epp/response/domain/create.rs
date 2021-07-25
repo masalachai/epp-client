@@ -9,6 +9,8 @@ pub type EppDomainCreateResponse = EppObject<CommandResponse<DomainCreateResult>
 pub struct DomainCreateData {
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
+    #[serde(rename = "xsi:schemaLocation")]
+    schema_location: String,
     pub name: StringValue,
     #[serde(rename = "crDate")]
     pub created_at: StringValue,

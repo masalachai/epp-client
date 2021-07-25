@@ -10,9 +10,12 @@ pub type EppContactInfoResponse = EppObject<CommandResponse<ContactInfoResult>>;
 pub struct ContactInfoData {
     #[serde(rename = "xmlns:contact")]
     xmlns: String,
+    #[serde(rename = "xsi:schemaLocation")]
+    schema_location: String,
     pub id: StringValue,
     pub roid: StringValue,
-    pub status: Vec<ContactStatus>,
+    #[serde(rename = "status")]
+    pub statuses: Vec<ContactStatus>,
     #[serde(rename = "postalInfo")]
     pub postal_info: PostalInfo,
     pub voice: Phone,

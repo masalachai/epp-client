@@ -9,6 +9,8 @@ pub type EppContactCreateResponse = EppObject<CommandResponse<ContactCreateResul
 pub struct ContactCreateData {
     #[serde(rename = "xmlns:contact")]
     xmlns: String,
+    #[serde(rename = "xsi:schemaLocation")]
+    schema_location: String,
     pub id: StringValue,
     #[serde(rename = "crDate")]
     pub created_at: StringValue,
@@ -17,5 +19,5 @@ pub struct ContactCreateData {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactCreateResult {
     #[serde(rename = "creData")]
-    pub check_data: ContactCreateData,
+    pub create_data: ContactCreateData,
 }

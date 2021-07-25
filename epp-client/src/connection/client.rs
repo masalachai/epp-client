@@ -37,7 +37,7 @@ use crate::config::CONFIG;
 use crate::connection::registry::{epp_connect, EppConnection};
 use crate::error;
 use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout};
-use crate::epp::response::{EppGreeting, EppCommandResponseStatus, EppCommandResponse, EppCommandResponseError};
+use crate::epp::response::{EppGreeting, EppCommandResponse, EppLoginResponse, EppLogoutResponse, EppCommandResponseError};
 use crate::epp::xml::EppXml;
 
 /// Connects to the registry and returns an logged-in instance of EppClient for further transactions
@@ -128,7 +128,7 @@ impl EppClient {
         let client_tr_id = generate_client_tr_id(&client.credentials.0)?;
         let login_request = EppLogin::new(&client.credentials.0, &client.credentials.1, &client.ext_uris, client_tr_id.as_str());
 
-        client.transact::<_, EppCommandResponse>(&login_request).await?;
+        client.transact::<_, EppLoginResponse>(&login_request).await?;
 
         Ok(client)
     }
@@ -150,7 +150,7 @@ impl EppClient {
 
         let response = self.connection.transact(&epp_xml).await?;
 
-        let status = EppCommandResponseStatus::deserialize(&response)?;
+        let status = EppCommandResponse::deserialize(&response)?;
 
         if status.data.result.code < 2000 {
             let response = E::deserialize(&response)?;
@@ -178,11 +178,11 @@ impl EppClient {
     }
 
     /// Sends the EPP Logout command to log out of the EPP session
-    pub async fn logout(&mut self) -> Result<EppCommandResponse, error::Error> {
+    pub async fn logout(&mut self) -> Result<EppLogoutResponse, error::Error> {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = EppLogout::new(client_tr_id.as_str());
 
-        self.transact::<_, EppCommandResponse>(&epp_logout).await
+        self.transact::<_, EppLogoutResponse>(&epp_logout).await
     }
 }
 

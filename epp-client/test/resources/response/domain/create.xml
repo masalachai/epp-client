@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+	<response>
+		<result code="1000">
+			<msg>Command completed successfully</msg>
+			<extValue>
+				<value xmlns:epp="urn:ietf:params:xml:ns:epp-1.0">
+					<epp:undef/>
+				</value>
+				<reason>200 Command completed successfully</reason>
+			</extValue>
+		</result>
+		<resData>
+			<domain:creData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
+				<domain:name>eppdev-2.com</domain:name>
+				<domain:crDate>2021-07-25T18:11:35.0Z</domain:crDate>
+				<domain:exDate>2022-07-25T18:11:34.0Z</domain:exDate>
+			</domain:creData>
+		</resData>
+		<trID>
+			<clTRID>cltrid:1626454866</clTRID>
+			<svTRID>RO-6879-1627224678242975</svTRID>
+		</trID>
+	</response>
+</epp>

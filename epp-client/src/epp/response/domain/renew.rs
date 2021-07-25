@@ -9,6 +9,8 @@ pub type EppDomainRenewResponse = EppObject<CommandResponse<DomainRenewResult>>;
 pub struct DomainRenewData {
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
+    #[serde(rename = "xsi:schemaLocation")]
+    schema_location: String,
     pub name: StringValue,
     #[serde(rename = "exDate")]
     pub expiry_date: StringValue,

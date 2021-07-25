@@ -39,7 +39,7 @@ async fn create_contact(client: &mut EppClient) {
     let mut fax = Phone::new("+47.86698799");
     fax.set_extension("677");
 
-    let mut contact_create = EppContactCreate::new("eppdev-contact-3", "contact@eppdev.net", postal_info, voice, "eppdev-387323", gen_client_tr_id("eppdev").unwrap().as_str());
+    let mut contact_create = EppContactCreate::new("eppdev-contact-4", "contact@eppdev.net", postal_info, voice, "eppdev-387323", gen_client_tr_id("eppdev").unwrap().as_str());
     contact_create.set_fax(fax);
 
     client.transact::<_, EppContactCreateResponse>(&contact_create).await.unwrap();
@@ -59,13 +59,13 @@ async fn update_contact(client: &mut EppClient) {
 }
 
 async fn query_contact(client: &mut EppClient) {
-    let mut contact_info = EppContactInfo::new("eppdev-contact-2", "eppdev-387323", gen_client_tr_id("eppdev").unwrap().as_str());
+    let mut contact_info = EppContactInfo::new("eppdev-contact-11", "eppdev-387323", gen_client_tr_id("eppdev").unwrap().as_str());
 
     client.transact::<_, EppContactInfoResponse>(&contact_info).await.unwrap();
 }
 
 async fn delete_contact(client: &mut EppClient) {
-    let contact_delete = EppContactDelete::new("eppdev-contact-1", gen_client_tr_id("eppdev").unwrap().as_str());
+    let contact_delete = EppContactDelete::new("eppdev-contact-4", gen_client_tr_id("eppdev").unwrap().as_str());
 
     client.transact::<_, EppContactDeleteResponse>(&contact_delete).await.unwrap();
 }
@@ -87,7 +87,7 @@ async fn create_domain(client: &mut EppClient) {
     ];
     // let domain_create = EppDomainCreate::new_with_ns("eppdev.com", 1, vec!["ns1.test.com", "ns2.test.com"], "eppdev-contact-1", "eppdevauth123", contacts, gen_client_tr_id("eppdev").unwrap().as_str());
 
-    let domain_create = EppDomainCreate::new("eppdev-1.com", 1, "eppdev-contact-2", "epP4uthd#v", contacts, gen_client_tr_id("eppdev").unwrap().as_str());
+    let domain_create = EppDomainCreate::new("eppdev-2.com", 1, "eppdev-contact-2", "epP4uthd#v", contacts, gen_client_tr_id("eppdev").unwrap().as_str());
 
     client.transact::<_, EppDomainCreateResponse>(&domain_create).await.unwrap();
 }
@@ -144,7 +144,7 @@ async fn update_domain(client: &mut EppClient) {
 }
 
 async fn delete_domain(client: &mut EppClient) {
-    let domain_delete = EppDomainDelete::new("eppdev.com", gen_client_tr_id("eppdev").unwrap().as_str());
+    let domain_delete = EppDomainDelete::new("eppdev-2.com", gen_client_tr_id("eppdev").unwrap().as_str());
 
     client.transact::<_, EppDomainDeleteResponse>(&domain_delete).await.unwrap();
 }
@@ -280,7 +280,7 @@ async fn main() {
 
     // hello(&mut client).await;
 
-    check_domains(&mut client).await;
+    // check_domains(&mut client).await;
 
     // check_contacts(&mut client).await;
 
@@ -298,7 +298,7 @@ async fn main() {
 
     // update_domain(&mut client).await;
 
-    // delete_domain(&mut client).await;
+    delete_domain(&mut client).await;
 
     // renew_domain(&mut client).await;
 

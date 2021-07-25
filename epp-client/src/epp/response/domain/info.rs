@@ -24,6 +24,8 @@ pub struct DomainCheckDataItem {
 pub struct DomainInfoData {
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
+    #[serde(rename = "xsi:schemaLocation")]
+    schema_location: String,
     pub name: StringValue,
     pub roid: StringValue,
     pub status: Vec<DomainStatus>,
