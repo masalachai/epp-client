@@ -1,6 +1,6 @@
 [package]
 name = "epp-client"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2018"
 license = "MIT"
 authors = ["Ritesh Chitlangi <ritesh@ayravat.com>"]
