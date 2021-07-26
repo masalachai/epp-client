@@ -2,12 +2,12 @@
 name = "epp-client"
 version = "0.1.0"
 edition = "2018"
+license = "MIT"
+authors = ["Ritesh Chitlangi <ritesh@ayravat.com>"]
+description = "EPP (Extensible Provisioning Protocol) Client Library for Domain Registration and Management"
+repository = "https://github.com/masalachai/epp-client"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[[example]]
-name = "example-client"
-path = "examples/client.rs"
 
 [dependencies]
 epp-client-macros = { path = "../epp-client-macros" }
