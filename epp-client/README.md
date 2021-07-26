@@ -39,15 +39,15 @@ usually located at `$HOME/.config` or defined by the `XDG_CONFIG_HOME` environme
 An example config looks like this:
 
 ```toml
-[registry.verisign
+[registry.verisign]
 host = 'epp.verisign-grs.com'
 port = 700
 username = 'username'
 password = 'password'
 # service extensions
-ext_uris = [
+ext_uris = []
 
-[registry.verisign.tls_files
+[registry.verisign.tls_files]
 # the full client certificate chain in PEM format
 cert_chain = '/path/to/certificate/chain/pemfile'
 # the RSA private key for your certificate
@@ -56,7 +56,7 @@ key = '/path/to/private/key/pemfile'
 
 ## Operation
 
-Once the config is set correctly, you can create a mut variable of type [`EppClient`
+Once the config is set correctly, you can create a mut variable of type `EppClient`
 with the domain registry
 
 ```rust
