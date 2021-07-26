@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+	<response>
+		<result code="1301">
+			<msg>Command completed successfully; ack to dequeue</msg>
+		</result>
+		<msgQ count="5" id="12345">
+			<qDate>2021-07-23T19:12:43.0Z</qDate>
+			<msg>Transfer requested.</msg>
+		</msgQ>
+		<resData>
+			<obj:trnData xmlns:obj="urn:ietf:params:xml:ns:obj-1.0">
+				<obj:name>eppdev-transfer.com</obj:name>
+				<obj:trStatus>pending</obj:trStatus>
+				<obj:reID>eppdev</obj:reID>
+				<obj:reDate>2021-07-23T15:31:21.0Z</obj:reDate>
+				<obj:acID>ClientY</obj:acID>
+				<obj:acDate>2021-07-28T15:31:21.0Z</obj:acDate>
+				<obj:exDate>2022-07-02T14:53:19.0Z</obj:exDate>
+			</obj:trnData>
+		</resData>
+		<trID>
+			<clTRID>cltrid:1626454866</clTRID>
+			<svTRID>RO-6879-1627224678242975</svTRID>
+		</trID>
+	</response>
+</epp>

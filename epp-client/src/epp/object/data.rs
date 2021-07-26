@@ -19,9 +19,9 @@ pub enum DomainNsList {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAddr {
     #[serde(rename = "ip")]
-    ip_version: Option<String>,
+    pub ip_version: Option<String>,
     #[serde(rename = "$value")]
-    address: String,
+    pub address: String,
 }
 
 impl HostAddr {

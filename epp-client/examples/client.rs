@@ -150,7 +150,7 @@ async fn delete_domain(client: &mut EppClient) {
 }
 
 async fn renew_domain(client: &mut EppClient) {
-    let exp_date = NaiveDate::from_ymd(2022, 7, 23);
+    let exp_date = NaiveDate::from_ymd(2023, 7, 23);
 
     let renew_domain = EppDomainRenew::new("eppdev-1.com", exp_date, 1, gen_client_tr_id("eppdev").unwrap().as_str());
 
@@ -195,10 +195,10 @@ async fn check_hosts(client: &mut EppClient) {
 
 async fn create_host(client: &mut EppClient) {
     let host = Host {
-        name: "host1.eppdev-1.com".to_string_value(),
+        name: "host2.eppdev-1.com".to_string_value(),
         addresses: Some(vec![
             HostAddr::new("v4", "29.245.122.14"),
-            HostAddr::new("v6", "2400:6180:100:d0::8d6:4001"),
+            HostAddr::new("v6", "2404:6800:4001:801::200e"),
         ])
     };
 
@@ -215,7 +215,7 @@ async fn query_host(client: &mut EppClient) {
 
 async fn update_host(client: &mut EppClient) {
     let addr = vec![
-        HostAddr::new("v6", "2400:6180:100:d0::8d6:4001"),
+        HostAddr::new("v6", "2404:6800:4001:801::200e"),
     ];
 
     let add = HostAddRemove {
@@ -298,7 +298,7 @@ async fn main() {
 
     // update_domain(&mut client).await;
 
-    delete_domain(&mut client).await;
+    // delete_domain(&mut client).await;
 
     // renew_domain(&mut client).await;
 
@@ -322,7 +322,7 @@ async fn main() {
 
     // delete_host(&mut client).await;
 
-    // poll_message(&mut client).await;
+    poll_message(&mut client).await;
 
     // ack_message(&mut client).await;
 }

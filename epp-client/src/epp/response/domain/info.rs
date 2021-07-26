@@ -28,7 +28,8 @@ pub struct DomainInfoData {
     schema_location: String,
     pub name: StringValue,
     pub roid: StringValue,
-    pub status: Vec<DomainStatus>,
+    #[serde(rename = "status")]
+    pub statuses: Vec<DomainStatus>,
     pub registrant: StringValue,
     #[serde(rename = "contact")]
     pub contacts: Vec<DomainContact>,
@@ -49,7 +50,7 @@ pub struct DomainInfoData {
     #[serde(rename = "trDate")]
     pub transferred_at: Option<StringValue>,
     #[serde(rename = "authInfo")]
-    pub auth_info: AuthInfo,
+    pub auth_info: Option<AuthInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

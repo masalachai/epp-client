@@ -158,9 +158,9 @@ pub struct MessageQueue {
     pub count: u32,
     pub id: String,
     #[serde(rename = "qDate")]
-    pub date: StringValue,
+    pub date: Option<StringValue>,
     #[serde(rename = "msg")]
-    pub message: StringValue,
+    pub message: Option<StringValue>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
@@ -185,9 +185,15 @@ pub struct CommandResponseStatus {
 }
 
 impl<T> CommandResponse<T> {
-    pub fn results(&self) -> Option<&T> {
+    pub fn res_data(&self) -> Option<&T> {
         match &self.res_data {
             Some(res_data) => Some(&res_data),
+            None => None,
+        }
+    }
+    pub fn message_queue(&self) -> Option<&MessageQueue> {
+        match &self.message_queue {
+            Some(queue) => Some(&queue),
             None => None,
         }
     }

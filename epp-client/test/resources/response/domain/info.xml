@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+	<response>
+		<result code="1000">
+			<msg>Command completed successfully</msg>
+		</result>
+		<resData>
+			<domain:infData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
+				<domain:name>eppdev-1.com</domain:name>
+				<domain:roid>125899511_DOMAIN_COM-VRSN</domain:roid>
+				<domain:status s="ok"/>
+				<domain:status s="clientTransferProhibited"/>
+				<domain:registrant>eppdev-contact-2</domain:registrant>
+				<domain:contact type="admin">eppdev-contact-2</domain:contact>
+				<domain:contact type="tech">eppdev-contact-2</domain:contact>
+				<domain:contact type="billing">eppdev-contact-2</domain:contact>
+				<domain:clID>eppdev</domain:clID>
+				<domain:crID>SYSTEM</domain:crID>
+				<domain:crDate>2021-07-23T15:31:20.0Z</domain:crDate>
+				<domain:upID>SYSTEM</domain:upID>
+				<domain:upDate>2021-07-23T15:31:21.0Z</domain:upDate>
+				<domain:exDate>2023-07-23T15:31:20.0Z</domain:exDate>
+				<domain:authInfo>
+					<domain:pw>epP4uthd#v</domain:pw>
+				</domain:authInfo>
+			</domain:infData>
+		</resData>
+		<trID>
+			<clTRID>cltrid:1626454866</clTRID>
+			<svTRID>RO-6879-1627224678242975</svTRID>
+		</trID>
+	</response>
+</epp>

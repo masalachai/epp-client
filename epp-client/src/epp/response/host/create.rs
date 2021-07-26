@@ -17,5 +17,5 @@ pub struct HostCreateData {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostCreateResult {
     #[serde(rename = "creData")]
-    pub check_data: HostCreateData,
+    pub create_data: HostCreateData,
 }

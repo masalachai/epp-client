@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+	<response>
+		<result code="1000">
+			<msg>Command completed successfully</msg>
+		</result>
+		<resData>
+			<host:chkData xmlns:host="urn:ietf:params:xml:ns:host-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:host-1.0 host-1.0.xsd">
+				<host:cd>
+					<host:name avail="1">host1.eppdev-1.com</host:name>
+				</host:cd>
+				<host:cd>
+					<host:name avail="0">ns1.testing.com</host:name>
+				</host:cd>
+			</host:chkData>
+		</resData>
+		<trID>
+			<clTRID>cltrid:1626454866</clTRID>
+			<svTRID>RO-6879-1627224678242975</svTRID>
+		</trID>
+	</response>
+</epp>

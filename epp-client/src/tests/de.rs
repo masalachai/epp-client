@@ -96,7 +96,7 @@ mod response {
         let xml = get_xml("response/contact/check.xml").unwrap();
         let object = EppContactCheckResponse::deserialize(xml.as_str()).unwrap();
 
-        let results = object.data.results().unwrap();
+        let results = object.data.res_data().unwrap();
 
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
@@ -122,7 +122,7 @@ mod response {
         let xml = get_xml("response/contact/create.xml").unwrap();
         let object = EppContactCreateResponse::deserialize(xml.as_str()).unwrap();
 
-        let results = object.data.results().unwrap();
+        let results = object.data.res_data().unwrap();
 
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
@@ -157,7 +157,7 @@ mod response {
         let xml = get_xml("response/contact/info.xml").unwrap();
         let object = EppContactInfoResponse::deserialize(xml.as_str()).unwrap();
 
-        let result = object.data.results().unwrap();
+        let result = object.data.res_data().unwrap();
         let fax = result.info_data.fax.as_ref().unwrap();
         let voice_ext = result.info_data.voice.extension.as_ref().unwrap();
         let fax_ext = fax.extension.as_ref().unwrap();
@@ -250,7 +250,7 @@ mod response {
         let xml = get_xml("response/domain/check.xml").unwrap();
         let object = EppDomainCheckResponse::deserialize(xml.as_str()).unwrap();
 
-        let result = object.data.results().unwrap();
+        let result = object.data.res_data().unwrap();
 
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
@@ -276,7 +276,7 @@ mod response {
         let xml = get_xml("response/domain/create.xml").unwrap();
         let object = EppDomainCreateResponse::deserialize(xml.as_str()).unwrap();
 
-        let result = object.data.results().unwrap();
+        let result = object.data.res_data().unwrap();
 
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
@@ -307,6 +307,435 @@ mod response {
             object.data.tr_ids.client_tr_id.unwrap(),
             CLTRID.to_string_value()
         );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn domain_info() {
+        let xml = get_xml("response/domain/info.xml").unwrap();
+        let object = EppDomainInfoResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+        let auth_info = result.info_data.auth_info.as_ref().unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(result.info_data.name, "eppdev-1.com".to_string_value());
+        assert_eq!(
+            result.info_data.roid,
+            "125899511_DOMAIN_COM-VRSN".to_string_value()
+        );
+        assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
+        assert_eq!(
+            result.info_data.statuses[1].status,
+            "clientTransferProhibited".to_string()
+        );
+        assert_eq!(
+            result.info_data.registrant,
+            "eppdev-contact-2".to_string_value()
+        );
+        assert_eq!(
+            result.info_data.contacts[0].id,
+            "eppdev-contact-2".to_string()
+        );
+        assert_eq!(
+            result.info_data.contacts[0].contact_type,
+            "admin".to_string()
+        );
+        assert_eq!(
+            result.info_data.contacts[1].id,
+            "eppdev-contact-2".to_string()
+        );
+        assert_eq!(
+            result.info_data.contacts[1].contact_type,
+            "tech".to_string()
+        );
+        assert_eq!(
+            result.info_data.contacts[2].id,
+            "eppdev-contact-2".to_string()
+        );
+        assert_eq!(
+            result.info_data.contacts[2].contact_type,
+            "billing".to_string()
+        );
+        assert_eq!(result.info_data.client_id, "eppdev".to_string_value());
+        assert_eq!(result.info_data.creator_id, "SYSTEM".to_string_value());
+        assert_eq!(
+            result.info_data.created_at,
+            "2021-07-23T15:31:20.0Z".to_string_value()
+        );
+        assert_eq!(result.info_data.updater_id, "SYSTEM".to_string_value());
+        assert_eq!(
+            result.info_data.updated_at,
+            "2021-07-23T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(
+            result.info_data.expiry_date,
+            "2023-07-23T15:31:20.0Z".to_string_value()
+        );
+        assert_eq!((*auth_info).password, "epP4uthd#v".to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn domain_renew() {
+        let xml = get_xml("response/domain/renew.xml").unwrap();
+        let object = EppDomainRenewResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(result.renew_data.name, "eppdev-1.com".to_string_value());
+        assert_eq!(
+            result.renew_data.expiry_date,
+            "2024-07-23T15:31:20.0Z".to_string_value()
+        );
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn domain_transfer_request() {
+        let xml = get_xml("response/domain/transfer_request.xml").unwrap();
+        let object = EppDomainTransferRequestResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+
+        assert_eq!(object.data.result.code, 1001);
+        assert_eq!(
+            object.data.result.message,
+            "Command completed successfully; action pending".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.name,
+            "eppdev-transfer.com".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.transfer_status,
+            "pending".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.requester_id,
+            "eppdev".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.requested_at,
+            "2021-07-23T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(result.transfer_data.ack_id, "ClientY".to_string_value());
+        assert_eq!(
+            result.transfer_data.ack_by,
+            "2021-07-28T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.expiry_date,
+            "2022-07-02T14:53:19.0Z".to_string_value()
+        );
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn domain_transfer_approve() {
+        let xml = get_xml("response/domain/transfer_approve.xml").unwrap();
+        let object = EppDomainTransferApproveResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn domain_transfer_reject() {
+        let xml = get_xml("response/domain/transfer_reject.xml").unwrap();
+        let object = EppDomainTransferRejectResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn domain_transfer_cancel() {
+        let xml = get_xml("response/domain/transfer_cancel.xml").unwrap();
+        let object = EppDomainTransferCancelResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn domain_transfer_query() {
+        let xml = get_xml("response/domain/transfer_query.xml").unwrap();
+        let object = EppDomainTransferQueryResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            result.transfer_data.name,
+            "eppdev-transfer.com".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.transfer_status,
+            "pending".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.requester_id,
+            "eppdev".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.requested_at,
+            "2021-07-23T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(result.transfer_data.ack_id, "ClientY".to_string_value());
+        assert_eq!(
+            result.transfer_data.ack_by,
+            "2021-07-28T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.expiry_date,
+            "2022-07-02T14:53:19.0Z".to_string_value()
+        );
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn domain_update() {
+        let xml = get_xml("response/domain/update.xml").unwrap();
+        let object = EppDomainUpdateResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn host_check() {
+        let xml = get_xml("response/host/check.xml").unwrap();
+        let object = EppHostCheckResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            result.check_data.host_list[0].host.name,
+            "host1.eppdev-1.com".to_string_value()
+        );
+        assert_eq!(result.check_data.host_list[0].host.available, 1);
+        assert_eq!(
+            result.check_data.host_list[1].host.name,
+            "ns1.testing.com".to_string_value()
+        );
+        assert_eq!(result.check_data.host_list[1].host.available, 0);
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn host_create() {
+        let xml = get_xml("response/host/create.xml").unwrap();
+        let object = EppHostCreateResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            result.create_data.name,
+            "host2.eppdev-1.com".to_string_value()
+        );
+        assert_eq!(
+            result.create_data.created_at,
+            "2021-07-26T05:28:55.0Z".to_string_value()
+        );
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn host_info() {
+        let xml = get_xml("response/host/info.xml").unwrap();
+        let object = EppHostInfoResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            result.info_data.name,
+            "host2.eppdev-1.com".to_string_value()
+        );
+        assert_eq!(result.info_data.roid, "UNDEF-ROID".to_string_value());
+        assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
+        assert_eq!(
+            *(result.info_data.addresses[0].ip_version.as_ref().unwrap()),
+            "v4".to_string()
+        );
+        assert_eq!(
+            result.info_data.addresses[0].address,
+            "29.245.122.14".to_string()
+        );
+        assert_eq!(
+            *(result.info_data.addresses[1].ip_version.as_ref().unwrap()),
+            "v6".to_string()
+        );
+        assert_eq!(
+            result.info_data.addresses[1].address,
+            "2404:6800:4001:0801:0000:0000:0000:200e".to_string()
+        );
+        assert_eq!(result.info_data.client_id, "eppdev".to_string_value());
+        assert_eq!(result.info_data.creator_id, "creator".to_string_value());
+        assert_eq!(
+            result.info_data.created_at,
+            "2021-07-26T05:28:55.0Z".to_string_value()
+        );
+        assert_eq!(
+            *(result.info_data.updater_id.as_ref().unwrap()),
+            "creator".to_string_value()
+        );
+        assert_eq!(
+            *(result.info_data.updated_at.as_ref().unwrap()),
+            "2021-07-26T05:28:55.0Z".to_string_value()
+        );
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn host_update() {
+        let xml = get_xml("response/host/update.xml").unwrap();
+        let object = EppHostUpdateResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn host_delete() {
+        let xml = get_xml("response/host/delete.xml").unwrap();
+        let object = EppHostDeleteResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn message_poll() {
+        let xml = get_xml("response/message/poll.xml").unwrap();
+        let object = EppMessagePollResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+        let msg = object.data.message_queue().unwrap();
+
+        assert_eq!(object.data.result.code, 1301);
+        assert_eq!(
+            object.data.result.message,
+            "Command completed successfully; ack to dequeue".to_string_value()
+        );
+        assert_eq!(msg.count, 5);
+        assert_eq!(msg.id, "12345".to_string());
+        assert_eq!(
+            *(msg.date.as_ref().unwrap()),
+            "2021-07-23T19:12:43.0Z".to_string_value()
+        );
+        assert_eq!(
+            *(msg.message.as_ref().unwrap()),
+            "Transfer requested.".to_string_value()
+        );
+        assert_eq!(
+            result.message_data.name,
+            "eppdev-transfer.com".to_string_value()
+        );
+        assert_eq!(
+            result.message_data.transfer_status,
+            "pending".to_string_value()
+        );
+        assert_eq!(result.message_data.requester_id, "eppdev".to_string_value());
+        assert_eq!(
+            result.message_data.requested_at,
+            "2021-07-23T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(result.message_data.ack_id, "ClientY".to_string_value());
+        assert_eq!(
+            result.message_data.ack_by,
+            "2021-07-28T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(
+            result.message_data.expiry_date,
+            "2022-07-02T14:53:19.0Z".to_string_value()
+        );
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn message_ack() {
+        let xml = get_xml("response/message/ack.xml").unwrap();
+        let object = EppMessageAckResponse::deserialize(xml.as_str()).unwrap();
+
+        let msg = object.data.message_queue().unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(msg.count, 4);
+        assert_eq!(msg.id, "12345".to_string());
         assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
     }
 }

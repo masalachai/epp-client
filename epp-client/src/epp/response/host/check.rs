@@ -15,7 +15,8 @@ pub struct HostCheck {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostCheckDataItem {
-    pub name: HostCheck,
+    #[serde(rename = "name")]
+    pub host: HostCheck,
     pub reason: Option<StringValue>,
 }
 
