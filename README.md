@@ -76,7 +76,7 @@ async fn main() {
     // Make a domain check call, which returns an object of type EppDomainCheckResponse
     // that contains the result of the call
     let domain_check = EppDomainCheck::new(
-        vec!["eppdev.com", "eppdev.net"
+        vec!["eppdev.com", "eppdev.net"]
         generate_client_tr_id(&client).as_str()
     );
 
