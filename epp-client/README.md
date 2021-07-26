@@ -91,4 +91,4 @@ async fn main() {
 
 ## Request
 
-Currently I don't have access to a registry's OT&E account to do extensive testing. I am using [hexonet's EPP Gateway](https://wiki.hexonet.net/wiki/EPP_Gateway) for testing, but access to a registry's OT&E account would be very helpful, so if anyone can help me out with one it would be very helpful!
+Currently I don't have access to a registry's OT&E account to do extensive testing. I am using [hexonet's EPP Gateway](https://wiki.hexonet.net/wiki/EPP_Gateway) for testing, but access to a registry's OT&E account would be very helpful, so if anyone can help me out with one I would be very grateful!
