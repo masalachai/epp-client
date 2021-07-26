@@ -64,7 +64,7 @@ use epp_client::EppClient;
 use epp_client::epp::{EppDomainCheck, EppDomainCheckResponse};
 use epp_client::epp::generate_client_tr_id;
 
-#[tokio::main
+#[tokio::main]
 async fn main() {
     // Create an instance of EppClient, specifying the name of the registry as in
     // the config file
