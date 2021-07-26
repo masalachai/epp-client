@@ -1,3 +1,5 @@
+//! `EppObject` to EPP XML serialization tests
+
 mod request {
     use super::super::get_xml;
     use super::super::CLTRID;

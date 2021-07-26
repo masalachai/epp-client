@@ -1,10 +1,11 @@
+//! EPP XML to `EppObject` deserialization tests
+
 mod response {
     use super::super::get_xml;
     use super::super::CLTRID;
     use crate::epp::object::StringValueTrait;
     use crate::epp::response::{
-        EppCommandResponse, EppCommandResponseError, EppGreeting, EppLoginResponse,
-        EppLogoutResponse,
+        EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
     };
     use crate::epp::xml::EppXml;
     use crate::epp::*;
@@ -286,7 +287,7 @@ mod response {
             "2021-07-25T18:11:35.0Z".to_string_value()
         );
         assert_eq!(
-            result.create_data.expiry_date,
+            result.create_data.expiring_at,
             "2022-07-25T18:11:34.0Z".to_string_value()
         );
         assert_eq!(
@@ -317,6 +318,9 @@ mod response {
 
         let result = object.data.res_data().unwrap();
         let auth_info = result.info_data.auth_info.as_ref().unwrap();
+        let ns_list = result.info_data.ns.as_ref().unwrap();
+        let ns = (*ns_list).host_obj.as_ref().unwrap();
+        let hosts = result.info_data.hosts.as_ref().unwrap();
 
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
@@ -358,6 +362,10 @@ mod response {
             result.info_data.contacts[2].contact_type,
             "billing".to_string()
         );
+        assert_eq!((*ns)[0], "ns1.eppdev-1.com".to_string_value());
+        assert_eq!((*ns)[1], "ns2.eppdev-1.com".to_string_value());
+        assert_eq!((*hosts)[0], "ns1.eppdev-1.com".to_string_value());
+        assert_eq!((*hosts)[1], "ns2.eppdev-1.com".to_string_value());
         assert_eq!(result.info_data.client_id, "eppdev".to_string_value());
         assert_eq!(result.info_data.creator_id, "SYSTEM".to_string_value());
         assert_eq!(
@@ -370,7 +378,7 @@ mod response {
             "2021-07-23T15:31:21.0Z".to_string_value()
         );
         assert_eq!(
-            result.info_data.expiry_date,
+            result.info_data.expiring_at,
             "2023-07-23T15:31:20.0Z".to_string_value()
         );
         assert_eq!((*auth_info).password, "epP4uthd#v".to_string_value());
@@ -392,7 +400,7 @@ mod response {
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
         assert_eq!(result.renew_data.name, "eppdev-1.com".to_string_value());
         assert_eq!(
-            result.renew_data.expiry_date,
+            result.renew_data.expiring_at,
             "2024-07-23T15:31:20.0Z".to_string_value()
         );
         assert_eq!(
@@ -436,7 +444,7 @@ mod response {
             "2021-07-28T15:31:21.0Z".to_string_value()
         );
         assert_eq!(
-            result.transfer_data.expiry_date,
+            result.transfer_data.expiring_at,
             "2022-07-02T14:53:19.0Z".to_string_value()
         );
         assert_eq!(
@@ -519,7 +527,7 @@ mod response {
             "2021-07-28T15:31:21.0Z".to_string_value()
         );
         assert_eq!(
-            result.transfer_data.expiry_date,
+            result.transfer_data.expiring_at,
             "2022-07-02T14:53:19.0Z".to_string_value()
         );
         assert_eq!(
@@ -715,7 +723,7 @@ mod response {
             "2021-07-28T15:31:21.0Z".to_string_value()
         );
         assert_eq!(
-            result.message_data.expiry_date,
+            result.message_data.expiring_at,
             "2022-07-02T14:53:19.0Z".to_string_value()
         );
         assert_eq!(

@@ -8,13 +8,6 @@ pub type DomainStatus = ContactStatus;
 /// The <status> attribute on EPP XML for host transactions
 pub type HostStatus = ContactStatus;
 
-/// The <hostObj> or <hostAttr> types under an <ns> tag on domain transactions
-#[derive(Serialize, Deserialize, Debug)]
-pub enum DomainNsList {
-    HostAttrList(HostAttrList),
-    HostObjList(HostObjList),
-}
-
 /// The <hostAddr> types domain or host transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAddr {

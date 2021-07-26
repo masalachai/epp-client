@@ -1,3 +1,5 @@
+//! Module containing types for EPP domain transactions
+
 pub mod check;
 pub mod create;
 pub mod delete;

@@ -43,6 +43,7 @@ impl EppConnection {
         })
     }
 
+    /// Writes to the socket
     async fn write(&mut self, buf: &Vec<u8>) -> Result<(), Box<dyn Error>> {
         let wrote = self.stream.writer.write(buf).await?;
 
@@ -51,6 +52,7 @@ impl EppConnection {
         Ok(())
     }
 
+    /// Constructs an EPP XML request in the required form and sends it to the server
     async fn send_epp_request(&mut self, content: &str) -> Result<(), Box<dyn Error>> {
         let len = content.len();
 
@@ -66,6 +68,7 @@ impl EppConnection {
         self.write(&buf).await
     }
 
+    /// Reads response from the socket
     async fn read_epp_response(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut buf = [0u8; 4];
         self.stream.reader.read_exact(&mut buf).await?;
@@ -100,6 +103,7 @@ impl EppConnection {
         Ok(data)
     }
 
+    /// Receives response from the socket and converts it into an EPP XML string
     async fn get_epp_response(&mut self) -> Result<String, Box<dyn Error>> {
         let contents = self.read_epp_response().await?;
 
@@ -108,7 +112,7 @@ impl EppConnection {
         Ok(response)
     }
 
-    /// Send an EPP XML request to the registry and return the response
+    /// Sends an EPP XML request to the registry and return the response
     /// receieved to the request
     pub async fn transact(&mut self, content: &str) -> Result<String, Box<dyn Error>> {
         debug!("{}: request: {}", self.registry, content);
@@ -120,6 +124,7 @@ impl EppConnection {
         Ok(response)
     }
 
+    /// Closes the socket
     async fn close(&mut self) -> Result<(), Box<dyn Error>> {
         info!("{}: Closing connection", self.registry);
 
@@ -134,7 +139,7 @@ impl Drop for EppConnection {
     }
 }
 
-/// Establish a TLS connection to a registry and return a ConnectionStream instance containing the
+/// Establishes a TLS connection to a registry and returns a ConnectionStream instance containing the
 /// socket stream to read/write to the connection
 pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<ConnectionStream, error::Error> {
     let (host, port) = registry_creds.connection_details();

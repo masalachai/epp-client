@@ -1,3 +1,5 @@
+//! XML serialization using the `quick-xml` library
+
 use quick_xml::de::from_str;
 use quick_xml::se;
 use serde::{de::DeserializeOwned, Serialize};

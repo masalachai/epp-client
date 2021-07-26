@@ -14,6 +14,12 @@
 				<domain:contact type="admin">eppdev-contact-2</domain:contact>
 				<domain:contact type="tech">eppdev-contact-2</domain:contact>
 				<domain:contact type="billing">eppdev-contact-2</domain:contact>
+				<domain:ns>
+					<domain:hostObj>ns1.eppdev-1.com</domain:hostObj>
+					<domain:hostObj>ns2.eppdev-1.com</domain:hostObj>
+				</domain:ns>
+				<domain:host>ns1.eppdev-1.com</domain:host>
+				<domain:host>ns2.eppdev-1.com</domain:host>
 				<domain:clID>eppdev</domain:clID>
 				<domain:crID>SYSTEM</domain:crID>
 				<domain:crDate>2021-07-23T15:31:20.0Z</domain:crDate>

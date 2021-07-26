@@ -1,3 +1,5 @@
+//! Module for automated tests
+
 pub mod de;
 pub mod se;
 
@@ -7,6 +9,7 @@ use std::{error::Error, fs::File, io::Read};
 const RESOURCES_DIR: &str = "./test/resources";
 const CLTRID: &str = "cltrid:1626454866";
 
+/// Reads EPP XML requests and responses from the test/resources directory to run tests on
 fn get_xml(path: &str) -> Result<String, Box<dyn Error>> {
     let ws_regex = Regex::new(r"[\s]{2,}")?;
 

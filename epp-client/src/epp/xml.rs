@@ -1,3 +1,5 @@
+//! Types to use in serialization to and deserialization from EPP XML
+
 pub mod quick_xml;
 
 use std::{error::Error, fmt::Debug};
@@ -19,6 +21,7 @@ pub const EPP_DOMAIN_SCHEMA_LOCATION: &str = "urn:ietf:params:xml:ns:domain-1.0 
 pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
 
+/// Trait to be implemented by serializers. Currently the only included serializer is `quick-xml`
 pub trait EppXml {
     type Output: Debug;
 
