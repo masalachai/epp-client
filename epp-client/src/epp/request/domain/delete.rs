@@ -8,6 +8,32 @@ use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for domain <delete> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainDelete, EppDomainDeleteResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainDelete instance
+///     let mut domain_delete = EppDomainDelete::new("eppdev-100.com", generate_client_tr_id(&client).as_str());
+///
+///     // send it to the registry and receive a response of type EppDomainDeleteResponse
+///     let response = client.transact::<_, EppDomainDeleteResponse>(&domain_delete).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainDelete = EppObject<Command<DomainDelete>>;
 
 /// Type for <name> element under the domain <delete> tag

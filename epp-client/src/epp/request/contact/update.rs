@@ -11,6 +11,43 @@ use crate::error;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for contact <update> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppContactUpdate, EppContactUpdateResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppContactUpdate instance
+///     let mut contact_update = EppContactUpdate::new(
+///         "eppdev-contact-100",
+///         generate_client_tr_id(&client).as_str()
+///     );
+///
+///     let add_statuses = vec![
+///         ContactStatus {
+///             status: "clientTransferProhibited".to_string()
+///         }
+///     ];
+///
+///     contact_update.add(add_statuses);
+///
+///     // send it to the registry and receive a response of type EppContactUpdateResponse
+///     let response = client.transact::<_, EppContactUpdateResponse>(&contact_update).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppContactUpdate = EppObject<Command<ContactUpdate>>;
 
 /// Type for elements under the <chg> tag for contact update request
@@ -96,12 +133,12 @@ impl EppContactUpdate {
     }
 
     /// Sets the data for the <add> tag for the contact update request
-    pub fn add_statuses(&mut self, statuses: Vec<ContactStatus>) {
+    pub fn add(&mut self, statuses: Vec<ContactStatus>) {
         self.data.command.contact.add_statuses = Some(StatusList { status: statuses });
     }
 
     /// Sets the data for the <rem> tag for the contact update request
-    pub fn remove_statuses(&mut self, statuses: Vec<ContactStatus>) {
+    pub fn remove(&mut self, statuses: Vec<ContactStatus>) {
         self.data.command.contact.remove_statuses = Some(StatusList { status: statuses });
     }
 

@@ -8,6 +8,32 @@ use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for domain <info> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainInfo, EppDomainInfoResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainInfo instance
+///     let domain_info = EppDomainInfo::new("eppdev-100.com", generate_client_tr_id(&client).as_str());
+///
+///     // send it to the registry and receive a response of type EppDomainInfoResponse
+///     let response = client.transact::<_, EppDomainInfoResponse>(&domain_info).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainInfo = EppObject<Command<DomainInfo>>;
 
 /// Type for data under the <name> element tag for the domain <info> tag

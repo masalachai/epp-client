@@ -10,6 +10,36 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for domain <renew> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use chrono::NaiveDate;
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainRenew, EppDomainRenewResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create a date object to set the current expiry date
+///     let exp_date = NaiveDate::from_ymd(2022, 7, 27);
+///
+///     // Create an EppDomainRenew instance
+///     let domain_renew = EppDomainRenew::new("eppdev-100.com", exp_date, 1, generate_client_tr_id(&client).as_str());
+///
+///     // send it to the registry and receive a response of type EppDomainRenewResponse
+///     let response = client.transact::<_, EppDomainRenewResponse>(&domain_renew).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainRenew = EppObject<Command<DomainRenew>>;
 
 /// Type for data under the domain <renew> tag

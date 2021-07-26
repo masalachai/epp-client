@@ -7,6 +7,32 @@ use crate::epp::request::Command;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for registry <poll op="req"> command
+///
+/// ## Usage
+///
+/// ```rust
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppMessagePoll, EppMessagePollResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppMessagePoll instance
+///     let message_poll = EppMessagePoll::new(generate_client_tr_id(&client).as_str());
+///
+///     // send it to the registry and receive a response of type EppMessagePollResponse
+///     let response = client.transact::<_, EppMessagePollResponse>(&message_poll).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppMessagePoll = EppObject<Command<MessagePoll>>;
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]

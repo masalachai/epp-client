@@ -1,4 +1,4 @@
-//! Module containing types for EPP domain transactions
+//! Types for EPP domain responses
 
 pub mod check;
 pub mod create;

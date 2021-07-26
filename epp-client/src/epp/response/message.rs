@@ -1,4 +1,4 @@
-//! Module containing types for EPP message transactions
+//! Types for EPP message responses
 
 pub mod ack;
 pub mod poll;

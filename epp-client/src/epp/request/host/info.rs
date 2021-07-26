@@ -8,6 +8,32 @@ use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for host <info> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppHostInfo, EppHostInfoResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppHostCreate instance
+///     let host_info = EppHostInfo::new("ns2.eppdev-101.com", generate_client_tr_id(&client).as_str());
+///
+///     // send it to the registry and receive a response of type EppHostInfoResponse
+///     let response = client.transact::<_, EppHostInfoResponse>(&host_info).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppHostInfo = EppObject<Command<HostInfo>>;
 
 /// Type for data under the host <info> tag

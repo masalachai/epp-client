@@ -26,7 +26,10 @@ use serde::{Deserialize, Serialize};
 ///     };
 ///
 ///     // Create an EppContactCheck instance
-///     let contact_check = EppContactCheck::new(vec!["epp-client-c1", "epp-client-c2"], generate_client_tr_id(&client).as_str());
+///     let contact_check = EppContactCheck::new(
+///         vec!["epp-client-c1", "epp-client-c2"],
+///         generate_client_tr_id(&client).as_str()
+///     );
 ///
 ///     // send it to the registry and receive a response of type EppContactCheckResponse
 ///     let response = client.transact::<_, EppContactCheckResponse>(&contact_check).await.unwrap();

@@ -1,3 +1,5 @@
+//! Types for EPP domain requests
+
 pub mod check;
 pub mod create;
 pub mod delete;

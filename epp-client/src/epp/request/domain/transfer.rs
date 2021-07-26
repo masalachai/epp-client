@@ -9,14 +9,158 @@ use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for transfer request for domain
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainTransferRequest, EppDomainTransferRequestResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainTransferRequest instance
+///     let domain_transfer_request = EppDomainTransferRequest::request(
+///         "eppdev-100.net", 1, "epP4uthd#v", generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppDomainTransferRequestResponse
+///     let response = client.transact::<_, EppDomainTransferRequestResponse>(&domain_transfer_request).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainTransferRequest = EppObject<Command<DomainTransfer>>;
+
 /// Type that represents the <epp> request for transfer approval for domains
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainTransferApprove, EppDomainTransferApproveResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainTransferApprove instance
+///     let domain_transfer_approve = EppDomainTransferApprove::approve(
+///         "eppdev-100.net", generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppDomainTransferApproveResponse
+///     let response = client.transact::<_, EppDomainTransferApproveResponse>(&domain_transfer_approve).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainTransferApprove = EppObject<Command<DomainTransfer>>;
+
 /// Type that represents the <epp> request for transfer rejection for domains
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainTransferReject, EppDomainTransferRejectResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainTransferReject instance
+///     let domain_transfer_reject = EppDomainTransferReject::reject(
+///         "eppdev-100.net", generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppDomainTransferRejectResponse
+///     let response = client.transact::<_, EppDomainTransferRejectResponse>(&domain_transfer_reject).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainTransferReject = EppObject<Command<DomainTransfer>>;
+
 /// Type that represents the <epp> request for transfer request cancellation for domains
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainTransferCancel, EppDomainTransferCancelResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainTransferCancel instance
+///     let domain_transfer_cancel = EppDomainTransferCancel::cancel(
+///         "eppdev-100.net", generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppDomainTransferCancelResponse
+///     let response = client.transact::<_, EppDomainTransferCancelResponse>(&domain_transfer_cancel).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainTransferCancel = EppObject<Command<DomainTransfer>>;
+
 /// Type that represents the <epp> request for transfer request query for domains
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainTransferQuery, EppDomainTransferQueryResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainTransferQuery instance
+///     let domain_transfer_query = EppDomainTransferQuery::query(
+///         "eppdev-100.net", "epP4uthd#v", generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppDomainTransferQueryResponse
+///     let response = client.transact::<_, EppDomainTransferQueryResponse>(&domain_transfer_query).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainTransferQuery = EppObject<Command<DomainTransfer>>;
 
 /// Type for elements under the domain <transfer> tag

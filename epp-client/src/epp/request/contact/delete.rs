@@ -8,6 +8,35 @@ use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type for the <epp> request for contact <delete> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppContactDelete, EppContactDeleteResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppContactDelete instance
+///     let contact_delete = EppContactDelete::new(
+///         "eppdev-contact-100",
+///         generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppContactDeleteResponse
+///     let response = client.transact::<_, EppContactDeleteResponse>(&contact_delete).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppContactDelete = EppObject<Command<ContactDelete>>;
 
 /// Type containing the data for the <delete> tag for contacts

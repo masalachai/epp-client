@@ -8,6 +8,35 @@ use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for host <check> command
+///
+/// ## Usage
+///
+/// ```rust
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppHostCheck, EppHostCheckResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppHostCheck instance
+///     let host_check = EppHostCheck::new(
+///         vec!["ns1.eppdev-101.com", "ns2.eppdev-101.com"],
+///         generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppHostCheckResponse
+///     let response = client.transact::<_, EppHostCheckResponse>(&host_check).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppHostCheck = EppObject<Command<HostCheck>>;
 
 /// Type for data under the host <check> tag

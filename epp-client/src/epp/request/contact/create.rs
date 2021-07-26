@@ -9,6 +9,50 @@ use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for contact <create> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::object::data::{Address, Phone, PostalInfo};
+/// use epp_client::epp::{EppContactCreate, EppContactCreateResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create the address, postal_info, voice instances
+///     let street = vec!["58", "Orchid Road"];
+///     let address = Address::new(street, "New York", "New York", "392374", "US");
+///     let postal_info = PostalInfo::new("int", "John Doe", "Acme Widgets", address);
+///     let mut voice = Phone::new("+1.47237942");
+///     voice.set_extension("123");
+///     let mut fax = Phone::new("+1.86698799");
+///     fax.set_extension("677");
+///
+///     // Create an EppContactCreate instance
+///     let mut contact_create = EppContactCreate::new(
+///         "eppdev-contact-100",
+///         "contact@eppdev.net",
+///         postal_info,
+///         voice,
+///         "epP4uthd#v",
+///         generate_client_tr_id(&client).as_str()
+///     );
+///     contact_create.set_fax(fax);
+///
+///     // send it to the registry and receive a response of type EppContactCreateResponse
+///     let response = client.transact::<_, EppContactCreateResponse>(&contact_create).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppContactCreate = EppObject<Command<ContactCreate>>;
 
 /// Type for elements under the contact <create> tag

@@ -8,6 +8,35 @@ use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for domain <check> command
+///
+/// ## Usage
+///
+/// ```rust
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppDomainCheck, EppDomainCheckResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainCheck instance
+///     let domain_check = EppDomainCheck::new(
+///         vec!["eppdev-100.com", "eppdev-100.net"],
+///         generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppDomainCheckResponse
+///     let response = client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainCheck = EppObject<Command<DomainCheck>>;
 
 /// Type for <name> elements under the domain <check> tag

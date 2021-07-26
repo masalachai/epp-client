@@ -10,6 +10,57 @@ use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for domain <update> command
 /// with <hostObj> elements in the request for <ns> list
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::object::data::{DomainStatus, DomainContact};
+/// use epp_client::epp::{EppDomainUpdate, EppDomainUpdateResponse, DomainAddRemove};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppDomainUpdate instance
+///     let mut domain_update = EppDomainUpdate::new("eppdev-100.com", generate_client_tr_id(&client).as_str());
+///
+///     let add = DomainAddRemove {
+///         ns: None,
+///         contacts: None,
+///         statuses: Some(vec![
+///             DomainStatus {
+///                 status: "clientUpdateProhibited".to_string()
+///             }
+///         ])
+///     };
+///
+///     let remove = DomainAddRemove {
+///         ns: None,
+///         contacts: Some(vec![
+///             DomainContact {
+///                 contact_type: "billing".to_string(),
+///                 id: "eppdev-contact-2".to_string()
+///             }
+///         ]),
+///         statuses: None,
+///     };
+///
+///     domain_update.add(add);
+///     domain_update.remove(remove);
+///
+///     // send it to the registry and receive a response of type EppDomainUpdateResponse
+///     let response = client.transact::<_, EppDomainUpdateResponse>(&domain_update).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainUpdate = EppObject<Command<DomainUpdate<HostObjList>>>;
 /// Type that represents the <epp> request for domain <update> command
 /// with <hostAttr> elements in the request for <ns> list

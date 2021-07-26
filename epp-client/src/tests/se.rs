@@ -4,7 +4,7 @@ mod request {
     use super::super::get_xml;
     use super::super::CLTRID;
     use crate::epp::object::data::{
-        Address, AuthInfo, ContactStatus, DomainContact, DomainStatus, Host, HostAddr, HostAttr,
+        Address, AuthInfo, ContactStatus, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
     };
     use crate::epp::object::StringValueTrait;
@@ -106,11 +106,11 @@ mod request {
         let add_statuses = vec![ContactStatus {
             status: "clientTransferProhibited".to_string(),
         }];
-        object.add_statuses(add_statuses);
+        object.add(add_statuses);
         let remove_statuses = vec![ContactStatus {
             status: "clientDeleteProhibited".to_string(),
         }];
-        object.remove_statuses(remove_statuses);
+        object.remove(remove_statuses);
 
         let serialized = object.serialize().unwrap();
 
@@ -395,15 +395,12 @@ mod request {
     fn host_create() {
         let xml = get_xml("request/host/create.xml").unwrap();
 
-        let host = Host {
-            name: "host1.eppdev-1.com".to_string_value(),
-            addresses: Some(vec![
-                HostAddr::new("v4", "29.245.122.14"),
-                HostAddr::new("v6", "2404:6800:4001:801::200e"),
-            ]),
-        };
+        let addresses = vec![
+            HostAddr::new("v4", "29.245.122.14"),
+            HostAddr::new("v6", "2404:6800:4001:801::200e"),
+        ];
 
-        let object = EppHostCreate::new(host, CLTRID);
+        let object = EppHostCreate::new("host1.eppdev-1.com", addresses, CLTRID);
 
         let serialized = object.serialize().unwrap();
 

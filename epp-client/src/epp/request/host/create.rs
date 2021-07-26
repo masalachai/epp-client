@@ -2,13 +2,46 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::{Host, HostAddr};
+use crate::epp::object::data::HostAddr;
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for host <create> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::object::data::HostAddr;
+/// use epp_client::epp::{EppHostCreate, EppHostCreateResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create a vector of IP addresses to assign to the host
+///     let addresses = vec![
+///         HostAddr::new("v4", "29.245.122.14"),
+///         HostAddr::new("v6", "2404:6800:4001:801::200e"),
+///     ];
+///
+///     // Create an EppHostCreate instance
+///     let host_create = EppHostCreate::new("ns1.eppdev-101.com", addresses, generate_client_tr_id(&client).as_str());
+///
+///     // send it to the registry and receive a response of type EppHostCreateResponse
+///     let response = client.transact::<_, EppHostCreateResponse>(&host_create).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppHostCreate = EppObject<Command<HostCreate>>;
 
 /// Type for data under the host <create> tag
@@ -34,12 +67,12 @@ pub struct HostCreate {
 
 impl EppHostCreate {
     /// Creates a new EppObject for host create corresponding to the <epp> tag in EPP XML
-    pub fn new(host: Host, client_tr_id: &str) -> EppHostCreate {
+    pub fn new(host: &str, addresses: Vec<HostAddr>, client_tr_id: &str) -> EppHostCreate {
         let host_create = HostCreate {
             host: HostCreateData {
                 xmlns: EPP_HOST_XMLNS.to_string(),
-                name: host.name,
-                addresses: host.addresses,
+                name: host.to_string_value(),
+                addresses: Some(addresses),
             },
         };
 

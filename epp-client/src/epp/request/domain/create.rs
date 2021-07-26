@@ -12,6 +12,51 @@ use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for domain <create> command
 /// with <hostObj> elements in the request for <ns> list
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::object::data::DomainContact;
+/// use epp_client::epp::{EppDomainCreate, EppDomainCreateResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     /// Create a vector of existing domain contact IDs
+///     let contacts = vec![
+///         DomainContact {
+///             contact_type: "admin".to_string(),
+///             id: "eppdev-contact-2".to_string()
+///         },
+///         DomainContact {
+///             contact_type: "tech".to_string(),
+///             id: "eppdev-contact-2".to_string()
+///         },
+///         DomainContact {
+///             contact_type: "billing".to_string(),
+///             id: "eppdev-contact-2".to_string()
+///         }
+///     ];
+///
+///     // Create an EppDomainCreate instance
+///     let domain_create = EppDomainCreate::new(
+///         "eppdev-100.com", 1, "eppdev-contact-2", "epP4uthd#v", contacts, generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppDomainCreateResponse
+///     let response = client.transact::<_, EppDomainCreateResponse>(&domain_create).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppDomainCreate = EppObject<Command<DomainCreate<HostObjList>>>;
 /// Type that represents the <epp> request for domain <create> command
 /// with <hostAttr> elements in the request for <ns> list

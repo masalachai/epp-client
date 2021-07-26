@@ -7,6 +7,31 @@ use crate::epp::request::Command;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the <epp> request for registry <poll op="ack"> command
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppMessageAck, EppMessageAckResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppMessageAck instance
+///     let message_ack = EppMessageAck::new(12345, generate_client_tr_id(&client).as_str());
+///
+///     // send it to the registry and receive a response of type EppMessageAckResponse
+///     let response = client.transact::<_, EppMessageAckResponse>(&message_ack).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppMessageAck = EppObject<Command<MessageAck>>;
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]

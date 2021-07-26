@@ -1,4 +1,4 @@
-//! Module containing types for EPP contact transactions
+//! Types for EPP contact responses
 
 pub mod check;
 pub mod create;

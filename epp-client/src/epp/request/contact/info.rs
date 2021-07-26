@@ -9,6 +9,36 @@ use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type for the <epp> request for contact <info> command
+///
+/// ## Usage
+///
+/// ```ignore
+/// use epp_client::EppClient;
+/// use epp_client::epp::{EppContactInfo, EppContactInfoResponse};
+/// use epp_client::epp::generate_client_tr_id;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     // Create an instance of EppClient, specifying the name of the registry as in
+///     // the config file
+///     let mut client = match EppClient::new("verisign").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     // Create an EppContactInfo instance
+///     let contact_info = EppContactInfo::new(
+///         "eppdev-contact-100",
+///         "epP4uthd#v",
+///         generate_client_tr_id(&client).as_str()
+///     );
+///
+///     // send it to the registry and receive a response of type EppContactInfoResponse
+///     let response = client.transact::<_, EppContactInfoResponse>(&contact_info).await.unwrap();
+///
+///     println!("{:?}", response);
+/// }
+/// ```
 pub type EppContactInfo = EppObject<Command<ContactInfo>>;
 
 /// Type for elements under the contact <info> tag
