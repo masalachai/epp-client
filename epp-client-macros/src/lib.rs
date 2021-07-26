@@ -1,3 +1,12 @@
+//! Macros for the EPP Client Library for the Extensible Provisioning Protocol (EPP).
+//!
+//! ## Description
+//!
+//! epp-client is a client library for Internet domain registration and management for domain registrars.
+//! This macro crate contains a fe macros to simplify serialization of generic types used in some places
+//! in the `epp-client` library
+//!
+
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
@@ -44,43 +53,3 @@ pub fn element_name_derive(input: TokenStream) -> TokenStream {
 
     element_name_macro(&ast)
 }
-
-// #[proc_macro_attribute]
-// pub fn epp_client_command_response(_metadat: TokenStream, input: TokenStream) -> TokenStream {
-//     let mut ast = parse_macro_input!(input as DeriveInput);
-
-//     match &mut ast.data {
-//         syn::Data::Struct(ref mut data) => {
-//             match &mut data.fields {
-//                 syn::Fields::Named(fields) => {
-//                     fields.named.push(
-//                         syn::Field::parse_named
-//                             .parse2(quote! {
-//                                 pub result: EppResult
-//                             })
-//                             .unwrap()
-//                     );
-//                     fields.named.push(
-//                         syn::Field::parse_named
-//                             .parse2(quote! {
-//                                 pub tr_ids: ResponseTRID
-//                             })
-//                             .unwrap()
-//                     );
-//                 }
-//                 _ => (),
-//             }
-
-//             return quote! { #ast }.into();
-//         }
-//         _ => panic!("Failed to parse CommandResponse macro input"),
-//     }
-// }
-
-// #[cfg(test)]
-// mod tests {
-//     #[test]
-//     fn it_works() {
-//         assert_eq!(2 + 2, 4);
-//     }
-// }
