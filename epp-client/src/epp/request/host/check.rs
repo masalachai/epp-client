@@ -7,7 +7,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for host <check> command
+/// Type that represents the &lt;epp&gt; request for host &lt;check&gt; command
 ///
 /// ## Usage
 ///
@@ -39,7 +39,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppHostCheck = EppObject<Command<HostCheck>>;
 
-/// Type for data under the host <check> tag
+/// Type for data under the host &lt;check&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostList {
     /// XML namespace for host commands
@@ -51,7 +51,7 @@ pub struct HostList {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
-/// Type for EPP XML <check> command for hosts
+/// Type for EPP XML &lt;check&gt; command for hosts
 pub struct HostCheck {
     /// The instance holding the list of hosts to be checked
     #[serde(rename = "check")]
@@ -59,7 +59,7 @@ pub struct HostCheck {
 }
 
 impl EppHostCheck {
-    /// Creates a new EppObject for host check corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for host check corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(hosts: Vec<&str>, client_tr_id: &str) -> EppHostCheck {
         let hosts = hosts
             .iter()

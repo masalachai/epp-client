@@ -8,7 +8,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for host <create> command
+/// Type that represents the &lt;epp&gt; request for host &lt;create&gt; command
 ///
 /// ## Usage
 ///
@@ -44,7 +44,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppHostCreate = EppObject<Command<HostCreate>>;
 
-/// Type for data under the host <create> tag
+/// Type for data under the host &lt;create&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostCreateData {
     /// XML namespace for host commands
@@ -58,7 +58,7 @@ pub struct HostCreateData {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "create")]
-/// Type for EPP XML <create> command for hosts
+/// Type for EPP XML &lt;create&gt; command for hosts
 pub struct HostCreate {
     /// The instance holding the data for the host to be created
     #[serde(rename = "create")]
@@ -66,7 +66,7 @@ pub struct HostCreate {
 }
 
 impl EppHostCreate {
-    /// Creates a new EppObject for host create corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for host create corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(host: &str, addresses: Vec<HostAddr>, client_tr_id: &str) -> EppHostCreate {
         let host_create = HostCreate {
             host: HostCreateData {

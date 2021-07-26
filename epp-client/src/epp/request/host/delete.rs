@@ -7,7 +7,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for host <delete> command
+/// Type that represents the &lt;epp&gt; request for host &lt;delete&gt; command
 ///
 /// ## Usage
 ///
@@ -36,7 +36,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppHostDelete = EppObject<Command<HostDelete>>;
 
-/// Type for data under the host <delete> tag
+/// Type for data under the host &lt;delete&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostDeleteData {
     /// XML namespace for host commands
@@ -47,7 +47,7 @@ pub struct HostDeleteData {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "delete")]
-/// Type for EPP XML <delete> command for hosts
+/// Type for EPP XML &lt;delete&gt; command for hosts
 pub struct HostDelete {
     /// The instance holding the data for the host to be deleted
     #[serde(rename = "delete")]
@@ -55,7 +55,7 @@ pub struct HostDelete {
 }
 
 impl EppHostDelete {
-    /// Creates a new EppObject for host delete corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for host delete corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppHostDelete {
         EppObject::build(Command::<HostDelete> {
             command: HostDelete {

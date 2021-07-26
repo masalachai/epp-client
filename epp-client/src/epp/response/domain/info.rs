@@ -6,18 +6,21 @@ use crate::epp::object::data::{AuthInfo, DomainContact, DomainStatus, HostAttr};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 
-/// Type that represents the <epp> tag for the EPP XML domain info response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain info response
 pub type EppDomainInfoResponse = EppObject<CommandResponse<DomainInfoResult>>;
 
+/// The two types of ns lists, hostObj and hostAttr, that may be returned in the
+/// domain info response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainNsList {
+    /// List of &lt;hostObj&gt; ns elements
     #[serde(rename = "hostObj")]
     pub host_obj: Option<Vec<StringValue>>,
-    #[serde(rename = "hostAttr")]
+    /// List of &lt;hostAttr&gt; ns elements
     pub host_attr: Option<Vec<HostAttr>>,
 }
 
-/// Type that represents the <infData> tag for domain info response
+/// Type that represents the &lt;infData&gt; tag for domain info response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainInfoData {
     /// XML namespace for domain response data
@@ -70,9 +73,10 @@ pub struct DomainInfoData {
     pub auth_info: Option<AuthInfo>,
 }
 
-/// Type that represents the <resData> tag for domain info response
+/// Type that represents the &lt;resData&gt; tag for domain info response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainInfoResult {
+    /// Data under the &lt;resData&gt; tag
     #[serde(rename = "infData")]
     pub info_data: DomainInfoData,
 }

@@ -10,8 +10,8 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for domain <create> command
-/// with <hostObj> elements in the request for <ns> list
+/// Type that represents the &lt;epp&gt; request for domain &lt;create&gt; command
+/// with &lt;hostObj&gt; elements in the request for &lt;ns&gt; list
 ///
 /// ## Usage
 ///
@@ -58,11 +58,11 @@ use serde::{Deserialize, Serialize};
 /// }
 /// ```
 pub type EppDomainCreate = EppObject<Command<DomainCreate<HostObjList>>>;
-/// Type that represents the <epp> request for domain <create> command
-/// with <hostAttr> elements in the request for <ns> list
+/// Type that represents the &lt;epp&gt; request for domain &lt;create&gt; command
+/// with &lt;hostAttr&gt; elements in the request for &lt;ns&gt; list
 pub type EppDomainCreateWithHostAttr = EppObject<Command<DomainCreate<HostAttrList>>>;
 
-/// Type for elements under the domain <create> tag
+/// Type for elements under the domain &lt;create&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainCreateData<T> {
     /// XML namespace for domain commands
@@ -86,7 +86,7 @@ pub struct DomainCreateData<T> {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "create")]
-/// Type for EPP XML <create> command for domains
+/// Type for EPP XML &lt;create&gt; command for domains
 pub struct DomainCreate<T> {
     /// The data for the domain to be created with
     /// T being the type of nameserver list (`HostObjList` or `HostAttrList`)
@@ -96,8 +96,8 @@ pub struct DomainCreate<T> {
 }
 
 impl EppDomainCreate {
-    /// Creates a new EppObject for domain create corresponding to the <epp> tag in EPP XML
-    /// with the <ns> tag containing <hostObj> tags
+    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
+    /// with the &lt;ns&gt; tag containing &lt;hostObj&gt; tags
     pub fn new_with_ns(
         name: &str,
         period: u16,
@@ -128,7 +128,7 @@ impl EppDomainCreate {
         })
     }
 
-    /// Creates a new EppObject for domain create corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
     /// without any nameservers
     pub fn new(
         name: &str,
@@ -154,7 +154,7 @@ impl EppDomainCreate {
         })
     }
 
-    /// Creates a new EppObject for domain create corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
     /// without any contacts
     pub fn new_without_contacts(
         name: &str,
@@ -178,8 +178,8 @@ impl EppDomainCreate {
         })
     }
 
-    /// Creates a new EppObject for domain create corresponding to the <epp> tag in EPP XML
-    /// with the <ns> tag containing <hostAttr> tags
+    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
+    /// with the &lt;ns&gt; tag containing &lt;hostAttr&gt; tags
     pub fn new_with_host_attr(
         name: &str,
         period: u16,

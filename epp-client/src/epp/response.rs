@@ -223,7 +223,7 @@ pub struct MessageQueue {
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[serde(rename_all = "lowercase")]
 #[element_name(name = "response")]
-/// Type corresponding to the <response> tag in an EPP response XML
+/// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 pub struct CommandResponse<T> {
     /// Data under the <result> tag
     pub result: EppResult,
@@ -231,7 +231,7 @@ pub struct CommandResponse<T> {
     #[serde(rename = "msgQ")]
     pub message_queue: Option<MessageQueue>,
     #[serde(rename = "resData")]
-    /// Data under the <resData> tag
+    /// Data under the &lt;resData&gt; tag
     pub res_data: Option<T>,
     /// Data under the <trID> tag
     #[serde(rename = "trID")]
@@ -240,8 +240,8 @@ pub struct CommandResponse<T> {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "response")]
-/// Type corresponding to the <response> tag in an EPP response XML
-/// without <msgQ> or <resData> sections. Generally used for error handling
+/// Type corresponding to the &lt;response&gt; tag in an EPP response XML
+/// without <msgQ> or &lt;resData&gt; sections. Generally used for error handling
 pub struct CommandResponseStatus {
     /// Data under the <result> tag
     pub result: EppResult,
@@ -251,7 +251,7 @@ pub struct CommandResponseStatus {
 }
 
 impl<T> CommandResponse<T> {
-    /// Returns the data under the corresponding <resData> from the EPP XML
+    /// Returns the data under the corresponding &lt;resData&gt; from the EPP XML
     pub fn res_data(&self) -> Option<&T> {
         match &self.res_data {
             Some(res_data) => Some(&res_data),

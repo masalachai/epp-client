@@ -7,7 +7,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for domain <info> command
+/// Type that represents the &lt;epp&gt; request for domain &lt;info&gt; command
 ///
 /// ## Usage
 ///
@@ -36,7 +36,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppDomainInfo = EppObject<Command<DomainInfo>>;
 
-/// Type for data under the <name> element tag for the domain <info> tag
+/// Type for data under the &lt;name&gt; element tag for the domain &lt;info&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Domain {
     /// The hosts attribute. Default value is "all"
@@ -46,7 +46,7 @@ pub struct Domain {
     name: String,
 }
 
-/// Type for <name> element under the domain <info> tag
+/// Type for &lt;name&gt; element under the domain &lt;info&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainInfoData {
     /// XML namespace for domain commands
@@ -58,15 +58,15 @@ pub struct DomainInfoData {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "info")]
-/// Type for EPP XML <info> command for domains
+/// Type for EPP XML &lt;info&gt; command for domains
 pub struct DomainInfo {
-    /// The data under the <info> tag for domain info
+    /// The data under the &lt;info&gt; tag for domain info
     #[serde(rename = "info")]
     info: DomainInfoData,
 }
 
 impl EppDomainInfo {
-    /// Creates a new EppObject for domain info corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain info corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppDomainInfo {
         EppObject::build(Command::<DomainInfo> {
             command: DomainInfo {

@@ -51,12 +51,12 @@ pub trait ElementName {
 #[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename = "epp")]
 pub struct EppObject<T: ElementName> {
-    /// XML namespace for the <epp> tag
+    /// XML namespace for the &lt;epp&gt; tag
     pub xmlns: String,
-    /// Schema namespace for the <epp> tag
+    /// Schema namespace for the &lt;epp&gt; tag
     #[serde(rename = "xmlns:xsi")]
     pub xmlns_xsi: String,
-    /// Schema location attribute for <epp>
+    /// Schema location attribute for &lt;epp&gt;
     #[serde(rename = "xsi:schemaLocation")]
     pub xsi_schema_location: String,
     /// the request or response object that is set or received in the EPP XML document
@@ -123,7 +123,7 @@ pub struct Services {
 }
 
 impl<T: ElementName> EppObject<T> {
-    /// Create the enclosing EPP XML tag <epp> for data that represents an EPP XML request or response
+    /// Create the enclosing EPP XML tag &lt;epp&gt; for data that represents an EPP XML request or response
     pub fn build(data: T) -> EppObject<T> {
         EppObject {
             // xml: None,

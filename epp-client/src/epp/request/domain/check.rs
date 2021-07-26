@@ -7,7 +7,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for domain <check> command
+/// Type that represents the &lt;epp&gt; request for domain &lt;check&gt; command
 ///
 /// ## Usage
 ///
@@ -39,7 +39,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppDomainCheck = EppObject<Command<DomainCheck>>;
 
-/// Type for <name> elements under the domain <check> tag
+/// Type for &lt;name&gt; elements under the domain &lt;check&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainList {
     /// XML namespace for domain commands
@@ -51,7 +51,7 @@ pub struct DomainList {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
-/// Type for EPP XML <check> command for domains
+/// Type for EPP XML &lt;check&gt; command for domains
 pub struct DomainCheck {
     /// The object holding the list of domains to be checked
     #[serde(rename = "check")]
@@ -59,7 +59,7 @@ pub struct DomainCheck {
 }
 
 impl EppDomainCheck {
-    /// Creates a new EppObject for domain check corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain check corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(domains: Vec<&str>, client_tr_id: &str) -> EppDomainCheck {
         let domains = domains
             .iter()

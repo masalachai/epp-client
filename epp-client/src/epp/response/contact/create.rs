@@ -5,10 +5,10 @@ use serde::{Deserialize, Serialize};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 
-/// Type that represents the <epp> tag for the EPP XML contact create response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML contact create response
 pub type EppContactCreateResponse = EppObject<CommandResponse<ContactCreateResult>>;
 
-/// Type that represents the <creData> tag for contact create response
+/// Type that represents the &lt;creData&gt; tag for contact create response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactCreateData {
     /// XML namespace for contact response data
@@ -24,10 +24,10 @@ pub struct ContactCreateData {
     pub created_at: StringValue,
 }
 
-/// Type that represents the <resData> tag for contact create response
+/// Type that represents the &lt;resData&gt; tag for contact create response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactCreateResult {
-    /// Data under the <creData> tag
+    /// Data under the &lt;creData&gt; tag
     #[serde(rename = "creData")]
     pub create_data: ContactCreateData,
 }

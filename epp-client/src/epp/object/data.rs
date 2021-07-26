@@ -3,12 +3,12 @@
 use crate::epp::object::{StringValue, StringValueTrait};
 use serde::{Deserialize, Serialize};
 
-/// The <status> attribute on EPP XML for domain transactions
+/// The &lt;status&gt; attribute on EPP XML for domain transactions
 pub type DomainStatus = ContactStatus;
-/// The <status> attribute on EPP XML for host transactions
+/// The &lt;status&gt; attribute on EPP XML for host transactions
 pub type HostStatus = ContactStatus;
 
-/// The <hostAddr> types domain or host transactions
+/// The &lt;hostAddr&gt; types domain or host transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAddr {
     #[serde(rename = "ip")]
@@ -43,44 +43,44 @@ impl HostAddr {
     }
 }
 
-/// The <host> type for host transactions
+/// The &lt;host&gt; type for host transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Host {
-    /// The <hostName> tag
+    /// The &lt;hostName&gt; tag
     pub name: StringValue,
-    /// The <hostAddr> tags
+    /// The &lt;hostAddr&gt; tags
     #[serde(rename = "addr")]
     pub addresses: Option<Vec<HostAddr>>,
 }
 
-/// The <hostAttr> type for domain transactions
+/// The &lt;hostAttr&gt; type for domain transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAttr {
-    /// The <hostName> tag
+    /// The &lt;hostName&gt; tag
     #[serde(rename = "hostName")]
     pub name: StringValue,
-    /// The <hostAddr> tags
+    /// The &lt;hostAddr&gt; tags
     #[serde(rename = "hostAddr")]
     pub addresses: Option<Vec<HostAddr>>,
 }
 
-/// The list of <hostAttr> types for domain transactions. Typically under an <ns> tag
+/// The list of &lt;hostAttr&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAttrList {
-    /// The list of <hostAttr> tags
+    /// The list of &lt;hostAttr&gt; tags
     #[serde(rename = "hostAttr")]
     pub hosts: Vec<HostAttr>,
 }
 
-/// The list of <hostObj> types for domain transactions. Typically under an <ns> tag
+/// The list of &lt;hostObj&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostObjList {
-    /// The list of <hostObj> tags
+    /// The list of &lt;hostObj&gt; tags
     #[serde(rename = "hostObj")]
     pub hosts: Vec<StringValue>,
 }
 
-/// The <contact> type on domain creation and update requests
+/// The &lt;contact&gt; type on domain creation and update requests
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainContact {
     /// The contact id
@@ -91,7 +91,7 @@ pub struct DomainContact {
     pub contact_type: String,
 }
 
-/// The <period> type for registration, renewal or transfer on domain transactions
+/// The &lt;period&gt; type for registration, renewal or transfer on domain transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Period {
     /// The interval (usually 'y' indicating years)
@@ -116,63 +116,63 @@ impl Period {
     }
 }
 
-/// The <status> type on contact transactions
+/// The &lt;status&gt; type on contact transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactStatus {
-    /// The status name, represented by the 's' attr on <status> tags
+    /// The status name, represented by the 's' attr on &lt;status&gt; tags
     #[serde(rename = "s")]
     pub status: String,
 }
 
-/// The data for <voice> and <fax> types on domain transactions
+/// The data for &lt;voice&gt; and &lt;fax&gt; types on domain transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Phone {
-    /// The inner text on the <voice> and <fax> tags
+    /// The inner text on the &lt;voice&gt; and &lt;fax&gt; tags
     #[serde(rename = "$value")]
     pub number: String,
-    /// The value of the 'x' attr on <voice> and <fax> tags
+    /// The value of the 'x' attr on &lt;voice&gt; and &lt;fax&gt; tags
     #[serde(rename = "x")]
     pub extension: Option<String>,
 }
 
-/// The <addr> type on contact transactions
+/// The &lt;addr&gt; type on contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Address {
-    /// The <street> tags under <addr>
+    /// The &lt;street&gt; tags under &lt;addr&gt;
     pub street: Vec<StringValue>,
-    /// The <city> tag under <addr>
+    /// The &lt;city&gt; tag under &lt;addr&gt;
     pub city: StringValue,
-    /// The <sp> tag under <addr>
+    /// The &lt;sp&gt; tag under &lt;addr&gt;
     #[serde(rename = "sp")]
     pub province: StringValue,
-    /// The <pc> tag under <addr>
+    /// The &lt;pc&gt; tag under &lt;addr&gt;
     #[serde(rename = "pc")]
     pub postal_code: StringValue,
-    /// The <cc> tag under <addr>
+    /// The &lt;cc&gt; tag under &lt;addr&gt;
     #[serde(rename = "cc")]
     pub country_code: StringValue,
 }
 
-/// The <postalInfo> type on contact transactions
+/// The &lt;postalInfo&gt; type on contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PostalInfo {
-    /// The 'type' attr on <postalInfo>
+    /// The 'type' attr on &lt;postalInfo&gt;
     #[serde(rename = "type")]
     pub info_type: String,
-    /// The <name> tag under <postalInfo>
+    /// The &lt;name&gt; tag under &lt;postalInfo&gt;
     pub name: StringValue,
-    /// The <org> tag under <postalInfo>
+    /// The &lt;org&gt; tag under &lt;postalInfo&gt;
     #[serde(rename = "org")]
     pub organization: StringValue,
-    /// The <addr> tag under <postalInfo>
+    /// The &lt;addr&gt; tag under &lt;postalInfo&gt;
     #[serde(rename = "addr")]
     pub address: Address,
 }
 
-/// The <authInfo> tag for domain and contact transactions
+/// The &lt;authInfo&gt; tag for domain and contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AuthInfo {
-    /// The <pw> tag under <authInfo>
+    /// The &lt;pw&gt; tag under &lt;authInfo&gt;
     #[serde(rename = "pw")]
     pub password: StringValue,
 }

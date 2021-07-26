@@ -7,7 +7,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for host <info> command
+/// Type that represents the &lt;epp&gt; request for host &lt;info&gt; command
 ///
 /// ## Usage
 ///
@@ -36,7 +36,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppHostInfo = EppObject<Command<HostInfo>>;
 
-/// Type for data under the host <info> tag
+/// Type for data under the host &lt;info&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostInfoData {
     /// XML namespace for host commands
@@ -47,7 +47,7 @@ pub struct HostInfoData {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "info")]
-/// Type for EPP XML <info> command for hosts
+/// Type for EPP XML &lt;info&gt; command for hosts
 pub struct HostInfo {
     /// The instance holding the data for the host query
     #[serde(rename = "info")]
@@ -55,7 +55,7 @@ pub struct HostInfo {
 }
 
 impl EppHostInfo {
-    /// Creates a new EppObject for host info corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for host info corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppHostInfo {
         EppObject::build(Command::<HostInfo> {
             command: HostInfo {

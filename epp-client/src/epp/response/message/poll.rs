@@ -4,10 +4,10 @@ use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> tag for the EPP XML message poll response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML message poll response
 pub type EppMessagePollResponse = EppObject<CommandResponse<MessagePollResult>>;
 
-/// Type that represents the <trnData> tag for message poll response
+/// Type that represents the &lt;trnData&gt; tag for message poll response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MessageDomainTransferData {
     /// XML namespace for message response data
@@ -35,10 +35,10 @@ pub struct MessageDomainTransferData {
     pub expiring_at: StringValue,
 }
 
-/// Type that represents the <resData> tag for message poll response
+/// Type that represents the &lt;resData&gt; tag for message poll response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MessagePollResult {
-    /// Data under the <trnData> tag
+    /// Data under the &lt;trnData&gt; tag
     #[serde(rename = "trnData")]
     pub message_data: MessageDomainTransferData,
 }

@@ -7,7 +7,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for domain <delete> command
+/// Type that represents the &lt;epp&gt; request for domain &lt;delete&gt; command
 ///
 /// ## Usage
 ///
@@ -36,7 +36,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppDomainDelete = EppObject<Command<DomainDelete>>;
 
-/// Type for <name> element under the domain <delete> tag
+/// Type for &lt;name&gt; element under the domain &lt;delete&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainDeleteData {
     /// XML namespace for domain commands
@@ -47,15 +47,15 @@ pub struct DomainDeleteData {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "delete")]
-/// Type for EPP XML <delete> command for domains
+/// Type for EPP XML &lt;delete&gt; command for domains
 pub struct DomainDelete {
-    /// The data under the <delete> tag for domain deletion
+    /// The data under the &lt;delete&gt; tag for domain deletion
     #[serde(rename = "delete")]
     domain: DomainDeleteData,
 }
 
 impl EppDomainDelete {
-    /// Creates a new EppObject for domain delete corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain delete corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppDomainDelete {
         EppObject::build(Command::<DomainDelete> {
             command: DomainDelete {

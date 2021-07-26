@@ -2,5 +2,5 @@
 
 use crate::epp::response::EppCommandResponse;
 
-/// Type that represents the <epp> tag for the EPP XML domain delete response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain delete response
 pub type EppDomainDeleteResponse = EppCommandResponse;

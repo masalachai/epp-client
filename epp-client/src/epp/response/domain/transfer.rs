@@ -5,18 +5,18 @@ use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 use crate::epp::response::EppCommandResponse;
 
-/// Type that represents the <epp> tag for the EPP XML domain transfer request response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer request response
 pub type EppDomainTransferRequestResponse = EppObject<CommandResponse<DomainTransferResult>>;
-/// Type that represents the <epp> tag for the EPP XML domain transfer approval response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer approval response
 pub type EppDomainTransferApproveResponse = EppCommandResponse;
-/// Type that represents the <epp> tag for the EPP XML domain transfer rejection response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer rejection response
 pub type EppDomainTransferRejectResponse = EppCommandResponse;
-/// Type that represents the <epp> tag for the EPP XML domain transfer cancellation response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer cancellation response
 pub type EppDomainTransferCancelResponse = EppCommandResponse;
-/// Type that represents the <epp> tag for the EPP XML domain transfer query response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer query response
 pub type EppDomainTransferQueryResponse = EppObject<CommandResponse<DomainTransferResult>>;
 
-/// Type that represents the <trnData> tag for domain transfer response
+/// Type that represents the &lt;trnData&gt; tag for domain transfer response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainTransferData {
     /// XML namespace for domain response data
@@ -47,10 +47,10 @@ pub struct DomainTransferData {
     pub expiring_at: StringValue,
 }
 
-/// Type that represents the <resData> tag for domain transfer response
+/// Type that represents the &lt;resData&gt; tag for domain transfer response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainTransferResult {
-    /// Data under the <trnData> tag
+    /// Data under the &lt;trnData&gt; tag
     #[serde(rename = "trnData")]
     pub transfer_data: DomainTransferData,
 }

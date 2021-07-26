@@ -6,10 +6,10 @@ use crate::epp::object::data::{AuthInfo, ContactStatus, Phone, PostalInfo};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 
-/// Type that represents the <epp> tag for the EPP XML contact info response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML contact info response
 pub type EppContactInfoResponse = EppObject<CommandResponse<ContactInfoResult>>;
 
-/// Type that represents the <infData> tag for contact check response
+/// Type that represents the &lt;infData&gt; tag for contact check response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactInfoData {
     /// XML namespace for contact response data
@@ -57,10 +57,10 @@ pub struct ContactInfoData {
     pub auth_info: Option<AuthInfo>,
 }
 
-/// Type that represents the <resData> tag for contact info response
+/// Type that represents the &lt;resData&gt; tag for contact info response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactInfoResult {
-    /// Data under the <infData> tag
+    /// Data under the &lt;infData&gt; tag
     #[serde(rename = "infData")]
     pub info_data: ContactInfoData,
 }

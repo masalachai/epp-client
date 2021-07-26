@@ -79,7 +79,7 @@ async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
     Ok(client)
 }
 
-/// Instances of the EppClient type are used to transact with the registry
+/// Instances of the EppClient type are used to transact with the registry.
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
 /// to the registry and deserialize the XML responses from the registry to local types
 pub struct EppClient {
@@ -133,7 +133,7 @@ impl EppClient {
         Ok(client)
     }
 
-    /// Executes an EPP Hello call and return the response as an `EppGreeting`
+    /// Executes an EPP Hello call and returns the response as an `EppGreeting`
     pub async fn hello(&mut self) -> Result<EppGreeting, Box<dyn Error>> {
         let hello = EppHello::new();
         let hello_xml = hello.serialize()?;
@@ -162,7 +162,7 @@ impl EppClient {
     }
 
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
-    /// Not recommended to use directly but sometimes can be useful for debugging
+    /// Not recommended for direct use but sometimes can be useful for debugging
     pub async fn transact_xml(&mut self, xml: &str) -> Result<String, Box<dyn Error>> {
         self.connection.transact(&xml).await
     }
@@ -172,7 +172,7 @@ impl EppClient {
         return String::from(&self.connection.greeting)
     }
 
-    /// Returns the greeting received on establishment of the connection as an `EppGreeting` instance
+    /// Returns the greeting received on establishment of the connection as an `EppGreeting`
     pub fn greeting(&self) -> Result<EppGreeting, error::Error> {
         EppGreeting::deserialize(&self.connection.greeting)
     }

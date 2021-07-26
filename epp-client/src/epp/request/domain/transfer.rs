@@ -8,7 +8,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for transfer request for domain
+/// Type that represents the &lt;epp&gt; request for transfer request for domain
 ///
 /// ## Usage
 ///
@@ -39,7 +39,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppDomainTransferRequest = EppObject<Command<DomainTransfer>>;
 
-/// Type that represents the <epp> request for transfer approval for domains
+/// Type that represents the &lt;epp&gt; request for transfer approval for domains
 ///
 /// ## Usage
 ///
@@ -70,7 +70,7 @@ pub type EppDomainTransferRequest = EppObject<Command<DomainTransfer>>;
 /// ```
 pub type EppDomainTransferApprove = EppObject<Command<DomainTransfer>>;
 
-/// Type that represents the <epp> request for transfer rejection for domains
+/// Type that represents the &lt;epp&gt; request for transfer rejection for domains
 ///
 /// ## Usage
 ///
@@ -101,7 +101,7 @@ pub type EppDomainTransferApprove = EppObject<Command<DomainTransfer>>;
 /// ```
 pub type EppDomainTransferReject = EppObject<Command<DomainTransfer>>;
 
-/// Type that represents the <epp> request for transfer request cancellation for domains
+/// Type that represents the &lt;epp&gt; request for transfer request cancellation for domains
 ///
 /// ## Usage
 ///
@@ -132,7 +132,7 @@ pub type EppDomainTransferReject = EppObject<Command<DomainTransfer>>;
 /// ```
 pub type EppDomainTransferCancel = EppObject<Command<DomainTransfer>>;
 
-/// Type that represents the <epp> request for transfer request query for domains
+/// Type that represents the &lt;epp&gt; request for transfer request query for domains
 ///
 /// ## Usage
 ///
@@ -163,7 +163,7 @@ pub type EppDomainTransferCancel = EppObject<Command<DomainTransfer>>;
 /// ```
 pub type EppDomainTransferQuery = EppObject<Command<DomainTransfer>>;
 
-/// Type for elements under the domain <transfer> tag
+/// Type for elements under the domain &lt;transfer&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainTransferData {
     /// XML namespace for domain commands
@@ -181,19 +181,19 @@ pub struct DomainTransferData {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "transfer")]
-/// Type for EPP XML <transfer> command for domains
+/// Type for EPP XML &lt;transfer&gt; command for domains
 pub struct DomainTransfer {
     /// The transfer operation to perform indicated by the 'op' attr
     /// The values are one of transfer, approve, reject, cancel, or query
     #[serde(rename = "op")]
     operation: String,
-    /// The data under the <transfer> tag in the transfer request
+    /// The data under the &lt;transfer&gt; tag in the transfer request
     #[serde(rename = "transfer")]
     domain: DomainTransferData,
 }
 
 impl EppDomainTransferRequest {
-    /// Creates a new EppObject for domain transfer request corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain transfer request corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn request(
         name: &str,
         years: u16,
@@ -221,7 +221,7 @@ impl EppDomainTransferRequest {
 }
 
 impl EppDomainTransferApprove {
-    /// Creates a new EppObject for domain transfer approval corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain transfer approval corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn approve(name: &str, client_tr_id: &str) -> EppDomainTransferApprove {
         EppObject::build(Command::<DomainTransfer> {
             command: DomainTransfer {
@@ -239,7 +239,7 @@ impl EppDomainTransferApprove {
 }
 
 impl EppDomainTransferCancel {
-    /// Creates a new EppObject for domain transfer request cancellation corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain transfer request cancellation corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn cancel(name: &str, client_tr_id: &str) -> EppDomainTransferCancel {
         EppObject::build(Command::<DomainTransfer> {
             command: DomainTransfer {
@@ -257,7 +257,7 @@ impl EppDomainTransferCancel {
 }
 
 impl EppDomainTransferReject {
-    /// Creates a new EppObject for domain transfer rejection corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain transfer rejection corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn reject(name: &str, client_tr_id: &str) -> EppDomainTransferReject {
         EppObject::build(Command::<DomainTransfer> {
             command: DomainTransfer {
@@ -275,7 +275,7 @@ impl EppDomainTransferReject {
 }
 
 impl EppDomainTransferQuery {
-    /// Creates a new EppObject for domain transfer request query corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for domain transfer request query corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn query(name: &str, auth_password: &str, client_tr_id: &str) -> EppDomainTransferQuery {
         EppObject::build(Command::<DomainTransfer> {
             command: DomainTransfer {

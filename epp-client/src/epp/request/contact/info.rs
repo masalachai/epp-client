@@ -8,7 +8,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type for the <epp> request for contact <info> command
+/// Type for the &lt;epp&gt; request for contact &lt;info&gt; command
 ///
 /// ## Usage
 ///
@@ -41,29 +41,29 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppContactInfo = EppObject<Command<ContactInfo>>;
 
-/// Type for elements under the contact <info> tag
+/// Type for elements under the contact &lt;info&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactInfoData {
     /// XML namespace for contact commands
     xmlns: String,
     /// The contact id for the info command
     id: StringValue,
-    /// The <authInfo> data
+    /// The &lt;authInfo&gt; data
     #[serde(rename = "authInfo")]
     auth_info: AuthInfo,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "info")]
-/// Type for EPP XML <info> command for contacts
+/// Type for EPP XML &lt;info&gt; command for contacts
 pub struct ContactInfo {
-    /// Data for <info> command for contact
+    /// Data for &lt;info&gt; command for contact
     #[serde(rename = "info")]
     info: ContactInfoData,
 }
 
 impl EppContactInfo {
-    /// Creates a new EppObject for contact info corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for contact info corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(id: &str, auth_password: &str, client_tr_id: &str) -> EppContactInfo {
         EppObject::build(Command::<ContactInfo> {
             command: ContactInfo {

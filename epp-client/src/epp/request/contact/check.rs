@@ -7,7 +7,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for contact <check> command
+/// Type that represents the &lt;epp&gt; request for contact &lt;check&gt; command
 ///
 /// ## Usage
 ///
@@ -39,10 +39,10 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppContactCheck = EppObject<Command<ContactCheck>>;
 
-/// Type that represents the <check> command for contact transactions
+/// Type that represents the &lt;check&gt; command for contact transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactList {
-    /// The XML namespace for the contact <check>
+    /// The XML namespace for the contact &lt;check&gt;
     xmlns: String,
     /// The list of contact ids to check for availability
     #[serde(rename = "id")]
@@ -51,15 +51,15 @@ pub struct ContactList {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
-/// The <command> type for contact check command
+/// The &lt;command&gt; type for contact check command
 pub struct ContactCheck {
-    /// The <check> tag for the contact check command
+    /// The &lt;check&gt; tag for the contact check command
     #[serde(rename = "check")]
     list: ContactList,
 }
 
 impl EppContactCheck {
-    /// Creates an EppObject corresponding to the <epp> tag with data for a contact check request
+    /// Creates an EppObject corresponding to the &lt;epp&gt; tag with data for a contact check request
     pub fn new(contact_ids: Vec<&str>, client_tr_id: &str) -> EppContactCheck {
         let contact_ids = contact_ids
             .iter()

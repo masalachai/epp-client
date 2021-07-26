@@ -24,9 +24,9 @@ pub type EppLogout = EppObject<Command<Logout>>;
 
 #[derive(Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "command")]
-/// Type corresponding to the <command> tag in an EPP XML request
+/// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 pub struct Command<T: ElementName> {
-    /// The instance that will be used to populate the <command> tag
+    /// The instance that will be used to populate the &lt;command&gt; tag
     pub command: T,
     /// The client TRID
     #[serde(rename = "clTRID")]
@@ -67,7 +67,7 @@ impl EppHello {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "login")]
-/// Type corresponding to the <login> tag in an EPP XML login request
+/// Type corresponding to the &lt;login&gt; tag in an EPP XML login request
 pub struct Login {
     /// The username to use for the login
     #[serde(rename(serialize = "clID", deserialize = "clID"))]
@@ -135,7 +135,7 @@ impl EppLogin {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "logout")]
-/// Type corresponding to the <logout> tag in an EPP XML logout request
+/// Type corresponding to the &lt;logout&gt; tag in an EPP XML logout request
 pub struct Logout;
 
 impl EppLogout {

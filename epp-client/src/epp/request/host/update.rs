@@ -8,7 +8,7 @@ use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for host <update> command
+/// Type that represents the &lt;epp&gt; request for host &lt;update&gt; command
 ///
 /// ## Usage
 ///
@@ -49,7 +49,7 @@ use serde::{Deserialize, Serialize};
 ///     host_update.add(add);
 ///     host_update.remove(remove);
 ///
-///     // Send a <chg> section as well
+///     // Send a &lt;chg&gt; section as well
 ///     host_update.info(HostChangeInfo { name: "ns2.eppdev-101.com".to_string_value() });
 ///
 ///     // send it to the registry and receive a response of type EppHostUpdateResponse
@@ -60,14 +60,14 @@ use serde::{Deserialize, Serialize};
 /// ```
 pub type EppHostUpdate = EppObject<Command<HostUpdate>>;
 
-/// Type for data under the <chg> tag
+/// Type for data under the &lt;chg&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostChangeInfo {
     /// The new name for the host
     pub name: StringValue,
 }
 
-/// Type for data under the <add> and <rem> tags
+/// Type for data under the &lt;add&gt; and &lt;rem&gt; tags
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAddRemove {
     /// The IP addresses to be added to or removed from the host
@@ -78,7 +78,7 @@ pub struct HostAddRemove {
     pub statuses: Option<Vec<HostStatus>>,
 }
 
-/// Type for data under the host <update> tag
+/// Type for data under the host &lt;update&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostUpdateData {
     /// XML namespace for host commands
@@ -97,7 +97,7 @@ pub struct HostUpdateData {
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "update")]
-/// Type for EPP XML <update> command for hosts
+/// Type for EPP XML &lt;update&gt; command for hosts
 pub struct HostUpdate {
     /// The instance holding the data for the host to be updated
     #[serde(rename = "update")]
@@ -105,7 +105,7 @@ pub struct HostUpdate {
 }
 
 impl EppHostUpdate {
-    /// Creates a new EppObject for host update corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for host update corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppHostUpdate {
         EppObject::build(Command::<HostUpdate> {
             command: HostUpdate {
@@ -121,17 +121,17 @@ impl EppHostUpdate {
         })
     }
 
-    /// Sets the data for the <chg> element of the host update
+    /// Sets the data for the &lt;chg&gt; element of the host update
     pub fn info(&mut self, info: HostChangeInfo) {
         self.data.command.host.change_info = Some(info);
     }
 
-    /// Sets the data for the <add> element of the host update
+    /// Sets the data for the &lt;add&gt; element of the host update
     pub fn add(&mut self, add: HostAddRemove) {
         self.data.command.host.add = Some(add);
     }
 
-    /// Sets the data for the <rem> element of the host update
+    /// Sets the data for the &lt;rem&gt; element of the host update
     pub fn remove(&mut self, remove: HostAddRemove) {
         self.data.command.host.remove = Some(remove);
     }

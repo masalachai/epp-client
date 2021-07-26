@@ -6,10 +6,10 @@ use crate::epp::object::data::{HostAddr, HostStatus};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 
-/// Type that represents the <epp> tag for the EPP XML host info response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML host info response
 pub type EppHostInfoResponse = EppObject<CommandResponse<HostInfoResult>>;
 
-/// Type that represents the <infData> tag for host info response
+/// Type that represents the &lt;infData&gt; tag for host info response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostInfoData {
     /// XML namespace for host response data
@@ -48,10 +48,10 @@ pub struct HostInfoData {
     pub transferred_at: Option<StringValue>,
 }
 
-/// Type that represents the <resData> tag for host info response
+/// Type that represents the &lt;resData&gt; tag for host info response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostInfoResult {
-    /// Data under the <infData> tag
+    /// Data under the &lt;infData&gt; tag
     #[serde(rename = "infData")]
     pub info_data: HostInfoData,
 }

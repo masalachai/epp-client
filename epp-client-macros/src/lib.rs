@@ -1,9 +1,9 @@
-//! Macros for the EPP Client Library for the Extensible Provisioning Protocol (EPP).
+//! # Macros for the epp-client Library.
 //!
 //! ## Description
 //!
-//! epp-client is a client library for Internet domain registration and management for domain registrars.
-//! This macro crate contains a fe macros to simplify serialization of generic types used in some places
+//! `epp-client` is a client library for Internet domain registration and management for domain registrars.
+//! This macro crate contains a few macros to simplify serialization of generic types used in some places
 //! in the `epp-client` library
 //!
 

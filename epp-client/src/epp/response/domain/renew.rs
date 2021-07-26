@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 
-/// Type that represents the <epp> tag for the EPP XML domain renew response
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain renew response
 pub type EppDomainRenewResponse = EppObject<CommandResponse<DomainRenewResult>>;
 
-/// Type that represents the <renData> tag for domain renew response
+/// Type that represents the &lt;renData&gt; tag for domain renew response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainRenewData {
     /// XML namespace for domain response data
@@ -23,10 +23,10 @@ pub struct DomainRenewData {
     pub expiring_at: StringValue,
 }
 
-/// Type that represents the <resData> tag for domain renew response
+/// Type that represents the &lt;resData&gt; tag for domain renew response
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainRenewResult {
-    /// Data under the <renData> tag
+    /// Data under the &lt;renData&gt; tag
     #[serde(rename = "renData")]
     pub renew_data: DomainRenewData,
 }

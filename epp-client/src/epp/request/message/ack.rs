@@ -6,7 +6,7 @@ use crate::epp::object::{ElementName, EppObject, StringValueTrait};
 use crate::epp::request::Command;
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the <epp> request for registry <poll op="ack"> command
+/// Type that represents the &lt;epp&gt; request for registry <poll op="ack"> command
 /// ## Usage
 ///
 /// ```ignore
@@ -36,7 +36,7 @@ pub type EppMessageAck = EppObject<Command<MessageAck>>;
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "poll")]
-/// Type for EPP XML <poll> command for message ack
+/// Type for EPP XML &lt;poll&gt; command for message ack
 pub struct MessageAck {
     /// The type of operation to perform
     /// The value is "ack" for message acknowledgement
@@ -47,7 +47,7 @@ pub struct MessageAck {
 }
 
 impl EppMessageAck {
-    /// Creates a new EppObject for <poll> ack corresponding to the <epp> tag in EPP XML
+    /// Creates a new EppObject for &lt;poll&gt; ack corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(message_id: u32, client_tr_id: &str) -> EppMessageAck {
         EppObject::build(Command::<MessageAck> {
             command: MessageAck {
