@@ -28,5 +28,5 @@ webpki = "0.22"
 webpki-roots = "0.21"
 
 [dev-dependencies]
-tokio-test = "*"
+tokio-test = "0.4"
 regex = "1.5"
