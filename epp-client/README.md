@@ -1,5 +1,6 @@
 # EPP (Extensible Provisioning Protocol) Library for Domain Registration and Management
 
+[![Build](https://ci.masalachai.net/api/badges/masalachai/epp-client/status.svg)](https://ci.masalachai.net/masalachai/epp-client)
 [![Documentation](https://docs.rs/epp-client/badge.svg)](https://docs.rs/epp-client/)
 
 ## Description
