@@ -1,5 +1,7 @@
 # EPP (Extensible Provisioning Protocol) Library for Domain Registration and Management
 
+[![Documentation](https://docs.rs/epp-client/badge.svg)](https://docs.rs/epp-client/)
+
 ## Description
 
 epp-client is a client library written in Rust for Internet domain registration and management for domain registrars.
@@ -7,28 +9,36 @@ epp-client is a client library written in Rust for Internet domain registration 
 It supports the following basic Domain, Contact, Host, and Message management calls, with plans to add more calls
 and other EPP extensions in the future, and to eventually be RFC compliant with the EPP protocol.
 
-- Domain Check - `EppDomainCheck`
-- Domain Create - `EppDomainCreate`
-- Domain Info - `EppDomainInfo`
-- Domain Update - `EppDomainUpdate`
-- Domain Delete - `EppDomainDelete`
-- Domain Renew - `EppDomainRenew`
-- Domain Transfer - `EppDomainTransferRequest`
+- Domain Check
+- Domain Create
+- Domain Info
+- Domain Update
+- Domain Delete
+- Domain Renew
+- Domain Transfer
 
-- Contact Check - `EppContactCheck`
-- Contact Create - `EppContactCreate`
-- Contact Info - `EppContactInfo`
-- Contact Update - `EppContactUpdate`
-- Contact Delete - `EppContactDelete`
+- Contact Check
+- Contact Create
+- Contact Info
+- Contact Update
+- Contact Delete
 
-- Host Check - `EppHostCheck`
-- Host Create - `EppHostCreate`
-- Host Info - `EppHostInfo`
-- Host Update - `EppHostUpdate`
-- Host Delete - `EppHostDelete`
+- Host Check
+- Host Create
+- Host Info
+- Host Update
+- Host Delete
 
-- Message Poll - `EppMessagePoll`
-- Message Ack - `EppMessageAck`
+- Message Poll
+- Message Ack
+
+## Usage
+
+Just add the following to your project's `Cargo.toml`
+
+```toml
+epp-client = "0.1.2"
+```
 
 ## Prerequisites
 
