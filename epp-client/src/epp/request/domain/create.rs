@@ -112,20 +112,22 @@ impl EppDomainCreate {
             .map(|n| n.to_string_value())
             .collect::<Vec<StringValue>>();
 
-        EppObject::build(Command::<DomainCreate<HostObjList>> {
-            command: DomainCreate {
-                domain: DomainCreateData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
-                    period: Period::new(period),
-                    ns: Some(HostObjList { hosts: ns_list }),
-                    registrant: Some(registrant_id.to_string_value()),
-                    auth_info: AuthInfo::new(auth_password),
-                    contacts: Some(contacts),
-                },
+        let domain_create = DomainCreate {
+            domain: DomainCreateData {
+                xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                name: name.to_string_value(),
+                period: Period::new(period),
+                ns: Some(HostObjList { hosts: ns_list }),
+                registrant: Some(registrant_id.to_string_value()),
+                auth_info: AuthInfo::new(auth_password),
+                contacts: Some(contacts),
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        };
+
+        EppObject::build(Command::<DomainCreate<HostObjList>>::new(
+            domain_create,
+            client_tr_id,
+        ))
     }
 
     /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
@@ -138,20 +140,21 @@ impl EppDomainCreate {
         contacts: Vec<DomainContact>,
         client_tr_id: &str,
     ) -> EppDomainCreate {
-        EppObject::build(Command::<DomainCreate<HostObjList>> {
-            command: DomainCreate {
-                domain: DomainCreateData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
-                    period: Period::new(period),
-                    ns: None,
-                    registrant: Some(registrant_id.to_string_value()),
-                    auth_info: AuthInfo::new(auth_password),
-                    contacts: Some(contacts),
-                },
+        let domain_create = DomainCreate {
+            domain: DomainCreateData {
+                xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                name: name.to_string_value(),
+                period: Period::new(period),
+                ns: None,
+                registrant: Some(registrant_id.to_string_value()),
+                auth_info: AuthInfo::new(auth_password),
+                contacts: Some(contacts),
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        };
+        EppObject::build(Command::<DomainCreate<HostObjList>>::new(
+            domain_create,
+            client_tr_id,
+        ))
     }
 
     /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
@@ -162,20 +165,22 @@ impl EppDomainCreate {
         auth_password: &str,
         client_tr_id: &str,
     ) -> EppDomainCreate {
-        EppObject::build(Command::<DomainCreate<HostObjList>> {
-            command: DomainCreate {
-                domain: DomainCreateData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
-                    period: Period::new(period),
-                    ns: None,
-                    registrant: None,
-                    auth_info: AuthInfo::new(auth_password),
-                    contacts: None,
-                },
+        let domain_create = DomainCreate {
+            domain: DomainCreateData {
+                xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                name: name.to_string_value(),
+                period: Period::new(period),
+                ns: None,
+                registrant: None,
+                auth_info: AuthInfo::new(auth_password),
+                contacts: None,
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        };
+
+        EppObject::build(Command::<DomainCreate<HostObjList>>::new(
+            domain_create,
+            client_tr_id,
+        ))
     }
 
     /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
@@ -189,19 +194,20 @@ impl EppDomainCreate {
         contacts: Vec<DomainContact>,
         client_tr_id: &str,
     ) -> EppDomainCreateWithHostAttr {
-        EppObject::build(Command::<DomainCreate<HostAttrList>> {
-            command: DomainCreate {
-                domain: DomainCreateData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
-                    period: Period::new(period),
-                    ns: Some(HostAttrList { hosts: ns }),
-                    registrant: Some(registrant_id.to_string_value()),
-                    auth_info: AuthInfo::new(auth_password),
-                    contacts: Some(contacts),
-                },
+        let domain_create = DomainCreate {
+            domain: DomainCreateData {
+                xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                name: name.to_string_value(),
+                period: Period::new(period),
+                ns: Some(HostAttrList { hosts: ns }),
+                registrant: Some(registrant_id.to_string_value()),
+                auth_info: AuthInfo::new(auth_password),
+                contacts: Some(contacts),
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        };
+        EppObject::build(Command::<DomainCreate<HostAttrList>>::new(
+            domain_create,
+            client_tr_id,
+        ))
     }
 }

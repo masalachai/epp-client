@@ -746,4 +746,17 @@ mod response {
         assert_eq!(msg.id, "12345".to_string());
         assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
     }
+
+    #[test]
+    fn rgp_restore_response() {
+        let xml = get_xml("response/domain/rgp_restore.xml").unwrap();
+        let object = EppDomainRgpRestoreRequestResponse::deserialize(xml.as_str()).unwrap();
+
+        let ext = object.data.extension.unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(ext.data.rgp_status.status, "pendingRestore".to_string());
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
 }

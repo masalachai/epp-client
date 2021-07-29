@@ -33,12 +33,15 @@ and other EPP extensions in the future, and to eventually be RFC compliant with 
 - Message Poll
 - Message Ack
 
+- RGP Restore Request
+- RGP Restore Report
+
 ## Usage
 
 Just add the following to your project's `Cargo.toml`
 
 ```toml
-epp-client = "0.1.2"
+epp-client = "0.2"
 ```
 
 ## Prerequisites
@@ -98,6 +101,13 @@ async fn main() {
         .iter()
         .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 }
+```
+
+The output would look similar to the following
+
+```
+Domain: eppdev.com, Available: 1
+Domain: eppdev.net, Available: 1
 ```
 
 ## Request

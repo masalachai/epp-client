@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject};
 use crate::epp::request::Command;
 use serde::{Deserialize, Serialize};
 
@@ -49,12 +49,12 @@ pub struct MessageAck {
 impl EppMessageAck {
     /// Creates a new EppObject for &lt;poll&gt; ack corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(message_id: u32, client_tr_id: &str) -> EppMessageAck {
-        EppObject::build(Command::<MessageAck> {
-            command: MessageAck {
+        EppObject::build(Command::<MessageAck>::new(
+            MessageAck {
                 op: "ack".to_string(),
                 message_id: message_id.to_string(),
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }

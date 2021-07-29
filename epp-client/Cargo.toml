@@ -1,6 +1,6 @@
 [package]
 name = "epp-client"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2018"
 license = "MIT"
 authors = ["Ritesh Chitlangi <ritesh@ayravat.com>"]
@@ -10,7 +10,7 @@ repository = "https://github.com/masalachai/epp-client"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-epp-client-macros = "0.1" #{ path = "../epp-client-macros" }
+epp-client-macros = { path = "../epp-client-macros" }
 bytes = "1"
 chrono = "0.4"
 confy = "0.4"

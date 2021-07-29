@@ -60,14 +60,13 @@ pub struct ContactDelete {
 impl EppContactDelete {
     /// Creates a new EppObject for contact delete corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(id: &str, client_tr_id: &str) -> EppContactDelete {
-        EppObject::build(Command::<ContactDelete> {
-            command: ContactDelete {
-                contact: ContactDeleteData {
-                    xmlns: EPP_CONTACT_XMLNS.to_string(),
-                    id: id.to_string_value(),
-                },
+        let contact_delete = ContactDelete {
+            contact: ContactDeleteData {
+                xmlns: EPP_CONTACT_XMLNS.to_string(),
+                id: id.to_string_value(),
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        };
+
+        EppObject::build(Command::<ContactDelete>::new(contact_delete, client_tr_id))
     }
 }

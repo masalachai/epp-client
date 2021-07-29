@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject};
 use crate::epp::request::Command;
 use serde::{Deserialize, Serialize};
 
@@ -47,11 +47,11 @@ pub struct MessagePoll {
 impl EppMessagePoll {
     /// Creates a new EppObject for &lt;poll&gt; req corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(client_tr_id: &str) -> EppMessagePoll {
-        EppObject::build(Command::<MessagePoll> {
-            command: MessagePoll {
+        EppObject::build(Command::<MessagePoll>::new(
+            MessagePoll {
                 op: "req".to_string(),
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }

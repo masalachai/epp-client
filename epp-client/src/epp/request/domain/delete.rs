@@ -57,14 +57,14 @@ pub struct DomainDelete {
 impl EppDomainDelete {
     /// Creates a new EppObject for domain delete corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppDomainDelete {
-        EppObject::build(Command::<DomainDelete> {
-            command: DomainDelete {
+        EppObject::build(Command::<DomainDelete>::new(
+            DomainDelete {
                 domain: DomainDeleteData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }

@@ -78,8 +78,8 @@ impl EppDomainRenew {
             .to_string()
             .to_string_value();
 
-        EppObject::build(Command::<DomainRenew> {
-            command: DomainRenew {
+        EppObject::build(Command::<DomainRenew>::new(
+            DomainRenew {
                 domain: DomainRenewData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
@@ -87,8 +87,8 @@ impl EppDomainRenew {
                     period: Period::new(years),
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 
     pub fn set_period(&mut self, period: Period) {

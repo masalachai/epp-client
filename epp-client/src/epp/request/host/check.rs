@@ -73,9 +73,6 @@ impl EppHostCheck {
             },
         };
 
-        EppObject::build(Command::<HostCheck> {
-            command: host_check,
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        EppObject::build(Command::<HostCheck>::new(host_check, client_tr_id))
     }
 }

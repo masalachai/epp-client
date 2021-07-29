@@ -73,9 +73,6 @@ impl EppContactCheck {
             },
         };
 
-        EppObject::build(Command::<ContactCheck> {
-            command: contact_check,
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        EppObject::build(Command::<ContactCheck>::new(contact_check, client_tr_id))
     }
 }

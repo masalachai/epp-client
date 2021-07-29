@@ -7,10 +7,14 @@ pub mod message;
 
 use epp_client_macros::*;
 use serde::{Deserialize, Deserializer, Serialize};
+use std::fmt::Debug;
 
 use crate::epp::object::{
-    ElementName, EppObject, Options, ServiceExtension, Services, StringValue,
+    ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
 };
+
+/// Type corresponding to the &lt;response&gt; tag in an EPP response without an &lt;extension&gt; section
+pub type CommandResponse<T> = CommandResponseWithExtension<T, EmptyTag>;
 
 /// The EPP Greeting that is received on a successful connection and in response to an EPP hello
 pub type EppGreeting = EppObject<Greeting>;
@@ -224,7 +228,8 @@ pub struct MessageQueue {
 #[serde(rename_all = "lowercase")]
 #[element_name(name = "response")]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
-pub struct CommandResponse<T> {
+/// containing an &lt;extension&gt; tag
+pub struct CommandResponseWithExtension<T, E: ElementName> {
     /// Data under the <result> tag
     pub result: EppResult,
     /// Data under the <msgQ> tag
@@ -233,6 +238,8 @@ pub struct CommandResponse<T> {
     #[serde(rename = "resData")]
     /// Data under the &lt;resData&gt; tag
     pub res_data: Option<T>,
+    /// Data under the &lt;extension&gt; tag
+    pub extension: Option<Extension<E>>,
     /// Data under the <trID> tag
     #[serde(rename = "trID")]
     pub tr_ids: ResponseTRID,
@@ -250,7 +257,7 @@ pub struct CommandResponseStatus {
     pub tr_ids: ResponseTRID,
 }
 
-impl<T> CommandResponse<T> {
+impl<T, E: ElementName> CommandResponseWithExtension<T, E> {
     /// Returns the data under the corresponding &lt;resData&gt; from the EPP XML
     pub fn res_data(&self) -> Option<&T> {
         match &self.res_data {

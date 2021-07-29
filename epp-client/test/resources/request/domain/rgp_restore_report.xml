@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+	<command>
+		<update>
+			<update xmlns="urn:ietf:params:xml:ns:domain-1.0">
+				<name>eppdev.com</name>
+				<chg/>
+			</update>
+		</update>
+		<extension>
+			<update xmlns="urn:ietf:params:xml:ns:rgp-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd">
+				<restore op="report">
+					<report>
+						<preData>Pre-delete registration data goes here. Both XML and free text are allowed.</preData>
+						<postData>Post-restore registration data goes here. Both XML and free text are allowed.</postData>
+						<delTime>2021-07-10T22:00:00Z</delTime>
+						<resTime>2021-07-20T22:00:00Z</resTime>
+						<resReason>Registrant error.</resReason>
+						<statement>This registrar has not restored the Registered Name in order to assume the rights to use or sell the Registered Name for itself or for any third party.</statement>
+						<statement>The information in this report is true to best of this registrar&apos;s knowledge, and this registrar acknowledges that intentionally supplying false information in this report shall constitute an incurable material breach of the Registry-Registrar Agreement.</statement>
+						<other>Supporting information goes here.</other>
+					</report>
+				</restore>
+			</update>
+		</extension>
+		<clTRID>cltrid:1626454866</clTRID>
+	</command>
+</epp>

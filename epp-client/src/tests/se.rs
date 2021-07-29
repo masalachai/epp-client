@@ -11,7 +11,8 @@ mod request {
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::xml::EppXml;
     use crate::epp::*;
-    use chrono::NaiveDate;
+    use chrono::{DateTime, NaiveDate};
+    use std::str::FromStr;
 
     #[test]
     fn hello() {
@@ -476,6 +477,51 @@ mod request {
         let xml = get_xml("request/message/ack.xml").unwrap();
 
         let object = EppMessageAck::new(12345, CLTRID);
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn rgp_restore_request() {
+        let xml = get_xml("request/domain/rgp_restore_request.xml").unwrap();
+
+        let object = EppDomainRgpRestoreRequest::new("eppdev.com", CLTRID);
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn rgp_restore_report() {
+        let xml = get_xml("request/domain/rgp_restore_report.xml").unwrap();
+
+        let pre_data =
+            "Pre-delete registration data goes here. Both XML and free text are allowed.";
+        let post_data =
+            "Post-restore registration data goes here. Both XML and free text are allowed.";
+        let deleted_at = DateTime::from_str("2021-07-10T22:00:00.0Z").unwrap();
+        let restored_at = DateTime::from_str("2021-07-20T22:00:00.0Z").unwrap();
+        let restore_reason = "Registrant error.";
+        let statements = vec![
+            "This registrar has not restored the Registered Name in order to assume the rights to use or sell the Registered Name for itself or for any third party.",
+            "The information in this report is true to best of this registrar's knowledge, and this registrar acknowledges that intentionally supplying false information in this report shall constitute an incurable material breach of the Registry-Registrar Agreement.",
+        ];
+        let other = "Supporting information goes here.";
+
+        let object = EppDomainRgpRestoreReport::new(
+            "eppdev.com",
+            pre_data,
+            post_data,
+            deleted_at,
+            restored_at,
+            restore_reason,
+            statements,
+            other,
+            CLTRID,
+        );
 
         let serialized = object.serialize().unwrap();
 

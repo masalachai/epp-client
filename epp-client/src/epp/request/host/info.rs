@@ -57,14 +57,14 @@ pub struct HostInfo {
 impl EppHostInfo {
     /// Creates a new EppObject for host info corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppHostInfo {
-        EppObject::build(Command::<HostInfo> {
-            command: HostInfo {
+        EppObject::build(Command::<HostInfo>::new(
+            HostInfo {
                 info: HostInfoData {
                     xmlns: EPP_HOST_XMLNS.to_string(),
                     name: name.to_string_value(),
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }

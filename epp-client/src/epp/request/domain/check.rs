@@ -73,9 +73,6 @@ impl EppDomainCheck {
             },
         };
 
-        EppObject::build(Command::<DomainCheck> {
-            command: domain_check,
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        EppObject::build(Command::<DomainCheck>::new(domain_check, client_tr_id))
     }
 }

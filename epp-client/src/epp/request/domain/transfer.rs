@@ -200,8 +200,8 @@ impl EppDomainTransferRequest {
         auth_password: &str,
         client_tr_id: &str,
     ) -> EppDomainTransferRequest {
-        EppObject::build(Command::<DomainTransfer> {
-            command: DomainTransfer {
+        EppObject::build(Command::<DomainTransfer>::new(
+            DomainTransfer {
                 operation: "request".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
@@ -210,8 +210,8 @@ impl EppDomainTransferRequest {
                     auth_info: Some(AuthInfo::new(auth_password)),
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 
     /// Sets the period for renewal in case of a successful transfer
@@ -223,8 +223,8 @@ impl EppDomainTransferRequest {
 impl EppDomainTransferApprove {
     /// Creates a new EppObject for domain transfer approval corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn approve(name: &str, client_tr_id: &str) -> EppDomainTransferApprove {
-        EppObject::build(Command::<DomainTransfer> {
-            command: DomainTransfer {
+        EppObject::build(Command::<DomainTransfer>::new(
+            DomainTransfer {
                 operation: "approve".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
@@ -233,16 +233,16 @@ impl EppDomainTransferApprove {
                     auth_info: None,
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }
 
 impl EppDomainTransferCancel {
     /// Creates a new EppObject for domain transfer request cancellation corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn cancel(name: &str, client_tr_id: &str) -> EppDomainTransferCancel {
-        EppObject::build(Command::<DomainTransfer> {
-            command: DomainTransfer {
+        EppObject::build(Command::<DomainTransfer>::new(
+            DomainTransfer {
                 operation: "cancel".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
@@ -251,16 +251,16 @@ impl EppDomainTransferCancel {
                     auth_info: None,
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }
 
 impl EppDomainTransferReject {
     /// Creates a new EppObject for domain transfer rejection corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn reject(name: &str, client_tr_id: &str) -> EppDomainTransferReject {
-        EppObject::build(Command::<DomainTransfer> {
-            command: DomainTransfer {
+        EppObject::build(Command::<DomainTransfer>::new(
+            DomainTransfer {
                 operation: "reject".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
@@ -269,16 +269,16 @@ impl EppDomainTransferReject {
                     auth_info: None,
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }
 
 impl EppDomainTransferQuery {
     /// Creates a new EppObject for domain transfer request query corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn query(name: &str, auth_password: &str, client_tr_id: &str) -> EppDomainTransferQuery {
-        EppObject::build(Command::<DomainTransfer> {
-            command: DomainTransfer {
+        EppObject::build(Command::<DomainTransfer>::new(
+            DomainTransfer {
                 operation: "query".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
@@ -287,7 +287,7 @@ impl EppDomainTransferQuery {
                     auth_info: Some(AuthInfo::new(auth_password)),
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }

@@ -2,6 +2,7 @@
 
 pub mod data;
 
+use epp_client_macros::*;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 use std::fmt::Display;
 
@@ -46,6 +47,11 @@ pub trait ElementName {
     fn element_name(&self) -> &'static str;
 }
 
+#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
+#[element_name(name = "empty")]
+/// An empty placeholder tag. To be refactored to something more compliant later.
+pub struct EmptyTag;
+
 /// An EPP XML Document that is used either as an EPP XML request or
 /// an EPP XML response
 #[derive(Deserialize, Debug, PartialEq)]
@@ -73,6 +79,7 @@ impl<T: ElementName + Serialize> Serialize for EppObject<T> {
         S: Serializer,
     {
         let data_name = self.data.element_name();
+
         let mut state = serializer.serialize_struct("epp", 4)?;
         state.serialize_field("xmlns", &self.xmlns)?;
         state.serialize_field("xmlns:xsi", &self.xmlns_xsi)?;
@@ -99,6 +106,28 @@ impl Options {
             version: version.to_string_value(),
             lang: lang.to_string_value(),
         }
+    }
+}
+
+/// Type representing the &lt;extension&gt; tag for an EPP document
+#[derive(Deserialize, Debug, PartialEq)]
+#[serde(rename = "extension")]
+pub struct Extension<E: ElementName> {
+    /// Data under the &lt;extension&gt; tag
+    #[serde(alias = "upData")]
+    pub data: E,
+}
+
+impl<E: ElementName + Serialize> Serialize for Extension<E> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let data_name = self.data.element_name();
+
+        let mut state = serializer.serialize_struct("extension", 1)?;
+        state.serialize_field(data_name, &self.data)?;
+        state.end()
     }
 }
 

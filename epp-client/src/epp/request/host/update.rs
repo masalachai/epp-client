@@ -107,8 +107,8 @@ pub struct HostUpdate {
 impl EppHostUpdate {
     /// Creates a new EppObject for host update corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppHostUpdate {
-        EppObject::build(Command::<HostUpdate> {
-            command: HostUpdate {
+        EppObject::build(Command::<HostUpdate>::new(
+            HostUpdate {
                 host: HostUpdateData {
                     xmlns: EPP_HOST_XMLNS.to_string(),
                     name: name.to_string_value(),
@@ -117,8 +117,8 @@ impl EppHostUpdate {
                     change_info: None,
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 
     /// Sets the data for the &lt;chg&gt; element of the host update

@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -68,8 +68,8 @@ pub struct DomainInfo {
 impl EppDomainInfo {
     /// Creates a new EppObject for domain info corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppDomainInfo {
-        EppObject::build(Command::<DomainInfo> {
-            command: DomainInfo {
+        EppObject::build(Command::<DomainInfo>::new(
+            DomainInfo {
                 info: DomainInfoData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     domain: Domain {
@@ -78,7 +78,7 @@ impl EppDomainInfo {
                     },
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }

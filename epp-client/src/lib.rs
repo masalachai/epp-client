@@ -30,6 +30,9 @@
 //! - Message Poll - [`EppMessagePoll`](epp/request/message/poll/type.EppMessagePoll.html)
 //! - Message Ack - [`EppMessageAck`](epp/request/message/ack/type.EppMessageAck.html)
 //!
+//! - RGP Restore Request - [`EppDomainRgpRestoreRequest`](epp/request/domain/rgp/request/type.EppDomainRgpRestoreRequest.html)
+//! - RGP Restore Report - [`EppDomainRgpRestoreReport`](epp/request/domain/rgp/report/type.EppDomainRgpRestoreReport.html)
+//!
 //! ## Prerequisites
 //!
 //! To use the library, you must have an `epp-client/epp-client.toml` config file with the relevant registry
@@ -87,6 +90,13 @@
 //!         .iter()
 //!         .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 //! }
+//! ```
+//!
+//! The output would look similar to the following
+//!
+//! ```
+//! Domain: eppdev.com, Available: 1
+//! Domain: eppdev.net, Available: 1
 //! ```
 
 #[macro_use]

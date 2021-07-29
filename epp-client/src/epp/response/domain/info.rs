@@ -4,10 +4,12 @@ use serde::{Deserialize, Serialize};
 
 use crate::epp::object::data::{AuthInfo, DomainContact, DomainStatus, HostAttr};
 use crate::epp::object::{EppObject, StringValue};
-use crate::epp::response::CommandResponse;
+use crate::epp::response::domain::rgp::request::RgpRequestResult;
+use crate::epp::response::CommandResponseWithExtension;
 
 /// Type that represents the &lt;epp&gt; tag for the EPP XML domain info response
-pub type EppDomainInfoResponse = EppObject<CommandResponse<DomainInfoResult>>;
+pub type EppDomainInfoResponse =
+    EppObject<CommandResponseWithExtension<DomainInfoResult, RgpRequestResult>>;
 
 /// The two types of ns lists, hostObj and hostAttr, that may be returned in the
 /// domain info response

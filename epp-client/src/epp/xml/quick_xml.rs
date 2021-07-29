@@ -12,12 +12,14 @@ use crate::error;
 impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject<T> {
     type Output = EppObject<T>;
 
+    /// Serializes the EppObject instance to an EPP XML document
     fn serialize(&self) -> Result<String, Box<dyn Error>> {
         let epp_xml = format!("{}\r\n{}", EPP_XML_HEADER, se::to_string(self)?);
 
         Ok(epp_xml)
     }
 
+    /// Deserializes an EPP XML document to an EppObject instance
     fn deserialize(epp_xml: &str) -> Result<Self::Output, error::Error> {
         let object: Self::Output = match from_str(epp_xml) {
             Ok(v) => v,

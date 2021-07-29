@@ -65,15 +65,14 @@ pub struct ContactInfo {
 impl EppContactInfo {
     /// Creates a new EppObject for contact info corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(id: &str, auth_password: &str, client_tr_id: &str) -> EppContactInfo {
-        EppObject::build(Command::<ContactInfo> {
-            command: ContactInfo {
-                info: ContactInfoData {
-                    xmlns: EPP_CONTACT_XMLNS.to_string(),
-                    id: id.to_string_value(),
-                    auth_info: AuthInfo::new(auth_password),
-                },
+        let contact_info = ContactInfo {
+            info: ContactInfoData {
+                xmlns: EPP_CONTACT_XMLNS.to_string(),
+                id: id.to_string_value(),
+                auth_info: AuthInfo::new(auth_password),
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        };
+
+        EppObject::build(Command::<ContactInfo>::new(contact_info, client_tr_id))
     }
 }

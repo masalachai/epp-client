@@ -107,10 +107,7 @@ impl EppContactCreate {
             },
         };
 
-        EppObject::build(Command::<ContactCreate> {
-            command: contact_create,
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        EppObject::build(Command::<ContactCreate>::new(contact_create, client_tr_id))
     }
 
     /// Sets the &lt;fax&gt; data for the request

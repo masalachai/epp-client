@@ -95,19 +95,19 @@ pub struct DomainAddRemove<T> {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainUpdateData<T> {
     /// XML namespace for domain commands
-    xmlns: String,
+    pub xmlns: String,
     /// The name of the domain to update
-    name: StringValue,
+    pub name: StringValue,
     /// `DomainAddRemove` Object containing the list of elements to be added
     /// to the domain
-    add: Option<DomainAddRemove<T>>,
+    pub add: Option<DomainAddRemove<T>>,
     /// `DomainAddRemove` Object containing the list of elements to be removed
     /// from the domain
     #[serde(rename = "rem")]
-    remove: Option<DomainAddRemove<T>>,
+    pub remove: Option<DomainAddRemove<T>>,
     /// The data under the &lt;chg&gt; tag for domain update
     #[serde(rename = "chg")]
-    change_info: Option<DomainChangeInfo>,
+    pub change_info: Option<DomainChangeInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -115,15 +115,15 @@ pub struct DomainUpdateData<T> {
 /// Type for EPP XML &lt;update&gt; command for domains
 pub struct DomainUpdate<T> {
     #[serde(rename = "update")]
-    domain: DomainUpdateData<T>,
+    pub domain: DomainUpdateData<T>,
 }
 
 impl EppDomainUpdate {
     /// Creates a new EppObject for domain update corresponding to the &lt;epp&gt; tag in EPP XML
     /// with the &lt;ns&gt; tag containing &lt;hostObj&gt; tags
     pub fn new(name: &str, client_tr_id: &str) -> EppDomainUpdate {
-        EppObject::build(Command::<DomainUpdate<HostObjList>> {
-            command: DomainUpdate {
+        EppObject::build(Command::<DomainUpdate<HostObjList>>::new(
+            DomainUpdate {
                 domain: DomainUpdateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
@@ -132,8 +132,8 @@ impl EppDomainUpdate {
                     change_info: None,
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 
     /// Sets the data for the &lt;chg&gt; tag
@@ -156,8 +156,8 @@ impl EppDomainUpdateWithHostAttr {
     /// Creates a new EppObject for domain update corresponding to the &lt;epp&gt; tag in EPP XML
     /// with the &lt;ns&gt; tag containing &lt;hostAttr&gt; tags
     pub fn new(name: &str, client_tr_id: &str) -> EppDomainUpdateWithHostAttr {
-        EppObject::build(Command::<DomainUpdate<HostAttrList>> {
-            command: DomainUpdate {
+        EppObject::build(Command::<DomainUpdate<HostAttrList>>::new(
+            DomainUpdate {
                 domain: DomainUpdateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
@@ -166,8 +166,8 @@ impl EppDomainUpdateWithHostAttr {
                     change_info: None,
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 
     /// Sets the data for the &lt;chg&gt; tag

@@ -76,9 +76,6 @@ impl EppHostCreate {
             },
         };
 
-        EppObject::build(Command::<HostCreate> {
-            command: host_create,
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        EppObject::build(Command::<HostCreate>::new(host_create, client_tr_id))
     }
 }

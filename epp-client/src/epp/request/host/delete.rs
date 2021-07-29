@@ -57,14 +57,14 @@ pub struct HostDelete {
 impl EppHostDelete {
     /// Creates a new EppObject for host delete corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppHostDelete {
-        EppObject::build(Command::<HostDelete> {
-            command: HostDelete {
+        EppObject::build(Command::<HostDelete>::new(
+            HostDelete {
                 host: HostDeleteData {
                     xmlns: EPP_HOST_XMLNS.to_string(),
                     name: name.to_string_value(),
                 },
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+            client_tr_id,
+        ))
     }
 }

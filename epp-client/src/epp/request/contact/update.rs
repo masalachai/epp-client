@@ -93,18 +93,16 @@ pub struct ContactUpdate {
 impl EppContactUpdate {
     /// Creates a new EppObject for contact update corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(id: &str, client_tr_id: &str) -> EppContactUpdate {
-        EppObject::build(Command::<ContactUpdate> {
-            command: ContactUpdate {
-                contact: ContactUpdateData {
-                    xmlns: EPP_CONTACT_XMLNS.to_string(),
-                    id: id.to_string_value(),
-                    add_statuses: None,
-                    remove_statuses: None,
-                    change_info: None,
-                },
+        let contact_update = ContactUpdate {
+            contact: ContactUpdateData {
+                xmlns: EPP_CONTACT_XMLNS.to_string(),
+                id: id.to_string_value(),
+                add_statuses: None,
+                remove_statuses: None,
+                change_info: None,
             },
-            client_tr_id: client_tr_id.to_string_value(),
-        })
+        };
+        EppObject::build(Command::<ContactUpdate>::new(contact_update, client_tr_id))
     }
 
     /// Sets the data for the &lt;chg&gt; tag for the contact update request
