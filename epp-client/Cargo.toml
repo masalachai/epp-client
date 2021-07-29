@@ -10,7 +10,7 @@ repository = "https://github.com/masalachai/epp-client"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-epp-client-macros = { path = "../epp-client-macros" }
+epp-client-macros = "0.1" # { path = "../epp-client-macros" }
 bytes = "1"
 chrono = "0.4"
 confy = "0.4"
