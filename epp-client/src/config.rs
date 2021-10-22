@@ -47,23 +47,12 @@
 //! let tls = registry.tls_files().unwrap();
 //! ```
 
-use confy;
-use lazy_static::lazy_static;
 use rustls::{Certificate, PrivateKey};
 use rustls_pemfile;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::default;
 use std::io::{Seek, SeekFrom};
 use std::{fs, io};
-
-lazy_static! {
-    /// Static reference to the config file
-    pub static ref CONFIG: EppClientConfig = match confy::load("epp-client") {
-        Ok(cfg) => cfg,
-        Err(e) => panic!("Config read error: {}", e),
-    };
-}
 
 /// Paths to the client certificate and client key PEM files
 #[derive(Serialize, Deserialize, Debug)]
@@ -75,39 +64,18 @@ pub struct EppClientTlsFiles {
 /// Connection details to connect to and authenticate with a registry
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientConnection {
-    host: String,
-    port: u16,
-    username: String,
-    password: String,
-    ext_uris: Option<Vec<String>>,
-    tls_files: Option<EppClientTlsFiles>,
+    pub host: String,
+    pub port: u16,
+    pub username: String,
+    pub password: String,
+    pub ext_uris: Option<Vec<String>>,
+    pub tls_files: Option<EppClientTlsFiles>,
 }
 
 /// Config that stores settings for multiple registries
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientConfig {
     pub registry: HashMap<String, EppClientConnection>,
-}
-
-impl default::Default for EppClientConfig {
-    fn default() -> Self {
-        let mut registries: HashMap<String, EppClientConnection> = HashMap::new();
-        let registrar = EppClientConnection {
-            host: "epphost".to_string(),
-            port: 700,
-            username: "username".to_string(),
-            password: "password".to_string(),
-            ext_uris: Some(vec![]),
-            tls_files: Some(EppClientTlsFiles {
-                cert_chain: "/path/to/certificate/chain/pemfile".to_string(),
-                key: "/path/to/private/key/pemfile".to_string(),
-            }),
-        };
-        registries.insert("verisign".to_string(), registrar);
-        Self {
-            registry: registries,
-        }
-    }
 }
 
 impl EppClientConnection {

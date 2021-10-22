@@ -28,12 +28,10 @@
 //! ```
 
 use futures::executor::block_on;
-use std::sync::mpsc;
 use std::time::SystemTime;
 use std::{error::Error, fmt::Debug};
-// use std::sync::Arc;
 
-use crate::config::CONFIG;
+use crate::config::EppClientConfig;
 use crate::connection::registry::{epp_connect, EppConnection};
 use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout};
 use crate::epp::response::{
@@ -41,40 +39,6 @@ use crate::epp::response::{
 };
 use crate::epp::xml::EppXml;
 use crate::error;
-
-/// Connects to the registry and returns an logged-in instance of EppClient for further transactions
-async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
-    let registry_creds = match CONFIG.registry(registry) {
-        Some(creds) => creds,
-        None => return Err(format!("missing credentials for {}", registry).into()),
-    };
-
-    let (tx, rx) = mpsc::channel();
-
-    tokio::spawn(async move {
-        let stream = epp_connect(registry_creds).await.unwrap();
-        let credentials = registry_creds.credentials();
-        let ext_uris = registry_creds.ext_uris();
-
-        let ext_uris =
-            ext_uris.map(|uris| uris.iter().map(|u| u.to_string()).collect::<Vec<String>>());
-
-        let connection = EppConnection::new(registry.to_string(), stream)
-            .await
-            .unwrap();
-
-        let client = EppClient::build(connection, credentials, ext_uris)
-            .await
-            .unwrap();
-
-        tx.send(client).unwrap();
-    });
-
-    let client = rx.recv()?;
-
-    Ok(client)
-}
-
 /// Instances of the EppClient type are used to transact with the registry.
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
 /// to the registry and deserialize the XML responses from the registry to local types
@@ -82,7 +46,6 @@ pub struct EppClient {
     credentials: (String, String),
     ext_uris: Option<Vec<String>>,
     connection: EppConnection,
-    // pub client_tr_id_fn: Arc<dyn Fn(&EppClient) -> String + Send + Sync>,
 }
 
 /// A function to generate a simple client TRID. Should only be used for testing, library users
@@ -96,20 +59,26 @@ pub fn default_client_tr_id_fn(client: &EppClient) -> String {
 }
 
 impl EppClient {
-    /// Fetches the username used in the registry connection
-    pub fn username(&self) -> String {
-        self.credentials.0.to_string()
-    }
-
-    // pub fn set_client_tr_id_fn<F>(&mut self, func: F)
-    // where F: Fn(&EppClient) -> String + Send + Sync + 'static {
-    //     self.client_tr_id_fn = Arc::new(func);
-    // }
-
     /// Creates a new EppClient object and does an EPP Login to a given registry to become ready
     /// for subsequent transactions on this client instance
-    pub async fn new(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
-        connect(registry).await
+    pub async fn new(
+        config: &EppClientConfig,
+        registry: &str,
+    ) -> Result<EppClient, Box<dyn Error>> {
+        let registry_creds = match config.registry(registry) {
+            Some(creds) => creds,
+            None => return Err(format!("missing credentials for {}", registry).into()),
+        };
+
+        let stream = epp_connect(registry_creds).await?;
+        let credentials = registry_creds.credentials();
+        let ext_uris = registry_creds.ext_uris();
+
+        let ext_uris =
+            ext_uris.map(|uris| uris.iter().map(|u| u.to_string()).collect::<Vec<String>>());
+
+        let connection = EppConnection::new(registry.to_string(), stream).await?;
+        EppClient::build(connection, credentials, ext_uris).await
     }
 
     /// Makes a login request to the registry and initializes an EppClient instance with it
@@ -169,6 +138,11 @@ impl EppClient {
             let epp_error = EppCommandResponseError::deserialize(&response)?;
             Err(error::Error::EppCommandError(epp_error))
         }
+    }
+
+    /// Fetches the username used in the registry connection
+    pub fn username(&self) -> String {
+        self.credentials.0.to_string()
     }
 
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
