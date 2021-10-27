@@ -31,22 +31,20 @@
 //! ```rust
 //! use epp_client::config::CONFIG;
 //!
-//! fn main() {
-//!     // Get configuration for the relevant registry section
-//!     let registry = CONFIG.registry("verisign").unwrap();
+//! // Get configuration for the relevant registry section
+//! let registry = CONFIG.registry("verisign").unwrap();
 //!
-//!     // Get EPP host name and port no.
-//!     let remote = registry.connection_details();
+//! // Get EPP host name and port no.
+//! let remote = registry.connection_details();
 //!
-//!     // Get username and password
-//!     let credentials = registry.credentials();
+//! // Get username and password
+//! let credentials = registry.credentials();
 //!
-//!     // Get EPP service extensions
-//!     let service_extensions = registry.ext_uris().unwrap();
+//! // Get EPP service extensions
+//! let service_extensions = registry.ext_uris().unwrap();
 //!
-//!     // Get client certificate and private key
-//!     let tls = registry.tls_files().unwrap();
-//! }
+//! // Get client certificate and private key
+//! let tls = registry.tls_files().unwrap();
 //! ```
 
 use confy;

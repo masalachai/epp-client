@@ -212,7 +212,7 @@ impl Address {
     ) -> Address {
         let street = street
             .iter()
-            .filter_map(|s| Some(s.to_string_value()))
+            .map(|s| s.to_string_value())
             .collect::<Vec<StringValue>>();
 
         Address {

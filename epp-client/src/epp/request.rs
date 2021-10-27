@@ -97,6 +97,12 @@ impl EppHello {
     }
 }
 
+impl Default for EppHello {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "login")]
 /// Type corresponding to the &lt;login&gt; tag in an EPP XML login request

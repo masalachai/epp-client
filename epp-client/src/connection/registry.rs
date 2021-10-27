@@ -48,7 +48,7 @@ impl EppConnection {
     }
 
     /// Writes to the socket
-    async fn write(&mut self, buf: &Vec<u8>) -> Result<(), Box<dyn Error>> {
+    async fn write(&mut self, buf: &[u8]) -> Result<(), Box<dyn Error>> {
         let wrote = self.stream.writer.write(buf).await?;
 
         debug!("{}: Wrote {} bytes", self.registry, wrote);
@@ -139,7 +139,7 @@ impl EppConnection {
 
 impl Drop for EppConnection {
     fn drop(&mut self) {
-        block_on(self.close());
+        let _ = block_on(self.close());
     }
 }
 
