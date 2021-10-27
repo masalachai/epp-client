@@ -17,8 +17,8 @@ fn get_xml(path: &str) -> Result<String, Box<dyn Error>> {
     let mut buf = String::new();
 
     f.read_to_string(&mut buf)?;
-    if buf.len() > 0 {
-        let mat = Regex::new(r"\?>").unwrap().find(&buf.as_str()).unwrap();
+    if !buf.is_empty() {
+        let mat = Regex::new(r"\?>").unwrap().find(buf.as_str()).unwrap();
         let start = mat.end();
         buf = format!(
             "{}\r\n{}",

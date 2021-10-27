@@ -156,7 +156,7 @@ impl<T: ElementName> EppObject<T> {
     pub fn build(data: T) -> EppObject<T> {
         EppObject {
             // xml: None,
-            data: data,
+            data,
             xmlns: EPP_XMLNS.to_string(),
             xmlns_xsi: EPP_XMLNS_XSI.to_string(),
             xsi_schema_location: EPP_XSI_SCHEMA_LOCATION.to_string(),

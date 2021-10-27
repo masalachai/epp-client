@@ -151,7 +151,7 @@ impl EppContactUpdate {
                     email: Some(res_data.info_data.email.clone()),
                     postal_info: Some(res_data.info_data.postal_info.clone()),
                     voice: Some(res_data.info_data.voice.clone()),
-                    fax: res_data.info_data.fax.clone(),
+                    fax: res_data.info_data.fax,
                     auth_info: None,
                 });
                 Ok(())

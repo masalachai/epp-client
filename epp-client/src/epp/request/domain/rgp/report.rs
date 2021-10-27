@@ -161,7 +161,7 @@ impl EppDomainRgpRestoreReport {
                                 .to_rfc3339_opts(SecondsFormat::AutoSi, true)
                                 .to_string_value(),
                             restore_reason: restore_reason.to_string_value(),
-                            statements: statements,
+                            statements,
                             other: other.to_string_value(),
                         },
                     },

@@ -25,7 +25,7 @@ impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject
             Ok(v) => v,
             Err(e) => {
                 return Err(error::Error::EppDeserializationError(
-                    format!("epp-client Deserialization Error: {}", e).to_string(),
+                    format!("epp-client Deserialization Error: {}", e),
                 ))
             }
         };

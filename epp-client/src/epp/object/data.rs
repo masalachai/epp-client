@@ -106,7 +106,7 @@ impl Period {
     pub fn new(length: u16) -> Period {
         Period {
             unit: "y".to_string(),
-            length: length,
+            length,
         }
     }
 
@@ -216,7 +216,7 @@ impl Address {
             .collect::<Vec<StringValue>>();
 
         Address {
-            street: street,
+            street,
             city: city.to_string_value(),
             province: province.to_string_value(),
             postal_code: postal_code.to_string_value(),
@@ -232,7 +232,7 @@ impl PostalInfo {
             info_type: info_type.to_string(),
             name: name.to_string_value(),
             organization: organization.to_string_value(),
-            address: address,
+            address,
         }
     }
 }

@@ -69,7 +69,7 @@ impl EppHostCheck {
         let host_check = HostCheck {
             list: HostList {
                 xmlns: EPP_HOST_XMLNS.to_string(),
-                hosts: hosts,
+                hosts,
             },
         };
 

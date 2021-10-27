@@ -34,7 +34,7 @@ impl Display for Error {
 
 impl From<std::boxed::Box<dyn std::error::Error>> for Error {
     fn from(e: std::boxed::Box<dyn std::error::Error>) -> Self {
-        Self::Other(format!("{:?}", e).to_string())
+        Self::Other(format!("{:?}", e))
     }
 }
 
