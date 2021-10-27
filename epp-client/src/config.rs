@@ -137,31 +137,23 @@ impl EppClientConnection {
     }
     /// Parses the client certificate chain
     fn client_certificate(&self) -> Option<Vec<Certificate>> {
-        match &self.tls_files {
-            Some(tls) => Some(
-                rustls_pemfile::certs(&mut io::BufReader::new(
+        self.tls_files.as_ref().map(|tls| rustls_pemfile::certs(&mut io::BufReader::new(
                     fs::File::open(tls.cert_chain.to_string()).unwrap(),
                 ))
                 .unwrap()
                 .iter()
                 .map(|v| Certificate(v.clone()))
-                .collect(),
-            ),
-            None => None,
-        }
+                .collect())
     }
     /// Parses the client RSA private key
     fn key(&self) -> Option<PrivateKey> {
-        match &self.tls_files {
-            Some(tls) => Some(rustls::PrivateKey(
+        self.tls_files.as_ref().map(|tls| rustls::PrivateKey(
                 rustls_pemfile::rsa_private_keys(&mut io::BufReader::new(
                     fs::File::open(tls.key.to_string()).unwrap(),
                 ))
                 .unwrap()[0]
                     .clone(),
-            )),
-            None => None,
-        }
+            ))
     }
 }
 

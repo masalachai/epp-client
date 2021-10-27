@@ -50,19 +50,14 @@ async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
     let (tx, rx) = mpsc::channel();
 
     tokio::spawn(async move {
-        let stream = epp_connect(&registry_creds).await.unwrap();
+        let stream = epp_connect(registry_creds).await.unwrap();
         let credentials = registry_creds.credentials();
         let ext_uris = registry_creds.ext_uris();
 
-        let ext_uris = match ext_uris {
-            Some(uris) => Some(
-                uris
+        let ext_uris = ext_uris.map(|uris| uris
                     .iter()
                     .map(|u| u.to_string())
-                    .collect::<Vec<String>>()
-            ),
-            None => None,
-        };
+                    .collect::<Vec<String>>());
 
         let connection = EppConnection::new(
             registry.to_string(),
@@ -119,9 +114,9 @@ impl EppClient {
     /// Makes a login request to the registry and initializes an EppClient instance with it
     async fn build(connection: EppConnection, credentials: (String, String), ext_uris: Option<Vec<String>>) -> Result<EppClient, Box<dyn Error>> {
         let mut client = EppClient {
-            connection: connection,
-            credentials: credentials,
-            ext_uris: ext_uris,
+            connection,
+            credentials,
+            ext_uris,
             // client_tr_id_fn: Arc::new(default_client_tr_id_fn),
         };
 
@@ -164,12 +159,12 @@ impl EppClient {
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
     /// Not recommended for direct use but sometimes can be useful for debugging
     pub async fn transact_xml(&mut self, xml: &str) -> Result<String, Box<dyn Error>> {
-        self.connection.transact(&xml).await
+        self.connection.transact(xml).await
     }
 
     /// Returns the greeting received on establishment of the connection in raw xml form
     pub fn xml_greeting(&self) -> String {
-        return String::from(&self.connection.greeting)
+        String::from(&self.connection.greeting)
     }
 
     /// Returns the greeting received on establishment of the connection as an `EppGreeting`

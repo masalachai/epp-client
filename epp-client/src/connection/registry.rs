@@ -38,9 +38,9 @@ impl EppConnection {
         debug!("{}: greeting: {}", registry, greeting);
 
         Ok(EppConnection {
-            registry: registry,
-            stream: stream,
-            greeting: greeting
+            registry,
+            stream,
+            greeting
         })
     }
 
@@ -64,7 +64,7 @@ impl EppConnection {
         let len_u32: [u8; 4] = u32::to_be_bytes(len.try_into()?);
 
         buf[..4].clone_from_slice(&len_u32);
-        buf[4..].clone_from_slice(&content.as_bytes());
+        buf[4..].clone_from_slice(content.as_bytes());
 
         self.write(&buf).await
     }
@@ -89,7 +89,7 @@ impl EppConnection {
             debug!("{}: Read: {} bytes", self.registry, read);
             buf.extend_from_slice(&read_buf[0..read]);
 
-            read_size = read_size + read;
+            read_size += read;
             debug!("{}: Total read: {} bytes", self.registry, read_size);
 
             if read == 0 {
@@ -117,7 +117,7 @@ impl EppConnection {
     /// receieved to the request
     pub async fn transact(&mut self, content: &str) -> Result<String, Box<dyn Error>> {
         debug!("{}: request: {}", self.registry, content);
-        self.send_epp_request(&content).await?;
+        self.send_epp_request(content).await?;
 
         let response = self.get_epp_response().await?;
         debug!("{}: response: {}", self.registry, response);
@@ -149,8 +149,7 @@ pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<Connect
 
     let addr = (host.as_str(), port)
         .to_socket_addrs()?
-        .next()
-        .ok_or_else(|| stdio::ErrorKind::NotFound)?;
+        .next().ok_or(stdio::ErrorKind::NotFound)?;
 
     let mut roots = RootCertStore::empty();
     roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
@@ -184,7 +183,7 @@ pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<Connect
     let (reader, writer) = split(stream);
 
     Ok(ConnectionStream {
-        reader: reader,
-        writer: writer,
+        reader,
+        writer,
     })
 }

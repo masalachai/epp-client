@@ -69,7 +69,7 @@ impl EppDomainCheck {
         let domain_check = DomainCheck {
             list: DomainList {
                 xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                domains: domains,
+                domains,
             },
         };
 

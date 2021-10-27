@@ -261,14 +261,14 @@ impl<T, E: ElementName> CommandResponseWithExtension<T, E> {
     /// Returns the data under the corresponding &lt;resData&gt; from the EPP XML
     pub fn res_data(&self) -> Option<&T> {
         match &self.res_data {
-            Some(res_data) => Some(&res_data),
+            Some(res_data) => Some(res_data),
             None => None,
         }
     }
     /// Returns the data under the corresponding <msgQ> from the EPP XML
     pub fn message_queue(&self) -> Option<&MessageQueue> {
         match &self.message_queue {
-            Some(queue) => Some(&queue),
+            Some(queue) => Some(queue),
             None => None,
         }
     }

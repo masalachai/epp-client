@@ -69,7 +69,7 @@ impl EppContactCheck {
         let contact_check = ContactCheck {
             list: ContactList {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
-                contact_ids: contact_ids,
+                contact_ids,
             },
         };
 

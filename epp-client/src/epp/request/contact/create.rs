@@ -99,8 +99,8 @@ impl EppContactCreate {
             contact: Contact {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
                 id: id.to_string_value(),
-                postal_info: postal_info,
-                voice: voice,
+                postal_info,
+                voice,
                 fax: None,
                 email: email.to_string_value(),
                 auth_info: data::AuthInfo::new(auth_password),

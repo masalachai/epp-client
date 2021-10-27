@@ -17,11 +17,11 @@ fn element_name_macro(ast: &syn::DeriveInput) -> TokenStream {
     let mut elem_name = ast.ident.to_string();
     let (impl_generics, type_generics, _) = &ast.generics.split_for_impl();
 
-    if ast.attrs.len() > 0 {
+    if !ast.attrs.is_empty() {
         let attribute = &ast.attrs[0];
         match attribute.parse_meta() {
             Ok(syn::Meta::List(meta)) => {
-                if meta.nested.len() > 0 {
+                if !meta.nested.is_empty() {
                     elem_name = match &meta.nested[0] {
                         syn::NestedMeta::Meta(syn::Meta::NameValue(v)) => match &v.lit {
                             syn::Lit::Str(lit) => lit.value(),

@@ -61,7 +61,7 @@ impl<T: ElementName> Command<T> {
     /// Creates a new &lt;command&gt; tag for an EPP document
     pub fn new(command: T, client_tr_id: &str) -> Command<T> {
         Command {
-            command: command,
+            command,
             extension: None,
             client_tr_id: client_tr_id.to_string_value(),
         }
@@ -72,7 +72,7 @@ impl<T: ElementName, E: ElementName> CommandWithExtension<T, E> {
     /// Creates a new &lt;command&gt; tag for an EPP document with a containing &lt;extension&gt; tag
     pub fn build(command: T, ext: E, client_tr_id: &str) -> CommandWithExtension<T, E> {
         CommandWithExtension {
-            command: command,
+            command,
             extension: Some(Extension { data: ext }),
             client_tr_id: client_tr_id.to_string_value(),
         }
@@ -122,14 +122,9 @@ impl EppLogin {
         ext_uris: &Option<Vec<String>>,
         client_tr_id: &str,
     ) -> EppLogin {
-        let ext_uris = match ext_uris {
-            Some(uris) => Some(
-                uris.iter()
+        let ext_uris = ext_uris.as_ref().map(|uris| uris.iter()
                     .map(|u| u.to_string_value())
-                    .collect::<Vec<StringValue>>(),
-            ),
-            None => None,
-        };
+                    .collect::<Vec<StringValue>>());
 
         let login = Login {
             username: username.to_string_value(),
@@ -144,7 +139,7 @@ impl EppLogin {
                     EPP_CONTACT_XMLNS.to_string_value(),
                     EPP_DOMAIN_XMLNS.to_string_value(),
                 ],
-                svc_ext: Some(ServiceExtension { ext_uris: ext_uris }),
+                svc_ext: Some(ServiceExtension { ext_uris }),
             },
         };
 
