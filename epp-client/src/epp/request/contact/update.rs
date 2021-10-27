@@ -124,9 +124,8 @@ impl EppContactUpdate {
 
     /// Sets the data for the &lt;fax&gt; tag under &lt;chg&gt; for the contact update request
     pub fn set_fax(&mut self, fax: Phone) {
-        match &mut self.data.command.contact.change_info {
-            Some(ref mut info) => info.fax = Some(fax),
-            _ => (),
+        if let Some(info) = &mut self.data.command.contact.change_info {
+            info.fax = Some(fax)
         }
     }
 

@@ -63,7 +63,7 @@ impl EppDomainCheck {
     pub fn new(domains: Vec<&str>, client_tr_id: &str) -> EppDomainCheck {
         let domains = domains
             .iter()
-            .filter_map(|d| Some(d.to_string_value()))
+            .map(|d| d.to_string_value())
             .collect::<Vec<StringValue>>();
 
         let domain_check = DomainCheck {

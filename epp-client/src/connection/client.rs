@@ -198,6 +198,6 @@ impl EppClient {
 
 impl Drop for EppClient {
     fn drop(&mut self) {
-        block_on(self.logout());
+        let _ = block_on(self.logout());
     }
 }

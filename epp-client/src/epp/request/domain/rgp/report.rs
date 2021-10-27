@@ -116,6 +116,7 @@ pub struct RgpRestoreReport {
 
 impl EppDomainRgpRestoreReport {
     /// Creates a new EppObject for domain rgp restore report corresponding to the &lt;epp&gt; tag in EPP XML
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         name: &str,
         pre_data: &str,

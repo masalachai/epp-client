@@ -63,7 +63,7 @@ impl EppHostCheck {
     pub fn new(hosts: Vec<&str>, client_tr_id: &str) -> EppHostCheck {
         let hosts = hosts
             .iter()
-            .filter_map(|d| Some(d.to_string_value()))
+            .map(|d| d.to_string_value())
             .collect::<Vec<StringValue>>();
 
         let host_check = HostCheck {

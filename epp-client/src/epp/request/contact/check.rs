@@ -63,7 +63,7 @@ impl EppContactCheck {
     pub fn new(contact_ids: Vec<&str>, client_tr_id: &str) -> EppContactCheck {
         let contact_ids = contact_ids
             .iter()
-            .filter_map(|d| Some(d.to_string_value()))
+            .map(|d| d.to_string_value())
             .collect::<Vec<StringValue>>();
 
         let contact_check = ContactCheck {
