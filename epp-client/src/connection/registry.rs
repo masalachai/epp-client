@@ -6,8 +6,9 @@ use bytes::BytesMut;
 use std::convert::TryInto;
 use futures::executor::block_on;
 use std::{error::Error, net::ToSocketAddrs, io as stdio};
-use tokio_rustls::{TlsConnector, rustls::ClientConfig, webpki::DNSNameRef, client::TlsStream};
+use tokio_rustls::{TlsConnector, rustls::ClientConfig, client::TlsStream};
 use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::ReadHalf, io::WriteHalf};
+use rustls::{RootCertStore, OwnedTrustAnchor};
 
 use crate::config::{EppClientConnection};
 use crate::error;
@@ -151,22 +152,31 @@ pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<Connect
         .next()
         .ok_or_else(|| stdio::ErrorKind::NotFound)?;
 
-    let mut config = ClientConfig::new();
+    let mut roots = RootCertStore::empty();
+    roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
+        OwnedTrustAnchor::from_subject_spki_name_constraints(
+            ta.subject,
+            ta.spki,
+            ta.name_constraints,
+        )
+    }));
 
-    config
-        .root_store
-        .add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
+    let builder = ClientConfig::builder()
+        .with_safe_defaults()
+        .with_root_certificates(roots);
 
-    if let Some(tls) = registry_creds.tls_files() {
-        if let Err(e) = config.set_single_client_cert(tls.0, tls.1) {
-            return Err(format!("Failed to set client TLS credentials: {}", e).into())
+    let config = match registry_creds.tls_files() {
+        Some((cert_chain, key)) => match builder.with_single_cert(cert_chain, key) {
+            Ok(config) => config,
+            Err(e) => return Err(format!("Failed to set client TLS credentials: {}", e).into()),
         }
-    }
+        None => builder.with_no_client_auth(),
+    };
 
     let connector = TlsConnector::from(Arc::new(config));
     let stream = TcpStream::connect(&addr).await?;
 
-    let domain = DNSNameRef::try_from_ascii_str(&host)
+    let domain = host.as_str().try_into()
         .map_err(|_| stdio::Error::new(stdio::ErrorKind::InvalidInput, format!("Invalid domain: {}", host)))?;
 
     let stream = connector.connect(domain, stream).await?;
