@@ -45,6 +45,7 @@ steps:
       - if [ $EPP_CLIENT_MACROS_VERSION_CHANGE -eq 2 ]; then echo "epp-client-macros version updated. publishing to crates.io" && cd epp-client-macros && cargo publish && cd .. ; else echo "epp-client-macros version unchanged"; fi
     when:
       branch: master
+      event: push
 
 volumes:
   - name: ssh
