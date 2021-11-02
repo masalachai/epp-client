@@ -122,9 +122,11 @@ impl EppLogin {
         ext_uris: &Option<Vec<String>>,
         client_tr_id: &str,
     ) -> EppLogin {
-        let ext_uris = ext_uris.as_ref().map(|uris| uris.iter()
-                    .map(|u| u.to_string_value())
-                    .collect::<Vec<StringValue>>());
+        let ext_uris = ext_uris.as_ref().map(|uris| {
+            uris.iter()
+                .map(|u| u.to_string_value())
+                .collect::<Vec<StringValue>>()
+        });
 
         let login = Login {
             username: username.to_string_value(),

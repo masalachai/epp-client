@@ -28,23 +28,25 @@
 //! ```
 
 use futures::executor::block_on;
-use std::{error::Error, fmt::Debug};
-use std::time::SystemTime;
 use std::sync::mpsc;
+use std::time::SystemTime;
+use std::{error::Error, fmt::Debug};
 // use std::sync::Arc;
 
 use crate::config::CONFIG;
 use crate::connection::registry::{epp_connect, EppConnection};
-use crate::error;
 use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout};
-use crate::epp::response::{EppGreeting, EppCommandResponse, EppLoginResponse, EppLogoutResponse, EppCommandResponseError};
+use crate::epp::response::{
+    EppCommandResponse, EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
+};
 use crate::epp::xml::EppXml;
+use crate::error;
 
 /// Connects to the registry and returns an logged-in instance of EppClient for further transactions
 async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
     let registry_creds = match CONFIG.registry(registry) {
         Some(creds) => creds,
-        None => return Err(format!("missing credentials for {}", registry).into())
+        None => return Err(format!("missing credentials for {}", registry).into()),
     };
 
     let (tx, rx) = mpsc::channel();
@@ -54,17 +56,16 @@ async fn connect(registry: &'static str) -> Result<EppClient, Box<dyn Error>> {
         let credentials = registry_creds.credentials();
         let ext_uris = registry_creds.ext_uris();
 
-        let ext_uris = ext_uris.map(|uris| uris
-                    .iter()
-                    .map(|u| u.to_string())
-                    .collect::<Vec<String>>());
+        let ext_uris =
+            ext_uris.map(|uris| uris.iter().map(|u| u.to_string()).collect::<Vec<String>>());
 
-        let connection = EppConnection::new(
-            registry.to_string(),
-            stream
-        ).await.unwrap();
+        let connection = EppConnection::new(registry.to_string(), stream)
+            .await
+            .unwrap();
 
-        let client = EppClient::build(connection, credentials, ext_uris).await.unwrap();
+        let client = EppClient::build(connection, credentials, ext_uris)
+            .await
+            .unwrap();
 
         tx.send(client).unwrap();
     });
@@ -89,7 +90,7 @@ pub struct EppClient {
 pub fn default_client_tr_id_fn(client: &EppClient) -> String {
     let timestamp = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
         Ok(time) => time,
-        Err(e) => panic!("Error in client TRID gen function: {}", e)
+        Err(e) => panic!("Error in client TRID gen function: {}", e),
     };
     format!("{}:{}", &client.username(), timestamp.as_secs())
 }
@@ -112,7 +113,11 @@ impl EppClient {
     }
 
     /// Makes a login request to the registry and initializes an EppClient instance with it
-    async fn build(connection: EppConnection, credentials: (String, String), ext_uris: Option<Vec<String>>) -> Result<EppClient, Box<dyn Error>> {
+    async fn build(
+        connection: EppConnection,
+        credentials: (String, String),
+        ext_uris: Option<Vec<String>>,
+    ) -> Result<EppClient, Box<dyn Error>> {
         let mut client = EppClient {
             connection,
             credentials,
@@ -121,9 +126,16 @@ impl EppClient {
         };
 
         let client_tr_id = generate_client_tr_id(&client.credentials.0)?;
-        let login_request = EppLogin::new(&client.credentials.0, &client.credentials.1, &client.ext_uris, client_tr_id.as_str());
+        let login_request = EppLogin::new(
+            &client.credentials.0,
+            &client.credentials.1,
+            &client.ext_uris,
+            client_tr_id.as_str(),
+        );
 
-        client.transact::<_, EppLoginResponse>(&login_request).await?;
+        client
+            .transact::<_, EppLoginResponse>(&login_request)
+            .await?;
 
         Ok(client)
     }
@@ -140,7 +152,10 @@ impl EppClient {
 
     /// Accepts an EPP request object to convert to a request to send to the registry. The response from the
     /// registry is deserialized to response type E and returned.
-    pub async fn transact<T: EppXml + Debug, E: EppXml + Debug>(&mut self, request: &T) -> Result<E::Output, error::Error> {
+    pub async fn transact<T: EppXml + Debug, E: EppXml + Debug>(
+        &mut self,
+        request: &T,
+    ) -> Result<E::Output, error::Error> {
         let epp_xml = request.serialize()?;
 
         let response = self.connection.transact(&epp_xml).await?;

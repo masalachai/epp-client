@@ -24,9 +24,10 @@ impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject
         let object: Self::Output = match from_str(epp_xml) {
             Ok(v) => v,
             Err(e) => {
-                return Err(error::Error::EppDeserializationError(
-                    format!("epp-client Deserialization Error: {}", e),
-                ))
+                return Err(error::Error::EppDeserializationError(format!(
+                    "epp-client Deserialization Error: {}",
+                    e
+                )))
             }
         };
         // object.xml = Some(epp_xml.to_string());

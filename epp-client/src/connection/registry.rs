@@ -1,16 +1,18 @@
 //! Manages registry connections and reading/writing to them
 
-use std::sync::Arc;
-use std::{str, u32};
 use bytes::BytesMut;
-use std::convert::TryInto;
 use futures::executor::block_on;
-use std::{error::Error, net::ToSocketAddrs, io as stdio};
-use tokio_rustls::{TlsConnector, rustls::ClientConfig, client::TlsStream};
-use tokio::{net::TcpStream, io::AsyncWriteExt, io::AsyncReadExt, io::split, io::ReadHalf, io::WriteHalf};
-use rustls::{RootCertStore, OwnedTrustAnchor};
+use rustls::{OwnedTrustAnchor, RootCertStore};
+use std::convert::TryInto;
+use std::sync::Arc;
+use std::{error::Error, io as stdio, net::ToSocketAddrs};
+use std::{str, u32};
+use tokio::{
+    io::split, io::AsyncReadExt, io::AsyncWriteExt, io::ReadHalf, io::WriteHalf, net::TcpStream,
+};
+use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
 
-use crate::config::{EppClientConnection};
+use crate::config::EppClientConnection;
 use crate::error;
 
 /// Socket stream for the connection to the registry
@@ -30,7 +32,8 @@ impl EppConnection {
     /// Create an EppConnection instance with the stream to the registry
     pub async fn new(
         registry: String,
-        mut stream: ConnectionStream) -> Result<EppConnection, Box<dyn Error>> {
+        mut stream: ConnectionStream,
+    ) -> Result<EppConnection, Box<dyn Error>> {
         let mut buf = vec![0u8; 4096];
         stream.reader.read(&mut buf).await?;
         let greeting = str::from_utf8(&buf[4..])?.to_string();
@@ -40,7 +43,7 @@ impl EppConnection {
         Ok(EppConnection {
             registry,
             stream,
-            greeting
+            greeting,
         })
     }
 
@@ -74,7 +77,7 @@ impl EppConnection {
         let mut buf = [0u8; 4];
         self.stream.reader.read_exact(&mut buf).await?;
 
-        let buf_size :usize = u32::from_be_bytes(buf).try_into()?;
+        let buf_size: usize = u32::from_be_bytes(buf).try_into()?;
 
         let message_size = buf_size - 4;
         debug!("{}: Response buffer size: {}", self.registry, message_size);
@@ -82,7 +85,7 @@ impl EppConnection {
         let mut buf = BytesMut::with_capacity(4096);
         let mut read_buf = vec![0u8; 4096];
 
-        let mut read_size :usize = 0;
+        let mut read_size: usize = 0;
 
         loop {
             let read = self.stream.reader.read(&mut read_buf).await?;
@@ -142,14 +145,17 @@ impl Drop for EppConnection {
 
 /// Establishes a TLS connection to a registry and returns a ConnectionStream instance containing the
 /// socket stream to read/write to the connection
-pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<ConnectionStream, error::Error> {
+pub async fn epp_connect(
+    registry_creds: &EppClientConnection,
+) -> Result<ConnectionStream, error::Error> {
     let (host, port) = registry_creds.connection_details();
 
     info!("Connecting: EPP Server: {} Port: {}", host, port);
 
     let addr = (host.as_str(), port)
         .to_socket_addrs()?
-        .next().ok_or(stdio::ErrorKind::NotFound)?;
+        .next()
+        .ok_or(stdio::ErrorKind::NotFound)?;
 
     let mut roots = RootCertStore::empty();
     roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
@@ -168,22 +174,23 @@ pub async fn epp_connect(registry_creds: &EppClientConnection) -> Result<Connect
         Some((cert_chain, key)) => match builder.with_single_cert(cert_chain, key) {
             Ok(config) => config,
             Err(e) => return Err(format!("Failed to set client TLS credentials: {}", e).into()),
-        }
+        },
         None => builder.with_no_client_auth(),
     };
 
     let connector = TlsConnector::from(Arc::new(config));
     let stream = TcpStream::connect(&addr).await?;
 
-    let domain = host.as_str().try_into()
-        .map_err(|_| stdio::Error::new(stdio::ErrorKind::InvalidInput, format!("Invalid domain: {}", host)))?;
+    let domain = host.as_str().try_into().map_err(|_| {
+        stdio::Error::new(
+            stdio::ErrorKind::InvalidInput,
+            format!("Invalid domain: {}", host),
+        )
+    })?;
 
     let stream = connector.connect(domain, stream).await?;
 
     let (reader, writer) = split(stream);
 
-    Ok(ConnectionStream {
-        reader,
-        writer,
-    })
+    Ok(ConnectionStream { reader, writer })
 }
