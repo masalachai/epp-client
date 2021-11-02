@@ -7,6 +7,54 @@ platform:
   arch: amd64
 
 steps:
+  - name: check
+    image: ayravat/rust:1.53.0-ci
+    volumes:
+      - name: ssh
+        path: /root/.ssh
+      - name: target
+        path: /tmp/cargo-target
+      - name: cache
+        path: /tmp/cargo
+      - name: config
+        path: /root/.config/epp-client
+    commands:
+      - export CARGO_HOME=/tmp/cargo
+      - export CARGO_TARGET_DIR=/tmp/cargo-target
+      - cargo check --all-targets
+
+  - name: fmt
+    image: ayravat/rust:1.53.0-ci
+    volumes:
+      - name: ssh
+        path: /root/.ssh
+      - name: target
+        path: /tmp/cargo-target
+      - name: cache
+        path: /tmp/cargo
+      - name: config
+        path: /root/.config/epp-client
+    commands:
+      - export CARGO_HOME=/tmp/cargo
+      - export CARGO_TARGET_DIR=/tmp/cargo-target
+      - cargo fmt --all -- --check
+
+  - name: clippy
+    image: ayravat/rust:1.53.0-ci
+    volumes:
+      - name: ssh
+        path: /root/.ssh
+      - name: target
+        path: /tmp/cargo-target
+      - name: cache
+        path: /tmp/cargo
+      - name: config
+        path: /root/.config/epp-client
+    commands:
+      - export CARGO_HOME=/tmp/cargo
+      - export CARGO_TARGET_DIR=/tmp/cargo-target
+      - cargo clippy --workspace --all-targets -- -D warnings
+
   - name: test
     image: ayravat/rust:1.53.0-ci
     volumes:
