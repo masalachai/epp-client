@@ -4,6 +4,8 @@ mod response {
     use super::super::get_xml;
     use super::super::CLTRID;
     use crate::epp::object::StringValueTrait;
+    use crate::epp::response::ExpiryType;
+    use crate::epp::response::Relative;
     use crate::epp::response::{
         EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
     };
@@ -37,6 +39,13 @@ mod response {
                 .unwrap()
                 .len(),
             5
+        );
+        assert_eq!(object.data.dcp.statement.len(), 2);
+        assert_eq!(
+            object.data.dcp.expiry.unwrap().ty,
+            ExpiryType::Relative(Relative {
+                relative: "P1M".to_string_value()
+            })
         );
     }
 
