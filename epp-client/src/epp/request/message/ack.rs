@@ -9,16 +9,33 @@ use serde::{Deserialize, Serialize};
 /// Type that represents the &lt;epp&gt; request for registry <poll op="ack"> command
 /// ## Usage
 ///
-/// ```ignore
+/// ```no_run
+/// use std::collections::HashMap;
+///
+/// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::epp::{EppMessageAck, EppMessageAckResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     // Create an instance of EppClient, specifying the name of the registry as in
-///     // the config file
-///     let mut client = match EppClient::new("verisign").await {
+///     // Create a config
+///     let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+///     registry.insert(
+///         "registry_name".to_owned(),
+///         EppClientConnection {
+///             host: "example.com".to_owned(),
+///             port: 700,
+///             username: "username".to_owned(),
+///             password: "password".to_owned(),
+///             ext_uris: None,
+///             tls_files: None,
+///         },
+///     );
+///     let config = EppClientConfig { registry };
+///
+///     // Create an instance of EppClient, passing the config and the registry you want to connect to
+///     let mut client = match EppClient::new(&config, "registry_name").await {
 ///         Ok(client) => client,
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
