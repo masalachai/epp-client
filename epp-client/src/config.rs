@@ -1,38 +1,31 @@
-//! Config load module
+//! Config
 //!
-//! Loads the configuration and credentials for each registry connection from
-//! the `$XDG_CONFIG_HOME/epp-client/epp-client.toml` file
-//!
-//! ## Usage
-//!
-//! The config is automatically loaded when the module is initialized
-//! and is available through the `epp_client::config::CONFIG` variable
-//!
-//! ## Sample config
-//!
-//! ```toml
-//! [registry.verisign]
-//! host = 'epp.verisign-grs.com'
-//! port = 700
-//! username = 'username'
-//! password = 'password'
-//! # service extensions
-//! ext_uris = []
-//!
-//! [registry.hexonet.tls_files]
-//! # the full client certificate chain in PEM format
-//! cert_chain = '/path/to/certificate/chain/pemfile'
-//! # the RSA private key for your certificate
-//! key = '/path/to/private/key/pemfile'
-//! ```
+//! This module contains the connection configuration for the EPP client.
 //!
 //! ## Example
 //!
-//! ```rust
-//! use epp_client::config::CONFIG;
+//! ```no_run
+//! use std::collections::HashMap;
+//!
+//! use epp_client::config::{EppClientConfig, EppClientConnection};
+//!
+//! // Create a config
+//! let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+//! registry.insert(
+//!     "registry_name".to_owned(),
+//!     EppClientConnection {
+//!         host: "example.com".to_owned(),
+//!         port: 700,
+//!         username: "username".to_owned(),
+//!         password: "password".to_owned(),
+//!         ext_uris: None,
+//!         tls_files: None,
+//!     },
+//! );
+//! let config = EppClientConfig { registry };
 //!
 //! // Get configuration for the relevant registry section
-//! let registry = CONFIG.registry("verisign").unwrap();
+//! let registry = config.registry("verisign").unwrap();
 //!
 //! // Get EPP host name and port no.
 //! let remote = registry.connection_details();
