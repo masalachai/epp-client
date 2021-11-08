@@ -54,6 +54,7 @@ use rustls_pemfile;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::default;
+use std::io::{Seek, SeekFrom};
 use std::{fs, io};
 
 lazy_static! {
@@ -145,16 +146,28 @@ impl EppClientConnection {
             .collect()
         })
     }
-    /// Parses the client RSA private key
+    /// Parses the client private key
     fn key(&self) -> Option<PrivateKey> {
         self.tls_files.as_ref().map(|tls| {
-            rustls::PrivateKey(
-                rustls_pemfile::rsa_private_keys(&mut io::BufReader::new(
-                    fs::File::open(tls.key.to_string()).unwrap(),
-                ))
-                .unwrap()[0]
-                    .clone(),
-            )
+            let mut r = io::BufReader::new(fs::File::open(tls.key.to_string()).unwrap());
+
+            let rsa_keys = rustls_pemfile::rsa_private_keys(&mut r).unwrap();
+            if rsa_keys.len() > 1 {
+                warn!("Multiple RSA keys found in PEM file {}", tls.key);
+            } else if !rsa_keys.is_empty() {
+                return rustls::PrivateKey(rsa_keys[0].clone());
+            }
+
+            r.seek(SeekFrom::Start(0)).unwrap();
+
+            let pkcs8_keys = rustls_pemfile::pkcs8_private_keys(&mut r).unwrap();
+            if pkcs8_keys.len() > 1 {
+                warn!("Multiple PKCS8 keys found in PEM file {}", tls.key);
+            } else if !pkcs8_keys.is_empty() {
+                return rustls::PrivateKey(pkcs8_keys[0].clone());
+            }
+
+            panic!("No private key found in PEM file");
         })
     }
 }
