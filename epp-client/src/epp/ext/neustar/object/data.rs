@@ -12,9 +12,6 @@ use std::fmt;
 pub struct Extension {
     /// The XML namespace for the Neustar &lt;extension&gt; tag
     pub xmlns: String,
-    /// XML schema location for the Neulevel extension
-    #[serde(rename = "xsi:schemaLocation")]
-    pub schema_location: String,
     /// The string under the &lt;unspec&gt; tag
     pub unspec: StringValue,
 }

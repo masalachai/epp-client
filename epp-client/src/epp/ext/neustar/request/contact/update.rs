@@ -2,7 +2,7 @@
 
 use crate::epp::ext::neustar::object::data::ContactExtension;
 use crate::epp::ext::neustar::object::data::Extension as NeustarExtension;
-use crate::epp::ext::neustar::xml::{EPP_NEULEVEL_XMLNS, EPP_XSI_NEULEVEL_SCHEMA_LOCATION};
+use crate::epp::ext::neustar::xml::EPP_NEULEVEL_XMLNS;
 use crate::epp::object::data::{ContactStatus, Phone, PostalInfo};
 use crate::epp::object::{EppObject, Extension, StringValueTrait};
 use crate::epp::request::contact::update::ContactUpdate;
@@ -74,7 +74,6 @@ impl EppNeustarContactUpdate {
         self.data.extension = Some(Extension {
             data: NeustarExtension {
                 xmlns: EPP_NEULEVEL_XMLNS.to_string(),
-                schema_location: EPP_XSI_NEULEVEL_SCHEMA_LOCATION.to_string(),
                 unspec: extension.to_string().to_string_value(),
             },
         });

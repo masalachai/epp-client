@@ -12,13 +12,12 @@ mod response {
         let xml = get_xml("ext/neustar/response/contact/info.xml").unwrap();
         let object = EppNeustarContactInfoResponse::deserialize(xml.as_str()).unwrap();
 
-        println!("{:?}", object);
-
         let result = object.data.res_data().unwrap();
         let fax = result.info_data.fax.as_ref().unwrap();
         let voice_ext = result.info_data.voice.extension.as_ref().unwrap();
         let fax_ext = fax.extension.as_ref().unwrap();
         let auth_info = result.info_data.auth_info.as_ref().unwrap();
+        let ext = object.data.extension.as_ref().unwrap();
 
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
@@ -85,6 +84,12 @@ mod response {
             object.data.tr_ids.client_tr_id.unwrap(),
             CLTRID.to_string_value()
         );
+
+        assert_eq!(
+            (*ext).data.unspec,
+            "appPurpose=P2 nexusCategory=C31/DE".to_string_value()
+        );
+
         assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
     }
 }

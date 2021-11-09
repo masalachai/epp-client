@@ -35,7 +35,7 @@
 			</contact:infData>
 		</resData>
 		<extension>
-			<extension xmlns="urn:ietf:params:xml:ns:neulevel-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:neulevel-1.0 neulevel-1.0.xsd">
+			<extension xmlns="urn:ietf:params:xml:ns:neulevel-1.0">
 				<unspec>appPurpose=P2 nexusCategory=C31/DE</unspec>
 			</extension>
 		</extension>
