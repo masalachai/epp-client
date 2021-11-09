@@ -2,7 +2,7 @@
 
 mod response {
     use super::super::get_xml;
-    use super::super::CLTRID;
+    use super::super::{CLTRID, SUCCESS_MSG, SVTRID};
     use crate::epp::object::StringValueTrait;
     use crate::epp::response::ExpiryType;
     use crate::epp::response::Relative;
@@ -11,9 +11,6 @@ mod response {
     };
     use crate::epp::xml::EppXml;
     use crate::epp::*;
-
-    const SVTRID: &str = "RO-6879-1627224678242975";
-    const SUCCESS_MSG: &str = "Command completed successfully";
 
     #[test]
     fn greeting() {

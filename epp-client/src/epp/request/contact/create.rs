@@ -76,6 +76,13 @@ pub struct Contact {
     auth_info: data::AuthInfo,
 }
 
+impl Contact {
+    /// Sets the &lt;fax&gt; data for the request
+    pub fn set_fax(&mut self, fax: data::Phone) {
+        self.fax = Some(fax);
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "create")]
 /// Type for EPP XML &lt;create&gt; command for contacts
@@ -83,6 +90,28 @@ pub struct ContactCreate {
     /// Data for &lt;create&gt; command for contact
     #[serde(rename = "create")]
     pub contact: Contact,
+}
+
+impl ContactCreate {
+    pub fn new(
+        id: &str,
+        email: &str,
+        postal_info: data::PostalInfo,
+        voice: data::Phone,
+        auth_password: &str,
+    ) -> ContactCreate {
+        ContactCreate {
+            contact: Contact {
+                xmlns: EPP_CONTACT_XMLNS.to_string(),
+                id: id.to_string_value(),
+                postal_info,
+                voice,
+                fax: None,
+                email: email.to_string_value(),
+                auth_info: data::AuthInfo::new(auth_password),
+            },
+        }
+    }
 }
 
 impl EppContactCreate {

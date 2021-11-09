@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:ietf:params:xml:ns:epp-1.0 epp-1.0.xsd">
+	<command>
+		<create>
+			<create xmlns="urn:ietf:params:xml:ns:contact-1.0">
+				<id>eppdev-contact-3</id>
+				<postalInfo type="int">
+					<name>John Doe</name>
+					<org>Acme Widgets</org>
+					<addr>
+						<street>58</street>
+						<street>Orchid Road</street>
+						<city>Paris</city>
+						<sp>Paris</sp>
+						<pc>392374</pc>
+						<cc>FR</cc>
+					</addr>
+				</postalInfo>
+				<voice x="123">+33.47237942</voice>
+				<fax x="677">+33.86698799</fax>
+				<email>contact@eppdev.net</email>
+				<authInfo>
+					<pw>eppdev-387323</pw>
+				</authInfo>
+			</create>
+		</create>
+		<extension>
+			<extension xmlns="urn:ietf:params:xml:ns:neulevel-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:neulevel-1.0 neulevel-1.0.xsd">
+				<unspec>appPurpose=P2 nexusCategory=C31/DE</unspec>
+			</extension>
+		</extension>
+		<clTRID>cltrid:1626454866</clTRID>
+	</command>
+</epp>

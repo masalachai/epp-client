@@ -5,7 +5,7 @@ use epp_client_macros::*;
 use crate::epp::object::data::{AuthInfo, ContactStatus, Phone, PostalInfo};
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::Command;
-use crate::epp::response::contact::info::EppContactInfoResponse;
+use crate::epp::response::contact::info::{ContactInfoResult, EppContactInfoResponse};
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use crate::error;
 use serde::{Deserialize, Serialize};
@@ -90,10 +90,9 @@ pub struct ContactUpdate {
     contact: ContactUpdateData,
 }
 
-impl EppContactUpdate {
-    /// Creates a new EppObject for contact update corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(id: &str, client_tr_id: &str) -> EppContactUpdate {
-        let contact_update = ContactUpdate {
+impl ContactUpdate {
+    pub fn new(id: &str) -> ContactUpdate {
+        ContactUpdate {
             contact: ContactUpdateData {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
                 id: id.to_string_value(),
@@ -101,7 +100,59 @@ impl EppContactUpdate {
                 remove_statuses: None,
                 change_info: None,
             },
-        };
+        }
+    }
+
+    /// Sets the data for the &lt;chg&gt; tag for the contact update request
+    pub fn set_info(
+        &mut self,
+        email: &str,
+        postal_info: PostalInfo,
+        voice: Phone,
+        auth_password: &str,
+    ) {
+        self.contact.change_info = Some(ContactChangeInfo {
+            email: Some(email.to_string_value()),
+            postal_info: Some(postal_info),
+            voice: Some(voice),
+            auth_info: Some(AuthInfo::new(auth_password)),
+            fax: None,
+        });
+    }
+
+    /// Sets the data for the &lt;fax&gt; tag under &lt;chg&gt; for the contact update request
+    pub fn set_fax(&mut self, fax: Phone) {
+        if let Some(info) = &mut self.contact.change_info {
+            info.fax = Some(fax)
+        }
+    }
+
+    /// Sets the data for the &lt;add&gt; tag for the contact update request
+    pub fn add(&mut self, statuses: Vec<ContactStatus>) {
+        self.contact.add_statuses = Some(StatusList { status: statuses });
+    }
+
+    /// Sets the data for the &lt;rem&gt; tag for the contact update request
+    pub fn remove(&mut self, statuses: Vec<ContactStatus>) {
+        self.contact.remove_statuses = Some(StatusList { status: statuses });
+    }
+
+    /// Loads data into the &lt;chg&gt; tag from an existing EppContactInfoResponse object
+    pub fn load_from_contact_info(&mut self, contact_info: ContactInfoResult) {
+        self.contact.change_info = Some(ContactChangeInfo {
+            email: Some(contact_info.info_data.email.clone()),
+            postal_info: Some(contact_info.info_data.postal_info.clone()),
+            voice: Some(contact_info.info_data.voice.clone()),
+            fax: contact_info.info_data.fax,
+            auth_info: None,
+        });
+    }
+}
+
+impl EppContactUpdate {
+    /// Creates a new EppObject for contact update corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(id: &str, client_tr_id: &str) -> EppContactUpdate {
+        let contact_update = ContactUpdate::new(id);
         EppObject::build(Command::<ContactUpdate>::new(contact_update, client_tr_id))
     }
 
@@ -113,30 +164,24 @@ impl EppContactUpdate {
         voice: Phone,
         auth_password: &str,
     ) {
-        self.data.command.contact.change_info = Some(ContactChangeInfo {
-            email: Some(email.to_string_value()),
-            postal_info: Some(postal_info),
-            voice: Some(voice),
-            auth_info: Some(AuthInfo::new(auth_password)),
-            fax: None,
-        });
+        self.data
+            .command
+            .set_info(email, postal_info, voice, auth_password);
     }
 
     /// Sets the data for the &lt;fax&gt; tag under &lt;chg&gt; for the contact update request
     pub fn set_fax(&mut self, fax: Phone) {
-        if let Some(info) = &mut self.data.command.contact.change_info {
-            info.fax = Some(fax)
-        }
+        self.data.command.set_fax(fax);
     }
 
     /// Sets the data for the &lt;add&gt; tag for the contact update request
     pub fn add(&mut self, statuses: Vec<ContactStatus>) {
-        self.data.command.contact.add_statuses = Some(StatusList { status: statuses });
+        self.data.command.add(statuses);
     }
 
     /// Sets the data for the &lt;rem&gt; tag for the contact update request
     pub fn remove(&mut self, statuses: Vec<ContactStatus>) {
-        self.data.command.contact.remove_statuses = Some(StatusList { status: statuses });
+        self.data.command.remove(statuses);
     }
 
     /// Loads data into the &lt;chg&gt; tag from an existing EppContactInfoResponse object
@@ -146,13 +191,7 @@ impl EppContactUpdate {
     ) -> Result<(), error::Error> {
         match contact_info.data.res_data {
             Some(res_data) => {
-                self.data.command.contact.change_info = Some(ContactChangeInfo {
-                    email: Some(res_data.info_data.email.clone()),
-                    postal_info: Some(res_data.info_data.postal_info.clone()),
-                    voice: Some(res_data.info_data.voice.clone()),
-                    fax: res_data.info_data.fax,
-                    auth_info: None,
-                });
+                self.data.command.load_from_contact_info(res_data);
                 Ok(())
             }
             None => Err(error::Error::Other(

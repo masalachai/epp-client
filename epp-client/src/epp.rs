@@ -1,10 +1,13 @@
 //! Types for EPP requests and responses
 
+pub mod ext;
 pub mod object;
 pub mod request;
 pub mod response;
 pub mod xml;
 
+pub use ext::neustar::request::contact::create::*;
+pub use ext::neustar::request::contact::update::*;
 pub use request::contact::check::*;
 pub use request::contact::create::*;
 pub use request::contact::delete::*;
@@ -27,6 +30,7 @@ pub use request::host::update::*;
 pub use request::message::ack::*;
 pub use request::message::poll::*;
 
+pub use ext::neustar::response::contact::info::*;
 pub use response::contact::check::*;
 pub use response::contact::create::*;
 pub use response::contact::delete::*;
