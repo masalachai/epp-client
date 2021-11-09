@@ -6,7 +6,7 @@ use epp_client_macros::*;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 use std::fmt::Display;
 
-use crate::epp::xml::{EPP_XMLNS, EPP_XMLNS_XSI, EPP_XSI_SCHEMA_LOCATION};
+use crate::epp::xml::EPP_XMLNS;
 
 /// Wraps String for easier serialization to and from values that are inner text
 /// for tags rather than attributes
@@ -59,12 +59,6 @@ pub struct EmptyTag;
 pub struct EppObject<T: ElementName> {
     /// XML namespace for the &lt;epp&gt; tag
     pub xmlns: String,
-    /// Schema namespace for the &lt;epp&gt; tag
-    #[serde(rename = "xmlns:xsi")]
-    pub xmlns_xsi: String,
-    /// Schema location attribute for &lt;epp&gt;
-    #[serde(rename = "xsi:schemaLocation")]
-    pub xsi_schema_location: String,
     /// the request or response object that is set or received in the EPP XML document
     #[serde(alias = "greeting", alias = "response")]
     pub data: T,
@@ -82,8 +76,6 @@ impl<T: ElementName + Serialize> Serialize for EppObject<T> {
 
         let mut state = serializer.serialize_struct("epp", 4)?;
         state.serialize_field("xmlns", &self.xmlns)?;
-        state.serialize_field("xmlns:xsi", &self.xmlns_xsi)?;
-        state.serialize_field("xsi:schemaLocation", &self.xsi_schema_location)?;
         state.serialize_field(data_name, &self.data)?;
         state.end()
     }
@@ -158,8 +150,6 @@ impl<T: ElementName> EppObject<T> {
             // xml: None,
             data,
             xmlns: EPP_XMLNS.to_string(),
-            xmlns_xsi: EPP_XMLNS_XSI.to_string(),
-            xsi_schema_location: EPP_XSI_SCHEMA_LOCATION.to_string(),
         }
     }
 }
