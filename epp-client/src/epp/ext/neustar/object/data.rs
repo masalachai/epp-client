@@ -35,8 +35,8 @@ impl fmt::Display for ContactExtension {
         if let Some(ext_contact) = self.ext_contact {
             ext_str = {
                 match ext_contact {
-                    true => format!("extContact=Y"),
-                    false => format!("extContact=N"),
+                    true => "extContact=Y".to_string(),
+                    false => "extContact=N".to_string(),
                 }
             }
         }
