@@ -52,6 +52,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppContactDeleteResponse>(&contact_delete).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppContactDelete = EppObject<Command<ContactDelete>>;

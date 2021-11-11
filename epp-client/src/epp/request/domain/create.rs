@@ -72,6 +72,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppDomainCreateResponse>(&domain_create).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainCreate = EppObject<Command<DomainCreate>>;

@@ -57,6 +57,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppHostCreateResponse>(&host_create).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppHostCreate = EppObject<Command<HostCreate>>;

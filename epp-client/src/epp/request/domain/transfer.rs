@@ -52,6 +52,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppDomainTransferRequestResponse>(&domain_transfer_request).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainTransferRequest = EppObject<Command<DomainTransfer>>;
@@ -100,6 +102,8 @@ pub type EppDomainTransferRequest = EppObject<Command<DomainTransfer>>;
 ///     let response = client.transact::<_, EppDomainTransferApproveResponse>(&domain_transfer_approve).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainTransferApprove = EppObject<Command<DomainTransfer>>;
@@ -148,6 +152,8 @@ pub type EppDomainTransferApprove = EppObject<Command<DomainTransfer>>;
 ///     let response = client.transact::<_, EppDomainTransferRejectResponse>(&domain_transfer_reject).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainTransferReject = EppObject<Command<DomainTransfer>>;
@@ -196,6 +202,8 @@ pub type EppDomainTransferReject = EppObject<Command<DomainTransfer>>;
 ///     let response = client.transact::<_, EppDomainTransferCancelResponse>(&domain_transfer_cancel).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainTransferCancel = EppObject<Command<DomainTransfer>>;
@@ -244,6 +252,8 @@ pub type EppDomainTransferCancel = EppObject<Command<DomainTransfer>>;
 ///     let response = client.transact::<_, EppDomainTransferQueryResponse>(&domain_transfer_query).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainTransferQuery = EppObject<Command<DomainTransfer>>;

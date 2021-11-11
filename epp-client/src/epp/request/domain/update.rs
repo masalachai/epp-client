@@ -76,6 +76,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppDomainUpdateResponse>(&domain_update).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainUpdate = EppObject<Command<DomainUpdate<HostObjList>>>;

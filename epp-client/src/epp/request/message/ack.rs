@@ -47,6 +47,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppMessageAckResponse>(&message_ack).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppMessageAck = EppObject<Command<MessageAck>>;

@@ -49,6 +49,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppDomainInfoResponse>(&domain_info).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainInfo = EppObject<Command<DomainInfo>>;

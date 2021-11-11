@@ -50,8 +50,8 @@ use std::{fs, io};
 /// Paths to the client certificate and client key PEM files
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientTlsFiles {
-    cert_chain: String,
-    key: String,
+    pub cert_chain: String,
+    pub key: String,
 }
 
 /// Connection details to connect to and authenticate with a registry
