@@ -13,7 +13,6 @@ repository = "https://github.com/masalachai/epp-client"
 epp-client-macros = "0.1" # { path = "../epp-client-macros" }
 bytes = "1"
 chrono = "0.4"
-futures = "0.3"
 env_logger = "0.9"
 log = "0.4"
 quick-xml = { version = "0.22", features = [ "serialize" ] }

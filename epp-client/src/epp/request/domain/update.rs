@@ -77,7 +77,7 @@ use serde::{Deserialize, Serialize};
 ///
 ///     println!("{:?}", response);
 ///
-///     client.close().await.unwrap();
+///     client.logout().await.unwrap();
 /// }
 /// ```
 pub type EppDomainUpdate = EppObject<Command<DomainUpdate<HostObjList>>>;

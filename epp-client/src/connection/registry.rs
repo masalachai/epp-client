@@ -127,8 +127,8 @@ impl EppConnection {
         Ok(response)
     }
 
-    /// Closes the socket
-    pub async fn close(&mut self) -> Result<(), Box<dyn Error>> {
+    /// Closes the socket and shuts the connection
+    pub async fn shutdown(&mut self) -> Result<(), Box<dyn Error>> {
         info!("{}: Closing connection", self.registry);
 
         self.stream.writer.shutdown().await?;
