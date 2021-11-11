@@ -49,6 +49,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppDomainDeleteResponse>(&domain_delete).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainDelete = EppObject<Command<DomainDelete>>;

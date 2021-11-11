@@ -46,7 +46,6 @@
 //! }
 //! ```
 
-use futures::executor::block_on;
 use std::time::SystemTime;
 use std::{error::Error, fmt::Debug};
 
@@ -187,10 +186,10 @@ impl EppClient {
 
         self.transact::<_, EppLogoutResponse>(&epp_logout).await
     }
-}
 
-impl Drop for EppClient {
-    fn drop(&mut self) {
-        let _ = block_on(self.logout());
+    pub async fn close(&mut self) -> Result<(), error::Error> {
+        self.logout().await?;
+
+        Ok(self.connection.close().await?)
     }
 }

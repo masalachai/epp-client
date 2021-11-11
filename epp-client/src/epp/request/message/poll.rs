@@ -48,6 +48,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppMessagePollResponse>(&message_poll).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppMessagePoll = EppObject<Command<MessagePoll>>;

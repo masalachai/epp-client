@@ -64,6 +64,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppContactUpdateResponse>(&contact_update).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppContactUpdate = EppObject<Command<ContactUpdate>>;

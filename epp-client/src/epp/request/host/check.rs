@@ -52,6 +52,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppHostCheckResponse>(&host_check).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppHostCheck = EppObject<Command<HostCheck>>;

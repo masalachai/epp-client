@@ -95,6 +95,8 @@ async fn main() {
     response.data.res_data.unwrap().check_data.domain_list
         .iter()
         .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
+
+    client.close().await.unwrap();
 }
 ```
 

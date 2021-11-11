@@ -1,7 +1,6 @@
 //! Manages registry connections and reading/writing to them
 
 use bytes::BytesMut;
-use futures::executor::block_on;
 use rustls::{OwnedTrustAnchor, RootCertStore};
 use std::convert::TryInto;
 use std::sync::Arc;
@@ -129,17 +128,11 @@ impl EppConnection {
     }
 
     /// Closes the socket
-    async fn close(&mut self) -> Result<(), Box<dyn Error>> {
+    pub async fn close(&mut self) -> Result<(), Box<dyn Error>> {
         info!("{}: Closing connection", self.registry);
 
         self.stream.writer.shutdown().await?;
         Ok(())
-    }
-}
-
-impl Drop for EppConnection {
-    fn drop(&mut self) {
-        let _ = block_on(self.close());
     }
 }
 

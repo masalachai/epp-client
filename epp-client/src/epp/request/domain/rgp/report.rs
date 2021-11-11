@@ -79,6 +79,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppDomainRgpRestoreReportResponse>(&domain_restore_report).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainRgpRestoreReport =

@@ -52,6 +52,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainCheck = EppObject<Command<DomainCheck>>;

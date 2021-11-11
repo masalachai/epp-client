@@ -56,6 +56,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppDomainRenewResponse>(&domain_renew).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppDomainRenew = EppObject<Command<DomainRenew>>;

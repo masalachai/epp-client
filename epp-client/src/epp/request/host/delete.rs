@@ -49,6 +49,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppHostDeleteResponse>(&host_delete).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppHostDelete = EppObject<Command<HostDelete>>;

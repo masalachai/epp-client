@@ -68,6 +68,8 @@ use serde::{Deserialize, Serialize};
 ///     let response = client.transact::<_, EppContactCreateResponse>(&contact_create).await.unwrap();
 ///
 ///     println!("{:?}", response);
+///
+///     client.close().await.unwrap();
 /// }
 /// ```
 pub type EppContactCreate = EppObject<Command<ContactCreate>>;
