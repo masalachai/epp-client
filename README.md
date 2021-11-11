@@ -96,7 +96,7 @@ async fn main() {
         .iter()
         .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 
-    client.close().await.unwrap();
+    client.logout().await.unwrap();
 }
 ```
 

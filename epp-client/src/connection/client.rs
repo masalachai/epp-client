@@ -184,12 +184,10 @@ impl EppClient {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = EppLogout::new(client_tr_id.as_str());
 
-        self.transact::<_, EppLogoutResponse>(&epp_logout).await
-    }
+        let response = self.transact::<_, EppLogoutResponse>(&epp_logout).await?;
 
-    pub async fn close(&mut self) -> Result<(), error::Error> {
-        self.logout().await?;
+        self.connection.shutdown().await?;
 
-        Ok(self.connection.close().await?)
+        Ok(response)
     }
 }

@@ -53,7 +53,7 @@ use serde::{Deserialize, Serialize};
 ///
 ///     println!("{:?}", response);
 ///
-///     client.close().await.unwrap();
+///     client.logout().await.unwrap();
 /// }
 /// ```
 pub type EppContactDelete = EppObject<Command<ContactDelete>>;
