@@ -19,8 +19,9 @@ steps:
       - name: config
         path: /root/.config/epp-client
     commands:
-      - export CARGO_HOME=/tmp/cargo
-      - export CARGO_TARGET_DIR=/tmp/cargo-target
+      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cargo check --all-targets
 
   - name: fmt
@@ -35,8 +36,9 @@ steps:
       - name: config
         path: /root/.config/epp-client
     commands:
-      - export CARGO_HOME=/tmp/cargo
-      - export CARGO_TARGET_DIR=/tmp/cargo-target
+      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cargo fmt --all -- --check
 
   - name: clippy
@@ -51,8 +53,9 @@ steps:
       - name: config
         path: /root/.config/epp-client
     commands:
-      - export CARGO_HOME=/tmp/cargo
-      - export CARGO_TARGET_DIR=/tmp/cargo-target
+      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cargo clippy --workspace --all-targets -- -D warnings
 
   - name: test
@@ -67,8 +70,9 @@ steps:
       - name: config
         path: /root/.config/epp-client
     commands:
-      - export CARGO_HOME=/tmp/cargo
-      - export CARGO_TARGET_DIR=/tmp/cargo-target
+      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cargo test -- --nocapture
 
   - name: crates.io
@@ -85,8 +89,9 @@ steps:
       - name: crates
         path: /root/.cargo
     commands:
-      - export CARGO_HOME=/tmp/cargo
-      - export CARGO_TARGET_DIR=/tmp/cargo-target
+      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - export EPP_CLIENT_VERSION_CHANGE=$(git diff HEAD^ HEAD -- epp-client/Cargo.toml | grep -E "([+\-]){1}version" | wc -l)
       - if [ $EPP_CLIENT_VERSION_CHANGE -eq 2 ]; then echo "epp-client version updated. publishing to crates.io" && cd epp-client && cargo publish && cd .. ; else echo "epp-client version unchanged"; fi
       - export EPP_CLIENT_MACROS_VERSION_CHANGE=$(git diff HEAD^ HEAD -- epp-client-macros/Cargo.toml | grep -E "([+\-]){1}version" | wc -l)
