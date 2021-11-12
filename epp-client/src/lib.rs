@@ -99,6 +99,7 @@ extern crate log;
 
 pub mod config;
 pub mod connection;
+pub mod domain;
 pub mod epp;
 pub mod error;
 pub use connection::client::EppClient;
