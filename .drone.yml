@@ -8,7 +8,7 @@ platform:
 
 steps:
   - name: check
-    image: ayravat/rust:1.53.0-ci
+    image: ayravat/rust:1.56.1-ci
     volumes:
       - name: ssh
         path: /root/.ssh
@@ -25,7 +25,7 @@ steps:
       - cargo check --all-targets
 
   - name: fmt
-    image: ayravat/rust:1.53.0-ci
+    image: ayravat/rust:1.56.1-ci
     volumes:
       - name: ssh
         path: /root/.ssh
@@ -42,7 +42,7 @@ steps:
       - cargo fmt --all -- --check
 
   - name: clippy
-    image: ayravat/rust:1.53.0-ci
+    image: ayravat/rust:1.56.1-ci
     volumes:
       - name: ssh
         path: /root/.ssh
@@ -59,7 +59,7 @@ steps:
       - cargo clippy --workspace --all-targets -- -D warnings
 
   - name: test
-    image: ayravat/rust:1.53.0-ci
+    image: ayravat/rust:1.56.1-ci
     volumes:
       - name: ssh
         path: /root/.ssh
@@ -76,7 +76,7 @@ steps:
       - cargo test -- --nocapture
 
   - name: crates.io
-    image: ayravat/rust:1.53.0-docker
+    image: ayravat/rust:1.56.1-docker
     volumes:
       - name: ssh
         path: /root/.ssh
@@ -92,12 +92,15 @@ steps:
       - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
       - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
       - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
-      - export EPP_CLIENT_VERSION_CHANGE=$(git diff HEAD^ HEAD -- epp-client/Cargo.toml | grep -E "([+\-]){1}version" | wc -l)
-      - if [ $EPP_CLIENT_VERSION_CHANGE -eq 2 ]; then echo "epp-client version updated. publishing to crates.io" && cd epp-client && cargo publish && cd .. ; else echo "epp-client version unchanged"; fi
-      - export EPP_CLIENT_MACROS_VERSION_CHANGE=$(git diff HEAD^ HEAD -- epp-client-macros/Cargo.toml | grep -E "([+\-]){1}version" | wc -l)
-      - if [ $EPP_CLIENT_MACROS_VERSION_CHANGE -eq 2 ]; then echo "epp-client-macros version updated. publishing to crates.io" && cd epp-client-macros && cargo publish && cd .. ; else echo "epp-client-macros version unchanged"; fi
+      - cd epp-client
+      - cargo publish
+      - cd ..
+      - cd epp-client-macros
+      - cargo publish
     when:
-      branch: master
+      branch:
+        - 0.2
+        - 0.3
       event: push
 
 volumes:

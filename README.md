@@ -43,7 +43,7 @@ to eventually be RFC compliant with the EPP protocol.
 Just add the following to your project's `Cargo.toml`
 
 ```toml
-epp-client = "0.2"
+epp-client = "0.3"
 ```
 
 ## Operation
@@ -96,6 +96,7 @@ async fn main() {
         .iter()
         .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 
+    // Close the connection
     client.logout().await.unwrap();
 }
 ```
