@@ -5,15 +5,31 @@ pub mod domain;
 pub mod host;
 pub mod message;
 
+use epp_client_macros::*;
+
 use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
+use std::fmt::Debug;
 use std::time::SystemTime;
 
 use crate::epp::object::{
     ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
 };
-use crate::epp::xml::{EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION};
-use epp_client_macros::*;
+use crate::epp::xml::{
+    EppXml, EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION,
+};
+
+/// Trait to set correct value for xml tags when tags are being generated from generic types
+pub trait EppRequest {
+    type Output: EppXml + Debug;
+
+    fn deserialize_response(
+        &self,
+        epp_xml: &str,
+    ) -> Result<Self::Output, Box<dyn std::error::Error>>;
+
+    fn serialize_request(&self) -> Result<String, Box<dyn std::error::Error>>;
+}
 
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// without an &lt;extension&gt; tag
