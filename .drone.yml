@@ -92,7 +92,7 @@ steps:
       - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
       - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
       - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
-      - export CARGO_TOKEN=$(grep 'token' $HOME/.cargo/credentials | sed -e 's/\"//g' | awk '{print $3}')
+      - export CARGO_TOKEN=$(cat $HOME/.cargo/credentials-token)
       - cd epp-client
       - cargo publish --token $CARGO_TOKEN
       - cd ..
