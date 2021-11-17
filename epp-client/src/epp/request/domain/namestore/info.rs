@@ -1,13 +1,13 @@
-//! Types for EPP domain info request
+//! Types for EPP NameStore domain info
 
-use epp_client_macros::*;
+use crate::epp::object::{EppObject, StringValueTrait};
+use crate::epp::request::domain::info::{Domain, DomainInfo, DomainInfoData};
+use crate::epp::request::{CommandWithExtension, Extension};
+use crate::epp::xml::{EPP_DOMAIN_NAMESTORE_EXT_XMLNS, EPP_DOMAIN_XMLNS};
 
-use crate::epp::object::{ElementName, EppObject};
-use crate::epp::request::Command;
-use crate::epp::xml::EPP_DOMAIN_XMLNS;
-use serde::{Deserialize, Serialize};
+use super::object::NameStore;
 
-/// Type that represents the &lt;epp&gt; request for domain &lt;info&gt; command
+/// Type that represents the &lt;epp&gt; request for domain &lt;info&gt; command with namestore extension
 ///
 /// ## Usage
 ///
@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainInfo, EppDomainInfoResponse};
+/// use epp_client::epp::{EppNamestoreDomainInfo, EppNamestoreDomainInfoResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -42,62 +42,44 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppDomainInfo instance
-///     let domain_info = EppDomainInfo::new("eppdev-100.com", generate_client_tr_id(&client).as_str());
+///     // Create an EppNamestoreDomainInfo instance
+///     let domain_info = EppNamestoreDomainInfo::new("eppdev-100.com", generate_client_tr_id(&client).as_str(), "com");
 ///
-///     // send it to the registry and receive a response of type EppDomainInfoResponse
-///     let response = client.transact::<_, EppDomainInfoResponse>(&domain_info).await.unwrap();
+///     // send it to the registry and receive a response of type EppNamestoreDomainInfoResponse
+///     let response = client.transact::<_, EppNamestoreDomainInfoResponse>(&domain_info).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainInfo = EppObject<Command<DomainInfo>>;
 
-/// Type for data under the &lt;name&gt; element tag for the domain &lt;info&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Domain {
-    /// The hosts attribute. Default value is "all"
-    hosts: String,
-    /// The name of the domain
-    #[serde(rename = "$value")]
-    name: String,
-}
+pub type EppNamestoreDomainInfo = EppObject<CommandWithExtension<DomainInfo, NameStore>>;
 
-/// Type for &lt;name&gt; element under the domain &lt;info&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DomainInfoData {
-    /// XML namespace for domain commands
-    xmlns: String,
-    /// The data for the domain to be queried
-    #[serde(rename = "name")]
-    domain: Domain,
-}
-
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "info")]
-/// Type for EPP XML &lt;info&gt; command for domains
-pub struct DomainInfo {
-    /// The data under the &lt;info&gt; tag for domain info
-    #[serde(rename = "info")]
-    info: DomainInfoData,
-}
-
-impl EppDomainInfo {
-    /// Creates a new EppObject for domain info corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppDomainInfo {
-        EppObject::build(Command::<DomainInfo>::new(
-            DomainInfo {
-                info: DomainInfoData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    domain: Domain {
-                        hosts: "all".to_string(),
-                        name: name.to_string(),
-                    },
+impl EppNamestoreDomainInfo {
+    /// Creates a new EppObject for NameStore domain check
+    pub fn new(name: &str, client_tr_id: &str, subproduct: &str) -> EppNamestoreDomainInfo {
+        let domain_info = DomainInfo {
+            info: DomainInfoData {
+                xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                domain: Domain {
+                    hosts: "all".to_string(),
+                    name: name.to_string(),
                 },
             },
-            client_tr_id,
-        ))
+        };
+
+        let command = CommandWithExtension::<DomainInfo, NameStore> {
+            command: domain_info,
+            extension: Some(Extension {
+                data: NameStore {
+                    xmlns: EPP_DOMAIN_NAMESTORE_EXT_XMLNS.to_string(),
+                    subproduct: subproduct.to_string_value(),
+                },
+            }),
+            client_tr_id: client_tr_id.to_string_value(),
+        };
+
+        EppObject::build(command)
     }
 }

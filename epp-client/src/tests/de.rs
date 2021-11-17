@@ -4,6 +4,7 @@ mod response {
     use super::super::get_xml;
     use super::super::CLTRID;
     use crate::epp::object::StringValueTrait;
+    use crate::epp::response::domain::namestore::info::EppNamestoreDomainInfoResponse;
     use crate::epp::response::ExpiryType;
     use crate::epp::response::Relative;
     use crate::epp::response::{
@@ -779,6 +780,19 @@ mod response {
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
         assert_eq!(ext.data.sub_product, "TLD".to_string());
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn namestore_domain_info() {
+        let xml = get_xml("response/domain/namestore_domain_info.xml").unwrap();
+        let object = EppNamestoreDomainInfoResponse::deserialize(xml.as_str()).unwrap();
+
+        let ext = object.data.extension.unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(ext.data.sub_product, "com".to_string());
         assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
     }
 }

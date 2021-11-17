@@ -8,6 +8,7 @@ mod request {
         HostStatus, Phone, PostalInfo,
     };
     use crate::epp::object::StringValueTrait;
+    use crate::epp::request::domain::namestore::info::EppNamestoreDomainInfo;
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::xml::EppXml;
     use crate::epp::*;
@@ -534,6 +535,17 @@ mod request {
 
         let object =
             EppNamestoreDomainCheck::new(vec!["eppdev1.com", "eppdev2.com"], CLTRID, "com");
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_info() {
+        let xml = get_xml("request/domain/namestore_domain_info.xml").unwrap();
+
+        let object = EppNamestoreDomainInfo::new("eppdev.com", CLTRID, "com");
 
         let serialized = object.serialize().unwrap();
 

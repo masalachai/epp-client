@@ -59,20 +59,20 @@ pub type EppDomainInfo = EppObject<Command<DomainInfo>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Domain {
     /// The hosts attribute. Default value is "all"
-    hosts: String,
+    pub hosts: String,
     /// The name of the domain
     #[serde(rename = "$value")]
-    name: String,
+    pub name: String,
 }
 
 /// Type for &lt;name&gt; element under the domain &lt;info&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainInfoData {
     /// XML namespace for domain commands
-    xmlns: String,
+    pub xmlns: String,
     /// The data for the domain to be queried
     #[serde(rename = "name")]
-    domain: Domain,
+    pub domain: Domain,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -81,7 +81,7 @@ pub struct DomainInfoData {
 pub struct DomainInfo {
     /// The data under the &lt;info&gt; tag for domain info
     #[serde(rename = "info")]
-    info: DomainInfoData,
+    pub info: DomainInfoData,
 }
 
 impl EppDomainInfo {
