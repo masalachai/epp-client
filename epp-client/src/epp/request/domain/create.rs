@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::{
-    AuthInfo, DomainContact, HostAttr, HostAttrList, HostObjList, Period,
+    AuthInfo, DomainContact, HostAttr, HostAttrList, HostList, HostObjList, Period,
 };
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::Command;
@@ -77,15 +77,6 @@ use serde::{Deserialize, Serialize};
 /// }
 /// ```
 pub type EppDomainCreate = EppObject<Command<DomainCreate>>;
-
-/// Enum that can accept one type which corresponds to either the &lt;hostObj&gt; or &lt;hostAttr&gt;
-/// list of tags
-#[derive(Serialize, Deserialize, Debug)]
-#[serde(untagged)]
-pub enum HostList {
-    HostObjList(HostObjList),
-    HostAttrList(HostAttrList),
-}
 
 /// Type for elements under the domain &lt;create&gt; tag
 #[derive(Serialize, Deserialize, Debug)]

@@ -2,7 +2,6 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::HostObjList;
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::domain::update::{DomainChangeInfo, DomainUpdate, DomainUpdateData};
 use crate::epp::request::{CommandWithExtension, Extension};
@@ -84,7 +83,7 @@ use serde::{Deserialize, Serialize};
 /// }
 /// ```
 pub type EppDomainRgpRestoreReport =
-    EppObject<CommandWithExtension<DomainUpdate<HostObjList>, RgpRestoreReport>>;
+    EppObject<CommandWithExtension<DomainUpdate, RgpRestoreReport>>;
 
 /// Type corresponding to the &lt;report&gt; section in the EPP rgp restore extension
 #[derive(Serialize, Deserialize, Debug)]
@@ -152,7 +151,7 @@ impl EppDomainRgpRestoreReport {
             .map(|s| s.to_string_value())
             .collect::<Vec<StringValue>>();
 
-        let command = CommandWithExtension::<DomainUpdate<HostObjList>, RgpRestoreReport> {
+        let command = CommandWithExtension::<DomainUpdate, RgpRestoreReport> {
             command: DomainUpdate {
                 domain: DomainUpdateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),

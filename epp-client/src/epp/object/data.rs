@@ -64,6 +64,15 @@ pub struct HostAttr {
     pub addresses: Option<Vec<HostAddr>>,
 }
 
+/// Enum that can accept one type which corresponds to either the &lt;hostObj&gt; or &lt;hostAttr&gt;
+/// list of tags
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum HostList {
+    HostObjList(HostObjList),
+    HostAttrList(HostAttrList),
+}
+
 /// The list of &lt;hostAttr&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAttrList {
