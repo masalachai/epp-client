@@ -5,7 +5,7 @@
 			<msg>Command completed successfully</msg>
 		</result>
 		<resData>
-			<domain:chkData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
+			<domain:chkData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
 				<domain:cd>
 					<domain:name avail="1">eppdev.com</domain:name>
 				</domain:cd>

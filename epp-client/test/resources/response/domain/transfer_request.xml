@@ -5,7 +5,7 @@
 			<msg>Command completed successfully; action pending</msg>
 		</result>
 		<resData>
-			<domain:trnData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
+			<domain:trnData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
 				<domain:name>eppdev-transfer.com</domain:name>
 				<domain:trStatus>pending</domain:trStatus>
 				<domain:reID>eppdev</domain:reID>

@@ -5,9 +5,7 @@ use epp_client_macros::*;
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::domain::update::{DomainChangeInfo, DomainUpdate, DomainUpdateData};
 use crate::epp::request::{CommandWithExtension, Extension};
-use crate::epp::xml::{
-    EPP_DOMAIN_RGP_EXT_SCHEMA_LOCATION, EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS,
-};
+use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
 use chrono::{DateTime, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -125,9 +123,6 @@ pub struct RgpRestoreReportSection {
 pub struct RgpRestoreReport {
     /// XML namespace for the RGP restore extension
     xmlns: String,
-    /// XML schema location for the RGP restore extension
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// The object holding the list of domains to be checked
     restore: RgpRestoreReportSection,
 }
@@ -167,7 +162,6 @@ impl EppDomainRgpRestoreReport {
             extension: Some(Extension {
                 data: RgpRestoreReport {
                     xmlns: EPP_DOMAIN_RGP_EXT_XMLNS.to_string(),
-                    schema_location: EPP_DOMAIN_RGP_EXT_SCHEMA_LOCATION.to_string(),
                     restore: RgpRestoreReportSection {
                         op: "report".to_string(),
                         report: RgpRestoreReportData {

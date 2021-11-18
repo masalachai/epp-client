@@ -8,7 +8,7 @@
 			</update>
 		</update>
 		<extension>
-			<update xmlns="urn:ietf:params:xml:ns:rgp-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd">
+			<update xmlns="urn:ietf:params:xml:ns:rgp-1.0">
 				<restore op="report">
 					<report>
 						<preData>Pre-delete registration data goes here. Both XML and free text are allowed.</preData>

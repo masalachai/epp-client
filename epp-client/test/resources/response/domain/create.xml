@@ -11,7 +11,7 @@
 			</extValue>
 		</result>
 		<resData>
-			<domain:creData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
+			<domain:creData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
 				<domain:name>eppdev-2.com</domain:name>
 				<domain:crDate>2021-07-25T18:11:35.0Z</domain:crDate>
 				<domain:exDate>2022-07-25T18:11:34.0Z</domain:exDate>

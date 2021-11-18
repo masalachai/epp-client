@@ -15,9 +15,6 @@ pub struct HostInfoData {
     /// XML namespace for host response data
     #[serde(rename = "xmlns:host")]
     xmlns: String,
-    /// XML schema location for host response data
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// The host name
     pub name: StringValue,
     /// The host ROID

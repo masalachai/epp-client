@@ -5,7 +5,7 @@
 			<msg>Command completed successfully</msg>
 		</result>
 		<resData>
-			<domain:infData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:domain-1.0 domain-1.0.xsd">
+			<domain:infData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
 				<domain:name>eppdev-1.com</domain:name>
 				<domain:roid>125899511_DOMAIN_COM-VRSN</domain:roid>
 				<domain:status s="ok"/>
