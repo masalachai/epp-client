@@ -84,10 +84,10 @@
 //!     .iter()
 //!     .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 //!
-//! }
-//!
 //! // Close the connection
 //! client.logout().await.unwrap();
+//!
+//! }
 //! ```
 //!
 //! The output would look similar to the following
