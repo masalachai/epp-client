@@ -66,13 +66,16 @@ pub type EppDomainRenew = EppObject<Command<DomainRenew>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainRenewData {
     /// XML namespace for domain commands
+    #[serde(rename = "xmlns:domain", alias = "xmlns")]
     xmlns: String,
     /// The name of the domain to be renewed
+    #[serde(rename = "domain:name", alias = "name")]
     name: StringValue,
     /// The current expiry date of the domain in 'Y-m-d' format
-    #[serde(rename = "curExpDate")]
+    #[serde(rename = "domain:curExpDate", alias = "curExpDate")]
     current_expiry_date: StringValue,
     /// The period of renewal
+    #[serde(rename = "domain:period", alias = "period")]
     period: Period,
 }
 
@@ -81,7 +84,7 @@ pub struct DomainRenewData {
 /// Type for EPP XML &lt;renew&gt; command for domains
 pub struct DomainRenew {
     /// The data under the &lt;renew&gt; tag for the domain renewal
-    #[serde(rename = "renew")]
+    #[serde(rename = "domain:renew", alias = "renew")]
     domain: DomainRenewData,
 }
 

@@ -78,21 +78,26 @@ pub type EppContactCreate = EppObject<Command<ContactCreate>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Contact {
     /// XML namespace for contact commands
+    #[serde(rename = "xmlns:contact")]
     xmlns: String,
     /// Contact &lt;id&gt; tag
+    #[serde(rename = "contact:id")]
     id: StringValue,
     /// Contact &lt;postalInfo&gt; tag
-    #[serde(rename = "postalInfo")]
+    #[serde(rename = "contact:postalInfo")]
     postal_info: data::PostalInfo,
     /// Contact &lt;voice&gt; tag
+    #[serde(rename = "contact:voice")]
     voice: data::Phone,
     /// Contact &lt;fax&gt; tag,
+    #[serde(rename = "contact:fax")]
     fax: Option<data::Phone>,
     /// Contact &lt;email&gt; tag
+    #[serde(rename = "contact:email")]
     email: StringValue,
     /// Contact &lt;authInfo&gt; tag
-    #[serde(rename = "authInfo")]
-    auth_info: data::AuthInfo,
+    #[serde(rename = "contact:authInfo")]
+    auth_info: data::ContactAuthInfo,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -100,7 +105,7 @@ pub struct Contact {
 /// Type for EPP XML &lt;create&gt; command for contacts
 pub struct ContactCreate {
     /// Data for &lt;create&gt; command for contact
-    #[serde(rename = "create")]
+    #[serde(rename = "contact:create")]
     pub contact: Contact,
 }
 
@@ -122,7 +127,7 @@ impl EppContactCreate {
                 voice,
                 fax: None,
                 email: email.to_string_value(),
-                auth_info: data::AuthInfo::new(auth_password),
+                auth_info: data::ContactAuthInfo::new(auth_password),
             },
         };
 

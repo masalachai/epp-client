@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::{
-    AuthInfo, DomainContact, HostAttr, HostAttrList, HostList, HostObjList, Period,
+    DomainAuthInfo, DomainContact, HostAttr, HostAttrList, HostList, HostObjList, Period,
 };
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::Command;
@@ -82,22 +82,27 @@ pub type EppDomainCreate = EppObject<Command<DomainCreate>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainCreateData {
     /// XML namespace for domain commands
+    #[serde(rename = "xmlns:domain", alias = "xmlns")]
     xmlns: String,
     /// The domain name
+    #[serde(rename = "domain:name", alias = "name")]
     name: StringValue,
     /// The period of registration
+    #[serde(rename = "domain:period", alias = "period")]
     period: Period,
     /// The list of nameserver hosts
     /// either of type `HostObjList` or `HostAttrList`
+    #[serde(rename = "domain:ns", alias = "ns")]
     ns: Option<HostList>,
     /// The domain registrant
+    #[serde(rename = "domain:registrant", alias = "registrant")]
     registrant: Option<StringValue>,
     /// The list of contacts for the domain
-    #[serde(rename = "contact")]
+    #[serde(rename = "domain:contact", alias = "contact")]
     contacts: Option<Vec<DomainContact>>,
     /// The auth info for the domain
-    #[serde(rename = "authInfo")]
-    auth_info: AuthInfo,
+    #[serde(rename = "domain:authInfo", alias = "authInfo")]
+    auth_info: DomainAuthInfo,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -107,7 +112,7 @@ pub struct DomainCreate {
     /// The data for the domain to be created with
     /// T being the type of nameserver list (`HostObjList` or `HostAttrList`)
     /// to be supplied
-    #[serde(rename = "create")]
+    #[serde(rename = "domain:create", alias = "create")]
     domain: DomainCreateData,
 }
 
@@ -135,7 +140,7 @@ impl EppDomainCreate {
                 period: Period::new(period),
                 ns: Some(HostList::HostObjList(HostObjList { hosts: ns_list })),
                 registrant: Some(registrant_id.to_string_value()),
-                auth_info: AuthInfo::new(auth_password),
+                auth_info: DomainAuthInfo::new(auth_password),
                 contacts: Some(contacts),
             },
         };
@@ -160,7 +165,7 @@ impl EppDomainCreate {
                 period: Period::new(period),
                 ns: None,
                 registrant: Some(registrant_id.to_string_value()),
-                auth_info: AuthInfo::new(auth_password),
+                auth_info: DomainAuthInfo::new(auth_password),
                 contacts: Some(contacts),
             },
         };
@@ -182,7 +187,7 @@ impl EppDomainCreate {
                 period: Period::new(period),
                 ns: None,
                 registrant: None,
-                auth_info: AuthInfo::new(auth_password),
+                auth_info: DomainAuthInfo::new(auth_password),
                 contacts: None,
             },
         };
@@ -208,7 +213,7 @@ impl EppDomainCreate {
                 period: Period::new(period),
                 ns: Some(HostList::HostAttrList(HostAttrList { hosts: ns })),
                 registrant: Some(registrant_id.to_string_value()),
-                auth_info: AuthInfo::new(auth_password),
+                auth_info: DomainAuthInfo::new(auth_password),
                 contacts: Some(contacts),
             },
         };

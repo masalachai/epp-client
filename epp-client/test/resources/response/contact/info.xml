@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<response>
-		<result code="1000">
-			<msg>Command completed successfully</msg>
-		</result>
-		<resData>
-			<contact:infData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
-				<contact:id>eppdev-contact-3</contact:id>
-				<contact:roid>UNDEF-ROID</contact:roid>
-				<contact:status s="ok"/>
-				<contact:postalInfo type="loc">
-					<contact:name>John Doe</contact:name>
-					<contact:org>Acme Widgets</contact:org>
-					<contact:addr>
-						<contact:street>58</contact:street>
-						<contact:street>Orchid Road</contact:street>
-						<contact:city>Paris</contact:city>
-						<contact:sp>Paris</contact:sp>
-						<contact:pc>392374</contact:pc>
-						<contact:cc>FR</contact:cc>
-					</contact:addr>
-				</contact:postalInfo>
-				<contact:voice x="123">+33.47237942</contact:voice>
-				<contact:fax x="243">+33.86698799</contact:fax>
-				<contact:email>contact@eppdev.net</contact:email>
-				<contact:clID>eppdev</contact:clID>
-				<contact:crID>SYSTEM</contact:crID>
-				<contact:crDate>2021-07-23T13:09:09.0Z</contact:crDate>
-				<contact:upID>SYSTEM</contact:upID>
-				<contact:upDate>2021-07-23T13:09:09.0Z</contact:upDate>
-				<contact:authInfo>
-					<contact:pw>eppdev-387323</contact:pw>
-				</contact:authInfo>
-			</contact:infData>
-		</resData>
-		<trID>
-			<clTRID>cltrid:1626454866</clTRID>
-			<svTRID>RO-6879-1627224678242975</svTRID>
-		</trID>
-	</response>
+    <response>
+        <result code="1000">
+            <msg>Command completed successfully</msg>
+        </result>
+        <resData>
+            <contact:infData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+                <contact:id>eppdev-contact-3</contact:id>
+                <contact:roid>UNDEF-ROID</contact:roid>
+                <contact:status s="ok"/>
+                <contact:postalInfo type="loc">
+                    <contact:name>John Doe</contact:name>
+                    <contact:org>Acme Widgets</contact:org>
+                    <contact:addr>
+                        <contact:street>58</contact:street>
+                        <contact:street>Orchid Road</contact:street>
+                        <contact:city>Paris</contact:city>
+                        <contact:sp>Paris</contact:sp>
+                        <contact:pc>392374</contact:pc>
+                        <contact:cc>FR</contact:cc>
+                    </contact:addr>
+                </contact:postalInfo>
+                <contact:voice x="123">+33.47237942</contact:voice>
+                <contact:fax x="243">+33.86698799</contact:fax>
+                <contact:email>contact@eppdev.net</contact:email>
+                <contact:clID>eppdev</contact:clID>
+                <contact:crID>SYSTEM</contact:crID>
+                <contact:crDate>2021-07-23T13:09:09.0Z</contact:crDate>
+                <contact:upID>SYSTEM</contact:upID>
+                <contact:upDate>2021-07-23T13:09:09.0Z</contact:upDate>
+                <contact:authInfo>
+                    <contact:pw>eppdev-387323</contact:pw>
+                </contact:authInfo>
+            </contact:infData>
+        </resData>
+        <trID>
+            <clTRID>cltrid:1626454866</clTRID>
+            <svTRID>RO-6879-1627224678242975</svTRID>
+        </trID>
+    </response>
 </epp>

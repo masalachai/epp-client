@@ -83,6 +83,7 @@ pub type EppHostUpdate = EppObject<Command<HostUpdate>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostChangeInfo {
     /// The new name for the host
+    #[serde(rename = "host:name", alias = "name")]
     pub name: StringValue,
 }
 
@@ -90,10 +91,10 @@ pub struct HostChangeInfo {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAddRemove {
     /// The IP addresses to be added to or removed from the host
-    #[serde(rename = "addr")]
+    #[serde(rename = "host:addr", alias = "addr")]
     pub addresses: Option<Vec<HostAddr>>,
     /// The statuses to be added to or removed from the host
-    #[serde(rename = "status")]
+    #[serde(rename = "host:status", alias = "status")]
     pub statuses: Option<Vec<HostStatus>>,
 }
 
@@ -101,16 +102,19 @@ pub struct HostAddRemove {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostUpdateData {
     /// XML namespace for host commands
+    #[serde(rename = "xmlns:host", alias = "xmlns")]
     xmlns: String,
     /// The name of the host
+    #[serde(rename = "host:name", alias = "name")]
     name: StringValue,
     /// The IP addresses and statuses to be added to the host
+    #[serde(rename = "host:add", alias = "add")]
     add: Option<HostAddRemove>,
     /// The IP addresses and statuses to be removed from the host
-    #[serde(rename = "rem")]
+    #[serde(rename = "host:rem", alias = "rem")]
     remove: Option<HostAddRemove>,
     /// The host details that need to be updated
-    #[serde(rename = "chg")]
+    #[serde(rename = "host:chg", alias = "chg")]
     change_info: Option<HostChangeInfo>,
 }
 
@@ -119,7 +123,7 @@ pub struct HostUpdateData {
 /// Type for EPP XML &lt;update&gt; command for hosts
 pub struct HostUpdate {
     /// The instance holding the data for the host to be updated
-    #[serde(rename = "update")]
+    #[serde(rename = "host:update", alias = "update")]
     host: HostUpdateData,
 }
 

@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::epp::object::data::{AuthInfo, DomainContact, DomainStatus, HostAttr};
+use crate::epp::object::data::{DomainAuthInfo, DomainContact, DomainStatus, HostAttr};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::domain::rgp::request::RgpRequestResult;
 use crate::epp::response::CommandResponseWithExtension;
@@ -69,7 +69,7 @@ pub struct DomainInfoData {
     pub transferred_at: Option<StringValue>,
     /// The domain auth info
     #[serde(rename = "authInfo")]
-    pub auth_info: Option<AuthInfo>,
+    pub auth_info: Option<DomainAuthInfo>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain info response

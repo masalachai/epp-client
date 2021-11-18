@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<command>
-		<update>
-			<update xmlns="urn:ietf:params:xml:ns:domain-1.0">
-				<name>eppdev.com</name>
-				<add>
-					<status s="clientDeleteProhibited"/>
-				</add>
-				<rem>
-					<contact type="billing">eppdev-contact-2</contact>
-				</rem>
-				<chg>
-					<authInfo>
-						<pw>epP5uthd#v</pw>
-					</authInfo>
-				</chg>
-			</update>
-		</update>
-		<clTRID>cltrid:1626454866</clTRID>
-	</command>
+    <command>
+        <update>
+            <domain:update xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>eppdev.com</domain:name>
+                <domain:add>
+                    <domain:status s="clientDeleteProhibited"/>
+                </domain:add>
+                <domain:rem>
+                    <domain:contact type="billing">eppdev-contact-2</domain:contact>
+                </domain:rem>
+                <domain:chg>
+                    <domain:authInfo>
+                        <domain:pw>epP5uthd#v</domain:pw>
+                    </domain:authInfo>
+                </domain:chg>
+            </domain:update>
+        </update>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
 </epp>

@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<command>
-		<create>
-			<create xmlns="urn:ietf:params:xml:ns:domain-1.0">
-				<name>eppdev-2.com</name>
-				<period unit="y">1</period>
-				<ns>
-					<hostAttr>
-						<hostName>ns1.eppdev-1.com</hostName>
-					</hostAttr>
-					<hostAttr>
-						<hostName>ns2.eppdev-1.com</hostName>
-						<hostAddr ip="v4">177.232.12.58</hostAddr>
-						<hostAddr ip="v6">2404:6800:4001:801::200e</hostAddr>
-					</hostAttr>
-				</ns>
-				<registrant>eppdev-contact-3</registrant>
-				<contact type="admin">eppdev-contact-3</contact>
-				<contact type="tech">eppdev-contact-3</contact>
-				<contact type="billing">eppdev-contact-3</contact>
-				<authInfo>
-					<pw>epP4uthd#v</pw>
-				</authInfo>
-			</create>
-		</create>
-		<clTRID>cltrid:1626454866</clTRID>
-	</command>
+    <command>
+        <create>
+            <domain:create xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>eppdev-2.com</domain:name>
+                <domain:period unit="y">1</domain:period>
+                <domain:ns>
+                    <domain:hostAttr>
+                        <domain:hostName>ns1.eppdev-1.com</domain:hostName>
+                    </domain:hostAttr>
+                    <domain:hostAttr>
+                        <domain:hostName>ns2.eppdev-1.com</domain:hostName>
+                        <domain:hostAddr ip="v4">177.232.12.58</domain:hostAddr>
+                        <domain:hostAddr ip="v6">2404:6800:4001:801::200e</domain:hostAddr>
+                    </domain:hostAttr>
+                </domain:ns>
+                <domain:registrant>eppdev-contact-3</domain:registrant>
+                <domain:contact type="admin">eppdev-contact-3</domain:contact>
+                <domain:contact type="tech">eppdev-contact-3</domain:contact>
+                <domain:contact type="billing">eppdev-contact-3</domain:contact>
+                <domain:authInfo>
+                    <domain:pw>epP4uthd#v</domain:pw>
+                </domain:authInfo>
+            </domain:create>
+        </create>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
 </epp>

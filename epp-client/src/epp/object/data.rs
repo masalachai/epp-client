@@ -47,9 +47,10 @@ impl HostAddr {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Host {
     /// The &lt;hostName&gt; tag
+    #[serde(rename = "host:name", alias = "name")]
     pub name: StringValue,
     /// The &lt;hostAddr&gt; tags
-    #[serde(rename = "addr")]
+    #[serde(rename = "host:addr", alias = "addr")]
     pub addresses: Option<Vec<HostAddr>>,
 }
 
@@ -57,10 +58,10 @@ pub struct Host {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAttr {
     /// The &lt;hostName&gt; tag
-    #[serde(rename = "hostName")]
+    #[serde(rename = "domain:hostName", alias = "hostName")]
     pub name: StringValue,
     /// The &lt;hostAddr&gt; tags
-    #[serde(rename = "hostAddr")]
+    #[serde(rename = "domain:hostAddr", alias = "hostAddr")]
     pub addresses: Option<Vec<HostAddr>>,
 }
 
@@ -77,7 +78,7 @@ pub enum HostList {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAttrList {
     /// The list of &lt;hostAttr&gt; tags
-    #[serde(rename = "hostAttr")]
+    #[serde(rename = "domain:hostAttr", alias = "hostAttr")]
     pub hosts: Vec<HostAttr>,
 }
 
@@ -85,7 +86,7 @@ pub struct HostAttrList {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostObjList {
     /// The list of &lt;hostObj&gt; tags
-    #[serde(rename = "hostObj")]
+    #[serde(rename = "domain:hostObj", alias = "hostObj")]
     pub hosts: Vec<StringValue>,
 }
 
@@ -148,17 +149,19 @@ pub struct Phone {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Address {
     /// The &lt;street&gt; tags under &lt;addr&gt;
+    #[serde(rename = "contact:street", alias = "street")]
     pub street: Vec<StringValue>,
     /// The &lt;city&gt; tag under &lt;addr&gt;
+    #[serde(rename = "contact:city", alias = "city")]
     pub city: StringValue,
     /// The &lt;sp&gt; tag under &lt;addr&gt;
-    #[serde(rename = "sp")]
+    #[serde(rename = "contact:sp", alias = "sp")]
     pub province: StringValue,
     /// The &lt;pc&gt; tag under &lt;addr&gt;
-    #[serde(rename = "pc")]
+    #[serde(rename = "contact:pc", alias = "pc")]
     pub postal_code: StringValue,
     /// The &lt;cc&gt; tag under &lt;addr&gt;
-    #[serde(rename = "cc")]
+    #[serde(rename = "contact:cc", alias = "cc")]
     pub country_code: StringValue,
 }
 
@@ -169,20 +172,29 @@ pub struct PostalInfo {
     #[serde(rename = "type")]
     pub info_type: String,
     /// The &lt;name&gt; tag under &lt;postalInfo&gt;
+    #[serde(rename = "contact:name", alias = "name")]
     pub name: StringValue,
     /// The &lt;org&gt; tag under &lt;postalInfo&gt;
-    #[serde(rename = "org")]
+    #[serde(rename = "contact:org", alias = "org")]
     pub organization: StringValue,
     /// The &lt;addr&gt; tag under &lt;postalInfo&gt;
-    #[serde(rename = "addr")]
+    #[serde(rename = "contact:addr", alias = "addr")]
     pub address: Address,
 }
 
 /// The &lt;authInfo&gt; tag for domain and contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AuthInfo {
+pub struct DomainAuthInfo {
     /// The &lt;pw&gt; tag under &lt;authInfo&gt;
-    #[serde(rename = "pw")]
+    #[serde(rename = "domain:pw", alias = "pw")]
+    pub password: StringValue,
+}
+
+/// The &lt;authInfo&gt; tag for domain and contact transactions
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ContactAuthInfo {
+    /// The &lt;pw&gt; tag under &lt;authInfo&gt;
+    #[serde(rename = "contact:pw", alias = "pw")]
     pub password: StringValue,
 }
 
@@ -201,10 +213,19 @@ impl Phone {
     }
 }
 
-impl AuthInfo {
-    /// Creates an AuthInfo instance with the given password
-    pub fn new(password: &str) -> AuthInfo {
-        AuthInfo {
+impl DomainAuthInfo {
+    /// Creates a DomainAuthInfo instance with the given password
+    pub fn new(password: &str) -> DomainAuthInfo {
+        DomainAuthInfo {
+            password: password.to_string_value(),
+        }
+    }
+}
+
+impl ContactAuthInfo {
+    /// Creates a ContactAuthInfo instance with the given password
+    pub fn new(password: &str) -> ContactAuthInfo {
+        ContactAuthInfo {
             password: password.to_string_value(),
         }
     }

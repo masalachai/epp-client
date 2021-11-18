@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::{AuthInfo, Period};
+use crate::epp::object::data::{DomainAuthInfo, Period};
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
@@ -262,16 +262,19 @@ pub type EppDomainTransferQuery = EppObject<Command<DomainTransfer>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainTransferData {
     /// XML namespace for domain commands
+    #[serde(rename = "xmlns:domain")]
     xmlns: String,
     /// The name of the domain under transfer
+    #[serde(rename = "domain:name")]
     name: StringValue,
     /// The period of renewal upon a successful transfer
     /// Only applicable in case of a transfer request
+    #[serde(rename = "domain:period")]
     period: Option<Period>,
     /// The authInfo for the domain under transfer
     /// Only applicable to domain transfer and domain transfer query requests
-    #[serde(rename = "authInfo")]
-    auth_info: Option<AuthInfo>,
+    #[serde(rename = "domain:authInfo")]
+    auth_info: Option<DomainAuthInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -283,7 +286,7 @@ pub struct DomainTransfer {
     #[serde(rename = "op")]
     operation: String,
     /// The data under the &lt;transfer&gt; tag in the transfer request
-    #[serde(rename = "transfer")]
+    #[serde(rename = "domain:transfer")]
     domain: DomainTransferData,
 }
 
@@ -302,7 +305,7 @@ impl EppDomainTransferRequest {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
                     period: Some(Period::new(years)),
-                    auth_info: Some(AuthInfo::new(auth_password)),
+                    auth_info: Some(DomainAuthInfo::new(auth_password)),
                 },
             },
             client_tr_id,
@@ -379,7 +382,7 @@ impl EppDomainTransferQuery {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.to_string_value(),
                     period: None,
-                    auth_info: Some(AuthInfo::new(auth_password)),
+                    auth_info: Some(DomainAuthInfo::new(auth_password)),
                 },
             },
             client_tr_id,

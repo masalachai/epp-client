@@ -4,7 +4,7 @@ mod request {
     use super::super::get_xml;
     use super::super::CLTRID;
     use crate::epp::object::data::{
-        Address, AuthInfo, ContactStatus, DomainContact, DomainStatus, HostAddr, HostAttr,
+        Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
     };
     use crate::epp::object::StringValueTrait;
@@ -291,7 +291,7 @@ mod request {
 
         let change_info = DomainChangeInfo {
             registrant: None,
-            auth_info: Some(AuthInfo::new("epP5uthd#v")),
+            auth_info: Some(DomainAuthInfo::new("epP5uthd#v")),
         };
 
         object.add(add);

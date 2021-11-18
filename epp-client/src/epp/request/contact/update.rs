@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::{AuthInfo, ContactStatus, Phone, PostalInfo};
+use crate::epp::object::data::{ContactAuthInfo, ContactStatus, Phone, PostalInfo};
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::Command;
 use crate::epp::response::contact::info::EppContactInfoResponse;
@@ -73,31 +73,37 @@ pub type EppContactUpdate = EppObject<Command<ContactUpdate>>;
 /// Type for elements under the &lt;chg&gt; tag for contact update request
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactChangeInfo {
-    #[serde(rename = "postalInfo")]
+    #[serde(rename = "contact:postalInfo", alias = "postalInfo")]
     postal_info: Option<PostalInfo>,
+    #[serde(rename = "contact:voice", alias = "voice")]
     voice: Option<Phone>,
+    #[serde(rename = "contact:fax", alias = "fax")]
     fax: Option<Phone>,
+    #[serde(rename = "contact:email", alias = "email")]
     email: Option<StringValue>,
-    #[serde(rename = "authInfo")]
-    auth_info: Option<AuthInfo>,
+    #[serde(rename = "contact:authInfo", alias = "authInfo")]
+    auth_info: Option<ContactAuthInfo>,
 }
 
 /// Type for list of elements of the &lt;status&gt; tag for contact update request
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StatusList {
+    #[serde(rename = "contact:status", alias = "status")]
     status: Vec<ContactStatus>,
 }
 
 /// Type for elements under the contact &lt;update&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactUpdateData {
+    #[serde(rename = "xmlns:contact", alias = "xmlns")]
     xmlns: String,
+    #[serde(rename = "contact:id", alias = "id")]
     id: StringValue,
-    #[serde(rename = "add")]
+    #[serde(rename = "contact:add", alias = "add")]
     add_statuses: Option<StatusList>,
-    #[serde(rename = "rem")]
+    #[serde(rename = "contact:rem", alias = "rem")]
     remove_statuses: Option<StatusList>,
-    #[serde(rename = "chg")]
+    #[serde(rename = "contact:chg", alias = "chg")]
     change_info: Option<ContactChangeInfo>,
 }
 
@@ -106,7 +112,7 @@ pub struct ContactUpdateData {
 /// Type for EPP XML &lt;update&gt; command for contacts
 pub struct ContactUpdate {
     /// The data under the &lt;update&gt; tag for the contact update
-    #[serde(rename = "update")]
+    #[serde(rename = "contact:update", alias = "update")]
     contact: ContactUpdateData,
 }
 
@@ -137,7 +143,7 @@ impl EppContactUpdate {
             email: Some(email.to_string_value()),
             postal_info: Some(postal_info),
             voice: Some(voice),
-            auth_info: Some(AuthInfo::new(auth_password)),
+            auth_info: Some(ContactAuthInfo::new(auth_password)),
             fax: None,
         });
     }

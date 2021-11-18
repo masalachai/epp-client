@@ -67,11 +67,13 @@ pub type EppHostCreate = EppObject<Command<HostCreate>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostCreateData {
     /// XML namespace for host commands
+    #[serde(rename = "xmlns:host", alias = "xmlns")]
     xmlns: String,
     /// The name of the host to be created
+    #[serde(rename = "host:name", alias = "name")]
     pub name: StringValue,
     /// The list of IP addresses for the host
-    #[serde(rename = "addr")]
+    #[serde(rename = "host:addr", alias = "addr")]
     pub addresses: Option<Vec<HostAddr>>,
 }
 
@@ -80,7 +82,7 @@ pub struct HostCreateData {
 /// Type for EPP XML &lt;create&gt; command for hosts
 pub struct HostCreate {
     /// The instance holding the data for the host to be created
-    #[serde(rename = "create")]
+    #[serde(rename = "host:create", alias = "create")]
     host: HostCreateData,
 }
 

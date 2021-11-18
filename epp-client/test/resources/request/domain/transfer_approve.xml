@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<command>
-		<transfer op="approve">
-			<transfer xmlns="urn:ietf:params:xml:ns:domain-1.0">
-				<name>testing.com</name>
-			</transfer>
-		</transfer>
-		<clTRID>cltrid:1626454866</clTRID>
-	</command>
+    <command>
+        <transfer op="approve">
+            <domain:transfer xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>testing.com</domain:name>
+            </domain:transfer>
+        </transfer>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
 </epp>

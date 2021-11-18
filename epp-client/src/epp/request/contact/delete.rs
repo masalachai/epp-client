@@ -62,8 +62,10 @@ pub type EppContactDelete = EppObject<Command<ContactDelete>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactDeleteData {
     /// XML namespace for the &lt;delete&gt; command for contacts
+    #[serde(rename = "xmlns:contact", alias = "xmlns")]
     xmlns: String,
     /// The id of the contact to be deleted
+    #[serde(rename = "contact:id", alias = "id")]
     id: StringValue,
 }
 
@@ -71,7 +73,7 @@ pub struct ContactDeleteData {
 #[element_name(name = "delete")]
 /// The &lt;delete&gt; type for the contact delete EPP command
 pub struct ContactDelete {
-    #[serde(rename = "delete")]
+    #[serde(rename = "contact:delete", alias = "delete")]
     /// The data for the &lt;delete&gt; tag for a contact delete command
     contact: ContactDeleteData,
 }

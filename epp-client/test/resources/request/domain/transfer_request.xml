@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<command>
-		<transfer op="request">
-			<transfer xmlns="urn:ietf:params:xml:ns:domain-1.0">
-				<name>testing.com</name>
-				<period unit="y">1</period>
-				<authInfo>
-					<pw>epP4uthd#v</pw>
-				</authInfo>
-			</transfer>
-		</transfer>
-		<clTRID>cltrid:1626454866</clTRID>
-	</command>
+    <command>
+        <transfer op="request">
+            <domain:transfer xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>testing.com</domain:name>
+                <domain:period unit="y">1</domain:period>
+                <domain:authInfo>
+                    <domain:pw>epP4uthd#v</domain:pw>
+                </domain:authInfo>
+            </domain:transfer>
+        </transfer>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
 </epp>

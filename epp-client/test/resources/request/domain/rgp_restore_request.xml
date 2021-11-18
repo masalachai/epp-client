@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<command>
-		<update>
-			<update xmlns="urn:ietf:params:xml:ns:domain-1.0">
-				<name>eppdev.com</name>
-				<chg/>
-			</update>
-		</update>
-		<extension>
-			<update xmlns="urn:ietf:params:xml:ns:rgp-1.0">
-				<restore op="request"/>
-			</update>
-		</extension>
-		<clTRID>cltrid:1626454866</clTRID>
-	</command>
+    <command>
+        <update>
+            <domain:update xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>eppdev.com</domain:name>
+                <domain:chg/>
+            </domain:update>
+        </update>
+        <extension>
+            <rgp:update xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0">
+                <rgp:restore op="request"/>
+            </rgp:update>
+        </extension>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
 </epp>

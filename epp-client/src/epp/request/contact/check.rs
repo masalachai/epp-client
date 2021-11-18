@@ -61,9 +61,10 @@ pub type EppContactCheck = EppObject<Command<ContactCheck>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactList {
     /// The XML namespace for the contact &lt;check&gt;
+    #[serde(rename = "xmlns:contact", alias = "xmlns")]
     xmlns: String,
     /// The list of contact ids to check for availability
-    #[serde(rename = "id")]
+    #[serde(rename = "contact:id", alias = "id")]
     pub contact_ids: Vec<StringValue>,
 }
 
@@ -72,7 +73,7 @@ pub struct ContactList {
 /// The &lt;command&gt; type for contact check command
 pub struct ContactCheck {
     /// The &lt;check&gt; tag for the contact check command
-    #[serde(rename = "check")]
+    #[serde(rename = "contact:check", alias = "check")]
     list: ContactList,
 }
 

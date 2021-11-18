@@ -87,24 +87,25 @@ pub type EppDomainRgpRestoreReport =
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RgpRestoreReportData {
     /// The pre-delete registration date
-    #[serde(rename = "preData")]
+    #[serde(rename = "rgp:preData", alias = "preData")]
     pre_data: StringValue,
     /// The post-delete registration date
-    #[serde(rename = "postData")]
+    #[serde(rename = "rgp:postData", alias = "postData")]
     post_data: StringValue,
     /// The domain deletion date
-    #[serde(rename = "delTime")]
+    #[serde(rename = "rgp:delTime", alias = "delTime")]
     deleted_at: StringValue,
     /// The domain restore request date
-    #[serde(rename = "resTime")]
+    #[serde(rename = "rgp:resTime", alias = "resTime")]
     restored_at: StringValue,
     /// The reason for domain restoration
-    #[serde(rename = "resReason")]
+    #[serde(rename = "rgp:resReason", alias = "resReason")]
     restore_reason: StringValue,
     /// The registrar's statements on the domain restoration
-    #[serde(rename = "statement")]
+    #[serde(rename = "rgp:statement", alias = "statement")]
     statements: Vec<StringValue>,
     /// Other remarks for domain restoration
+    #[serde(rename = "rgp:other", alias = "other")]
     other: StringValue,
 }
 
@@ -114,16 +115,19 @@ pub struct RgpRestoreReportSection {
     /// The value of the op attribute for the &lt;restore&gt; tag
     op: String,
     /// Data for the &lt;report&gt; tag
+    #[serde(rename = "rgp:report", alias = "report")]
     report: RgpRestoreReportData,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "update")]
+#[element_name(name = "rgp:update")]
 /// Type for EPP XML &lt;check&gt; command for domains
 pub struct RgpRestoreReport {
     /// XML namespace for the RGP restore extension
+    #[serde(rename = "xmlns:rgp", alias = "xmlns")]
     xmlns: String,
     /// The object holding the list of domains to be checked
+    #[serde(rename = "rgp:restore", alias = "restore")]
     restore: RgpRestoreReportSection,
 }
 
