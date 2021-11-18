@@ -145,9 +145,9 @@ mod request {
     fn wrapped_domain_check() {
         let xml = get_xml("request/domain/check.xml").unwrap();
 
-        let object = domain::check::Request::new(vec!["eppdev.com", "eppdev.net"], CLTRID);
+        let object = domain::check::Request::new(vec!["eppdev.com", "eppdev.net"]);
 
-        let serialized = object.serialize_request().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }

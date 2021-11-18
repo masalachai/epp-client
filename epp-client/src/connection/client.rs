@@ -160,21 +160,14 @@ impl EppClient {
 
     pub async fn transact_new<T: EppRequest + Debug>(
         &mut self,
-        request: &T,
+        request: T,
+        id: &str,
     ) -> Result<<T as EppRequest>::Output, error::Error> {
-        let epp_xml = request.serialize_request()?;
+        let epp_xml = request.serialize_request(id)?;
 
         let response = self.connection.transact(&epp_xml).await?;
 
-        let status = EppCommandResponse::deserialize(&response)?;
-
-        if status.data.result.code < 2000 {
-            let response = request.deserialize_response(&response)?;
-            Ok(response)
-        } else {
-            let epp_error = EppCommandResponseError::deserialize(&response)?;
-            Err(error::Error::EppCommandError(epp_error))
-        }
+        T::deserialize_response(&response)
     }
 
     /// Fetches the username used in the registry connection

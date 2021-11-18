@@ -7,7 +7,7 @@ pub mod message;
 
 use epp_client_macros::*;
 
-use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
+use serde::{de::DeserializeOwned, ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
 use std::fmt::Debug;
 use std::time::SystemTime;
@@ -16,20 +16,41 @@ use crate::epp::object::{
     ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
     StringValueTrait,
 };
+use crate::epp::response::{CommandResponse, CommandResponseStatus};
 use crate::epp::xml::{
     EppXml, EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION,
 };
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
-pub trait EppRequest {
-    type Output: EppXml + Debug;
+pub trait EppRequest: ElementName + DeserializeOwned + Serialize + Debug + Sized {
+    type Extension: ElementName + DeserializeOwned + Serialize + Debug;
+    type Output: EppXml + DeserializeOwned + Serialize + Debug;
 
-    fn deserialize_response(
-        &self,
-        epp_xml: &str,
-    ) -> Result<Self::Output, Box<dyn std::error::Error>>;
+    fn extension(&self) -> Option<Self::Extension> {
+        None
+    }
 
-    fn serialize_request(&self) -> Result<String, Box<dyn std::error::Error>>;
+    fn deserialize_response(epp_xml: &str) -> Result<Self::Output, crate::error::Error> {
+        let rsp = <EppObject<CommandResponse<Self::Output>> as EppXml>::deserialize(epp_xml)?;
+        match rsp.data.result.code {
+            0..=2000 => Ok(rsp.data.res_data.unwrap()),
+            _ => Err(crate::error::Error::EppCommandError(EppObject::build(
+                CommandResponseStatus {
+                    result: rsp.data.result,
+                    tr_ids: rsp.data.tr_ids,
+                },
+            ))),
+        }
+    }
+
+    fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+        let extension = self.extension().map(|data| Extension { data });
+        EppXml::serialize(&EppObject::build(CommandWithExtension {
+            command: self,
+            extension,
+            client_tr_id: client_tr_id.to_string_value(),
+        }))
+    }
 }
 
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request

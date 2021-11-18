@@ -22,9 +22,9 @@ async fn domain_check() {
     };
 
     let domains = vec!["eppdev.com", "eppdev.net"];
-    let request = domain::check::Request::new(domains, CLTRID);
+    let request = domain::check::Request::new(domains);
 
-    client.transact_new(&request).await.unwrap();
+    client.transact_new(request, CLTRID).await.unwrap();
 
     client.logout().await.unwrap();
 }
