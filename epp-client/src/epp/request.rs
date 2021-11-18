@@ -48,9 +48,8 @@ impl<T: ElementName + Serialize, E: ElementName + Serialize> Serialize
     where
         S: Serializer,
     {
-        let command_name = self.command.element_name();
         let mut state = serializer.serialize_struct("command", 3)?;
-        state.serialize_field(command_name, &self.command)?;
+        state.serialize_field(T::ELEMENT, &self.command)?;
         state.serialize_field("extension", &self.extension)?;
         state.serialize_field("clTRID", &self.client_tr_id)?;
         state.end()

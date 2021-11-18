@@ -39,9 +39,7 @@ fn element_name_macro(ast: &syn::DeriveInput) -> TokenStream {
 
     let implement = quote! {
         impl #impl_generics ElementName for #name #type_generics {
-            fn element_name(&self) -> &'static str {
-                #elem_name
-            }
+            const ELEMENT: &'static str = #elem_name;
         }
     };
     implement.into()

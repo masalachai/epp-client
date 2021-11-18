@@ -44,7 +44,7 @@ impl StringValueTrait for String {
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
 pub trait ElementName {
-    fn element_name(&self) -> &'static str;
+    const ELEMENT: &'static str;
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
@@ -72,11 +72,9 @@ impl<T: ElementName + Serialize> Serialize for EppObject<T> {
     where
         S: Serializer,
     {
-        let data_name = self.data.element_name();
-
         let mut state = serializer.serialize_struct("epp", 4)?;
         state.serialize_field("xmlns", &self.xmlns)?;
-        state.serialize_field(data_name, &self.data)?;
+        state.serialize_field(T::ELEMENT, &self.data)?;
         state.end()
     }
 }
@@ -115,10 +113,8 @@ impl<E: ElementName + Serialize> Serialize for Extension<E> {
     where
         S: Serializer,
     {
-        let data_name = self.data.element_name();
-
         let mut state = serializer.serialize_struct("extension", 1)?;
-        state.serialize_field(data_name, &self.data)?;
+        state.serialize_field(E::ELEMENT, &self.data)?;
         state.end()
     }
 }
