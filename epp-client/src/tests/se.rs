@@ -9,6 +9,7 @@ mod request {
     };
     use crate::epp::object::StringValueTrait;
     use crate::epp::request::domain::namestore::create::EppNamestoreDomainCreate;
+    use crate::epp::request::domain::namestore::delete::EppNamestoreDomainDelete;
     use crate::epp::request::domain::namestore::info::EppNamestoreDomainInfo;
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::xml::EppXml;
@@ -581,6 +582,17 @@ mod request {
             CLTRID,
             "com",
         );
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_domain() {
+        let xml = get_xml("request/domain/namestore_domain_delete.xml").unwrap();
+
+        let object = EppNamestoreDomainDelete::new("eppdev.com", CLTRID, "com");
 
         let serialized = object.serialize().unwrap();
 
