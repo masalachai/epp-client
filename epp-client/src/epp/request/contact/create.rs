@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data;
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -46,7 +46,7 @@ use serde::{Deserialize, Serialize};
 ///
 ///     // Create the address, postal_info, voice instances
 ///     let street = vec!["58", "Orchid Road"];
-///     let address = Address::new(street, "New York", "New York", "392374", "US");
+///     let address = Address::new(&street, "New York", "New York", "392374", "US");
 ///     let postal_info = PostalInfo::new("int", "John Doe", "Acme Widgets", address);
 ///     let mut voice = Phone::new("+1.47237942");
 ///     voice.set_extension("123");
@@ -122,11 +122,11 @@ impl EppContactCreate {
         let contact_create = ContactCreate {
             contact: Contact {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.to_string_value(),
+                id: id.into(),
                 postal_info,
                 voice,
                 fax: None,
-                email: email.to_string_value(),
+                email: email.into(),
                 auth_info: data::ContactAuthInfo::new(auth_password),
             },
         };

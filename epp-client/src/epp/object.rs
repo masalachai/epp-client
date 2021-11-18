@@ -10,14 +10,8 @@ use crate::epp::xml::EPP_XMLNS;
 
 /// Wraps String for easier serialization to and from values that are inner text
 /// for tags rather than attributes
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct StringValue(String);
-
-impl Default for StringValue {
-    fn default() -> Self {
-        Self(String::from(""))
-    }
-}
 
 impl Display for StringValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -25,20 +19,15 @@ impl Display for StringValue {
     }
 }
 
-/// Trait for StringValue type to add easier conversion from str and String
-pub trait StringValueTrait {
-    fn to_string_value(&self) -> StringValue;
-}
-
-impl StringValueTrait for &str {
-    fn to_string_value(&self) -> StringValue {
-        StringValue(self.to_string())
+impl From<&str> for StringValue {
+    fn from(s: &str) -> Self {
+        Self(s.to_owned())
     }
 }
 
-impl StringValueTrait for String {
-    fn to_string_value(&self) -> StringValue {
-        StringValue(self.to_string())
+impl From<String> for StringValue {
+    fn from(s: String) -> Self {
+        Self(s)
     }
 }
 
@@ -93,8 +82,8 @@ impl Options {
     /// Creates an Options object with version and lang data
     pub fn build(version: &str, lang: &str) -> Options {
         Options {
-            version: version.to_string_value(),
-            lang: lang.to_string_value(),
+            version: version.into(),
+            lang: lang.into(),
         }
     }
 }

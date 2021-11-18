@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::ContactAuthInfo;
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -89,7 +89,7 @@ impl EppContactInfo {
         let contact_info = ContactInfo {
             info: ContactInfoData {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.to_string_value(),
+                id: id.into(),
                 auth_info: ContactAuthInfo::new(auth_password),
             },
         };

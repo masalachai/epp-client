@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::domain::update::{DomainChangeInfo, DomainUpdate, DomainUpdateData};
 use crate::epp::request::{CommandWithExtension, Extension};
 use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
@@ -67,7 +67,7 @@ use serde::{Deserialize, Serialize};
 ///         deleted_at,
 ///         restored_at,
 ///         restore_reason,
-///         statements,
+///         &statements,
 ///         other,
 ///         generate_client_tr_id(&client).as_str()
 ///     );
@@ -141,20 +141,17 @@ impl EppDomainRgpRestoreReport {
         deleted_at: DateTime<Utc>,
         restored_at: DateTime<Utc>,
         restore_reason: &str,
-        statements: Vec<&str>,
+        statements: &[&str],
         other: &str,
         client_tr_id: &str,
     ) -> EppDomainRgpRestoreReport {
-        let statements = statements
-            .iter()
-            .map(|s| s.to_string_value())
-            .collect::<Vec<StringValue>>();
+        let statements = statements.iter().map(|&s| s.into()).collect();
 
         let command = CommandWithExtension::<DomainUpdate, RgpRestoreReport> {
             command: DomainUpdate {
                 domain: DomainUpdateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     add: None,
                     remove: None,
                     change_info: Some(DomainChangeInfo {
@@ -169,22 +166,22 @@ impl EppDomainRgpRestoreReport {
                     restore: RgpRestoreReportSection {
                         op: "report".to_string(),
                         report: RgpRestoreReportData {
-                            pre_data: pre_data.to_string_value(),
-                            post_data: post_data.to_string_value(),
+                            pre_data: pre_data.into(),
+                            post_data: post_data.into(),
                             deleted_at: deleted_at
                                 .to_rfc3339_opts(SecondsFormat::AutoSi, true)
-                                .to_string_value(),
+                                .into(),
                             restored_at: restored_at
                                 .to_rfc3339_opts(SecondsFormat::AutoSi, true)
-                                .to_string_value(),
-                            restore_reason: restore_reason.to_string_value(),
+                                .into(),
+                            restore_reason: restore_reason.into(),
                             statements,
-                            other: other.to_string_value(),
+                            other: other.into(),
                         },
                     },
                 },
             }),
-            client_tr_id: client_tr_id.to_string_value(),
+            client_tr_id: client_tr_id.into(),
         };
 
         EppObject::build(command)

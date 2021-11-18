@@ -11,7 +11,6 @@ use std::time::SystemTime;
 
 use crate::epp::object::{
     ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
-    StringValueTrait,
 };
 use crate::epp::xml::{EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION};
 use epp_client_macros::*;
@@ -62,7 +61,7 @@ impl<T: ElementName> Command<T> {
         Command {
             command,
             extension: None,
-            client_tr_id: client_tr_id.to_string_value(),
+            client_tr_id: client_tr_id.into(),
         }
     }
 }
@@ -73,7 +72,7 @@ impl<T: ElementName, E: ElementName> CommandWithExtension<T, E> {
         CommandWithExtension {
             command,
             extension: Some(Extension { data: ext }),
-            client_tr_id: client_tr_id.to_string_value(),
+            client_tr_id: client_tr_id.into(),
         }
     }
 }
@@ -127,24 +126,22 @@ impl EppLogin {
         ext_uris: &Option<Vec<String>>,
         client_tr_id: &str,
     ) -> EppLogin {
-        let ext_uris = ext_uris.as_ref().map(|uris| {
-            uris.iter()
-                .map(|u| u.to_string_value())
-                .collect::<Vec<StringValue>>()
-        });
+        let ext_uris = ext_uris
+            .as_ref()
+            .map(|uris| uris.iter().map(|u| u.as_str().into()).collect());
 
         let login = Login {
-            username: username.to_string_value(),
-            password: password.to_string_value(),
+            username: username.into(),
+            password: password.into(),
             options: Options {
-                version: EPP_VERSION.to_string_value(),
-                lang: EPP_LANG.to_string_value(),
+                version: EPP_VERSION.into(),
+                lang: EPP_LANG.into(),
             },
             services: Services {
                 obj_uris: vec![
-                    EPP_HOST_XMLNS.to_string_value(),
-                    EPP_CONTACT_XMLNS.to_string_value(),
-                    EPP_DOMAIN_XMLNS.to_string_value(),
+                    EPP_HOST_XMLNS.into(),
+                    EPP_CONTACT_XMLNS.into(),
+                    EPP_DOMAIN_XMLNS.into(),
                 ],
                 svc_ext: Some(ServiceExtension { ext_uris }),
             },
@@ -153,7 +150,7 @@ impl EppLogin {
         EppObject::build(Command::<Login> {
             command: login,
             extension: None,
-            client_tr_id: client_tr_id.to_string_value(),
+            client_tr_id: client_tr_id.into(),
         })
     }
 
@@ -179,7 +176,7 @@ impl EppLogout {
         EppObject::build(Command::<Logout> {
             command: Logout,
             extension: None,
-            client_tr_id: client_tr_id.to_string_value(),
+            client_tr_id: client_tr_id.into(),
         })
     }
 }

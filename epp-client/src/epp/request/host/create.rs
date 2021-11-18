@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::HostAddr;
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -92,7 +92,7 @@ impl EppHostCreate {
         let host_create = HostCreate {
             host: HostCreateData {
                 xmlns: EPP_HOST_XMLNS.to_string(),
-                name: host.to_string_value(),
+                name: host.into(),
                 addresses: Some(addresses),
             },
         };

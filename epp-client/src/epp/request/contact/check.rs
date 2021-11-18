@@ -1,7 +1,7 @@
 /// Types for EPP contact check request
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -43,7 +43,7 @@ use serde::{Deserialize, Serialize};
 ///
 ///     // Create an EppContactCheck instance
 ///     let contact_check = EppContactCheck::new(
-///         vec!["epp-client-c1", "epp-client-c2"],
+///         &["epp-client-c1", "epp-client-c2"],
 ///         generate_client_tr_id(&client).as_str()
 ///     );
 ///
@@ -79,10 +79,10 @@ pub struct ContactCheck {
 
 impl EppContactCheck {
     /// Creates an EppObject corresponding to the &lt;epp&gt; tag with data for a contact check request
-    pub fn new(contact_ids: Vec<&str>, client_tr_id: &str) -> EppContactCheck {
+    pub fn new(contact_ids: &[&str], client_tr_id: &str) -> EppContactCheck {
         let contact_ids = contact_ids
             .iter()
-            .map(|d| d.to_string_value())
+            .map(|&d| d.into())
             .collect::<Vec<StringValue>>();
 
         let contact_check = ContactCheck {

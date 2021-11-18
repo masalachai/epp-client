@@ -7,7 +7,6 @@ mod request {
         Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
     };
-    use crate::epp::object::StringValueTrait;
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::xml::EppXml;
     use crate::epp::*;
@@ -48,7 +47,7 @@ mod request {
     #[test]
     fn contact_check() {
         let xml = get_xml("request/contact/check.xml").unwrap();
-        let object = EppContactCheck::new(vec!["eppdev-contact-1", "eppdev-contact-2"], CLTRID);
+        let object = EppContactCheck::new(&["eppdev-contact-1", "eppdev-contact-2"], CLTRID);
         let serialized = object.serialize().unwrap();
 
         assert_eq!(xml, serialized);
@@ -58,7 +57,7 @@ mod request {
     fn contact_create() {
         let xml = get_xml("request/contact/create.xml").unwrap();
 
-        let street = vec!["58", "Orchid Road"];
+        let street = &["58", "Orchid Road"];
         let address = Address::new(street, "Paris", "Paris", "392374", "FR");
         let postal_info = PostalInfo::new("int", "John Doe", "Acme Widgets", address);
         let mut voice = Phone::new("+33.47237942");
@@ -98,7 +97,7 @@ mod request {
 
         let mut object = EppContactUpdate::new("eppdev-contact-3", CLTRID);
 
-        let street = vec!["58", "Orchid Road"];
+        let street = &["58", "Orchid Road"];
         let address = Address::new(street, "Paris", "Paris", "392374", "FR");
         let postal_info = PostalInfo::new("loc", "John Doe", "Acme Widgets", address);
         let voice = Phone::new("+33.47237942");
@@ -195,7 +194,7 @@ mod request {
         let object = EppDomainCreate::new_with_ns(
             "eppdev-1.com",
             1,
-            vec!["ns1.test.com", "ns2.test.com"],
+            &["ns1.test.com", "ns2.test.com"],
             "eppdev-contact-3",
             "epP4uthd#v",
             contacts,
@@ -228,11 +227,11 @@ mod request {
 
         let host_attr = vec![
             HostAttr {
-                name: "ns1.eppdev-1.com".to_string_value(),
+                name: "ns1.eppdev-1.com".into(),
                 addresses: None,
             },
             HostAttr {
-                name: "ns2.eppdev-1.com".to_string_value(),
+                name: "ns2.eppdev-1.com".into(),
                 addresses: Some(vec![
                     HostAddr::new_v4("177.232.12.58"),
                     HostAddr::new_v6("2404:6800:4001:801::200e"),
@@ -385,7 +384,7 @@ mod request {
     fn host_check() {
         let xml = get_xml("request/host/check.xml").unwrap();
 
-        let object = EppHostCheck::new(vec!["ns1.eppdev-1.com", "host1.eppdev-1.com"], CLTRID);
+        let object = EppHostCheck::new(&["ns1.eppdev-1.com", "host1.eppdev-1.com"], CLTRID);
 
         let serialized = object.serialize().unwrap();
 
@@ -442,7 +441,7 @@ mod request {
         object.add(add);
         object.remove(remove);
         object.info(HostChangeInfo {
-            name: "host2.eppdev-1.com".to_string_value(),
+            name: "host2.eppdev-1.com".into(),
         });
 
         let serialized = object.serialize().unwrap();
@@ -505,7 +504,7 @@ mod request {
         let deleted_at = DateTime::from_str("2021-07-10T22:00:00.0Z").unwrap();
         let restored_at = DateTime::from_str("2021-07-20T22:00:00.0Z").unwrap();
         let restore_reason = "Registrant error.";
-        let statements = vec![
+        let statements = &[
             "This registrar has not restored the Registered Name in order to assume the rights to use or sell the Registered Name for itself or for any third party.",
             "The information in this report is true to best of this registrar's knowledge, and this registrar acknowledges that intentionally supplying false information in this report shall constitute an incurable material breach of the Registry-Registrar Agreement.",
         ];

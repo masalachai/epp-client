@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -44,7 +44,7 @@ use serde::{Deserialize, Serialize};
 ///
 ///     // Create an EppHostCheck instance
 ///     let host_check = EppHostCheck::new(
-///         vec!["ns1.eppdev-101.com", "ns2.eppdev-101.com"],
+///         &["ns1.eppdev-101.com", "ns2.eppdev-101.com"],
 ///         generate_client_tr_id(&client).as_str()
 ///     );
 ///
@@ -80,11 +80,8 @@ pub struct HostCheck {
 
 impl EppHostCheck {
     /// Creates a new EppObject for host check corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(hosts: Vec<&str>, client_tr_id: &str) -> EppHostCheck {
-        let hosts = hosts
-            .iter()
-            .map(|d| d.to_string_value())
-            .collect::<Vec<StringValue>>();
+    pub fn new(hosts: &[&str], client_tr_id: &str) -> EppHostCheck {
+        let hosts = hosts.iter().map(|&d| d.into()).collect();
 
         let host_check = HostCheck {
             list: HostList {

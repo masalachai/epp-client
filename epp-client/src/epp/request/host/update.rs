@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::{HostAddr, HostStatus};
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -17,7 +17,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::object::StringValueTrait;
 /// use epp_client::epp::object::data::{HostAddr, HostStatus};
 /// use epp_client::epp::{EppHostUpdate, EppHostUpdateResponse, HostAddRemove, HostChangeInfo};
 /// use epp_client::epp::generate_client_tr_id;
@@ -67,7 +66,7 @@ use serde::{Deserialize, Serialize};
 ///     host_update.remove(remove);
 ///
 ///     // Send a &lt;chg&gt; section as well
-///     host_update.info(HostChangeInfo { name: "ns2.eppdev-101.com".to_string_value() });
+///     host_update.info(HostChangeInfo { name: "ns2.eppdev-101.com".into() });
 ///
 ///     // send it to the registry and receive a response of type EppHostUpdateResponse
 ///     let response = client.transact::<_, EppHostUpdateResponse>(&host_update).await.unwrap();
@@ -134,7 +133,7 @@ impl EppHostUpdate {
             HostUpdate {
                 host: HostUpdateData {
                     xmlns: EPP_HOST_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     add: None,
                     remove: None,
                     change_info: None,

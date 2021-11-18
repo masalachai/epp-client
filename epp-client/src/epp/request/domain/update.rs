@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::{DomainAuthInfo, DomainContact, DomainStatus, HostList};
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -146,7 +146,7 @@ impl EppDomainUpdate {
             DomainUpdate {
                 domain: DomainUpdateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     add: None,
                     remove: None,
                     change_info: None,
