@@ -11,6 +11,7 @@ mod request {
     use crate::epp::request::domain::namestore::create::EppNamestoreDomainCreate;
     use crate::epp::request::domain::namestore::delete::EppNamestoreDomainDelete;
     use crate::epp::request::domain::namestore::info::EppNamestoreDomainInfo;
+    use crate::epp::request::domain::namestore::renew::EppNamestoreDomainRenew;
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::xml::EppXml;
     use crate::epp::*;
@@ -589,10 +590,22 @@ mod request {
     }
 
     #[test]
-    fn namestore_domain_domain() {
+    fn namestore_domain_delete() {
         let xml = get_xml("request/domain/namestore_domain_delete.xml").unwrap();
 
         let object = EppNamestoreDomainDelete::new("eppdev.com", CLTRID, "com");
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_renew() {
+        let xml = get_xml("request/domain/namestore_domain_renew.xml").unwrap();
+
+        let exp_date = NaiveDate::from_ymd(2022, 7, 23);
+        let object = EppNamestoreDomainRenew::new("eppdev.com", exp_date, 1, CLTRID, "com");
 
         let serialized = object.serialize().unwrap();
 

@@ -60,20 +60,21 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
+
 pub type EppDomainRenew = EppObject<Command<DomainRenew>>;
 
 /// Type for data under the domain &lt;renew&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainRenewData {
     /// XML namespace for domain commands
-    xmlns: String,
+    pub xmlns: String,
     /// The name of the domain to be renewed
-    name: StringValue,
+    pub name: StringValue,
     /// The current expiry date of the domain in 'Y-m-d' format
     #[serde(rename = "curExpDate")]
-    current_expiry_date: StringValue,
+    pub current_expiry_date: StringValue,
     /// The period of renewal
-    period: Period,
+    pub period: Period,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -82,7 +83,7 @@ pub struct DomainRenewData {
 pub struct DomainRenew {
     /// The data under the &lt;renew&gt; tag for the domain renewal
     #[serde(rename = "renew")]
-    domain: DomainRenewData,
+    pub domain: DomainRenewData,
 }
 
 impl EppDomainRenew {
