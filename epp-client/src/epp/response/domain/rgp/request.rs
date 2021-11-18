@@ -23,9 +23,6 @@ pub struct RgpStatus {
 pub struct RgpRequestResult {
     #[serde(rename = "xmlns:rgp")]
     xmlns: String,
-    /// XML schema location for domain response data
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// Data under the &lt;rgpStatus&gt; tag
     #[serde(rename = "rgpStatus")]
     pub rgp_status: RgpStatus,

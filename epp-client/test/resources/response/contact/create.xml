@@ -5,7 +5,7 @@
 			<msg>Command completed successfully</msg>
 		</result>
 		<resData>
-			<contact:creData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:contact-1.0 contact-1.0.xsd">
+			<contact:creData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
 				<contact:id>eppdev-contact-4</contact:id>
 				<contact:crDate>2021-07-25T16:05:32.0Z</contact:crDate>
 			</contact:creData>

@@ -35,9 +35,6 @@ pub struct HostCheckData {
     /// XML namespace for host response data
     #[serde(rename = "xmlns:host")]
     xmlns: String,
-    /// XML schema location for host response data
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// Data under the &lt;cd&gt; tag
     #[serde(rename = "cd")]
     pub host_list: Vec<HostCheckDataItem>,

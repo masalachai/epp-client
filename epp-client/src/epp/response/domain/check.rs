@@ -35,9 +35,6 @@ pub struct DomainCheckData {
     /// XML namespace for domain response data
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
-    /// XML schema location for domain response data
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// Data under the &lt;cd&gt; tag
     #[serde(rename = "cd")]
     pub domain_list: Vec<DomainCheckDataItem>,

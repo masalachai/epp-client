@@ -15,9 +15,6 @@ pub struct ContactInfoData {
     /// XML namespace for contact response data
     #[serde(rename = "xmlns:contact")]
     xmlns: String,
-    /// XML schema location for contact response data
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// The contact id
     pub id: StringValue,
     /// The contact ROID

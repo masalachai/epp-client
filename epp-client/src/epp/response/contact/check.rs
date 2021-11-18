@@ -35,9 +35,6 @@ pub struct ContactCheckData {
     /// XML namespace for contact response data
     #[serde(rename = "xmlns:contact")]
     xmlns: String,
-    /// XML schema location for contact response data
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// Data under the &lt;cd&gt; tag
     #[serde(rename = "cd")]
     pub contact_list: Vec<ContactCheckDataItem>,

@@ -13,9 +13,6 @@ pub struct DomainRenewData {
     /// XML namespace for domain response data
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
-    /// XML schema location for domain response data
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// The name of the domain
     pub name: StringValue,
     /// The new expiry date after renewal

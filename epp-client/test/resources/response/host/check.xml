@@ -5,7 +5,7 @@
 			<msg>Command completed successfully</msg>
 		</result>
 		<resData>
-			<host:chkData xmlns:host="urn:ietf:params:xml:ns:host-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:host-1.0 host-1.0.xsd">
+			<host:chkData xmlns:host="urn:ietf:params:xml:ns:host-1.0">
 				<host:cd>
 					<host:name avail="1">host1.eppdev-1.com</host:name>
 				</host:cd>

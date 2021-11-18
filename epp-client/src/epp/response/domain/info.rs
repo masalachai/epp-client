@@ -28,9 +28,6 @@ pub struct DomainInfoData {
     /// XML namespace for domain response data
     #[serde(rename = "xmlns:domain")]
     xmlns: String,
-    /// XML schema location for domain response data
-    #[serde(rename = "xsi:schemaLocation")]
-    schema_location: String,
     /// The domain name
     pub name: StringValue,
     /// The domain ROID

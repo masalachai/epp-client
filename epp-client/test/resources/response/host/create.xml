@@ -5,7 +5,7 @@
 			<msg>Command completed successfully</msg>
 		</result>
 		<resData>
-			<host:creData xmlns:host="urn:ietf:params:xml:ns:host-1.0" xsi:schemaLocation="urn:ietf:params:xml:ns:host-1.0 host-1.0.xsd">
+			<host:creData xmlns:host="urn:ietf:params:xml:ns:host-1.0">
 				<host:name>host2.eppdev-1.com</host:name>
 				<host:crDate>2021-07-26T05:28:55.0Z</host:crDate>
 			</host:creData>
