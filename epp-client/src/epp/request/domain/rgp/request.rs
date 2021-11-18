@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject};
 use crate::epp::request::domain::update::{DomainChangeInfo, DomainUpdate, DomainUpdateData};
 use crate::epp::request::{CommandWithExtension, Extension};
 use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
@@ -86,7 +86,7 @@ impl EppDomainRgpRestoreRequest {
             command: DomainUpdate {
                 domain: DomainUpdateData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     add: None,
                     remove: None,
                     change_info: Some(DomainChangeInfo {
@@ -103,7 +103,7 @@ impl EppDomainRgpRestoreRequest {
                     },
                 },
             }),
-            client_tr_id: client_tr_id.to_string_value(),
+            client_tr_id: client_tr_id.into(),
         };
 
         EppObject::build(command)

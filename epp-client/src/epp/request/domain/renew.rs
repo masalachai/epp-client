@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::Period;
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use chrono::NaiveDate;
@@ -96,16 +96,13 @@ impl EppDomainRenew {
         years: u16,
         client_tr_id: &str,
     ) -> EppDomainRenew {
-        let exp_date_str = current_expiry_date
-            .format("%Y-%m-%d")
-            .to_string()
-            .to_string_value();
+        let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();
 
         EppObject::build(Command::<DomainRenew>::new(
             DomainRenew {
                 domain: DomainRenewData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     current_expiry_date: exp_date_str,
                     period: Period::new(years),
                 },

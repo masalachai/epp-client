@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::{DomainAuthInfo, Period};
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -303,7 +303,7 @@ impl EppDomainTransferRequest {
                 operation: "request".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     period: Some(Period::new(years)),
                     auth_info: Some(DomainAuthInfo::new(auth_password)),
                 },
@@ -326,7 +326,7 @@ impl EppDomainTransferApprove {
                 operation: "approve".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     period: None,
                     auth_info: None,
                 },
@@ -344,7 +344,7 @@ impl EppDomainTransferCancel {
                 operation: "cancel".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     period: None,
                     auth_info: None,
                 },
@@ -362,7 +362,7 @@ impl EppDomainTransferReject {
                 operation: "reject".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     period: None,
                     auth_info: None,
                 },
@@ -380,7 +380,7 @@ impl EppDomainTransferQuery {
                 operation: "query".to_string(),
                 domain: DomainTransferData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.to_string_value(),
+                    name: name.into(),
                     period: None,
                     auth_info: Some(DomainAuthInfo::new(auth_password)),
                 },

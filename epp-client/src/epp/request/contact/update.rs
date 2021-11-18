@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::epp::object::data::{ContactAuthInfo, ContactStatus, Phone, PostalInfo};
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::contact::info::EppContactInfoResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
@@ -122,7 +122,7 @@ impl EppContactUpdate {
         let contact_update = ContactUpdate {
             contact: ContactUpdateData {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.to_string_value(),
+                id: id.into(),
                 add_statuses: None,
                 remove_statuses: None,
                 change_info: None,
@@ -140,7 +140,7 @@ impl EppContactUpdate {
         auth_password: &str,
     ) {
         self.data.command.contact.change_info = Some(ContactChangeInfo {
-            email: Some(email.to_string_value()),
+            email: Some(email.into()),
             postal_info: Some(postal_info),
             voice: Some(voice),
             auth_info: Some(ContactAuthInfo::new(auth_password)),

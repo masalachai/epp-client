@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -84,7 +84,7 @@ impl EppContactDelete {
         let contact_delete = ContactDelete {
             contact: ContactDeleteData {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.to_string_value(),
+                id: id.into(),
             },
         };
 

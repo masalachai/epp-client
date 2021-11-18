@@ -1,6 +1,6 @@
 //! Common data types included in EPP Requests and Responses
 
-use crate::epp::object::{StringValue, StringValueTrait};
+use crate::epp::object::StringValue;
 use serde::{Deserialize, Serialize};
 
 /// The &lt;status&gt; attribute on EPP XML for domain transactions
@@ -217,7 +217,7 @@ impl DomainAuthInfo {
     /// Creates a DomainAuthInfo instance with the given password
     pub fn new(password: &str) -> DomainAuthInfo {
         DomainAuthInfo {
-            password: password.to_string_value(),
+            password: password.into(),
         }
     }
 }
@@ -226,7 +226,7 @@ impl ContactAuthInfo {
     /// Creates a ContactAuthInfo instance with the given password
     pub fn new(password: &str) -> ContactAuthInfo {
         ContactAuthInfo {
-            password: password.to_string_value(),
+            password: password.into(),
         }
     }
 }
@@ -234,23 +234,20 @@ impl ContactAuthInfo {
 impl Address {
     /// Creates a new Address instance
     pub fn new(
-        street: Vec<&str>,
+        street: &[&str],
         city: &str,
         province: &str,
         postal_code: &str,
         country_code: &str,
     ) -> Address {
-        let street = street
-            .iter()
-            .map(|s| s.to_string_value())
-            .collect::<Vec<StringValue>>();
+        let street = street.iter().map(|&s| s.into()).collect();
 
         Address {
             street,
-            city: city.to_string_value(),
-            province: province.to_string_value(),
-            postal_code: postal_code.to_string_value(),
-            country_code: country_code.to_string_value(),
+            city: city.into(),
+            province: province.into(),
+            postal_code: postal_code.into(),
+            country_code: country_code.into(),
         }
     }
 }
@@ -260,8 +257,8 @@ impl PostalInfo {
     pub fn new(info_type: &str, name: &str, organization: &str, address: Address) -> PostalInfo {
         PostalInfo {
             info_type: info_type.to_string(),
-            name: name.to_string_value(),
-            organization: organization.to_string_value(),
+            name: name.into(),
+            organization: organization.into(),
             address,
         }
     }

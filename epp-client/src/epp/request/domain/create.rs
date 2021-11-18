@@ -5,7 +5,7 @@ use epp_client_macros::*;
 use crate::epp::object::data::{
     DomainAuthInfo, DomainContact, HostAttr, HostAttrList, HostList, HostObjList, Period,
 };
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -122,24 +122,21 @@ impl EppDomainCreate {
     pub fn new_with_ns(
         name: &str,
         period: u16,
-        ns: Vec<&str>,
+        ns: &[&str],
         registrant_id: &str,
         auth_password: &str,
         contacts: Vec<DomainContact>,
         client_tr_id: &str,
     ) -> EppDomainCreate {
-        let ns_list = ns
-            .iter()
-            .map(|n| n.to_string_value())
-            .collect::<Vec<StringValue>>();
+        let ns_list = ns.iter().map(|&n| n.into()).collect();
 
         let domain_create = DomainCreate {
             domain: DomainCreateData {
                 xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                name: name.to_string_value(),
+                name: name.into(),
                 period: Period::new(period),
                 ns: Some(HostList::HostObjList(HostObjList { hosts: ns_list })),
-                registrant: Some(registrant_id.to_string_value()),
+                registrant: Some(registrant_id.into()),
                 auth_info: DomainAuthInfo::new(auth_password),
                 contacts: Some(contacts),
             },
@@ -161,10 +158,10 @@ impl EppDomainCreate {
         let domain_create = DomainCreate {
             domain: DomainCreateData {
                 xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                name: name.to_string_value(),
+                name: name.into(),
                 period: Period::new(period),
                 ns: None,
-                registrant: Some(registrant_id.to_string_value()),
+                registrant: Some(registrant_id.into()),
                 auth_info: DomainAuthInfo::new(auth_password),
                 contacts: Some(contacts),
             },
@@ -183,7 +180,7 @@ impl EppDomainCreate {
         let domain_create = DomainCreate {
             domain: DomainCreateData {
                 xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                name: name.to_string_value(),
+                name: name.into(),
                 period: Period::new(period),
                 ns: None,
                 registrant: None,
@@ -209,10 +206,10 @@ impl EppDomainCreate {
         let domain_create = DomainCreate {
             domain: DomainCreateData {
                 xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                name: name.to_string_value(),
+                name: name.into(),
                 period: Period::new(period),
                 ns: Some(HostList::HostAttrList(HostAttrList { hosts: ns })),
-                registrant: Some(registrant_id.to_string_value()),
+                registrant: Some(registrant_id.into()),
                 auth_info: DomainAuthInfo::new(auth_password),
                 contacts: Some(contacts),
             },

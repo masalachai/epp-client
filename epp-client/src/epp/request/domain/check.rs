@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
+use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
@@ -81,10 +81,7 @@ pub struct DomainCheck {
 impl EppDomainCheck {
     /// Creates a new EppObject for domain check corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(domains: Vec<&str>, client_tr_id: &str) -> EppDomainCheck {
-        let domains = domains
-            .iter()
-            .map(|d| d.to_string_value())
-            .collect::<Vec<StringValue>>();
+        let domains = domains.into_iter().map(|d| d.into()).collect();
 
         let domain_check = DomainCheck {
             list: DomainList {
