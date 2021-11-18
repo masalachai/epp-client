@@ -611,4 +611,40 @@ mod request {
 
         assert_eq!(xml, serialized);
     }
+
+    #[test]
+    fn namestore_domain_update() {
+        let xml = get_xml("request/domain/namestore_domain_update.xml").unwrap();
+
+        let mut object = EppNamestoreDomainUpdate::new("eppdev.com", CLTRID, "com");
+
+        let add = DomainAddRemove {
+            ns: None,
+            contacts: None,
+            statuses: Some(vec![DomainStatus {
+                status: "clientDeleteProhibited".to_string(),
+            }]),
+        };
+
+        let remove = DomainAddRemove {
+            ns: None,
+            contacts: Some(vec![DomainContact {
+                contact_type: "billing".to_string(),
+                id: "eppdev-contact-2".to_string(),
+            }]),
+            statuses: None,
+        };
+
+        let change_info = DomainChangeInfo {
+            registrant: None,
+            auth_info: Some(AuthInfo::new("epP5uthd#v")),
+        };
+
+        object.add(add);
+        object.remove(remove);
+        object.info(change_info);
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
 }

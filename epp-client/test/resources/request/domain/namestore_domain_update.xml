@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+	<command>
+		<update>
+			<update xmlns="urn:ietf:params:xml:ns:domain-1.0">
+				<name>eppdev.com</name>
+				<add>
+					<status s="clientDeleteProhibited"/>
+				</add>
+				<rem>
+					<contact type="billing">eppdev-contact-2</contact>
+				</rem>
+				<chg>
+					<authInfo>
+						<pw>epP5uthd#v</pw>
+					</authInfo>
+				</chg>
+			</update>
+		</update>
+        <extension>
+            <namestoreExt:namestoreExt xmlns:namestoreExt="http://www.verisign-grs.com/epp/namestoreExt-1.1">
+                <namestoreExt:subProduct>com</namestoreExt:subProduct>
+            </namestoreExt:namestoreExt>
+        </extension>
+		<clTRID>cltrid:1626454866</clTRID>
+	</command>
+</epp>
