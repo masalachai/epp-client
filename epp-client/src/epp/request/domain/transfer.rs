@@ -262,16 +262,16 @@ pub type EppDomainTransferQuery = EppObject<Command<DomainTransfer>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainTransferData {
     /// XML namespace for domain commands
-    xmlns: String,
+    pub xmlns: String,
     /// The name of the domain under transfer
-    name: StringValue,
+    pub name: StringValue,
     /// The period of renewal upon a successful transfer
     /// Only applicable in case of a transfer request
-    period: Option<Period>,
+    pub period: Option<Period>,
     /// The authInfo for the domain under transfer
     /// Only applicable to domain transfer and domain transfer query requests
     #[serde(rename = "authInfo")]
-    auth_info: Option<AuthInfo>,
+    pub auth_info: Option<AuthInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -281,10 +281,10 @@ pub struct DomainTransfer {
     /// The transfer operation to perform indicated by the 'op' attr
     /// The values are one of transfer, approve, reject, cancel, or query
     #[serde(rename = "op")]
-    operation: String,
+    pub operation: String,
     /// The data under the &lt;transfer&gt; tag in the transfer request
     #[serde(rename = "transfer")]
-    domain: DomainTransferData,
+    pub domain: DomainTransferData,
 }
 
 impl EppDomainTransferRequest {

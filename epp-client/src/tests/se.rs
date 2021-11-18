@@ -12,6 +12,11 @@ mod request {
     use crate::epp::request::domain::namestore::delete::EppNamestoreDomainDelete;
     use crate::epp::request::domain::namestore::info::EppNamestoreDomainInfo;
     use crate::epp::request::domain::namestore::renew::EppNamestoreDomainRenew;
+    use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferApprove;
+    use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferCancel;
+    use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferQuery;
+    use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferReject;
+    use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferRequest;
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::xml::EppXml;
     use crate::epp::*;
@@ -643,6 +648,68 @@ mod request {
         object.add(add);
         object.remove(remove);
         object.info(change_info);
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_transfer_request() {
+        let xml = get_xml("request/domain/namestore_transfer_request.xml").unwrap();
+
+        let object = EppNamestoreDomainTransferRequest::request(
+            "testing.com",
+            1,
+            "epP4uthd#v",
+            CLTRID,
+            "com",
+        );
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_transfer_approve() {
+        let xml = get_xml("request/domain/namestore_transfer_approve.xml").unwrap();
+
+        let object = EppNamestoreDomainTransferApprove::approve("testing.com", CLTRID, "com");
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_transfer_reject() {
+        let xml = get_xml("request/domain/namestore_transfer_reject.xml").unwrap();
+
+        let object = EppNamestoreDomainTransferReject::reject("testing.com", CLTRID, "com");
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_transfer_cancel() {
+        let xml = get_xml("request/domain/namestore_transfer_cancel.xml").unwrap();
+
+        let object = EppNamestoreDomainTransferCancel::cancel("testing.com", CLTRID, "com");
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_transfer_query() {
+        let xml = get_xml("request/domain/namestore_transfer_query.xml").unwrap();
+
+        let object =
+            EppNamestoreDomainTransferQuery::query("testing.com", "epP4uthd#v", CLTRID, "com");
+
         let serialized = object.serialize().unwrap();
 
         assert_eq!(xml, serialized);

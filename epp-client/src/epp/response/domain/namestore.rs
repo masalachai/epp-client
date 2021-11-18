@@ -6,4 +6,5 @@ pub mod delete;
 pub mod info;
 pub mod object;
 pub mod renew;
+pub mod transfer;
 pub mod update;

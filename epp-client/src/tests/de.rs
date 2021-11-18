@@ -6,6 +6,11 @@ mod response {
     use crate::epp::object::StringValueTrait;
     use crate::epp::response::domain::namestore::create::EppNamestoreDomainCreateResponse;
     use crate::epp::response::domain::namestore::info::EppNamestoreDomainInfoResponse;
+    use crate::epp::response::domain::namestore::transfer::EppNamestoreDomainTransferApproveResponse;
+    use crate::epp::response::domain::namestore::transfer::EppNamestoreDomainTransferCancelResponse;
+    use crate::epp::response::domain::namestore::transfer::EppNamestoreDomainTransferQueryResponse;
+    use crate::epp::response::domain::namestore::transfer::EppNamestoreDomainTransferRejectResponse;
+    use crate::epp::response::domain::namestore::transfer::EppNamestoreDomainTransferRequestResponse;
     use crate::epp::response::ExpiryType;
     use crate::epp::response::Relative;
     use crate::epp::response::{
@@ -846,6 +851,133 @@ mod response {
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
         assert_eq!(ext.data.sub_product, "com".to_string());
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn namestore_domain_transfer_request() {
+        let xml = get_xml("response/domain/namestore_transfer_request.xml").unwrap();
+        let object = EppNamestoreDomainTransferRequestResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+
+        assert_eq!(object.data.result.code, 1001);
+        assert_eq!(
+            object.data.result.message,
+            "Command completed successfully; action pending".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.name,
+            "eppdev-transfer.com".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.transfer_status,
+            "pending".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.requester_id,
+            "eppdev".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.requested_at,
+            "2021-07-23T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(result.transfer_data.ack_id, "ClientY".to_string_value());
+        assert_eq!(
+            result.transfer_data.ack_by,
+            "2021-07-28T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.expiring_at,
+            "2022-07-02T14:53:19.0Z".to_string_value()
+        );
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn namestore_domain_transfer_approve() {
+        let xml = get_xml("response/domain/namestore_transfer_approve.xml").unwrap();
+        let object = EppNamestoreDomainTransferApproveResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn namestore_domain_transfer_reject() {
+        let xml = get_xml("response/domain/namestore_transfer_reject.xml").unwrap();
+        let object = EppNamestoreDomainTransferRejectResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn namestore_domain_transfer_cancel() {
+        let xml = get_xml("response/domain/namestore_transfer_cancel.xml").unwrap();
+        let object = EppNamestoreDomainTransferCancelResponse::deserialize(xml.as_str()).unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
+
+    #[test]
+    fn namestore_domain_transfer_query() {
+        let xml = get_xml("response/domain/namestore_transfer_query.xml").unwrap();
+        let object = EppNamestoreDomainTransferQueryResponse::deserialize(xml.as_str()).unwrap();
+
+        let result = object.data.res_data().unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(
+            result.transfer_data.name,
+            "eppdev-transfer.com".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.transfer_status,
+            "pending".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.requester_id,
+            "eppdev".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.requested_at,
+            "2021-07-23T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(result.transfer_data.ack_id, "ClientY".to_string_value());
+        assert_eq!(
+            result.transfer_data.ack_by,
+            "2021-07-28T15:31:21.0Z".to_string_value()
+        );
+        assert_eq!(
+            result.transfer_data.expiring_at,
+            "2022-07-02T14:53:19.0Z".to_string_value()
+        );
+        assert_eq!(
+            object.data.tr_ids.client_tr_id.unwrap(),
+            CLTRID.to_string_value()
+        );
         assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
     }
 }
