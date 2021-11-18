@@ -1,14 +1,14 @@
-//! Types for EPP domain create request
-
-use epp_client_macros::*;
+//! Types for EPP NameStore domain create
 
 use crate::epp::object::data::{
     AuthInfo, DomainContact, HostAttr, HostAttrList, HostList, HostObjList, Period,
 };
-use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
-use crate::epp::request::Command;
-use crate::epp::xml::EPP_DOMAIN_XMLNS;
-use serde::{Deserialize, Serialize};
+use crate::epp::object::{EppObject, StringValue, StringValueTrait};
+use crate::epp::request::domain::create::{DomainCreate, DomainCreateData};
+use crate::epp::request::{CommandWithExtension, Extension};
+use crate::epp::xml::{EPP_DOMAIN_NAMESTORE_EXT_XMLNS, EPP_DOMAIN_XMLNS};
+
+use super::object::NameStore;
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;create&gt; command
 /// with &lt;hostObj&gt; elements in the request for &lt;ns&gt; list
@@ -21,7 +21,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::epp::object::data::DomainContact;
-/// use epp_client::epp::{EppDomainCreate, EppDomainCreateResponse};
+/// use epp_client::epp::{EppNamestoreDomainCreate, EppNamestoreDomainCreateResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -63,55 +63,65 @@ use serde::{Deserialize, Serialize};
 ///         }
 ///     ];
 ///
-///     // Create an EppDomainCreate instance
-///     let domain_create = EppDomainCreate::new(
-///         "eppdev-100.com", 1, "eppdev-contact-2", "epP4uthd#v", contacts, generate_client_tr_id(&client).as_str()
+///     // Create an EppNamestoreDomainCreate instance
+///     let domain_create = EppNamestoreDomainCreate::new(
+///         "eppdev-100.com",
+///         1,
+///         "eppdev-contact-2",
+///         "epP4uthd#v",
+///         contacts,
+///         generate_client_tr_id(&client).as_str(),
+///         "com"
 ///     );
 ///
-///     // send it to the registry and receive a response of type EppDomainCreateResponse
-///     let response = client.transact::<_, EppDomainCreateResponse>(&domain_create).await.unwrap();
+///     // send it to the registry and receive a response of type EppNamestoreDomainCreateResponse
+///     let response = client.transact::<_, EppNamestoreDomainCreateResponse>(&domain_create).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainCreate = EppObject<Command<DomainCreate>>;
 
-/// Type for elements under the domain &lt;create&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DomainCreateData {
-    /// XML namespace for domain commands
-    pub xmlns: String,
-    /// The domain name
-    pub name: StringValue,
-    /// The period of registration
-    pub period: Period,
-    /// The list of nameserver hosts
-    /// either of type `HostObjList` or `HostAttrList`
-    pub ns: Option<HostList>,
-    /// The domain registrant
-    pub registrant: Option<StringValue>,
-    /// The list of contacts for the domain
-    #[serde(rename = "contact")]
-    pub contacts: Option<Vec<DomainContact>>,
-    /// The auth info for the domain
-    #[serde(rename = "authInfo")]
-    pub auth_info: AuthInfo,
-}
+pub type EppNamestoreDomainCreate = EppObject<CommandWithExtension<DomainCreate, NameStore>>;
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "create")]
-/// Type for EPP XML &lt;create&gt; command for domains
-pub struct DomainCreate {
-    /// The data for the domain to be created with
-    /// T being the type of nameserver list (`HostObjList` or `HostAttrList`)
-    /// to be supplied
-    #[serde(rename = "create")]
-    pub domain: DomainCreateData,
-}
+impl EppNamestoreDomainCreate {
+    /// Creates a new EppObject for NameStore domain create with namestore extension
+    pub fn new(
+        name: &str,
+        period: u16,
+        registrant_id: &str,
+        auth_password: &str,
+        contacts: Vec<DomainContact>,
+        client_tr_id: &str,
+        subproduct: &str,
+    ) -> EppNamestoreDomainCreate {
+        let domain_create = DomainCreate {
+            domain: DomainCreateData {
+                xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                name: name.to_string_value(),
+                period: Period::new(period),
+                ns: None,
+                registrant: Some(registrant_id.to_string_value()),
+                auth_info: AuthInfo::new(auth_password),
+                contacts: Some(contacts),
+            },
+        };
 
-impl EppDomainCreate {
+        let command = CommandWithExtension::<DomainCreate, NameStore> {
+            command: domain_create,
+            extension: Some(Extension {
+                data: NameStore {
+                    xmlns: EPP_DOMAIN_NAMESTORE_EXT_XMLNS.to_string(),
+                    subproduct: subproduct.to_string_value(),
+                },
+            }),
+            client_tr_id: client_tr_id.to_string_value(),
+        };
+
+        EppObject::build(command)
+    }
+
     /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
     /// with the &lt;ns&gt; tag containing &lt;hostObj&gt; tags
     pub fn new_with_ns(
@@ -122,7 +132,8 @@ impl EppDomainCreate {
         auth_password: &str,
         contacts: Vec<DomainContact>,
         client_tr_id: &str,
-    ) -> EppDomainCreate {
+        subproduct: &str,
+    ) -> EppNamestoreDomainCreate {
         let ns_list = ns
             .iter()
             .map(|n| n.to_string_value())
@@ -140,31 +151,18 @@ impl EppDomainCreate {
             },
         };
 
-        EppObject::build(Command::<DomainCreate>::new(domain_create, client_tr_id))
-    }
-
-    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
-    /// without any nameservers
-    pub fn new(
-        name: &str,
-        period: u16,
-        registrant_id: &str,
-        auth_password: &str,
-        contacts: Vec<DomainContact>,
-        client_tr_id: &str,
-    ) -> EppDomainCreate {
-        let domain_create = DomainCreate {
-            domain: DomainCreateData {
-                xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                name: name.to_string_value(),
-                period: Period::new(period),
-                ns: None,
-                registrant: Some(registrant_id.to_string_value()),
-                auth_info: AuthInfo::new(auth_password),
-                contacts: Some(contacts),
-            },
+        let command = CommandWithExtension::<DomainCreate, NameStore> {
+            command: domain_create,
+            extension: Some(Extension {
+                data: NameStore {
+                    xmlns: EPP_DOMAIN_NAMESTORE_EXT_XMLNS.to_string(),
+                    subproduct: subproduct.to_string_value(),
+                },
+            }),
+            client_tr_id: client_tr_id.to_string_value(),
         };
-        EppObject::build(Command::<DomainCreate>::new(domain_create, client_tr_id))
+
+        EppObject::build(command)
     }
 
     /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
@@ -174,7 +172,8 @@ impl EppDomainCreate {
         period: u16,
         auth_password: &str,
         client_tr_id: &str,
-    ) -> EppDomainCreate {
+        subproduct: &str,
+    ) -> EppNamestoreDomainCreate {
         let domain_create = DomainCreate {
             domain: DomainCreateData {
                 xmlns: EPP_DOMAIN_XMLNS.to_string(),
@@ -187,7 +186,18 @@ impl EppDomainCreate {
             },
         };
 
-        EppObject::build(Command::<DomainCreate>::new(domain_create, client_tr_id))
+        let command = CommandWithExtension::<DomainCreate, NameStore> {
+            command: domain_create,
+            extension: Some(Extension {
+                data: NameStore {
+                    xmlns: EPP_DOMAIN_NAMESTORE_EXT_XMLNS.to_string(),
+                    subproduct: subproduct.to_string_value(),
+                },
+            }),
+            client_tr_id: client_tr_id.to_string_value(),
+        };
+
+        EppObject::build(command)
     }
 
     /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
@@ -200,7 +210,8 @@ impl EppDomainCreate {
         auth_password: &str,
         contacts: Vec<DomainContact>,
         client_tr_id: &str,
-    ) -> EppDomainCreate {
+        subproduct: &str,
+    ) -> EppNamestoreDomainCreate {
         let domain_create = DomainCreate {
             domain: DomainCreateData {
                 xmlns: EPP_DOMAIN_XMLNS.to_string(),
@@ -212,6 +223,18 @@ impl EppDomainCreate {
                 contacts: Some(contacts),
             },
         };
-        EppObject::build(Command::<DomainCreate>::new(domain_create, client_tr_id))
+
+        let command = CommandWithExtension::<DomainCreate, NameStore> {
+            command: domain_create,
+            extension: Some(Extension {
+                data: NameStore {
+                    xmlns: EPP_DOMAIN_NAMESTORE_EXT_XMLNS.to_string(),
+                    subproduct: subproduct.to_string_value(),
+                },
+            }),
+            client_tr_id: client_tr_id.to_string_value(),
+        };
+
+        EppObject::build(command)
     }
 }

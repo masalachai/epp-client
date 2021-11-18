@@ -8,6 +8,7 @@ mod request {
         HostStatus, Phone, PostalInfo,
     };
     use crate::epp::object::StringValueTrait;
+    use crate::epp::request::domain::namestore::create::EppNamestoreDomainCreate;
     use crate::epp::request::domain::namestore::info::EppNamestoreDomainInfo;
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::xml::EppXml;
@@ -546,6 +547,40 @@ mod request {
         let xml = get_xml("request/domain/namestore_domain_info.xml").unwrap();
 
         let object = EppNamestoreDomainInfo::new("eppdev.com", CLTRID, "com");
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore_domain_create() {
+        let xml = get_xml("request/domain/namestore_domain_create.xml").unwrap();
+
+        let contacts = vec![
+            DomainContact {
+                contact_type: "admin".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+            DomainContact {
+                contact_type: "tech".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+            DomainContact {
+                contact_type: "billing".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+        ];
+
+        let object = EppNamestoreDomainCreate::new(
+            "eppdev-1.com",
+            1,
+            "eppdev-contact-3",
+            "epP4uthd#v",
+            contacts,
+            CLTRID,
+            "com",
+        );
 
         let serialized = object.serialize().unwrap();
 
