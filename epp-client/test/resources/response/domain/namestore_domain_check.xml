@@ -1,0 +1,32 @@
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <response>
+        <result code="1000">
+            <msg>Command completed successfully</msg>
+        </result>
+        <resData>
+            <domain:chkData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:cd>
+                    <domain:name avail="1">EXAMPLE1.TLD</domain:name>
+                </domain:cd>
+                <domain:cd>
+                    <domain:name avail="0">EXAMPLE2.TLD</domain:name>
+                    <domain:reason>In use</domain:reason>
+                </domain:cd>
+                <domain:cd>
+                    <domain:name avail="1">EXAMPLE3.TLD</domain:name>
+                </domain:cd>
+            </domain:chkData>
+        </resData>
+        <extension>
+            <namestoreExt:namestoreExt xmlns:namestoreExt="http://www.verisign-grs.com/epp/namestoreExt-1.1">
+                <namestoreExt:subProduct>TLD</namestoreExt:subProduct>
+            </namestoreExt:namestoreExt>
+        </extension>
+        <trID>
+            <clTRID>cltrid:1626454866</clTRID>
+            <svTRID>RO-6879-1627224678242975</svTRID>
+        </trID>
+    </response>
+</epp>

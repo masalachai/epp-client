@@ -527,4 +527,16 @@ mod request {
 
         assert_eq!(xml, serialized);
     }
+
+    #[test]
+    fn namestore_domain_check() {
+        let xml = get_xml("request/domain/namestore_domain_check.xml").unwrap();
+
+        let object =
+            EppNamestoreDomainCheck::new(vec!["eppdev1.com", "eppdev2.com"], CLTRID, "com");
+
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
 }

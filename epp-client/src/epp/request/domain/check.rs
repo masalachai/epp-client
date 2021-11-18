@@ -74,7 +74,7 @@ pub struct DomainList {
 pub struct DomainCheck {
     /// The object holding the list of domains to be checked
     #[serde(rename = "check")]
-    list: DomainList,
+    pub list: DomainList,
 }
 
 impl EppDomainCheck {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <command>
+        <check>
+            <check xmlns="urn:ietf:params:xml:ns:domain-1.0">
+                <name>eppdev1.com</name>
+                <name>eppdev2.com</name>
+            </check>
+        </check>
+        <extension>
+            <namestoreExt:namestoreExt xmlns:namestoreExt="http://www.verisign-grs.com/epp/namestoreExt-1.1">
+                <namestoreExt:subProduct>com</namestoreExt:subProduct>
+            </namestoreExt:namestoreExt>
+        </extension>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
+</epp>

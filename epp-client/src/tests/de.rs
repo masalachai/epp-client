@@ -768,4 +768,17 @@ mod response {
         assert_eq!(ext.data.rgp_status.status, "pendingRestore".to_string());
         assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
     }
+
+    #[test]
+    fn namestore_domain_check() {
+        let xml = get_xml("response/domain/namestore_domain_check.xml").unwrap();
+        let object = EppNamestoreDomainCheckResponse::deserialize(xml.as_str()).unwrap();
+
+        let ext = object.data.extension.unwrap();
+
+        assert_eq!(object.data.result.code, 1000);
+        assert_eq!(object.data.result.message, SUCCESS_MSG.to_string_value());
+        assert_eq!(ext.data.sub_product, "TLD".to_string());
+        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.to_string_value());
+    }
 }

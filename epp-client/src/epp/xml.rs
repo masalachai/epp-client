@@ -19,6 +19,8 @@ pub const EPP_DOMAIN_SCHEMA_LOCATION: &str = "urn:ietf:params:xml:ns:domain-1.0 
 pub const EPP_DOMAIN_RGP_EXT_XMLNS: &str = "urn:ietf:params:xml:ns:rgp-1.0";
 pub const EPP_DOMAIN_RGP_EXT_SCHEMA_LOCATION: &str = "urn:ietf:params:xml:ns:rgp-1.0 rgp-1.0.xsd";
 
+pub const EPP_DOMAIN_NAMESTORE_EXT_XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
+
 pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
 
