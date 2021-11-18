@@ -59,8 +59,10 @@ pub type EppHostDelete = EppObject<Command<HostDelete>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostDeleteData {
     /// XML namespace for host commands
+    #[serde(rename = "xmlns:host", alias = "xmlns")]
     xmlns: String,
     /// The host to be deleted
+    #[serde(rename = "host:name", alias = "name")]
     name: StringValue,
 }
 
@@ -69,7 +71,7 @@ pub struct HostDeleteData {
 /// Type for EPP XML &lt;delete&gt; command for hosts
 pub struct HostDelete {
     /// The instance holding the data for the host to be deleted
-    #[serde(rename = "delete")]
+    #[serde(rename = "host:delete", alias = "delete")]
     host: HostDeleteData,
 }
 

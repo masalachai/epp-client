@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<command>
-		<logout/>
-		<clTRID>cltrid:1626454866</clTRID>
-	</command>
+    <command>
+        <logout/>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
 </epp>

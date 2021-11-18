@@ -68,12 +68,14 @@ pub struct RgpRestoreRequestData {
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "update")]
+#[element_name(name = "rgp:update")]
 /// Type for EPP XML &lt;check&gt; command for domains
 pub struct RgpRestoreRequest {
     /// XML namespace for the RGP restore extension
+    #[serde(rename = "xmlns:rgp", alias = "xmlns")]
     xmlns: String,
     /// The object holding the list of domains to be checked
+    #[serde(rename = "rgp:restore", alias = "restore")]
     restore: RgpRestoreRequestData,
 }
 

@@ -59,8 +59,10 @@ pub type EppHostInfo = EppObject<Command<HostInfo>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostInfoData {
     /// XML namespace for host commands
+    #[serde(rename = "xmlns:host", alias = "xmlns")]
     xmlns: String,
     /// The name of the host to be queried
+    #[serde(rename = "host:name", alias = "name")]
     name: StringValue,
 }
 
@@ -69,7 +71,7 @@ pub struct HostInfoData {
 /// Type for EPP XML &lt;info&gt; command for hosts
 pub struct HostInfo {
     /// The instance holding the data for the host query
-    #[serde(rename = "info")]
+    #[serde(rename = "host:info", alias = "info")]
     info: HostInfoData,
 }
 

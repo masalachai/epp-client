@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<command>
-		<info>
-			<info xmlns="urn:ietf:params:xml:ns:host-1.0">
-				<name>ns1.eppdev-1.com</name>
-			</info>
-		</info>
-		<clTRID>cltrid:1626454866</clTRID>
-	</command>
+    <command>
+        <info>
+            <host:info xmlns:host="urn:ietf:params:xml:ns:host-1.0">
+                <host:name>ns1.eppdev-1.com</host:name>
+            </host:info>
+        </info>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
 </epp>

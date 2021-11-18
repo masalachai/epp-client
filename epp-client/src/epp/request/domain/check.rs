@@ -61,9 +61,10 @@ pub type EppDomainCheck = EppObject<Command<DomainCheck>>;
 /// Type for &lt;name&gt; elements under the domain &lt;check&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainList {
+    #[serde(rename = "xmlns:domain", alias = "xmlns")]
     /// XML namespace for domain commands
     pub xmlns: String,
-    #[serde(rename = "name")]
+    #[serde(rename = "domain:name", alias = "name")]
     /// List of domains to be checked for availability
     pub domains: Vec<StringValue>,
 }
@@ -73,7 +74,7 @@ pub struct DomainList {
 /// Type for EPP XML &lt;check&gt; command for domains
 pub struct DomainCheck {
     /// The object holding the list of domains to be checked
-    #[serde(rename = "check")]
+    #[serde(rename = "domain:check", alias = "check")]
     list: DomainList,
 }
 

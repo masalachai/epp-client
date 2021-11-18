@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
-	<response>
-		<result code="1000">
-			<msg>Command completed successfully</msg>
-		</result>
-		<resData>
-			<contact:creData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
-				<contact:id>eppdev-contact-4</contact:id>
-				<contact:crDate>2021-07-25T16:05:32.0Z</contact:crDate>
-			</contact:creData>
-		</resData>
-		<trID>
-			<clTRID>cltrid:1626454866</clTRID>
-			<svTRID>RO-6879-1627224678242975</svTRID>
-		</trID>
-	</response>
+    <response>
+        <result code="1000">
+            <msg>Command completed successfully</msg>
+        </result>
+        <resData>
+            <contact:creData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+                <contact:id>eppdev-contact-4</contact:id>
+                <contact:crDate>2021-07-25T16:05:32.0Z</contact:crDate>
+            </contact:creData>
+        </resData>
+        <trID>
+            <clTRID>cltrid:1626454866</clTRID>
+            <svTRID>RO-6879-1627224678242975</svTRID>
+        </trID>
+    </response>
 </epp>

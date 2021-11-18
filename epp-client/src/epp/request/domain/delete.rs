@@ -59,8 +59,10 @@ pub type EppDomainDelete = EppObject<Command<DomainDelete>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DomainDeleteData {
     /// XML namespace for domain commands
+    #[serde(rename = "xmlns:domain", alias = "xmlns")]
     xmlns: String,
     /// The domain to be deleted
+    #[serde(rename = "domain:name", alias = "name")]
     name: StringValue,
 }
 
@@ -69,7 +71,7 @@ pub struct DomainDeleteData {
 /// Type for EPP XML &lt;delete&gt; command for domains
 pub struct DomainDelete {
     /// The data under the &lt;delete&gt; tag for domain deletion
-    #[serde(rename = "delete")]
+    #[serde(rename = "domain:delete", alias = "delete")]
     domain: DomainDeleteData,
 }
 

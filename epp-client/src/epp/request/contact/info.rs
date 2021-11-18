@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::AuthInfo;
+use crate::epp::object::data::ContactAuthInfo;
 use crate::epp::object::{ElementName, EppObject, StringValue, StringValueTrait};
 use crate::epp::request::Command;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
@@ -64,12 +64,14 @@ pub type EppContactInfo = EppObject<Command<ContactInfo>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ContactInfoData {
     /// XML namespace for contact commands
+    #[serde(rename = "xmlns:contact", alias = "contact")]
     xmlns: String,
     /// The contact id for the info command
+    #[serde(rename = "contact:id", alias = "id")]
     id: StringValue,
     /// The &lt;authInfo&gt; data
-    #[serde(rename = "authInfo")]
-    auth_info: AuthInfo,
+    #[serde(rename = "contact:authInfo", alias = "authInfo")]
+    auth_info: ContactAuthInfo,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -77,7 +79,7 @@ pub struct ContactInfoData {
 /// Type for EPP XML &lt;info&gt; command for contacts
 pub struct ContactInfo {
     /// Data for &lt;info&gt; command for contact
-    #[serde(rename = "info")]
+    #[serde(rename = "contact:info", alias = "info")]
     info: ContactInfoData,
 }
 
@@ -88,7 +90,7 @@ impl EppContactInfo {
             info: ContactInfoData {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
                 id: id.to_string_value(),
-                auth_info: AuthInfo::new(auth_password),
+                auth_info: ContactAuthInfo::new(auth_password),
             },
         };
 

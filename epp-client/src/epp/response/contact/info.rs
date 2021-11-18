@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::epp::object::data::{AuthInfo, ContactStatus, Phone, PostalInfo};
+use crate::epp::object::data::{ContactAuthInfo, ContactStatus, Phone, PostalInfo};
 use crate::epp::object::{EppObject, StringValue};
 use crate::epp::response::CommandResponse;
 
@@ -51,7 +51,7 @@ pub struct ContactInfoData {
     pub transferred_at: Option<StringValue>,
     /// The contact auth info
     #[serde(rename = "authInfo")]
-    pub auth_info: Option<AuthInfo>,
+    pub auth_info: Option<ContactAuthInfo>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for contact info response

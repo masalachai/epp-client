@@ -62,9 +62,10 @@ pub type EppHostCheck = EppObject<Command<HostCheck>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostList {
     /// XML namespace for host commands
+    #[serde(rename = "xmlns:host", alias = "xmlns")]
     xmlns: String,
     /// List of hosts to be checked for availability
-    #[serde(rename = "name")]
+    #[serde(rename = "host:name", alias = "name")]
     pub hosts: Vec<StringValue>,
 }
 
@@ -73,7 +74,7 @@ pub struct HostList {
 /// Type for EPP XML &lt;check&gt; command for hosts
 pub struct HostCheck {
     /// The instance holding the list of hosts to be checked
-    #[serde(rename = "check")]
+    #[serde(rename = "host:check", alias = "check")]
     list: HostList,
 }
 
