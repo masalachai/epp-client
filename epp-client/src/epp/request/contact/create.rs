@@ -78,25 +78,25 @@ pub type EppContactCreate = EppObject<Command<ContactCreate>>;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Contact {
     /// XML namespace for contact commands
-    #[serde(rename = "xmlns:contact")]
+    #[serde(rename = "xmlns:contact", alias = "xmlns")]
     xmlns: String,
     /// Contact &lt;id&gt; tag
-    #[serde(rename = "contact:id")]
+    #[serde(rename = "contact:id", alias = "id")]
     id: StringValue,
     /// Contact &lt;postalInfo&gt; tag
-    #[serde(rename = "contact:postalInfo")]
+    #[serde(rename = "contact:postalInfo", alias = "postalInfo")]
     postal_info: data::PostalInfo,
     /// Contact &lt;voice&gt; tag
-    #[serde(rename = "contact:voice")]
+    #[serde(rename = "contact:voice", alias = "voice")]
     voice: data::Phone,
     /// Contact &lt;fax&gt; tag,
-    #[serde(rename = "contact:fax")]
+    #[serde(rename = "contact:fax", alias = "fax")]
     fax: Option<data::Phone>,
     /// Contact &lt;email&gt; tag
-    #[serde(rename = "contact:email")]
+    #[serde(rename = "contact:email", alias = "email")]
     email: StringValue,
     /// Contact &lt;authInfo&gt; tag
-    #[serde(rename = "contact:authInfo")]
+    #[serde(rename = "contact:authInfo", alias = "authInfo")]
     auth_info: data::ContactAuthInfo,
 }
 
@@ -105,7 +105,7 @@ pub struct Contact {
 /// Type for EPP XML &lt;create&gt; command for contacts
 pub struct ContactCreate {
     /// Data for &lt;create&gt; command for contact
-    #[serde(rename = "contact:create")]
+    #[serde(rename = "contact:create", alias = "create")]
     pub contact: Contact,
 }
 
