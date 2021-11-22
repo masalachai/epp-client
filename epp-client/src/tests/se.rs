@@ -3,6 +3,7 @@
 mod request {
     use super::super::get_xml;
     use super::super::CLTRID;
+    use crate::domain;
     use crate::epp::object::data::{
         Address, AuthInfo, ContactStatus, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
@@ -18,6 +19,7 @@ mod request {
     use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferReject;
     use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferRequest;
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
+    use crate::epp::request::{EppHello, EppLogin, EppLogout, EppRequest};
     use crate::epp::xml::EppXml;
     use crate::epp::*;
     use chrono::{DateTime, NaiveDate};
@@ -145,6 +147,17 @@ mod request {
         let object = EppDomainCheck::new(vec!["eppdev.com", "eppdev.net"], CLTRID);
 
         let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn wrapped_domain_check() {
+        let xml = get_xml("request/domain/check.xml").unwrap();
+
+        let object = domain::check::Request::new(vec!["eppdev.com", "eppdev.net"]);
+
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }

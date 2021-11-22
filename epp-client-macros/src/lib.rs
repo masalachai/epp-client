@@ -53,3 +53,59 @@ pub fn element_name_derive(input: TokenStream) -> TokenStream {
 
     element_name_macro(&ast)
 }
+
+fn epp_request_macro(ast: &syn::DeriveInput) -> proc_macro::TokenStream {
+    let name = &ast.ident;
+    let attr = &ast.attrs[0];
+    let mut response_type: Option<syn::Ident> = None;
+    let (impl_generics, type_generics, _) = &ast.generics.split_for_impl();
+
+    if attr.path.is_ident("response") {
+        match attr.parse_meta() {
+            Ok(syn::Meta::List(meta)) => {
+                let item = &meta.nested[0];
+                match item {
+                    syn::NestedMeta::Meta(syn::Meta::Path(p)) => {
+                        response_type = Some(p.get_ident().unwrap().clone());
+                    }
+                    _ => panic!("Failed to parse args for epp_types"),
+                }
+            }
+            _ => panic!("Failed to parse args for epp_types"),
+        };
+    }
+
+    if let Some(resp) = response_type {
+        let implement = quote::quote! {
+            impl #impl_generics EppRequest for #name #type_generics {
+                type Output = #resp;
+
+                fn deserialize_response(&self, epp_xml: &str) -> Result<Self::Output, Box<dyn std::error::Error>> {
+                    match Self::Output::deserialize(epp_xml) {
+                        Ok(v) => Ok(v),
+                        Err(e) => Err(format!("epp-client: Deserialization error: {}", e).into()),
+                    }
+                }
+
+                fn serialize_request(&self) -> Result<String, Box<dyn std::error::Error>> {
+                    match &self.0.serialize() {
+                        Ok(serialized) => Ok(serialized.to_string()),
+                        Err(e) => Err(format!("epp-client: Serialization error: {}", e).into()),
+                    }
+                }
+            }
+        };
+        implement.into()
+    } else {
+        panic!(
+            "response() needs 1 argument, a response type that implements epp_client::epp::xml::EppXml"
+        );
+    }
+}
+
+#[proc_macro_derive(EppRequest, attributes(response))]
+pub fn epp_request_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let ast = syn::parse(input).expect("Error while parsing EppTransaction macro input");
+
+    epp_request_macro(&ast)
+}
