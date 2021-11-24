@@ -22,12 +22,21 @@ use crate::epp::xml::{
 };
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
-pub trait EppRequest: ElementName + DeserializeOwned + Serialize + Debug + Sized {
+pub trait EppRequest: Sized + Debug {
     type Extension: ElementName + DeserializeOwned + Serialize + Debug;
+    type Input: ElementName + DeserializeOwned + Serialize + Sized + Debug;
     type Output: EppXml + DeserializeOwned + Serialize + Debug;
 
-    fn extension(&self) -> Option<Self::Extension> {
-        None
+    fn into_parts(self) -> (Self::Input, Option<Self::Extension>);
+
+    fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+        let (command, extension) = self.into_parts();
+        let extension = extension.map(|data| Extension { data });
+        EppXml::serialize(&EppObject::build(CommandWithExtension {
+            command,
+            extension,
+            client_tr_id: client_tr_id.to_string_value(),
+        }))
     }
 
     fn deserialize_response(epp_xml: &str) -> Result<Self::Output, crate::error::Error> {
@@ -41,15 +50,6 @@ pub trait EppRequest: ElementName + DeserializeOwned + Serialize + Debug + Sized
                 },
             ))),
         }
-    }
-
-    fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
-        let extension = self.extension().map(|data| Extension { data });
-        EppXml::serialize(&EppObject::build(CommandWithExtension {
-            command: self,
-            extension,
-            client_tr_id: client_tr_id.to_string_value(),
-        }))
     }
 }
 

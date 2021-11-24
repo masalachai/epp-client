@@ -18,7 +18,6 @@ mod request {
     use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferQuery;
     use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferReject;
     use crate::epp::request::domain::namestore::transfer::EppNamestoreDomainTransferRequest;
-    use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::request::{EppHello, EppLogin, EppLogout, EppRequest};
     use crate::epp::xml::EppXml;
     use crate::epp::*;
@@ -155,7 +154,7 @@ mod request {
     fn wrapped_domain_check() {
         let xml = get_xml("request/domain/check.xml").unwrap();
 
-        let object = domain::check::Request::new(vec!["eppdev.com", "eppdev.net"]);
+        let object = domain::check::Check::new(vec!["eppdev.com", "eppdev.net"]);
 
         let serialized = object.serialize_request(CLTRID).unwrap();
 
