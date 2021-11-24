@@ -104,6 +104,17 @@ steps:
         - 0.3
       event: push
 
+  - name: notify
+    image: drillster/drone-email
+    volumes:
+      - name: notify-env
+        path: /root/.notify-env
+    environment:
+      PLUGIN_ENV_FILE: /root/.notify-env
+    when:
+      status:
+        - failure
+
 volumes:
   - name: ssh
     host:
@@ -120,4 +131,7 @@ volumes:
   - name: cache
     host:
       path: /var/drone/cache/epp-client-cache
+  - name: notify-env
+    host:
+      path: /root/.notify-env
 ...
