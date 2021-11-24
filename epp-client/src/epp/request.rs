@@ -5,15 +5,58 @@ pub mod domain;
 pub mod host;
 pub mod message;
 
-use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
+use epp_client_macros::*;
+
+use serde::{de::DeserializeOwned, ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
+use std::fmt::Debug;
 use std::time::SystemTime;
 
 use crate::epp::object::{
     ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
 };
-use crate::epp::xml::{EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION};
-use epp_client_macros::*;
+use crate::epp::response::{CommandResponseStatus, CommandResponseWithExtension};
+use crate::epp::xml::{
+    EppXml, EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION,
+};
+
+/// Trait to set correct value for xml tags when tags are being generated from generic types
+pub trait EppRequest: Sized + Debug {
+    type Input: ElementName + DeserializeOwned + Serialize + Sized + Debug;
+    type InputExtension: ElementName + DeserializeOwned + Serialize + Debug;
+    type Output: DeserializeOwned + Serialize + Debug;
+    type OutputExtension: ElementName + DeserializeOwned + Serialize + Debug;
+
+    fn into_parts(self) -> (Self::Input, Option<Self::InputExtension>);
+
+    fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+        let (command, extension) = self.into_parts();
+        let extension = extension.map(|data| Extension { data });
+        EppXml::serialize(&EppObject::build(CommandWithExtension {
+            command,
+            extension,
+            client_tr_id: client_tr_id.into(),
+        }))
+    }
+
+    fn deserialize_response(
+        epp_xml: &str,
+    ) -> Result<
+        CommandResponseWithExtension<Self::Output, Self::OutputExtension>,
+        crate::error::Error,
+    > {
+        let rsp = <EppObject<CommandResponseWithExtension<Self::Output, Self::OutputExtension>> as EppXml>::deserialize(epp_xml)?;
+        match rsp.data.result.code {
+            0..=2000 => Ok(rsp.data),
+            _ => Err(crate::error::Error::EppCommandError(EppObject::build(
+                CommandResponseStatus {
+                    result: rsp.data.result,
+                    tr_ids: rsp.data.tr_ids,
+                },
+            ))),
+        }
+    }
+}
 
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// without an &lt;extension&gt; tag

@@ -51,9 +51,10 @@ use std::{error::Error, fmt::Debug};
 
 use crate::config::EppClientConfig;
 use crate::connection::registry::{epp_connect, EppConnection};
-use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout};
+use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout, EppRequest};
 use crate::epp::response::{
-    EppCommandResponse, EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
+    CommandResponseWithExtension, EppCommandResponse, EppCommandResponseError, EppGreeting,
+    EppLoginResponse, EppLogoutResponse,
 };
 use crate::epp::xml::EppXml;
 use crate::error;
@@ -156,6 +157,21 @@ impl EppClient {
             let epp_error = EppCommandResponseError::deserialize(&response)?;
             Err(error::Error::EppCommandError(epp_error))
         }
+    }
+
+    pub async fn transact_new<T: EppRequest + Debug>(
+        &mut self,
+        request: T,
+        id: &str,
+    ) -> Result<
+        CommandResponseWithExtension<<T as EppRequest>::Output, <T as EppRequest>::OutputExtension>,
+        error::Error,
+    > {
+        let epp_xml = request.serialize_request(id)?;
+
+        let response = self.connection.transact(&epp_xml).await?;
+
+        T::deserialize_response(&response)
     }
 
     /// Fetches the username used in the registry connection

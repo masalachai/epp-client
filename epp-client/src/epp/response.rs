@@ -10,7 +10,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::Debug;
 
 use crate::epp::object::{
-    ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
+    ElementName, EmptyTag, EppObject, Options, ServiceExtension, Services, StringValue,
 };
 
 /// Type corresponding to the &lt;response&gt; tag in an EPP response without an &lt;extension&gt; section
@@ -369,7 +369,7 @@ pub struct CommandResponseWithExtension<T, E: ElementName> {
     /// Data under the &lt;resData&gt; tag
     pub res_data: Option<T>,
     /// Data under the &lt;extension&gt; tag
-    pub extension: Option<Extension<E>>,
+    pub extension: Option<E>,
     /// Data under the <trID> tag
     #[serde(rename = "trID")]
     pub tr_ids: ResponseTRID,
