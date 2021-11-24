@@ -3,6 +3,8 @@
 mod response {
     use super::super::get_xml;
     use super::super::CLTRID;
+    use crate::domain::check::DomainCheck;
+    use crate::epp::request::EppRequest;
     use crate::epp::response::ExpiryType;
     use crate::epp::response::Relative;
     use crate::epp::response::{
@@ -212,12 +214,12 @@ mod response {
     #[test]
     fn domain_check() {
         let xml = get_xml("response/domain/check.xml").unwrap();
-        let object = EppDomainCheckResponse::deserialize(xml.as_str()).unwrap();
+        let object = DomainCheck::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(
             result.check_data.domain_list[0].domain.name,
             "eppdev.com".into()
@@ -228,8 +230,8 @@ mod response {
             "eppdev.net".into()
         );
         assert_eq!(result.check_data.domain_list[1].domain.available, 0);
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
@@ -614,7 +616,7 @@ mod response {
 
         assert_eq!(object.data.result.code, 1000);
         assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(ext.data.rgp_status.status, "pendingRestore".to_string());
+        assert_eq!(ext.rgp_status.status, "pendingRestore".to_string());
         assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
     }
 }
