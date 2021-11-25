@@ -13,27 +13,45 @@ use std::fmt::Debug;
 use std::time::SystemTime;
 
 use crate::epp::object::{
-    ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
+    ElementName, EppObject, Extension, NoExtension, Options, ServiceExtension, Services,
+    StringValue,
 };
+use crate::epp::response::{CommandResponseStatus, EppCommandResponse};
 use crate::epp::xml::{
     EppXml, EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION,
 };
 
-/// Trait to set correct value for xml tags when tags are being generated from generic types
+/// Trait to handle serialization and de serialization to required request and response types
 pub trait EppRequest {
-    type Output: EppXml + Debug;
+    type Request: EppXml + Debug;
+    type Response: EppXml + Serialize + Debug;
 
-    fn deserialize_response(
-        &self,
+    fn as_epp_object(&self) -> &Self::Request;
+
+    fn serialize(&self) -> Result<String, Box<dyn Error>> {
+        self.as_epp_object().serialize()
+    }
+
+    fn deserialize(
         epp_xml: &str,
-    ) -> Result<Self::Output, Box<dyn std::error::Error>>;
+    ) -> Result<<Self::Response as EppXml>::Output, crate::error::Error> {
+        let status = <EppCommandResponse as EppXml>::deserialize(epp_xml)?;
 
-    fn serialize_request(&self) -> Result<String, Box<dyn std::error::Error>>;
+        match status.data.result.code {
+            0..=2000 => Self::Response::deserialize(epp_xml),
+            _ => Err(crate::error::Error::EppCommandError(EppObject::build(
+                CommandResponseStatus {
+                    result: status.data.result,
+                    tr_ids: status.data.tr_ids,
+                },
+            ))),
+        }
+    }
 }
 
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// without an &lt;extension&gt; tag
-pub type Command<T> = CommandWithExtension<T, EmptyTag>;
+pub type Command<T> = CommandWithExtension<T, NoExtension>;
 
 /// The EPP Hello request
 pub type EppHello = EppObject<Hello>;

@@ -10,11 +10,12 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::Debug;
 
 use crate::epp::object::{
-    ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
+    ElementName, EppObject, Extension, NoExtension, Options, ServiceExtension, Services,
+    StringValue,
 };
 
 /// Type corresponding to the &lt;response&gt; tag in an EPP response without an &lt;extension&gt; section
-pub type CommandResponse<T> = CommandResponseWithExtension<T, EmptyTag>;
+pub type CommandResponse<T> = CommandResponseWithExtension<T, NoExtension>;
 
 /// The EPP Greeting that is received on a successful connection and in response to an EPP hello
 pub type EppGreeting = EppObject<Greeting>;

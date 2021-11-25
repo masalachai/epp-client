@@ -4,11 +4,12 @@ mod request {
     use super::super::get_xml;
     use super::super::CLTRID;
     use crate::domain;
+    use crate::epp::ext::namestore::check::NamestoreCheck;
     use crate::epp::object::data::{
         Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
     };
-    use crate::epp::object::StringValueTrait;
+    use crate::epp::object::NoExtension;
     use crate::epp::request::{EppHello, EppLogin, EppLogout, EppRequest};
     use crate::epp::xml::EppXml;
     use crate::epp::*;
@@ -145,9 +146,30 @@ mod request {
     fn wrapped_domain_check() {
         let xml = get_xml("request/domain/check.xml").unwrap();
 
-        let object = domain::check::Request::new(vec!["eppdev.com", "eppdev.net"], CLTRID);
+        let object = domain::check::Request::<NoExtension>::new(
+            vec!["eppdev.com", "eppdev.net"],
+            None,
+            CLTRID,
+        );
 
-        let serialized = object.serialize_request().unwrap();
+        let serialized = object.serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn domain_check_namestore() {
+        let xml = get_xml("request/domain/ext/namestore/check.xml").unwrap();
+
+        let ext = NamestoreCheck::new("dotCC");
+
+        let object = domain::check::Request::<NamestoreCheck>::new(
+            vec!["eppdev.com", "eppdev.net"],
+            Some(ext),
+            CLTRID,
+        );
+
+        let serialized = object.serialize().unwrap();
 
         assert_eq!(xml, serialized);
     }

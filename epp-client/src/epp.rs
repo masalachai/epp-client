@@ -1,5 +1,6 @@
 //! Types for EPP requests and responses
 
+pub mod ext;
 pub mod object;
 pub mod request;
 pub mod response;

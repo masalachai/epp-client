@@ -39,7 +39,7 @@ pub trait ElementName {
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "empty")]
 /// An empty placeholder tag. To be refactored to something more compliant later.
-pub struct EmptyTag;
+pub struct NoExtension;
 
 /// An EPP XML Document that is used either as an EPP XML request or
 /// an EPP XML response
