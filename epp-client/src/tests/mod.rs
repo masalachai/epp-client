@@ -1,6 +1,7 @@
 //! Module for automated tests
 
 pub mod de;
+pub mod int;
 pub mod se;
 
 use regex::Regex;

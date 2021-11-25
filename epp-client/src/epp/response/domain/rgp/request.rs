@@ -1,12 +1,12 @@
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EmptyTag, EppObject};
+use crate::epp::object::{ElementName, EppObject, NoExtension};
 use crate::epp::response::CommandResponseWithExtension;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; tag for the EPP XML rgp restore request response
 pub type EppDomainRgpRestoreRequestResponse =
-    EppObject<CommandResponseWithExtension<EmptyTag, RgpRequestResult>>;
+    EppObject<CommandResponseWithExtension<NoExtension, RgpRequestResult>>;
 
 /// Type that represents the &lt;rgpStatus&gt; tag for domain rgp restore request response
 #[derive(Serialize, Deserialize, Debug)]

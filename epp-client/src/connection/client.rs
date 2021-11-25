@@ -49,9 +49,15 @@
 use std::time::SystemTime;
 use std::{error::Error, fmt::Debug};
 
+use serde::de::DeserializeOwned;
+use serde::Serialize;
+
 use crate::config::EppClientConfig;
 use crate::connection::registry::{epp_connect, EppConnection};
-use crate::epp::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout, EppRequest};
+use crate::epp::object::ElementName;
+use crate::epp::request::{
+    generate_client_tr_id, EppExtension, EppHello, EppLogin, EppLogout, EppRequest,
+};
 use crate::epp::response::{
     CommandResponseWithExtension, EppCommandResponse, EppCommandResponseError, EppGreeting,
     EppLoginResponse, EppLogoutResponse,
@@ -131,7 +137,7 @@ impl EppClient {
     /// Executes an EPP Hello call and returns the response as an `EppGreeting`
     pub async fn hello(&mut self) -> Result<EppGreeting, Box<dyn Error>> {
         let hello = EppHello::new();
-        let hello_xml = hello.serialize()?;
+        let hello_xml = EppXml::serialize(&hello)?;
 
         let response = self.connection.transact(&hello_xml).await?;
 
@@ -159,14 +165,15 @@ impl EppClient {
         }
     }
 
-    pub async fn transact_new<T: EppRequest + Debug>(
+    pub async fn transact_new<T, E>(
         &mut self,
         request: T,
         id: &str,
-    ) -> Result<
-        CommandResponseWithExtension<<T as EppRequest>::Output, <T as EppRequest>::OutputExtension>,
-        error::Error,
-    > {
+    ) -> Result<CommandResponseWithExtension<<T as EppRequest<E>>::Output, E::Response>, error::Error>
+    where
+        T: EppRequest<E> + Debug,
+        E: EppExtension,
+    {
         let epp_xml = request.serialize_request(id)?;
 
         let response = self.connection.transact(&epp_xml).await?;

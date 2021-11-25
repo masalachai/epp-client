@@ -73,10 +73,10 @@ pub struct RgpRestoreRequestData {
 pub struct RgpRestoreRequest {
     /// XML namespace for the RGP restore extension
     #[serde(rename = "xmlns:rgp", alias = "xmlns")]
-    xmlns: String,
+    pub xmlns: String,
     /// The object holding the list of domains to be checked
     #[serde(rename = "rgp:restore", alias = "restore")]
-    restore: RgpRestoreRequestData,
+    pub restore: RgpRestoreRequestData,
 }
 
 impl EppDomainRgpRestoreRequest {

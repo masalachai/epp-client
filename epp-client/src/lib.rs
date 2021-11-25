@@ -105,6 +105,7 @@ pub mod connection;
 pub mod domain;
 pub mod epp;
 pub mod error;
+pub mod extensions;
 pub use connection::client::EppClient;
 
 #[cfg(test)]

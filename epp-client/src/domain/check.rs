@@ -1,9 +1,12 @@
+use std::fmt::Debug;
+
 use epp_client_macros::*;
 
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
-use crate::epp::object::{ElementName, EmptyTag, StringValue};
-use crate::epp::request::EppRequest;
+use crate::epp::object::{ElementName, NoExtension, StringValue};
+use crate::epp::request::{EppExtension, EppRequest};
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;check&gt; command
@@ -42,7 +45,7 @@ use crate::epp::xml::EPP_DOMAIN_XMLNS;
 ///     };
 ///
 ///     // Create a Check instance
-///     let domain_check = Check::new(vec!["eppdev-100.com", "eppdev-100.net"];
+///     let domain_check = Check::new(vec!["eppdev-100.com", "eppdev-100.net"]);
 ///
 ///     // send it to the registry and receive a response of type DomainCheck
 ///     let response = client.transact_new::<_, DomainCheck>(&domain_check).await.unwrap();
@@ -54,33 +57,40 @@ use crate::epp::xml::EPP_DOMAIN_XMLNS;
 /// ```
 
 #[derive(Debug)]
-pub struct DomainCheck {
+pub struct DomainCheck<E> {
     request: DomainCheckRequest,
+    extension: Option<E>,
 }
 
-impl EppRequest for DomainCheck {
+impl<E: EppExtension> EppRequest<E> for DomainCheck<E> {
     type Input = DomainCheckRequest;
-    type InputExtension = EmptyTag;
     type Output = DomainCheckResponse;
-    type OutputExtension = EmptyTag;
 
-    fn into_parts(self) -> (Self::Input, Option<Self::InputExtension>) {
-        (self.request, None)
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
     }
 }
 
-impl DomainCheck {
-    pub fn new(domains: impl IntoIterator<Item = impl AsRef<str>>) -> Self {
-        Self {
+impl<E: EppExtension> DomainCheck<E> {
+    pub fn new(domains: Vec<&str>) -> DomainCheck<NoExtension> {
+        DomainCheck {
             request: DomainCheckRequest {
                 list: DomainCheckList {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     domains: domains
                         .into_iter()
-                        .map(|d| d.as_ref().into())
+                        .map(|d| d.into())
                         .collect::<Vec<StringValue>>(),
                 },
             },
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainCheck<F> {
+        DomainCheck {
+            request: self.request,
+            extension: Some(extension),
         }
     }
 }

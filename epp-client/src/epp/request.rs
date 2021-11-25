@@ -13,7 +13,8 @@ use std::fmt::Debug;
 use std::time::SystemTime;
 
 use crate::epp::object::{
-    ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
+    ElementName, EppObject, Extension, NoExtension, Options, ServiceExtension, Services,
+    StringValue,
 };
 use crate::epp::response::{CommandResponseStatus, CommandResponseWithExtension};
 use crate::epp::xml::{
@@ -21,13 +22,11 @@ use crate::epp::xml::{
 };
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
-pub trait EppRequest: Sized + Debug {
+pub trait EppRequest<E: EppExtension>: Sized + Debug {
     type Input: ElementName + DeserializeOwned + Serialize + Sized + Debug;
-    type InputExtension: ElementName + DeserializeOwned + Serialize + Debug;
     type Output: DeserializeOwned + Serialize + Debug;
-    type OutputExtension: ElementName + DeserializeOwned + Serialize + Debug;
 
-    fn into_parts(self) -> (Self::Input, Option<Self::InputExtension>);
+    fn into_parts(self) -> (Self::Input, Option<E>);
 
     fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
         let (command, extension) = self.into_parts();
@@ -41,11 +40,11 @@ pub trait EppRequest: Sized + Debug {
 
     fn deserialize_response(
         epp_xml: &str,
-    ) -> Result<
-        CommandResponseWithExtension<Self::Output, Self::OutputExtension>,
-        crate::error::Error,
-    > {
-        let rsp = <EppObject<CommandResponseWithExtension<Self::Output, Self::OutputExtension>> as EppXml>::deserialize(epp_xml)?;
+    ) -> Result<CommandResponseWithExtension<Self::Output, E::Response>, crate::error::Error> {
+        let rsp =
+            <EppObject<CommandResponseWithExtension<Self::Output, E::Response>> as EppXml>::deserialize(
+                epp_xml,
+            )?;
         match rsp.data.result.code {
             0..=2000 => Ok(rsp.data),
             _ => Err(crate::error::Error::EppCommandError(EppObject::build(
@@ -58,9 +57,13 @@ pub trait EppRequest: Sized + Debug {
     }
 }
 
+pub trait EppExtension: ElementName + DeserializeOwned + Serialize + Sized + Debug {
+    type Response: ElementName + DeserializeOwned + Serialize + Debug;
+}
+
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// without an &lt;extension&gt; tag
-pub type Command<T> = CommandWithExtension<T, EmptyTag>;
+pub type Command<T> = CommandWithExtension<T, NoExtension>;
 
 /// The EPP Hello request
 pub type EppHello = EppObject<Hello>;

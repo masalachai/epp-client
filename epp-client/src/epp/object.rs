@@ -8,6 +8,8 @@ use std::fmt::Display;
 
 use crate::epp::xml::EPP_XMLNS;
 
+use super::request::EppExtension;
+
 /// Wraps String for easier serialization to and from values that are inner text
 /// for tags rather than attributes
 #[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone)]
@@ -39,7 +41,11 @@ pub trait ElementName {
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "empty")]
 /// An empty placeholder tag. To be refactored to something more compliant later.
-pub struct EmptyTag;
+pub struct NoExtension;
+
+impl EppExtension for NoExtension {
+    type Response = NoExtension;
+}
 
 /// An EPP XML Document that is used either as an EPP XML request or
 /// an EPP XML response
