@@ -4,6 +4,7 @@ mod response {
     use super::super::get_xml;
     use super::super::CLTRID;
     use crate::domain::check::EppDomainCheckResponse;
+    use crate::domain::create::EppDomainCreateResponse;
     use crate::epp::response::ExpiryType;
     use crate::epp::response::Relative;
     use crate::epp::response::{
