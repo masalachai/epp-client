@@ -43,7 +43,7 @@
 //!
 //! use epp_client::config::{EppClientConfig, EppClientConnection};
 //! use epp_client::EppClient;
-//! use epp_client::epp::{EppDomainCheck, EppDomainCheckResponse};
+//! use epp_client::domain::check::{EppDomainCheck, EppDomainCheckResponse};
 //! use epp_client::epp::generate_client_tr_id;
 //!
 //! #[tokio::main]
@@ -102,6 +102,7 @@ extern crate log;
 
 pub mod config;
 pub mod connection;
+pub mod domain;
 pub mod epp;
 pub mod error;
 pub use connection::client::EppClient;

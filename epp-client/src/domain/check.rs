@@ -4,6 +4,7 @@ use epp_client_macros::*;
 
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +17,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainCheck, EppDomainCheckResponse};
+/// use epp_client::domain::check::{EppDomainCheck, EppDomainCheckResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -56,7 +57,31 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainCheck = EppObject<Command<DomainCheck>>;
+pub type EppDomainCheck = EppObject<Command<DomainCheckRequest>>;
+
+impl EppDomainCheck {
+    /// Creates a new EppObject for domain check corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(domains: Vec<&str>, client_tr_id: &str) -> EppDomainCheck {
+        let domains = domains.into_iter().map(|d| d.into()).collect();
+
+        let domain_check = DomainCheckRequest {
+            list: DomainList {
+                xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                domains,
+            },
+        };
+
+        EppObject::build(Command::<DomainCheckRequest>::new(
+            domain_check,
+            client_tr_id,
+        ))
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain check response
+pub type EppDomainCheckResponse = EppObject<CommandResponse<DomainCheckResponse>>;
+
+// Request
 
 /// Type for &lt;name&gt; elements under the domain &lt;check&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
@@ -72,24 +97,50 @@ pub struct DomainList {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
 /// Type for EPP XML &lt;check&gt; command for domains
-pub struct DomainCheck {
+pub struct DomainCheckRequest {
     /// The object holding the list of domains to be checked
     #[serde(rename = "domain:check", alias = "check")]
     list: DomainList,
 }
 
-impl EppDomainCheck {
-    /// Creates a new EppObject for domain check corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(domains: Vec<&str>, client_tr_id: &str) -> EppDomainCheck {
-        let domains = domains.into_iter().map(|d| d.into()).collect();
+// Response
 
-        let domain_check = DomainCheck {
-            list: DomainList {
-                xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                domains,
-            },
-        };
+/// Type that represents the &lt;name&gt; tag for domain check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainAvailable {
+    /// The domain name
+    #[serde(rename = "$value")]
+    pub name: StringValue,
+    /// The domain (un)availability
+    #[serde(rename = "avail")]
+    pub available: u16,
+}
 
-        EppObject::build(Command::<DomainCheck>::new(domain_check, client_tr_id))
-    }
+/// Type that represents the &lt;cd&gt; tag for domain check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainCheckResponseDataItem {
+    /// Data under the &lt;name&gt; tag
+    #[serde(rename = "name")]
+    pub domain: DomainAvailable,
+    /// The reason for (un)availability
+    pub reason: Option<StringValue>,
+}
+
+/// Type that represents the &lt;chkData&gt; tag for domain check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainCheckResponseData {
+    /// XML namespace for domain response data
+    #[serde(rename = "xmlns:domain")]
+    xmlns: String,
+    /// Data under the &lt;cd&gt; tag
+    #[serde(rename = "cd")]
+    pub domain_list: Vec<DomainCheckResponseDataItem>,
+}
+
+/// Type that represents the &lt;resData&gt; tag for domain check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainCheckResponse {
+    /// Data under the &lt;chkData&gt; tag
+    #[serde(rename = "chkData")]
+    pub check_data: DomainCheckResponseData,
 }
