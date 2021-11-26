@@ -3,11 +3,12 @@
 use epp_client_macros::*;
 
 use crate::common::ElementName;
-use crate::domain::rgp::EPP_DOMAIN_RGP_EXT_XMLNS;
 
 use crate::request::EppExtension;
 
 use serde::{Deserialize, Serialize};
+
+use super::EPP_DOMAIN_RGP_EXT_XMLNS;
 
 /// Type that represents the &lt;epp&gt; request for a domain rgp restore request command
 ///
@@ -18,7 +19,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
-/// use epp_client::domain::rgp::request::RgpRestoreRequest;
+/// use epp_client::extensions::rgp::request::RgpRestoreRequest;
 /// use epp_client::domain::update::DomainUpdate;
 /// use epp_client::generate_client_tr_id;
 ///

@@ -128,11 +128,14 @@ pub mod domain {
     pub mod delete;
     pub mod info;
     pub mod renew;
-    pub mod rgp;
     pub mod transfer;
     pub mod update;
 
     pub const XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
+}
+
+pub mod extensions {
+    pub mod rgp;
 }
 
 pub mod host {

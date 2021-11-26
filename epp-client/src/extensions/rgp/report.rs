@@ -3,10 +3,11 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::domain::rgp::EPP_DOMAIN_RGP_EXT_XMLNS;
 use crate::request::EppExtension;
 use chrono::{DateTime, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
+
+use super::EPP_DOMAIN_RGP_EXT_XMLNS;
 
 /// Type that represents the domain rgp restore report extension
 ///
@@ -18,7 +19,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::common::{DomainStatus, DomainContact};
-/// use epp_client::domain::rgp::report::RgpRestoreReport;
+/// use epp_client::extensions::rgp::report::RgpRestoreReport;
 /// use epp_client::domain::update::DomainUpdate;
 /// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;

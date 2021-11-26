@@ -14,13 +14,13 @@ mod response {
     use crate::domain::delete::DomainDelete;
     use crate::domain::info::DomainInfo;
     use crate::domain::renew::DomainRenew;
-    use crate::domain::rgp::request::RgpRestoreRequest;
     use crate::domain::transfer::DomainTransferApprove;
     use crate::domain::transfer::DomainTransferCancel;
     use crate::domain::transfer::DomainTransferQuery;
     use crate::domain::transfer::DomainTransferReject;
     use crate::domain::transfer::DomainTransferRequest;
     use crate::domain::update::DomainUpdate;
+    use crate::extensions::rgp::request::RgpRestoreRequest;
     use crate::hello::ExpiryType;
     use crate::hello::Greeting;
     use crate::hello::Relative;
