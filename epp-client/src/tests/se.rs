@@ -29,6 +29,7 @@ mod request {
     use crate::domain::update::DomainAddRemove;
     use crate::domain::update::DomainChangeInfo;
     use crate::domain::update::DomainUpdate;
+    use crate::extensions::namestore::NameStore;
     use crate::extensions::rgp::report::RgpRestoreReport;
     use crate::extensions::rgp::request::RgpRestoreRequest;
     use crate::hello::Hello;
@@ -577,6 +578,21 @@ mod request {
         };
 
         object.info(change_info);
+
+        let serialized = object.serialize_request(CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn namestore() {
+        let xml = get_xml("request/extensions/namestore.xml").unwrap();
+
+        let namestore_ext = NameStore::new("com");
+
+        let object =
+            DomainCheck::<NameStore>::new(vec!["example1.com", "example2.com", "example3.com"])
+                .with_extension(namestore_ext);
 
         let serialized = object.serialize_request(CLTRID).unwrap();
 
