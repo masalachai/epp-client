@@ -1,4 +1,4 @@
-//! XML serialization using the `quick-xml` library
+//! Types to use in serialization to and deserialization from EPP XML
 
 use quick_xml::de::from_str;
 use quick_xml::se;
@@ -6,8 +6,9 @@ use serde::{de::DeserializeOwned, Serialize};
 use std::{error::Error, fmt::Debug};
 
 use crate::common::{ElementName, EppObject};
-use crate::epp::xml::{EppXml, EPP_XML_HEADER};
 use crate::error;
+
+pub const EPP_XML_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
 
 impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject<T> {
     type Output = EppObject<T>;
@@ -33,4 +34,12 @@ impl<T: Serialize + DeserializeOwned + ElementName + Debug> EppXml for EppObject
         // object.xml = Some(epp_xml.to_string());
         Ok(object)
     }
+}
+
+/// Trait to be implemented by serializers. Currently the only included serializer is `quick-xml`
+pub trait EppXml {
+    type Output: Debug;
+
+    fn serialize(&self) -> Result<String, Box<dyn Error>>;
+    fn deserialize(epp_xml: &str) -> Result<Self::Output, error::Error>;
 }

@@ -44,7 +44,7 @@
 //! use epp_client::config::{EppClientConfig, EppClientConnection};
 //! use epp_client::EppClient;
 //! use epp_client::domain::check::{EppDomainCheck, EppDomainCheckResponse};
-//! use epp_client::epp::generate_client_tr_id;
+//! use epp_client::generate_client_tr_id;
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -105,13 +105,15 @@ pub mod config;
 pub mod connection;
 pub mod contact;
 pub mod domain;
-pub mod epp;
 pub mod error;
 pub mod host;
 pub mod message;
 pub mod request;
 pub mod response;
+pub mod xml;
 pub use connection::client::EppClient;
+
+pub use crate::connection::client::default_client_tr_id_fn as generate_client_tr_id;
 
 #[cfg(test)]
 pub mod tests;

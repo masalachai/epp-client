@@ -3,8 +3,9 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, Extension, StringValue};
+use crate::domain::rgp::EPP_DOMAIN_RGP_EXT_XMLNS;
 use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
-use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
+use crate::domain::EPP_DOMAIN_XMLNS;
 use crate::request::CommandWithExtension;
 use crate::response::EppCommandResponse;
 use chrono::{DateTime, SecondsFormat, Utc};
@@ -20,7 +21,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::domain::rgp::report::{EppDomainRgpRestoreReport, EppDomainRgpRestoreReportResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 /// use chrono::{DateTime, NaiveDate};
 /// use std::str::FromStr;
 ///
