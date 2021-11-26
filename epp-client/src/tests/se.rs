@@ -6,6 +6,7 @@ mod request {
     use crate::domain::check::EppDomainCheck;
     use crate::domain::create::EppDomainCreate;
     use crate::domain::delete::EppDomainDelete;
+    use crate::domain::info::EppDomainInfo;
     use crate::epp::object::data::{
         Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
