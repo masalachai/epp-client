@@ -1,3 +1,3 @@
 //! Types for EPP RGP restore requests
 
-pub mod request;
+pub mod report;
