@@ -13,6 +13,9 @@ mod request {
     use crate::domain::transfer::EppDomainTransferQuery;
     use crate::domain::transfer::EppDomainTransferReject;
     use crate::domain::transfer::EppDomainTransferRequest;
+    use crate::domain::update::DomainAddRemove;
+    use crate::domain::update::DomainChangeInfo;
+    use crate::domain::update::EppDomainUpdate;
     use crate::epp::object::data::{
         Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,

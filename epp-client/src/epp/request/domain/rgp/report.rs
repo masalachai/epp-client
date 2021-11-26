@@ -2,8 +2,8 @@
 
 use epp_client_macros::*;
 
+use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
 use crate::epp::object::{ElementName, EppObject, StringValue};
-use crate::epp::request::domain::update::{DomainChangeInfo, DomainUpdate, DomainUpdateData};
 use crate::epp::request::{CommandWithExtension, Extension};
 use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
 use chrono::{DateTime, SecondsFormat, Utc};
@@ -81,7 +81,7 @@ use serde::{Deserialize, Serialize};
 /// }
 /// ```
 pub type EppDomainRgpRestoreReport =
-    EppObject<CommandWithExtension<DomainUpdate, RgpRestoreReport>>;
+    EppObject<CommandWithExtension<DomainUpdateRequest, RgpRestoreReport>>;
 
 /// Type corresponding to the &lt;report&gt; section in the EPP rgp restore extension
 #[derive(Serialize, Deserialize, Debug)]
@@ -147,9 +147,9 @@ impl EppDomainRgpRestoreReport {
     ) -> EppDomainRgpRestoreReport {
         let statements = statements.iter().map(|&s| s.into()).collect();
 
-        let command = CommandWithExtension::<DomainUpdate, RgpRestoreReport> {
-            command: DomainUpdate {
-                domain: DomainUpdateData {
+        let command = CommandWithExtension::<DomainUpdateRequest, RgpRestoreReport> {
+            command: DomainUpdateRequest {
+                domain: DomainUpdateRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
                     add: None,

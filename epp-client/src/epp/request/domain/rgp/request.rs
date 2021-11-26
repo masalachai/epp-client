@@ -2,8 +2,8 @@
 
 use epp_client_macros::*;
 
+use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
 use crate::epp::object::{ElementName, EppObject};
-use crate::epp::request::domain::update::{DomainChangeInfo, DomainUpdate, DomainUpdateData};
 use crate::epp::request::{CommandWithExtension, Extension};
 use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
 use serde::{Deserialize, Serialize};
@@ -58,7 +58,7 @@ use serde::{Deserialize, Serialize};
 /// }
 /// ```
 pub type EppDomainRgpRestoreRequest =
-    EppObject<CommandWithExtension<DomainUpdate, RgpRestoreRequest>>;
+    EppObject<CommandWithExtension<DomainUpdateRequest, RgpRestoreRequest>>;
 
 /// Type corresponding to the &lt;restore&gt; tag for an rgp restore request
 #[derive(Serialize, Deserialize, Debug)]
@@ -82,9 +82,9 @@ pub struct RgpRestoreRequest {
 impl EppDomainRgpRestoreRequest {
     /// Creates a new EppObject for domain rgp restore request corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppDomainRgpRestoreRequest {
-        let command = CommandWithExtension::<DomainUpdate, RgpRestoreRequest> {
-            command: DomainUpdate {
-                domain: DomainUpdateData {
+        let command = CommandWithExtension::<DomainUpdateRequest, RgpRestoreRequest> {
+            command: DomainUpdateRequest {
+                domain: DomainUpdateRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
                     add: None,
