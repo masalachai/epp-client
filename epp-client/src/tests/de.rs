@@ -14,7 +14,7 @@ mod response {
     use crate::domain::delete::DomainDelete;
     use crate::domain::info::DomainInfo;
     use crate::domain::renew::DomainRenew;
-    use crate::domain::rgp::request::EppDomainRgpRestoreRequestResponse;
+    use crate::domain::rgp::request::RgpRestoreRequest;
     use crate::domain::transfer::DomainTransferApprove;
     use crate::domain::transfer::DomainTransferCancel;
     use crate::domain::transfer::DomainTransferQuery;
@@ -639,13 +639,13 @@ mod response {
     #[test]
     fn rgp_restore_response() {
         let xml = get_xml("response/domain/rgp_restore.xml").unwrap();
-        let object = EppDomainRgpRestoreRequestResponse::deserialize(xml.as_str()).unwrap();
+        let object = DomainUpdate::<RgpRestoreRequest>::deserialize_response(xml.as_str()).unwrap();
 
-        let ext = object.data.extension.unwrap();
+        let ext = object.extension.unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(ext.data.rgp_status.status, "pendingRestore".to_string());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 }

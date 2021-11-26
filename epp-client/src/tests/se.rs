@@ -21,8 +21,8 @@ mod request {
     use crate::domain::delete::DomainDelete;
     use crate::domain::info::DomainInfo;
     use crate::domain::renew::DomainRenew;
-    use crate::domain::rgp::report::EppDomainRgpRestoreReport;
-    use crate::domain::rgp::request::EppDomainRgpRestoreRequest;
+    use crate::domain::rgp::report::RgpRestoreReport;
+    use crate::domain::rgp::request::RgpRestoreRequest;
     use crate::domain::transfer::DomainTransferApprove;
     use crate::domain::transfer::DomainTransferCancel;
     use crate::domain::transfer::DomainTransferQuery;
@@ -524,9 +524,19 @@ mod request {
     fn rgp_restore_request() {
         let xml = get_xml("request/domain/rgp_restore_request.xml").unwrap();
 
-        let object = EppDomainRgpRestoreRequest::new("eppdev.com", CLTRID);
+        let domain_restore_request = RgpRestoreRequest::new();
 
-        let serialized = object.serialize().unwrap();
+        let mut object = DomainUpdate::<RgpRestoreReport>::new("eppdev.com")
+            .with_extension(domain_restore_request);
+
+        let change_info = DomainChangeInfo {
+            registrant: None,
+            auth_info: None,
+        };
+
+        object.info(change_info);
+
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -548,8 +558,7 @@ mod request {
         ];
         let other = "Supporting information goes here.";
 
-        let object = EppDomainRgpRestoreReport::new(
-            "eppdev.com",
+        let domain_restore_report = RgpRestoreReport::new(
             pre_data,
             post_data,
             deleted_at,
@@ -557,10 +566,19 @@ mod request {
             restore_reason,
             statements,
             other,
-            CLTRID,
         );
 
-        let serialized = object.serialize().unwrap();
+        let mut object = DomainUpdate::<RgpRestoreReport>::new("eppdev.com")
+            .with_extension(domain_restore_report);
+
+        let change_info = DomainChangeInfo {
+            registrant: None,
+            auth_info: None,
+        };
+
+        object.info(change_info);
+
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
