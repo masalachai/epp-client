@@ -1,7 +1,5 @@
 //! Types for EPP responses
 
-pub mod message;
-
 use epp_client_macros::*;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::Debug;
