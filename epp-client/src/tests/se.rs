@@ -31,6 +31,7 @@ mod request {
     use crate::epp::xml::EppXml;
     use crate::epp::*;
     use crate::host::check::EppHostCheck;
+    use crate::host::create::EppHostCreate;
     use chrono::{DateTime, NaiveDate};
     use std::str::FromStr;
 

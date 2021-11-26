@@ -5,6 +5,7 @@ use epp_client_macros::*;
 use crate::epp::object::data::HostAddr;
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -18,7 +19,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::epp::object::data::HostAddr;
-/// use epp_client::epp::{EppHostCreate, EppHostCreateResponse};
+/// use epp_client::host::create::{EppHostCreate, EppHostCreateResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -61,11 +62,31 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppHostCreate = EppObject<Command<HostCreate>>;
+pub type EppHostCreate = EppObject<Command<HostCreateRequest>>;
+
+impl EppHostCreate {
+    /// Creates a new EppObject for host create corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(host: &str, addresses: Vec<HostAddr>, client_tr_id: &str) -> EppHostCreate {
+        let host_create = HostCreateRequest {
+            host: HostCreateRequestData {
+                xmlns: EPP_HOST_XMLNS.to_string(),
+                name: host.into(),
+                addresses: Some(addresses),
+            },
+        };
+
+        EppObject::build(Command::<HostCreateRequest>::new(host_create, client_tr_id))
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML host create response
+pub type EppHostCreateResponse = EppObject<CommandResponse<HostCreateResponse>>;
+
+// Request
 
 /// Type for data under the host &lt;create&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HostCreateData {
+pub struct HostCreateRequestData {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host", alias = "xmlns")]
     xmlns: String,
@@ -80,23 +101,31 @@ pub struct HostCreateData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "create")]
 /// Type for EPP XML &lt;create&gt; command for hosts
-pub struct HostCreate {
+pub struct HostCreateRequest {
     /// The instance holding the data for the host to be created
     #[serde(rename = "host:create", alias = "create")]
-    host: HostCreateData,
+    host: HostCreateRequestData,
 }
 
-impl EppHostCreate {
-    /// Creates a new EppObject for host create corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(host: &str, addresses: Vec<HostAddr>, client_tr_id: &str) -> EppHostCreate {
-        let host_create = HostCreate {
-            host: HostCreateData {
-                xmlns: EPP_HOST_XMLNS.to_string(),
-                name: host.into(),
-                addresses: Some(addresses),
-            },
-        };
+// Response
 
-        EppObject::build(Command::<HostCreate>::new(host_create, client_tr_id))
-    }
+/// Type that represents the &lt;creData&gt; tag for host create response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostCreateData {
+    /// XML namespace for host response data
+    #[serde(rename = "xmlns:host")]
+    xmlns: String,
+    /// The host name
+    pub name: StringValue,
+    /// The host creation date
+    #[serde(rename = "crDate")]
+    pub created_at: StringValue,
+}
+
+/// Type that represents the &lt;resData&gt; tag for host check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostCreateResponse {
+    /// Data under the &lt;creData&gt; tag
+    #[serde(rename = "creData")]
+    pub create_data: HostCreateData,
 }
