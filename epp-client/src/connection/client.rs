@@ -55,8 +55,8 @@ use crate::error;
 use crate::hello::{EppGreeting, EppHello};
 use crate::login::{EppLogin, EppLoginResponse};
 use crate::logout::{EppLogout, EppLogoutResponse};
-use crate::request::generate_client_tr_id;
-use crate::response::{EppCommandResponse, EppCommandResponseError};
+use crate::request::{generate_client_tr_id, EppExtension, EppRequest};
+use crate::response::{CommandResponseWithExtension, EppCommandResponse, EppCommandResponseError};
 use crate::xml::EppXml;
 /// Instances of the EppClient type are used to transact with the registry.
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
@@ -157,6 +157,22 @@ impl EppClient {
             let epp_error = EppCommandResponseError::deserialize(&response)?;
             Err(error::Error::EppCommandError(epp_error))
         }
+    }
+
+    pub async fn transact_new<T, E>(
+        &mut self,
+        request: T,
+        id: &str,
+    ) -> Result<CommandResponseWithExtension<<T as EppRequest<E>>::Output, E::Response>, error::Error>
+    where
+        T: EppRequest<E> + Debug,
+        E: EppExtension,
+    {
+        let epp_xml = request.serialize_request(id)?;
+
+        let response = self.connection.transact(&epp_xml).await?;
+
+        T::deserialize_response(&response)
     }
 
     /// Fetches the username used in the registry connection
