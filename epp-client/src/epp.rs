@@ -5,7 +5,6 @@ pub mod request;
 pub mod response;
 pub mod xml;
 
-pub use request::host::check::*;
 pub use request::host::create::*;
 pub use request::host::delete::*;
 pub use request::host::info::*;
@@ -13,7 +12,6 @@ pub use request::host::update::*;
 pub use request::message::ack::*;
 pub use request::message::poll::*;
 
-pub use response::host::check::*;
 pub use response::host::create::*;
 pub use response::host::delete::*;
 pub use response::host::info::*;
