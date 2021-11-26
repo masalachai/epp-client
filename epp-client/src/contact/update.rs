@@ -6,6 +6,7 @@ use crate::contact::info::EppContactInfoResponse;
 use crate::epp::object::data::{ContactAuthInfo, ContactStatus, Phone, PostalInfo};
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use crate::error;
 use serde::{Deserialize, Serialize};
@@ -19,7 +20,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppContactUpdate, EppContactUpdateResponse};
+/// use epp_client::contact::update::{EppContactUpdate, EppContactUpdateResponse};
 /// use epp_client::epp::generate_client_tr_id;
 /// use epp_client::epp::object::data::ContactStatus;
 ///
@@ -68,59 +69,13 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppContactUpdate = EppObject<Command<ContactUpdate>>;
-
-/// Type for elements under the &lt;chg&gt; tag for contact update request
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ContactChangeInfo {
-    #[serde(rename = "contact:postalInfo", alias = "postalInfo")]
-    postal_info: Option<PostalInfo>,
-    #[serde(rename = "contact:voice", alias = "voice")]
-    voice: Option<Phone>,
-    #[serde(rename = "contact:fax", alias = "fax")]
-    fax: Option<Phone>,
-    #[serde(rename = "contact:email", alias = "email")]
-    email: Option<StringValue>,
-    #[serde(rename = "contact:authInfo", alias = "authInfo")]
-    auth_info: Option<ContactAuthInfo>,
-}
-
-/// Type for list of elements of the &lt;status&gt; tag for contact update request
-#[derive(Serialize, Deserialize, Debug)]
-pub struct StatusList {
-    #[serde(rename = "contact:status", alias = "status")]
-    status: Vec<ContactStatus>,
-}
-
-/// Type for elements under the contact &lt;update&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ContactUpdateData {
-    #[serde(rename = "xmlns:contact", alias = "xmlns")]
-    xmlns: String,
-    #[serde(rename = "contact:id", alias = "id")]
-    id: StringValue,
-    #[serde(rename = "contact:add", alias = "add")]
-    add_statuses: Option<StatusList>,
-    #[serde(rename = "contact:rem", alias = "rem")]
-    remove_statuses: Option<StatusList>,
-    #[serde(rename = "contact:chg", alias = "chg")]
-    change_info: Option<ContactChangeInfo>,
-}
-
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "update")]
-/// Type for EPP XML &lt;update&gt; command for contacts
-pub struct ContactUpdate {
-    /// The data under the &lt;update&gt; tag for the contact update
-    #[serde(rename = "contact:update", alias = "update")]
-    contact: ContactUpdateData,
-}
+pub type EppContactUpdate = EppObject<Command<ContactUpdateRequest>>;
 
 impl EppContactUpdate {
     /// Creates a new EppObject for contact update corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(id: &str, client_tr_id: &str) -> EppContactUpdate {
-        let contact_update = ContactUpdate {
-            contact: ContactUpdateData {
+        let contact_update = ContactUpdateRequest {
+            contact: ContactUpdateRequestData {
                 xmlns: EPP_CONTACT_XMLNS.to_string(),
                 id: id.into(),
                 add_statuses: None,
@@ -128,7 +83,10 @@ impl EppContactUpdate {
                 change_info: None,
             },
         };
-        EppObject::build(Command::<ContactUpdate>::new(contact_update, client_tr_id))
+        EppObject::build(Command::<ContactUpdateRequest>::new(
+            contact_update,
+            client_tr_id,
+        ))
     }
 
     /// Sets the data for the &lt;chg&gt; tag for the contact update request
@@ -186,4 +144,53 @@ impl EppContactUpdate {
             )),
         }
     }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML contact update response
+pub type EppContactUpdateResponse = EppCommandResponse;
+
+/// Type for elements under the &lt;chg&gt; tag for contact update request
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ContactChangeInfo {
+    #[serde(rename = "contact:postalInfo", alias = "postalInfo")]
+    postal_info: Option<PostalInfo>,
+    #[serde(rename = "contact:voice", alias = "voice")]
+    voice: Option<Phone>,
+    #[serde(rename = "contact:fax", alias = "fax")]
+    fax: Option<Phone>,
+    #[serde(rename = "contact:email", alias = "email")]
+    email: Option<StringValue>,
+    #[serde(rename = "contact:authInfo", alias = "authInfo")]
+    auth_info: Option<ContactAuthInfo>,
+}
+
+/// Type for list of elements of the &lt;status&gt; tag for contact update request
+#[derive(Serialize, Deserialize, Debug)]
+pub struct StatusList {
+    #[serde(rename = "contact:status", alias = "status")]
+    status: Vec<ContactStatus>,
+}
+
+/// Type for elements under the contact &lt;update&gt; tag
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ContactUpdateRequestData {
+    #[serde(rename = "xmlns:contact", alias = "xmlns")]
+    xmlns: String,
+    #[serde(rename = "contact:id", alias = "id")]
+    id: StringValue,
+    #[serde(rename = "contact:add", alias = "add")]
+    add_statuses: Option<StatusList>,
+    #[serde(rename = "contact:rem", alias = "rem")]
+    remove_statuses: Option<StatusList>,
+    #[serde(rename = "contact:chg", alias = "chg")]
+    change_info: Option<ContactChangeInfo>,
+}
+
+#[derive(Serialize, Deserialize, Debug, ElementName)]
+#[element_name(name = "update")]
+/// Type for EPP XML &lt;update&gt; command for contacts
+pub struct ContactUpdateRequest {
+    /// The data under the &lt;update&gt; tag for the contact update
+    #[serde(rename = "contact:update", alias = "update")]
+    contact: ContactUpdateRequestData,
 }
