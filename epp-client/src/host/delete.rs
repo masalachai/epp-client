@@ -4,6 +4,7 @@ use epp_client_macros::*;
 
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +17,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppHostDelete, EppHostDeleteResponse};
+/// use epp_client::host::delete::{EppHostDelete, EppHostDeleteResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -53,11 +54,29 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppHostDelete = EppObject<Command<HostDelete>>;
+pub type EppHostDelete = EppObject<Command<HostDeleteRequest>>;
+
+impl EppHostDelete {
+    /// Creates a new EppObject for host delete corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(name: &str, client_tr_id: &str) -> EppHostDelete {
+        EppObject::build(Command::<HostDeleteRequest>::new(
+            HostDeleteRequest {
+                host: HostDeleteRequestData {
+                    xmlns: EPP_HOST_XMLNS.to_string(),
+                    name: name.into(),
+                },
+            },
+            client_tr_id,
+        ))
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML host delete response
+pub type EppHostDeleteResponse = EppCommandResponse;
 
 /// Type for data under the host &lt;delete&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HostDeleteData {
+pub struct HostDeleteRequestData {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host", alias = "xmlns")]
     xmlns: String,
@@ -69,23 +88,8 @@ pub struct HostDeleteData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "delete")]
 /// Type for EPP XML &lt;delete&gt; command for hosts
-pub struct HostDelete {
+pub struct HostDeleteRequest {
     /// The instance holding the data for the host to be deleted
     #[serde(rename = "host:delete", alias = "delete")]
-    host: HostDeleteData,
-}
-
-impl EppHostDelete {
-    /// Creates a new EppObject for host delete corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppHostDelete {
-        EppObject::build(Command::<HostDelete>::new(
-            HostDelete {
-                host: HostDeleteData {
-                    xmlns: EPP_HOST_XMLNS.to_string(),
-                    name: name.into(),
-                },
-            },
-            client_tr_id,
-        ))
-    }
+    host: HostDeleteRequestData,
 }
