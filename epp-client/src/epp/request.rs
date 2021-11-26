@@ -4,10 +4,13 @@ use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
 
-use crate::epp::object::{
-    ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
+use crate::{
+    common::{
+        ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services,
+        StringValue,
+    },
+    epp::xml::{EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION},
 };
-use crate::epp::xml::{EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION};
 use epp_client_macros::*;
 
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request

@@ -2,8 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::Period;
-use crate::epp::object::{ElementName, EppObject, StringValue};
+use crate::common::{ElementName, EppObject, Period, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
