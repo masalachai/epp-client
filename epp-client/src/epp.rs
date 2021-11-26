@@ -5,7 +5,6 @@ pub mod request;
 pub mod response;
 pub mod xml;
 
-pub use request::contact::check::*;
 pub use request::contact::create::*;
 pub use request::contact::delete::*;
 pub use request::contact::info::*;
@@ -18,7 +17,6 @@ pub use request::host::update::*;
 pub use request::message::ack::*;
 pub use request::message::poll::*;
 
-pub use response::contact::check::*;
 pub use response::contact::create::*;
 pub use response::contact::delete::*;
 pub use response::contact::info::*;
