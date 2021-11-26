@@ -20,6 +20,7 @@ mod response {
     use crate::domain::transfer::DomainTransferReject;
     use crate::domain::transfer::DomainTransferRequest;
     use crate::domain::update::DomainUpdate;
+    use crate::extensions::namestore::NameStore;
     use crate::extensions::rgp::request::RgpRestoreRequest;
     use crate::hello::ExpiryType;
     use crate::hello::Greeting;
@@ -644,5 +645,16 @@ mod response {
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(ext.data.rgp_status.status, "pendingRestore".to_string());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+
+    #[test]
+    fn namestore() {
+        let xml = get_xml("response/extensions/namestore.xml").unwrap();
+
+        let object = DomainCheck::<NameStore>::deserialize_response(xml.as_str()).unwrap();
+
+        let ext = object.extension.unwrap();
+
+        assert_eq!(ext.data.subproduct, "com".into());
     }
 }
