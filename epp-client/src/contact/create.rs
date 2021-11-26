@@ -5,6 +5,7 @@ use epp_client_macros::*;
 use crate::epp::object::data;
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -18,7 +19,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::epp::object::data::{Address, Phone, PostalInfo};
-/// use epp_client::epp::{EppContactCreate, EppContactCreateResponse};
+/// use epp_client::contact::create::{EppContactCreate, EppContactCreateResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -72,7 +73,46 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppContactCreate = EppObject<Command<ContactCreate>>;
+pub type EppContactCreate = EppObject<Command<ContactCreateRequest>>;
+
+impl EppContactCreate {
+    /// Creates a new EppObject for contact create corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(
+        id: &str,
+        email: &str,
+        postal_info: data::PostalInfo,
+        voice: data::Phone,
+        auth_password: &str,
+        client_tr_id: &str,
+    ) -> EppContactCreate {
+        let contact_create = ContactCreateRequest {
+            contact: Contact {
+                xmlns: EPP_CONTACT_XMLNS.to_string(),
+                id: id.into(),
+                postal_info,
+                voice,
+                fax: None,
+                email: email.into(),
+                auth_info: data::ContactAuthInfo::new(auth_password),
+            },
+        };
+
+        EppObject::build(Command::<ContactCreateRequest>::new(
+            contact_create,
+            client_tr_id,
+        ))
+    }
+
+    /// Sets the &lt;fax&gt; data for the request
+    pub fn set_fax(&mut self, fax: data::Phone) {
+        self.data.command.contact.fax = Some(fax);
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML contact create response
+pub type EppContactCreateResponse = EppObject<CommandResponse<ContactCreateResult>>;
+
+// Request
 
 /// Type for elements under the contact &lt;create&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
@@ -103,39 +143,31 @@ pub struct Contact {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "create")]
 /// Type for EPP XML &lt;create&gt; command for contacts
-pub struct ContactCreate {
+pub struct ContactCreateRequest {
     /// Data for &lt;create&gt; command for contact
     #[serde(rename = "contact:create", alias = "create")]
     pub contact: Contact,
 }
 
-impl EppContactCreate {
-    /// Creates a new EppObject for contact create corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(
-        id: &str,
-        email: &str,
-        postal_info: data::PostalInfo,
-        voice: data::Phone,
-        auth_password: &str,
-        client_tr_id: &str,
-    ) -> EppContactCreate {
-        let contact_create = ContactCreate {
-            contact: Contact {
-                xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.into(),
-                postal_info,
-                voice,
-                fax: None,
-                email: email.into(),
-                auth_info: data::ContactAuthInfo::new(auth_password),
-            },
-        };
+// Response
 
-        EppObject::build(Command::<ContactCreate>::new(contact_create, client_tr_id))
-    }
+/// Type that represents the &lt;creData&gt; tag for contact create response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ContactCreateData {
+    /// XML namespace for contact response data
+    #[serde(rename = "xmlns:contact")]
+    xmlns: String,
+    /// The contact id
+    pub id: StringValue,
+    #[serde(rename = "crDate")]
+    /// The contact creation date
+    pub created_at: StringValue,
+}
 
-    /// Sets the &lt;fax&gt; data for the request
-    pub fn set_fax(&mut self, fax: data::Phone) {
-        self.data.command.contact.fax = Some(fax);
-    }
+/// Type that represents the &lt;resData&gt; tag for contact create response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ContactCreateResult {
+    /// Data under the &lt;creData&gt; tag
+    #[serde(rename = "creData")]
+    pub create_data: ContactCreateData,
 }
