@@ -522,7 +522,7 @@ mod request {
 
     #[test]
     fn rgp_restore_request() {
-        let xml = get_xml("request/domain/rgp_restore_request.xml").unwrap();
+        let xml = get_xml("request/extensions/rgp_restore_request.xml").unwrap();
 
         let domain_restore_request = RgpRestoreRequest::new();
 
@@ -543,7 +543,7 @@ mod request {
 
     #[test]
     fn rgp_restore_report() {
-        let xml = get_xml("request/domain/rgp_restore_report.xml").unwrap();
+        let xml = get_xml("request/extensions/rgp_restore_report.xml").unwrap();
 
         let pre_data =
             "Pre-delete registration data goes here. Both XML and free text are allowed.";

@@ -635,7 +635,7 @@ mod response {
 
     #[test]
     fn rgp_restore_response() {
-        let xml = get_xml("response/domain/rgp_restore.xml").unwrap();
+        let xml = get_xml("response/extensions/rgp_restore.xml").unwrap();
         let object = DomainUpdate::<RgpRestoreRequest>::deserialize_response(xml.as_str()).unwrap();
 
         let ext = object.extension.unwrap();
