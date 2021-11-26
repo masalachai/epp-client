@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EmptyTag, EppObject, Extension};
+use crate::common::{ElementName, EppObject, Extension, NoExtension};
 use crate::domain::rgp::EPP_DOMAIN_RGP_EXT_XMLNS;
 use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
 use crate::domain::EPP_DOMAIN_XMLNS;
@@ -95,7 +95,7 @@ impl EppDomainRgpRestoreRequest {
 
 /// Type that represents the &lt;epp&gt; tag for the EPP XML rgp restore request response
 pub type EppDomainRgpRestoreRequestResponse =
-    EppObject<CommandResponseWithExtension<EmptyTag, RgpRequestResponse>>;
+    EppObject<CommandResponseWithExtension<NoExtension, RgpRequestResponse>>;
 
 // Request
 
