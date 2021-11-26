@@ -7,6 +7,7 @@ mod response {
     use crate::domain::create::EppDomainCreateResponse;
     use crate::domain::delete::EppDomainDeleteResponse;
     use crate::domain::info::EppDomainInfoResponse;
+    use crate::domain::renew::EppDomainRenewResponse;
     use crate::epp::response::ExpiryType;
     use crate::epp::response::Relative;
     use crate::epp::response::{
