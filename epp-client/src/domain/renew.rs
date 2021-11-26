@@ -3,9 +3,9 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, Period, StringValue};
-use crate::epp::request::Command;
-use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
+use crate::request::Command;
+use crate::response::CommandResponse;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 

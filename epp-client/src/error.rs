@@ -1,6 +1,6 @@
 //! Error types to wrap internal errors and make EPP errors easier to read
 
-use crate::epp::response::EppCommandResponseError;
+use crate::response::EppCommandResponseError;
 use std::fmt::Display;
 
 /// Error enum holding the possible error types

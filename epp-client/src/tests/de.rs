@@ -20,11 +20,6 @@ mod response {
     use crate::domain::transfer::EppDomainTransferRejectResponse;
     use crate::domain::transfer::EppDomainTransferRequestResponse;
     use crate::domain::update::EppDomainUpdateResponse;
-    use crate::epp::response::ExpiryType;
-    use crate::epp::response::Relative;
-    use crate::epp::response::{
-        EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
-    };
     use crate::epp::xml::EppXml;
     use crate::host::check::EppHostCheckResponse;
     use crate::host::create::EppHostCreateResponse;
@@ -33,6 +28,11 @@ mod response {
     use crate::host::update::EppHostUpdateResponse;
     use crate::message::ack::EppMessageAckResponse;
     use crate::message::poll::EppMessagePollResponse;
+    use crate::response::ExpiryType;
+    use crate::response::Relative;
+    use crate::response::{
+        EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
+    };
 
     const SVTRID: &str = "RO-6879-1627224678242975";
     const SUCCESS_MSG: &str = "Command completed successfully";

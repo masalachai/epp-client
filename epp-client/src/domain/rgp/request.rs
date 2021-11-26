@@ -4,9 +4,9 @@ use epp_client_macros::*;
 
 use crate::common::{ElementName, EmptyTag, EppObject, Extension};
 use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
-use crate::epp::request::CommandWithExtension;
-use crate::epp::response::CommandResponseWithExtension;
 use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
+use crate::request::CommandWithExtension;
+use crate::response::CommandResponseWithExtension;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for a domain rgp restore request command

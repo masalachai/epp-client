@@ -3,9 +3,9 @@
 use epp_client_macros::*;
 
 use crate::common::{DomainAuthInfo, ElementName, EppObject, Period, StringValue};
-use crate::epp::request::Command;
-use crate::epp::response::{CommandResponse, EppCommandResponse};
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
+use crate::request::Command;
+use crate::response::{CommandResponse, EppCommandResponse};
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for transfer request for domain

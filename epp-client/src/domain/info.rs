@@ -6,9 +6,9 @@ use crate::common::{
     DomainAuthInfo, DomainContact, DomainStatus, ElementName, EppObject, HostAttr, StringValue,
 };
 use crate::domain::rgp::request::RgpRequestResponse;
-use crate::epp::request::Command;
-use crate::epp::response::CommandResponseWithExtension;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
+use crate::request::Command;
+use crate::response::CommandResponseWithExtension;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;info&gt; command

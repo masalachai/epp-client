@@ -3,9 +3,9 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, StringValue};
-use crate::epp::request::Command;
-use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
+use crate::request::Command;
+use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;delete&gt; command

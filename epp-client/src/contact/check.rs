@@ -2,8 +2,8 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, StringValue};
-use crate::epp::request::Command;
-use crate::epp::response::CommandResponse;
+use crate::request::Command;
+use crate::response::CommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
