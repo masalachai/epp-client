@@ -4,6 +4,7 @@ use epp_client_macros::*;
 
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_HOST_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +17,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppHostCheck, EppHostCheckResponse};
+/// use epp_client::host::check::{EppHostCheck, EppHostCheckResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -56,7 +57,28 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppHostCheck = EppObject<Command<HostCheck>>;
+pub type EppHostCheck = EppObject<Command<HostCheckRequest>>;
+
+impl EppHostCheck {
+    /// Creates a new EppObject for host check corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(hosts: &[&str], client_tr_id: &str) -> EppHostCheck {
+        let hosts = hosts.iter().map(|&d| d.into()).collect();
+
+        let host_check = HostCheckRequest {
+            list: HostList {
+                xmlns: EPP_HOST_XMLNS.to_string(),
+                hosts,
+            },
+        };
+
+        EppObject::build(Command::<HostCheckRequest>::new(host_check, client_tr_id))
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML host check response
+pub type EppHostCheckResponse = EppObject<CommandResponse<HostCheckResult>>;
+
+// Request
 
 /// Type for data under the host &lt;check&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
@@ -72,24 +94,50 @@ pub struct HostList {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
 /// Type for EPP XML &lt;check&gt; command for hosts
-pub struct HostCheck {
+pub struct HostCheckRequest {
     /// The instance holding the list of hosts to be checked
     #[serde(rename = "host:check", alias = "check")]
     list: HostList,
 }
 
-impl EppHostCheck {
-    /// Creates a new EppObject for host check corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(hosts: &[&str], client_tr_id: &str) -> EppHostCheck {
-        let hosts = hosts.iter().map(|&d| d.into()).collect();
+// Response
 
-        let host_check = HostCheck {
-            list: HostList {
-                xmlns: EPP_HOST_XMLNS.to_string(),
-                hosts,
-            },
-        };
+/// Type that represents the &lt;name&gt; tag for host check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostCheck {
+    /// The host name
+    #[serde(rename = "$value")]
+    pub name: StringValue,
+    /// The host (un)availability
+    #[serde(rename = "avail")]
+    pub available: u16,
+}
 
-        EppObject::build(Command::<HostCheck>::new(host_check, client_tr_id))
-    }
+/// Type that represents the &lt;cd&gt; tag for host check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostCheckDataItem {
+    /// Data under the &lt;name&gt; tag
+    #[serde(rename = "name")]
+    pub host: HostCheck,
+    /// The reason for (un)availability
+    pub reason: Option<StringValue>,
+}
+
+/// Type that represents the &lt;chkData&gt; tag for host check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostCheckData {
+    /// XML namespace for host response data
+    #[serde(rename = "xmlns:host")]
+    xmlns: String,
+    /// Data under the &lt;cd&gt; tag
+    #[serde(rename = "cd")]
+    pub host_list: Vec<HostCheckDataItem>,
+}
+
+/// Type that represents the &lt;resData&gt; tag for host check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HostCheckResult {
+    /// Data under the &lt;chkData&gt; tag
+    #[serde(rename = "chkData")]
+    pub check_data: HostCheckData,
 }

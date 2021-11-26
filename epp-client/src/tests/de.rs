@@ -27,6 +27,7 @@ mod response {
     };
     use crate::epp::xml::EppXml;
     use crate::epp::*;
+    use crate::host::check::EppHostCheckResponse;
 
     const SVTRID: &str = "RO-6879-1627224678242975";
     const SUCCESS_MSG: &str = "Command completed successfully";
