@@ -6,6 +6,7 @@ mod response {
     use crate::contact::check::EppContactCheckResponse;
     use crate::contact::create::EppContactCreateResponse;
     use crate::contact::delete::EppContactDeleteResponse;
+    use crate::contact::info::EppContactInfoResponse;
     use crate::domain::check::EppDomainCheckResponse;
     use crate::domain::create::EppDomainCreateResponse;
     use crate::domain::delete::EppDomainDeleteResponse;
