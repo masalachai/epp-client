@@ -7,6 +7,7 @@ mod request {
     use crate::contact::create::EppContactCreate;
     use crate::contact::delete::EppContactDelete;
     use crate::contact::info::EppContactInfo;
+    use crate::contact::update::EppContactUpdate;
     use crate::domain::check::EppDomainCheck;
     use crate::domain::create::EppDomainCreate;
     use crate::domain::delete::EppDomainDelete;

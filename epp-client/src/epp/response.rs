@@ -1,6 +1,5 @@
 //! Types for EPP responses
 
-pub mod contact;
 pub mod host;
 pub mod message;
 

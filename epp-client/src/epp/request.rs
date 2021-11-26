@@ -1,6 +1,5 @@
 //! Types for EPP requests
 
-pub mod contact;
 pub mod host;
 pub mod message;
 
