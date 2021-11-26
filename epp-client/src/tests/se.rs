@@ -27,7 +27,6 @@ mod request {
     use crate::domain::update::DomainAddRemove;
     use crate::domain::update::DomainChangeInfo;
     use crate::domain::update::EppDomainUpdate;
-    use crate::epp::xml::EppXml;
     use crate::host::check::EppHostCheck;
     use crate::host::create::EppHostCreate;
     use crate::host::delete::EppHostDelete;
@@ -38,6 +37,7 @@ mod request {
     use crate::message::ack::EppMessageAck;
     use crate::message::poll::EppMessagePoll;
     use crate::request::{EppHello, EppLogin, EppLogout};
+    use crate::xml::EppXml;
     use chrono::{DateTime, NaiveDate};
     use std::str::FromStr;
 

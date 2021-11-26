@@ -2,9 +2,9 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, StringValue};
+use crate::contact::EPP_CONTACT_XMLNS;
 use crate::request::Command;
 use crate::response::CommandResponse;
-use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for contact &lt;check&gt; command
@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::contact::check::{EppContactCheck, EppContactCheckResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {

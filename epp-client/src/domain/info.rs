@@ -2,11 +2,11 @@
 
 use epp_client_macros::*;
 
+use super::EPP_DOMAIN_XMLNS;
 use crate::common::{
     DomainAuthInfo, DomainContact, DomainStatus, ElementName, EppObject, HostAttr, StringValue,
 };
 use crate::domain::rgp::request::RgpRequestResponse;
-use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use crate::request::Command;
 use crate::response::CommandResponseWithExtension;
 use serde::{Deserialize, Serialize};
@@ -21,7 +21,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::domain::info::{EppDomainInfo, EppDomainInfoResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {

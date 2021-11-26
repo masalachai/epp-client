@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, HostAddr, StringValue};
-use crate::epp::xml::EPP_HOST_XMLNS;
+use crate::host::EPP_HOST_XMLNS;
 use crate::request::Command;
 use crate::response::CommandResponse;
 use serde::{Deserialize, Serialize};
@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::EppClient;
 /// use epp_client::common::HostAddr;
 /// use epp_client::host::create::{EppHostCreate, EppHostCreateResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {

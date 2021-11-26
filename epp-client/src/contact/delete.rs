@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, StringValue};
-use crate::epp::xml::EPP_CONTACT_XMLNS;
+use crate::contact::EPP_CONTACT_XMLNS;
 use crate::request::Command;
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::contact::delete::{EppContactDelete, EppContactDeleteResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {

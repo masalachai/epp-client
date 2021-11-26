@@ -2,8 +2,8 @@
 
 use epp_client_macros::*;
 
+use super::EPP_DOMAIN_XMLNS;
 use crate::common::{DomainAuthInfo, ElementName, EppObject, Period, StringValue};
-use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use crate::request::Command;
 use crate::response::{CommandResponse, EppCommandResponse};
 use serde::{Deserialize, Serialize};
@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::{EppDomainTransferRequest, EppDomainTransferRequestResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -68,7 +68,7 @@ pub type EppDomainTransferRequest = EppObject<Command<DomainTransferRequest>>;
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::{EppDomainTransferApprove, EppDomainTransferApproveResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -118,7 +118,7 @@ pub type EppDomainTransferApprove = EppObject<Command<DomainTransferRequest>>;
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::{EppDomainTransferReject, EppDomainTransferRejectResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -168,7 +168,7 @@ pub type EppDomainTransferReject = EppObject<Command<DomainTransferRequest>>;
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::{EppDomainTransferCancel, EppDomainTransferCancelResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -218,7 +218,7 @@ pub type EppDomainTransferCancel = EppObject<Command<DomainTransferRequest>>;
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::{EppDomainTransferQuery, EppDomainTransferQueryResponse};
-/// use epp_client::epp::generate_client_tr_id;
+/// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
 /// async fn main() {

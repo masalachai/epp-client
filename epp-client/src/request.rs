@@ -9,9 +9,14 @@ use crate::{
         ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services,
         StringValue,
     },
-    epp::xml::{EPP_CONTACT_XMLNS, EPP_DOMAIN_XMLNS, EPP_HOST_XMLNS, EPP_LANG, EPP_VERSION},
+    contact::EPP_CONTACT_XMLNS,
+    domain::EPP_DOMAIN_XMLNS,
+    host::EPP_HOST_XMLNS,
 };
 use epp_client_macros::*;
+
+pub const EPP_VERSION: &str = "1.0";
+pub const EPP_LANG: &str = "en";
 
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// without an &lt;extension&gt; tag
