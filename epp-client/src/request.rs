@@ -1,14 +1,59 @@
 //! Types for EPP requests
 
-use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
+use serde::{de::DeserializeOwned, ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
+use std::fmt::Debug;
 use std::time::SystemTime;
 
-use crate::common::{ElementName, EmptyTag, Extension, StringValue};
+use crate::{
+    common::{ElementName, EmptyTag, EppObject, Extension, StringValue},
+    response::{CommandResponseStatus, CommandResponseWithExtension},
+    xml::EppXml,
+};
 use epp_client_macros::ElementName;
 
 pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
+
+/// Trait to set correct value for xml tags when tags are being generated from generic types
+pub trait EppRequest<E: EppExtension>: Sized + Debug {
+    type Input: ElementName + DeserializeOwned + Serialize + Sized + Debug;
+    type Output: DeserializeOwned + Serialize + Debug;
+
+    fn into_parts(self) -> (Self::Input, Option<E>);
+
+    fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+        let (command, extension) = self.into_parts();
+        let extension = extension.map(|data| Extension { data });
+        EppXml::serialize(&EppObject::build(CommandWithExtension {
+            command,
+            extension,
+            client_tr_id: client_tr_id.into(),
+        }))
+    }
+
+    fn deserialize_response(
+        epp_xml: &str,
+    ) -> Result<CommandResponseWithExtension<Self::Output, E::Response>, crate::error::Error> {
+        let rsp =
+            <EppObject<CommandResponseWithExtension<Self::Output, E::Response>> as EppXml>::deserialize(
+                epp_xml,
+            )?;
+        match rsp.data.result.code {
+            0..=2000 => Ok(rsp.data),
+            _ => Err(crate::error::Error::EppCommandError(EppObject::build(
+                CommandResponseStatus {
+                    result: rsp.data.result,
+                    tr_ids: rsp.data.tr_ids,
+                },
+            ))),
+        }
+    }
+}
+
+pub trait EppExtension: ElementName + DeserializeOwned + Serialize + Sized + Debug {
+    type Response: ElementName + DeserializeOwned + Serialize + Debug;
+}
 
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// without an &lt;extension&gt; tag
