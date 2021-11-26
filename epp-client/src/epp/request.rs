@@ -1,7 +1,5 @@
 //! Types for EPP requests
 
-pub mod message;
-
 use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
