@@ -31,6 +31,7 @@ mod response {
     use crate::host::create::EppHostCreateResponse;
     use crate::host::delete::EppHostDeleteResponse;
     use crate::host::info::EppHostInfoResponse;
+    use crate::host::update::EppHostUpdateResponse;
 
     const SVTRID: &str = "RO-6879-1627224678242975";
     const SUCCESS_MSG: &str = "Command completed successfully";
