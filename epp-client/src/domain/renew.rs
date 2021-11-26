@@ -5,6 +5,7 @@ use epp_client_macros::*;
 use crate::epp::object::data::Period;
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
@@ -20,7 +21,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainRenew, EppDomainRenewResponse};
+/// use epp_client::domain::renew::{EppDomainRenew, EppDomainRenewResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -60,11 +61,44 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainRenew = EppObject<Command<DomainRenew>>;
+pub type EppDomainRenew = EppObject<Command<DomainRenewRequest>>;
+
+impl EppDomainRenew {
+    /// Creates a new EppObject for domain renew corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(
+        name: &str,
+        current_expiry_date: NaiveDate,
+        years: u16,
+        client_tr_id: &str,
+    ) -> EppDomainRenew {
+        let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();
+
+        EppObject::build(Command::<DomainRenewRequest>::new(
+            DomainRenewRequest {
+                domain: DomainRenewRequestData {
+                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    name: name.into(),
+                    current_expiry_date: exp_date_str,
+                    period: Period::new(years),
+                },
+            },
+            client_tr_id,
+        ))
+    }
+
+    pub fn set_period(&mut self, period: Period) {
+        self.data.command.domain.period = period;
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain renew response
+pub type EppDomainRenewResponse = EppObject<CommandResponse<DomainRenewResponse>>;
+
+// Request
 
 /// Type for data under the domain &lt;renew&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DomainRenewData {
+pub struct DomainRenewRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain", alias = "xmlns")]
     xmlns: String,
@@ -82,36 +116,31 @@ pub struct DomainRenewData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "renew")]
 /// Type for EPP XML &lt;renew&gt; command for domains
-pub struct DomainRenew {
+pub struct DomainRenewRequest {
     /// The data under the &lt;renew&gt; tag for the domain renewal
     #[serde(rename = "domain:renew", alias = "renew")]
-    domain: DomainRenewData,
+    domain: DomainRenewRequestData,
 }
 
-impl EppDomainRenew {
-    /// Creates a new EppObject for domain renew corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(
-        name: &str,
-        current_expiry_date: NaiveDate,
-        years: u16,
-        client_tr_id: &str,
-    ) -> EppDomainRenew {
-        let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();
+// Response
 
-        EppObject::build(Command::<DomainRenew>::new(
-            DomainRenew {
-                domain: DomainRenewData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.into(),
-                    current_expiry_date: exp_date_str,
-                    period: Period::new(years),
-                },
-            },
-            client_tr_id,
-        ))
-    }
+/// Type that represents the &lt;renData&gt; tag for domain renew response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainRenewResponseData {
+    /// XML namespace for domain response data
+    #[serde(rename = "xmlns:domain")]
+    xmlns: String,
+    /// The name of the domain
+    pub name: StringValue,
+    /// The new expiry date after renewal
+    #[serde(rename = "exDate")]
+    pub expiring_at: StringValue,
+}
 
-    pub fn set_period(&mut self, period: Period) {
-        self.data.command.domain.period = period;
-    }
+/// Type that represents the &lt;resData&gt; tag for domain renew response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainRenewResponse {
+    /// Data under the &lt;renData&gt; tag
+    #[serde(rename = "renData")]
+    pub renew_data: DomainRenewResponseData,
 }
