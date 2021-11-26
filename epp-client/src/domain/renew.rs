@@ -3,11 +3,25 @@
 use epp_client_macros::*;
 
 use super::EPP_DOMAIN_XMLNS;
-use crate::common::{ElementName, EppObject, Period, StringValue};
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::common::{ElementName, NoExtension, Period, StringValue};
+use crate::request::{EppExtension, EppRequest};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct DomainRenew<E> {
+    request: DomainRenewRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for DomainRenew<E> {
+    type Input = DomainRenewRequest;
+    type Output = DomainRenewResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;renew&gt; command
 ///
@@ -20,8 +34,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::domain::renew::{EppDomainRenew, EppDomainRenewResponse};
+/// use epp_client::domain::renew::DomainRenew;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -49,31 +64,22 @@ use serde::{Deserialize, Serialize};
 ///     // Create a date object to set the current expiry date
 ///     let exp_date = NaiveDate::from_ymd(2022, 7, 27);
 ///
-///     // Create an EppDomainRenew instance
-///     let domain_renew = EppDomainRenew::new("eppdev-100.com", exp_date, 1, generate_client_tr_id(&client).as_str());
+///     // Create an DomainRenew instance
+///     let domain_renew = DomainRenew::<NoExtension>::new("eppdev-100.com", exp_date, 1);
 ///
-///     // send it to the registry and receive a response of type EppDomainRenewResponse
-///     let response = client.transact::<_, EppDomainRenewResponse>(&domain_renew).await.unwrap();
+///     // send it to the registry and receive a response of type DomainRenewResponse
+///     let response = client.transact_new(domain_renew, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainRenew = EppObject<Command<DomainRenewRequest>>;
-
-impl EppDomainRenew {
-    /// Creates a new EppObject for domain renew corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(
-        name: &str,
-        current_expiry_date: NaiveDate,
-        years: u16,
-        client_tr_id: &str,
-    ) -> EppDomainRenew {
+impl<E: EppExtension> DomainRenew<E> {
+    pub fn new(name: &str, current_expiry_date: NaiveDate, years: u16) -> DomainRenew<NoExtension> {
         let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();
-
-        EppObject::build(Command::<DomainRenewRequest>::new(
-            DomainRenewRequest {
+        DomainRenew {
+            request: DomainRenewRequest {
                 domain: DomainRenewRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
@@ -81,17 +87,17 @@ impl EppDomainRenew {
                     period: Period::new(years),
                 },
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
     }
 
-    pub fn set_period(&mut self, period: Period) {
-        self.data.command.domain.period = period;
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainRenew<F> {
+        DomainRenew {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML domain renew response
-pub type EppDomainRenewResponse = EppObject<CommandResponse<DomainRenewResponse>>;
 
 // Request
 

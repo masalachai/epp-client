@@ -2,14 +2,33 @@
 
 use epp_client_macros::*;
 
-use crate::common::{
-    DomainAuthInfo, DomainContact, DomainStatus, ElementName, EppObject, HostList, StringValue,
+use crate::{
+    common::{
+        DomainAuthInfo, DomainContact, DomainStatus, ElementName, HostList, NoExtension,
+        StringValue,
+    },
+    request::{EppExtension, EppRequest},
 };
 
 use super::EPP_DOMAIN_XMLNS;
-use crate::request::Command;
+
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct DomainUpdate<E> {
+    request: DomainUpdateRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for DomainUpdate<E> {
+    type Input = DomainUpdateRequest;
+    type Output = EppCommandResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;update&gt; command
 /// with &lt;hostObj&gt; elements in the request for &lt;ns&gt; list
@@ -22,8 +41,9 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::common::{DomainStatus, DomainContact};
-/// use epp_client::domain::update::{EppDomainUpdate, EppDomainUpdateResponse, DomainAddRemove};
+/// use epp_client::domain::update::{DomainUpdate, DomainAddRemove};
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -48,8 +68,8 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppDomainUpdate instance
-///     let mut domain_update = EppDomainUpdate::new("eppdev-100.com", generate_client_tr_id(&client).as_str());
+///     // Create an DomainUpdate instance
+///     let mut domain_update = DomainUpdate::<NoExtension>::new("eppdev-100.com");
 ///
 ///     let add = DomainAddRemove {
 ///         ns: None,
@@ -76,21 +96,17 @@ use serde::{Deserialize, Serialize};
 ///     domain_update.remove(remove);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
-///     let response = client.transact::<_, EppDomainUpdateResponse>(&domain_update).await.unwrap();
+///     let response = client.transact_new(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainUpdate = EppObject<Command<DomainUpdateRequest>>;
-
-impl EppDomainUpdate {
-    /// Creates a new EppObject for domain update corresponding to the &lt;epp&gt; tag in EPP XML
-    /// with the &lt;ns&gt; tag containing &lt;hostObj&gt; tags
-    pub fn new(name: &str, client_tr_id: &str) -> EppDomainUpdate {
-        EppObject::build(Command::<DomainUpdateRequest>::new(
-            DomainUpdateRequest {
+impl<E: EppExtension> DomainUpdate<E> {
+    pub fn new(name: &str) -> DomainUpdate<NoExtension> {
+        DomainUpdate {
+            request: DomainUpdateRequest {
                 domain: DomainUpdateRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
@@ -99,28 +115,32 @@ impl EppDomainUpdate {
                     change_info: None,
                 },
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainUpdate<F> {
+        DomainUpdate {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 
     /// Sets the data for the &lt;chg&gt; tag
     pub fn info(&mut self, info: DomainChangeInfo) {
-        self.data.command.domain.change_info = Some(info);
+        self.request.domain.change_info = Some(info);
     }
 
     /// Sets the data for the &lt;add&gt; tag
     pub fn add(&mut self, add: DomainAddRemove) {
-        self.data.command.domain.add = Some(add);
+        self.request.domain.add = Some(add);
     }
 
     /// Sets the data for the &lt;rem&gt; tag
     pub fn remove(&mut self, remove: DomainAddRemove) {
-        self.data.command.domain.remove = Some(remove);
+        self.request.domain.remove = Some(remove);
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML domain update response
-pub type EppDomainUpdateResponse = EppCommandResponse;
 
 /// Type for elements under the &lt;chg&gt; tag for domain update
 #[derive(Serialize, Deserialize, Debug)]

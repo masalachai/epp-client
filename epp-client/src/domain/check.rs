@@ -3,10 +3,24 @@
 use epp_client_macros::*;
 
 use super::EPP_DOMAIN_XMLNS;
-use crate::common::{ElementName, EppObject, StringValue};
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::common::{ElementName, NoExtension, StringValue};
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct DomainCheck<E> {
+    request: DomainCheckRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for DomainCheck<E> {
+    type Input = DomainCheckRequest;
+    type Output = DomainCheckResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;check&gt; command
 ///
@@ -17,8 +31,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::domain::check::{EppDomainCheck, EppDomainCheckResponse};
+/// use epp_client::domain::check::DomainCheck;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -43,43 +58,42 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppDomainCheck instance
-///     let domain_check = EppDomainCheck::new(
+///     // Create an DomainCheck instance
+///     let domain_check = DomainCheck::<NoExtension>::new(
 ///         vec!["eppdev-100.com", "eppdev-100.net"],
-///         generate_client_tr_id(&client).as_str()
 ///     );
 ///
 ///     // send it to the registry and receive a response of type EppDomainCheckResponse
-///     let response = client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
+///     let response = client.transact_new(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainCheck = EppObject<Command<DomainCheckRequest>>;
-
-impl EppDomainCheck {
-    /// Creates a new EppObject for domain check corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(domains: Vec<&str>, client_tr_id: &str) -> EppDomainCheck {
-        let domains = domains.into_iter().map(|d| d.into()).collect();
-
-        let domain_check = DomainCheckRequest {
-            list: DomainList {
-                xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                domains,
+impl<E: EppExtension> DomainCheck<E> {
+    pub fn new(domains: Vec<&str>) -> DomainCheck<NoExtension> {
+        DomainCheck {
+            request: DomainCheckRequest {
+                list: DomainList {
+                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    domains: domains
+                        .into_iter()
+                        .map(|d| d.into())
+                        .collect::<Vec<StringValue>>(),
+                },
             },
-        };
+            extension: None,
+        }
+    }
 
-        EppObject::build(Command::<DomainCheckRequest>::new(
-            domain_check,
-            client_tr_id,
-        ))
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainCheck<F> {
+        DomainCheck {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML domain check response
-pub type EppDomainCheckResponse = EppObject<CommandResponse<DomainCheckResponse>>;
 
 // Request
 

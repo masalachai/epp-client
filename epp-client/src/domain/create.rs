@@ -4,12 +4,25 @@ use epp_client_macros::*;
 
 use super::EPP_DOMAIN_XMLNS;
 use crate::common::{
-    DomainAuthInfo, DomainContact, ElementName, EppObject, HostAttr, HostAttrList, HostList,
-    HostObjList, Period, StringValue,
+    DomainAuthInfo, DomainContact, ElementName, HostList, NoExtension, Period, StringValue,
 };
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct DomainCreate<E> {
+    request: DomainCreateRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for DomainCreate<E> {
+    type Input = DomainCreateRequest;
+    type Output = DomainCreateResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;create&gt; command
 /// with &lt;hostObj&gt; elements in the request for &lt;ns&gt; list
@@ -22,9 +35,13 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::common::DomainContact;
-/// use epp_client::domain::create::{EppDomainCreate, EppDomainCreateResponse};
+/// use epp_client::domain::create::DomainCreate;
 /// use epp_client::generate_client_tr_id;
-///
+/// use epp_client::common::NoExtension;
+/// use epp_client::common::HostAttrList;
+/// use epp_client::common::HostList;
+/// use epp_client::common::HostObjList;
+
 /// #[tokio::main]
 /// async fn main() {
 ///     // Create a config
@@ -48,153 +65,77 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     /// Create a vector of existing domain contact IDs
 ///     let contacts = vec![
 ///         DomainContact {
 ///             contact_type: "admin".to_string(),
-///             id: "eppdev-contact-2".to_string()
+///             id: "eppdev-contact-3".to_string(),
 ///         },
 ///         DomainContact {
 ///             contact_type: "tech".to_string(),
-///             id: "eppdev-contact-2".to_string()
+///             id: "eppdev-contact-3".to_string(),
 ///         },
 ///         DomainContact {
 ///             contact_type: "billing".to_string(),
-///             id: "eppdev-contact-2".to_string()
-///         }
+///             id: "eppdev-contact-3".to_string(),
+///         },
 ///     ];
-///
-///     // Create an EppDomainCreate instance
-///     let domain_create = EppDomainCreate::new(
-///         "eppdev-100.com", 1, "eppdev-contact-2", "epP4uthd#v", contacts, generate_client_tr_id(&client).as_str()
+
+///     let ns = Some(HostList::HostObjList(HostObjList {
+///         hosts: vec!["ns1.test.com".into(), "ns2.test.com".into()],
+///     }));
+
+///     let domain_create = DomainCreate::<NoExtension>::new(
+///         "eppdev-1.com",
+///         1,
+///         ns,
+///         Some("eppdev-contact-3"),
+///         "epP4uthd#v",
+///         Some(contacts),
 ///     );
 ///
 ///     // send it to the registry and receive a response of type EppDomainCreateResponse
-///     let response = client.transact::<_, EppDomainCreateResponse>(&domain_create).await.unwrap();
+///     let response = client.transact_new(domain_create, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainCreate = EppObject<Command<DomainCreateRequest>>;
-
-impl EppDomainCreate {
-    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
-    /// with the &lt;ns&gt; tag containing &lt;hostObj&gt; tags
-    pub fn new_with_ns(
-        name: &str,
-        period: u16,
-        ns: &[&str],
-        registrant_id: &str,
-        auth_password: &str,
-        contacts: Vec<DomainContact>,
-        client_tr_id: &str,
-    ) -> EppDomainCreate {
-        let ns_list = ns.iter().map(|&n| n.into()).collect();
-
-        let domain_create = DomainCreateRequest {
-            domain: DomainCreateRequestData {
-                xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                name: name.into(),
-                period: Period::new(period),
-                ns: Some(HostList::HostObjList(HostObjList { hosts: ns_list })),
-                registrant: Some(registrant_id.into()),
-                auth_info: DomainAuthInfo::new(auth_password),
-                contacts: Some(contacts),
-            },
-        };
-
-        EppObject::build(Command::<DomainCreateRequest>::new(
-            domain_create,
-            client_tr_id,
-        ))
-    }
-
-    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
-    /// without any nameservers
+impl<E: EppExtension> DomainCreate<E> {
     pub fn new(
         name: &str,
         period: u16,
-        registrant_id: &str,
+        ns: Option<HostList>,
+        registrant_id: Option<&str>,
         auth_password: &str,
-        contacts: Vec<DomainContact>,
-        client_tr_id: &str,
-    ) -> EppDomainCreate {
+        contacts: Option<Vec<DomainContact>>,
+    ) -> DomainCreate<NoExtension> {
+        let registrant = registrant_id.map(|id| id.into());
         let domain_create = DomainCreateRequest {
             domain: DomainCreateRequestData {
                 xmlns: EPP_DOMAIN_XMLNS.to_string(),
                 name: name.into(),
                 period: Period::new(period),
-                ns: None,
-                registrant: Some(registrant_id.into()),
+                ns,
+                registrant,
                 auth_info: DomainAuthInfo::new(auth_password),
-                contacts: Some(contacts),
+                contacts,
             },
         };
-        EppObject::build(Command::<DomainCreateRequest>::new(
-            domain_create,
-            client_tr_id,
-        ))
+
+        DomainCreate {
+            request: domain_create,
+            extension: None,
+        }
     }
 
-    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
-    /// without any contacts
-    pub fn new_without_contacts(
-        name: &str,
-        period: u16,
-        auth_password: &str,
-        client_tr_id: &str,
-    ) -> EppDomainCreate {
-        let domain_create = DomainCreateRequest {
-            domain: DomainCreateRequestData {
-                xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                name: name.into(),
-                period: Period::new(period),
-                ns: None,
-                registrant: None,
-                auth_info: DomainAuthInfo::new(auth_password),
-                contacts: None,
-            },
-        };
-
-        EppObject::build(Command::<DomainCreateRequest>::new(
-            domain_create,
-            client_tr_id,
-        ))
-    }
-
-    /// Creates a new EppObject for domain create corresponding to the &lt;epp&gt; tag in EPP XML
-    /// with the &lt;ns&gt; tag containing &lt;hostAttr&gt; tags
-    pub fn new_with_host_attr(
-        name: &str,
-        period: u16,
-        ns: Vec<HostAttr>,
-        registrant_id: &str,
-        auth_password: &str,
-        contacts: Vec<DomainContact>,
-        client_tr_id: &str,
-    ) -> EppDomainCreate {
-        let domain_create = DomainCreateRequest {
-            domain: DomainCreateRequestData {
-                xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                name: name.into(),
-                period: Period::new(period),
-                ns: Some(HostList::HostAttrList(HostAttrList { hosts: ns })),
-                registrant: Some(registrant_id.into()),
-                auth_info: DomainAuthInfo::new(auth_password),
-                contacts: Some(contacts),
-            },
-        };
-        EppObject::build(Command::<DomainCreateRequest>::new(
-            domain_create,
-            client_tr_id,
-        ))
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainCreate<F> {
+        DomainCreate {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML domain create response
-pub type EppDomainCreateResponse = EppObject<CommandResponse<DomainCreateResponse>>;
 
 // Request
 
@@ -203,26 +144,26 @@ pub type EppDomainCreateResponse = EppObject<CommandResponse<DomainCreateRespons
 pub struct DomainCreateRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain", alias = "xmlns")]
-    xmlns: String,
+    pub xmlns: String,
     /// The domain name
     #[serde(rename = "domain:name", alias = "name")]
-    name: StringValue,
+    pub name: StringValue,
     /// The period of registration
     #[serde(rename = "domain:period", alias = "period")]
-    period: Period,
+    pub period: Period,
     /// The list of nameserver hosts
     /// either of type `HostObjList` or `HostAttrList`
     #[serde(rename = "domain:ns", alias = "ns")]
-    ns: Option<HostList>,
+    pub ns: Option<HostList>,
     /// The domain registrant
     #[serde(rename = "domain:registrant", alias = "registrant")]
-    registrant: Option<StringValue>,
+    pub registrant: Option<StringValue>,
     /// The list of contacts for the domain
     #[serde(rename = "domain:contact", alias = "contact")]
-    contacts: Option<Vec<DomainContact>>,
+    pub contacts: Option<Vec<DomainContact>>,
     /// The auth info for the domain
     #[serde(rename = "domain:authInfo", alias = "authInfo")]
-    auth_info: DomainAuthInfo,
+    pub auth_info: DomainAuthInfo,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -233,7 +174,7 @@ pub struct DomainCreateRequest {
     /// T being the type of nameserver list (`HostObjList` or `HostAttrList`)
     /// to be supplied
     #[serde(rename = "domain:create", alias = "create")]
-    domain: DomainCreateRequestData,
+    pub domain: DomainCreateRequestData,
 }
 
 // Response
@@ -243,7 +184,7 @@ pub struct DomainCreateRequest {
 pub struct DomainCreateResponseData {
     /// XML namespace for domain response data
     #[serde(rename = "xmlns:domain")]
-    xmlns: String,
+    pub xmlns: String,
     /// The domain name
     pub name: StringValue,
     /// The creation date

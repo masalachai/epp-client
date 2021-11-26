@@ -2,11 +2,26 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, StringValue};
+use crate::common::{ElementName, NoExtension, StringValue};
 use crate::host::EPP_HOST_XMLNS;
-use crate::request::Command;
+use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct HostDelete<E> {
+    request: HostDeleteRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for HostDelete<E> {
+    type Input = HostDeleteRequest;
+    type Output = EppCommandResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for host &lt;delete&gt; command
 ///
@@ -17,8 +32,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::host::delete::{EppHostDelete, EppHostDeleteResponse};
+/// use epp_client::host::delete::HostDelete;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -43,36 +59,37 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppHostDelete instance
-///     let host_delete = EppHostDelete::new("ns2.eppdev-101.com", generate_client_tr_id(&client).as_str());
+///     // Create an HostDelete instance
+///     let host_delete = HostDelete::<NoExtension>::new("ns2.eppdev-101.com");
 ///
-///     // send it to the registry and receive a response of type EppHostDeleteResponse
-///     let response = client.transact::<_, EppHostDeleteResponse>(&host_delete).await.unwrap();
+///     // send it to the registry and receive a response of type HostDeleteResponse
+///     let response = client.transact_new(host_delete, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppHostDelete = EppObject<Command<HostDeleteRequest>>;
-
-impl EppHostDelete {
-    /// Creates a new EppObject for host delete corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppHostDelete {
-        EppObject::build(Command::<HostDeleteRequest>::new(
-            HostDeleteRequest {
+impl<E: EppExtension> HostDelete<E> {
+    pub fn new(name: &str) -> HostDelete<NoExtension> {
+        HostDelete {
+            request: HostDeleteRequest {
                 host: HostDeleteRequestData {
                     xmlns: EPP_HOST_XMLNS.to_string(),
                     name: name.into(),
                 },
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostDelete<F> {
+        HostDelete {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML host delete response
-pub type EppHostDeleteResponse = EppCommandResponse;
 
 /// Type for data under the host &lt;delete&gt; tag
 #[derive(Serialize, Deserialize, Debug)]

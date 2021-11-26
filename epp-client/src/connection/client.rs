@@ -7,8 +7,9 @@
 //!
 //! use epp_client::config::{EppClientConfig, EppClientConnection};
 //! use epp_client::EppClient;
-//! use epp_client::domain::check::{EppDomainCheck, EppDomainCheckResponse};
+//! use epp_client::domain::check::DomainCheck;
 //! use epp_client::generate_client_tr_id;
+//! use epp_client::common::NoExtension;
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -39,8 +40,8 @@
 //! println!("{:?}", greeting);
 //!
 //! // Execute an EPP Command against the registry with distinct request and response objects
-//! let domain_check = EppDomainCheck::new(vec!["eppdev.com", "eppdev.net"], generate_client_tr_id(&client).as_str());
-//! let response = client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
+//! let domain_check = DomainCheck::<NoExtension>::new(vec!["eppdev.com", "eppdev.net"]);
+//! let response = client.transact_new(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 //! println!("{:?}", response);
 //!
 //! }
@@ -49,14 +50,18 @@
 use std::time::SystemTime;
 use std::{error::Error, fmt::Debug};
 
+use crate::common::{EppObject, NoExtension};
 use crate::config::EppClientConfig;
 use crate::connection::registry::{epp_connect, EppConnection};
 use crate::error;
 use crate::hello::{EppGreeting, EppHello};
-use crate::login::{EppLogin, EppLoginResponse};
-use crate::logout::{EppLogout, EppLogoutResponse};
+use crate::login::Login;
+use crate::logout::Logout;
 use crate::request::{generate_client_tr_id, EppExtension, EppRequest};
-use crate::response::{CommandResponseWithExtension, EppCommandResponse, EppCommandResponseError};
+use crate::response::{
+    CommandResponseStatus, CommandResponseWithExtension, EppCommandResponse,
+    EppCommandResponseError,
+};
 use crate::xml::EppXml;
 /// Instances of the EppClient type are used to transact with the registry.
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
@@ -110,19 +115,17 @@ impl EppClient {
             connection,
             credentials,
             ext_uris,
-            // client_tr_id_fn: Arc::new(default_client_tr_id_fn),
         };
 
         let client_tr_id = generate_client_tr_id(&client.credentials.0)?;
-        let login_request = EppLogin::new(
+        let login_request = Login::<NoExtension>::new(
             &client.credentials.0,
             &client.credentials.1,
             &client.ext_uris,
-            client_tr_id.as_str(),
         );
 
         client
-            .transact::<_, EppLoginResponse>(&login_request)
+            .transact_new(login_request, client_tr_id.as_str())
             .await?;
 
         Ok(client)
@@ -197,11 +200,16 @@ impl EppClient {
     }
 
     /// Sends the EPP Logout command to log out of the EPP session
-    pub async fn logout(&mut self) -> Result<EppLogoutResponse, error::Error> {
+    pub async fn logout(
+        &mut self,
+    ) -> Result<
+        CommandResponseWithExtension<EppObject<CommandResponseStatus>, NoExtension>,
+        error::Error,
+    > {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
-        let epp_logout = EppLogout::new(client_tr_id.as_str());
+        let epp_logout = Logout::<NoExtension>::new();
 
-        let response = self.transact::<_, EppLogoutResponse>(&epp_logout).await?;
+        let response = self.transact_new(epp_logout, client_tr_id.as_str()).await?;
 
         self.connection.shutdown().await?;
 

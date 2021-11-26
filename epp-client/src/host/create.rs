@@ -2,11 +2,25 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, HostAddr, StringValue};
+use crate::common::{ElementName, HostAddr, NoExtension, StringValue};
 use crate::host::EPP_HOST_XMLNS;
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct HostCreate<E> {
+    request: HostCreateRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for HostCreate<E> {
+    type Input = HostCreateRequest;
+    type Output = HostCreateResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for host &lt;create&gt; command
 ///
@@ -18,8 +32,9 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::common::HostAddr;
-/// use epp_client::host::create::{EppHostCreate, EppHostCreateResponse};
+/// use epp_client::host::create::HostCreate;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -50,36 +65,38 @@ use serde::{Deserialize, Serialize};
 ///         HostAddr::new("v6", "2404:6800:4001:801::200e"),
 ///     ];
 ///
-///     // Create an EppHostCreate instance
-///     let host_create = EppHostCreate::new("ns1.eppdev-101.com", addresses, generate_client_tr_id(&client).as_str());
+///     // Create an HostCreate instance
+///     let host_create = HostCreate::<NoExtension>::new("ns1.eppdev-101.com", addresses);
 ///
-///     // send it to the registry and receive a response of type EppHostCreateResponse
-///     let response = client.transact::<_, EppHostCreateResponse>(&host_create).await.unwrap();
+///     // send it to the registry and receive a response of type HostCreateResponse
+///     let response = client.transact_new(host_create, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppHostCreate = EppObject<Command<HostCreateRequest>>;
-
-impl EppHostCreate {
-    /// Creates a new EppObject for host create corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(host: &str, addresses: Vec<HostAddr>, client_tr_id: &str) -> EppHostCreate {
-        let host_create = HostCreateRequest {
-            host: HostCreateRequestData {
-                xmlns: EPP_HOST_XMLNS.to_string(),
-                name: host.into(),
-                addresses: Some(addresses),
+impl<E: EppExtension> HostCreate<E> {
+    pub fn new(host: &str, addresses: Vec<HostAddr>) -> HostCreate<NoExtension> {
+        HostCreate {
+            request: HostCreateRequest {
+                host: HostCreateRequestData {
+                    xmlns: EPP_HOST_XMLNS.to_string(),
+                    name: host.into(),
+                    addresses: Some(addresses),
+                },
             },
-        };
+            extension: None,
+        }
+    }
 
-        EppObject::build(Command::<HostCreateRequest>::new(host_create, client_tr_id))
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostCreate<F> {
+        HostCreate {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML host create response
-pub type EppHostCreateResponse = EppObject<CommandResponse<HostCreateResponse>>;
 
 // Request
 

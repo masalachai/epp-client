@@ -3,14 +3,27 @@
 use epp_client_macros::*;
 
 use crate::common::{
-    ContactAuthInfo, ContactStatus, ElementName, EppObject, Phone, PostalInfo, StringValue,
+    ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
 };
-use crate::contact::info::EppContactInfoResponse;
 use crate::contact::EPP_CONTACT_XMLNS;
-use crate::error;
-use crate::request::Command;
+use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct ContactUpdate<E> {
+    request: ContactUpdateRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for ContactUpdate<E> {
+    type Input = ContactUpdateRequest;
+    type Output = EppCommandResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for contact &lt;update&gt; command
 ///
@@ -21,9 +34,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::contact::update::{EppContactUpdate, EppContactUpdateResponse};
+/// use epp_client::contact::update::ContactUpdate;
 /// use epp_client::generate_client_tr_id;
 /// use epp_client::common::ContactStatus;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -48,10 +62,9 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppContactUpdate instance
-///     let mut contact_update = EppContactUpdate::new(
-///         "eppdev-contact-100",
-///         generate_client_tr_id(&client).as_str()
+///     // Create an ContactUpdate instance
+///     let mut contact_update = ContactUpdate::<NoExtension>::new(
+///         "eppdev-contact-100"
 ///     );
 ///
 ///     let add_statuses = vec![
@@ -62,32 +75,35 @@ use serde::{Deserialize, Serialize};
 ///
 ///     contact_update.add(add_statuses);
 ///
-///     // send it to the registry and receive a response of type EppContactUpdateResponse
-///     let response = client.transact::<_, EppContactUpdateResponse>(&contact_update).await.unwrap();
+///     // send it to the registry and receive a response of type ContactUpdateResponse
+///     let response = client.transact_new(contact_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppContactUpdate = EppObject<Command<ContactUpdateRequest>>;
-
-impl EppContactUpdate {
-    /// Creates a new EppObject for contact update corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(id: &str, client_tr_id: &str) -> EppContactUpdate {
-        let contact_update = ContactUpdateRequest {
-            contact: ContactUpdateRequestData {
-                xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.into(),
-                add_statuses: None,
-                remove_statuses: None,
-                change_info: None,
+impl<E: EppExtension> ContactUpdate<E> {
+    pub fn new(id: &str) -> ContactUpdate<NoExtension> {
+        ContactUpdate {
+            request: ContactUpdateRequest {
+                contact: ContactUpdateRequestData {
+                    xmlns: EPP_CONTACT_XMLNS.to_string(),
+                    id: id.into(),
+                    add_statuses: None,
+                    remove_statuses: None,
+                    change_info: None,
+                },
             },
-        };
-        EppObject::build(Command::<ContactUpdateRequest>::new(
-            contact_update,
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> ContactUpdate<F> {
+        ContactUpdate {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 
     /// Sets the data for the &lt;chg&gt; tag for the contact update request
@@ -98,7 +114,7 @@ impl EppContactUpdate {
         voice: Phone,
         auth_password: &str,
     ) {
-        self.data.command.contact.change_info = Some(ContactChangeInfo {
+        self.request.contact.change_info = Some(ContactChangeInfo {
             email: Some(email.into()),
             postal_info: Some(postal_info),
             voice: Some(voice),
@@ -109,46 +125,21 @@ impl EppContactUpdate {
 
     /// Sets the data for the &lt;fax&gt; tag under &lt;chg&gt; for the contact update request
     pub fn set_fax(&mut self, fax: Phone) {
-        if let Some(info) = &mut self.data.command.contact.change_info {
+        if let Some(info) = &mut self.request.contact.change_info {
             info.fax = Some(fax)
         }
     }
 
     /// Sets the data for the &lt;add&gt; tag for the contact update request
     pub fn add(&mut self, statuses: Vec<ContactStatus>) {
-        self.data.command.contact.add_statuses = Some(StatusList { status: statuses });
+        self.request.contact.add_statuses = Some(StatusList { status: statuses });
     }
 
     /// Sets the data for the &lt;rem&gt; tag for the contact update request
     pub fn remove(&mut self, statuses: Vec<ContactStatus>) {
-        self.data.command.contact.remove_statuses = Some(StatusList { status: statuses });
-    }
-
-    /// Loads data into the &lt;chg&gt; tag from an existing EppContactInfoResponse object
-    pub fn load_from_epp_contact_info(
-        &mut self,
-        contact_info: EppContactInfoResponse,
-    ) -> Result<(), error::Error> {
-        match contact_info.data.res_data {
-            Some(res_data) => {
-                self.data.command.contact.change_info = Some(ContactChangeInfo {
-                    email: Some(res_data.info_data.email.clone()),
-                    postal_info: Some(res_data.info_data.postal_info.clone()),
-                    voice: Some(res_data.info_data.voice.clone()),
-                    fax: res_data.info_data.fax,
-                    auth_info: None,
-                });
-                Ok(())
-            }
-            None => Err(error::Error::Other(
-                "No res_data in EppContactInfoResponse object".to_string(),
-            )),
-        }
+        self.request.contact.remove_statuses = Some(StatusList { status: statuses });
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML contact update response
-pub type EppContactUpdateResponse = EppCommandResponse;
 
 /// Type for elements under the &lt;chg&gt; tag for contact update request
 #[derive(Serialize, Deserialize, Debug)]

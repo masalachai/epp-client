@@ -4,71 +4,82 @@ use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    common::{ElementName, EppObject, Options, ServiceExtension, Services, StringValue},
+    common::{ElementName, NoExtension, Options, ServiceExtension, Services, StringValue},
     contact::EPP_CONTACT_XMLNS,
     domain::EPP_DOMAIN_XMLNS,
     host::EPP_HOST_XMLNS,
-    request::{Command, EPP_LANG, EPP_VERSION},
+    request::{EppExtension, EppRequest, EPP_LANG, EPP_VERSION},
     response::EppCommandResponse,
 };
 
-/// The EPP Login Request
-pub type EppLogin = EppObject<Command<Login>>;
+#[derive(Debug)]
+pub struct Login<E> {
+    request: LoginRequest,
+    extension: Option<E>,
+}
 
-impl EppLogin {
-    /// Creates a new EPP Login request
+impl<E: EppExtension> EppRequest<E> for Login<E> {
+    type Input = LoginRequest;
+    type Output = EppCommandResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
+
+impl<E: EppExtension> Login<E> {
     pub fn new(
         username: &str,
         password: &str,
         ext_uris: &Option<Vec<String>>,
-        client_tr_id: &str,
-    ) -> EppLogin {
+    ) -> Login<NoExtension> {
         let ext_uris = ext_uris
             .as_ref()
             .map(|uris| uris.iter().map(|u| u.as_str().into()).collect());
 
-        let login = Login {
-            username: username.into(),
-            password: password.into(),
-            options: Options {
-                version: EPP_VERSION.into(),
-                lang: EPP_LANG.into(),
+        Login {
+            request: LoginRequest {
+                username: username.into(),
+                password: password.into(),
+                options: Options {
+                    version: EPP_VERSION.into(),
+                    lang: EPP_LANG.into(),
+                },
+                services: Services {
+                    obj_uris: vec![
+                        EPP_HOST_XMLNS.into(),
+                        EPP_CONTACT_XMLNS.into(),
+                        EPP_DOMAIN_XMLNS.into(),
+                    ],
+                    svc_ext: Some(ServiceExtension { ext_uris }),
+                },
             },
-            services: Services {
-                obj_uris: vec![
-                    EPP_HOST_XMLNS.into(),
-                    EPP_CONTACT_XMLNS.into(),
-                    EPP_DOMAIN_XMLNS.into(),
-                ],
-                svc_ext: Some(ServiceExtension { ext_uris }),
-            },
-        };
-
-        EppObject::build(Command::<Login> {
-            command: login,
             extension: None,
-            client_tr_id: client_tr_id.into(),
-        })
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> Login<F> {
+        Login {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 
     /// Sets the <options> tag data
     pub fn options(&mut self, options: Options) {
-        self.data.command.options = options;
+        self.request.options = options;
     }
 
     /// Sets the <svcs> tag data
     pub fn services(&mut self, services: Services) {
-        self.data.command.services = services;
+        self.request.services = services;
     }
 }
-
-/// An alias of `EppCommandResponse` received in response to a successful login request
-pub type EppLoginResponse = EppCommandResponse;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "login")]
 /// Type corresponding to the &lt;login&gt; tag in an EPP XML login request
-pub struct Login {
+pub struct LoginRequest {
     /// The username to use for the login
     #[serde(rename(serialize = "clID", deserialize = "clID"))]
     username: StringValue,

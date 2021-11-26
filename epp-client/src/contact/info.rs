@@ -3,12 +3,26 @@
 use epp_client_macros::*;
 
 use crate::common::{
-    ContactAuthInfo, ContactStatus, ElementName, EppObject, Phone, PostalInfo, StringValue,
+    ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
 };
 use crate::contact::EPP_CONTACT_XMLNS;
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct ContactInfo<E> {
+    request: ContactInfoRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for ContactInfo<E> {
+    type Input = ContactInfoRequest;
+    type Output = ContactInfoResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type for the &lt;epp&gt; request for contact &lt;info&gt; command
 ///
@@ -19,8 +33,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::contact::info::{EppContactInfo, EppContactInfoResponse};
+/// use epp_client::contact::info::ContactInfo;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -45,43 +60,41 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppContactInfo instance
-///     let contact_info = EppContactInfo::new(
+///     // Create an ContactInfo instance
+///     let contact_info = ContactInfo::<NoExtension>::new(
 ///         "eppdev-contact-100",
-///         "epP4uthd#v",
-///         generate_client_tr_id(&client).as_str()
+///         "epP4uthd#v"
 ///     );
 ///
-///     // send it to the registry and receive a response of type EppContactInfoResponse
-///     let response = client.transact::<_, EppContactInfoResponse>(&contact_info).await.unwrap();
+///     // send it to the registry and receive a response of type ContactInfoResponse
+///     let response = client.transact_new(contact_info, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppContactInfo = EppObject<Command<ContactInfoRequest>>;
-
-impl EppContactInfo {
-    /// Creates a new EppObject for contact info corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(id: &str, auth_password: &str, client_tr_id: &str) -> EppContactInfo {
-        let contact_info = ContactInfoRequest {
-            info: ContactInfoRequestData {
-                xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.into(),
-                auth_info: ContactAuthInfo::new(auth_password),
+impl<E: EppExtension> ContactInfo<E> {
+    pub fn new(id: &str, auth_password: &str) -> ContactInfo<NoExtension> {
+        ContactInfo {
+            request: ContactInfoRequest {
+                info: ContactInfoRequestData {
+                    xmlns: EPP_CONTACT_XMLNS.to_string(),
+                    id: id.into(),
+                    auth_info: ContactAuthInfo::new(auth_password),
+                },
             },
-        };
+            extension: None,
+        }
+    }
 
-        EppObject::build(Command::<ContactInfoRequest>::new(
-            contact_info,
-            client_tr_id,
-        ))
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> ContactInfo<F> {
+        ContactInfo {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML contact info response
-pub type EppContactInfoResponse = EppObject<CommandResponse<ContactInfoResponse>>;
 
 // Request
 

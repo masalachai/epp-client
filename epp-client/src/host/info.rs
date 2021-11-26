@@ -2,11 +2,25 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, HostAddr, HostStatus, StringValue};
+use crate::common::{ElementName, HostAddr, HostStatus, NoExtension, StringValue};
 use crate::host::EPP_HOST_XMLNS;
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct HostInfo<E> {
+    request: HostInfoRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for HostInfo<E> {
+    type Input = HostInfoRequest;
+    type Output = HostInfoResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for host &lt;info&gt; command
 ///
@@ -17,8 +31,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::host::info::{EppHostInfo, EppHostInfoResponse};
+/// use epp_client::host::info::HostInfo;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -43,36 +58,37 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppHostCreate instance
-///     let host_info = EppHostInfo::new("ns2.eppdev-101.com", generate_client_tr_id(&client).as_str());
+///     // Create an HostInfo instance
+///     let host_info = HostInfo::<NoExtension>::new("ns2.eppdev-101.com");
 ///
-///     // send it to the registry and receive a response of type EppHostInfoResponse
-///     let response = client.transact::<_, EppHostInfoResponse>(&host_info).await.unwrap();
+///     // send it to the registry and receive a response of type HostInfoResponse
+///     let response = client.transact_new(host_info, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppHostInfo = EppObject<Command<HostInfoRequest>>;
-
-impl EppHostInfo {
-    /// Creates a new EppObject for host info corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppHostInfo {
-        EppObject::build(Command::<HostInfoRequest>::new(
-            HostInfoRequest {
+impl<E: EppExtension> HostInfo<E> {
+    pub fn new(name: &str) -> HostInfo<NoExtension> {
+        HostInfo {
+            request: HostInfoRequest {
                 info: HostInfoRequestData {
                     xmlns: EPP_HOST_XMLNS.to_string(),
                     name: name.into(),
                 },
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostInfo<F> {
+        HostInfo {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML host info response
-pub type EppHostInfoResponse = EppObject<CommandResponse<HostInfoResponse>>;
 
 // Request
 
