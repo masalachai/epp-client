@@ -6,9 +6,9 @@ use crate::common::{
     DomainAuthInfo, DomainContact, ElementName, EppObject, HostAttr, HostAttrList, HostList,
     HostObjList, Period, StringValue,
 };
-use crate::epp::request::Command;
-use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
+use crate::request::Command;
+use crate::response::CommandResponse;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;create&gt; command

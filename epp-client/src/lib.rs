@@ -109,6 +109,8 @@ pub mod epp;
 pub mod error;
 pub mod host;
 pub mod message;
+pub mod request;
+pub mod response;
 pub use connection::client::EppClient;
 
 #[cfg(test)]

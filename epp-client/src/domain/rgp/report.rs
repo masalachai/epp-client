@@ -4,9 +4,9 @@ use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, Extension, StringValue};
 use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
-use crate::epp::request::CommandWithExtension;
-use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
+use crate::request::CommandWithExtension;
+use crate::response::EppCommandResponse;
 use chrono::{DateTime, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 

@@ -5,9 +5,9 @@ use epp_client_macros::*;
 use crate::common::{
     ContactAuthInfo, ContactStatus, ElementName, EppObject, Phone, PostalInfo, StringValue,
 };
-use crate::epp::request::Command;
-use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
+use crate::request::Command;
+use crate::response::CommandResponse;
 use serde::{Deserialize, Serialize};
 
 /// Type for the &lt;epp&gt; request for contact &lt;info&gt; command

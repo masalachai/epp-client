@@ -6,10 +6,10 @@ use crate::common::{
     ContactAuthInfo, ContactStatus, ElementName, EppObject, Phone, PostalInfo, StringValue,
 };
 use crate::contact::info::EppContactInfoResponse;
-use crate::epp::request::Command;
-use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use crate::error;
+use crate::request::Command;
+use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for contact &lt;update&gt; command

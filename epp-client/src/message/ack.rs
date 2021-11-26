@@ -3,8 +3,8 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject};
-use crate::epp::request::Command;
-use crate::epp::response::CommandResponse;
+use crate::request::Command;
+use crate::response::CommandResponse;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for registry <poll op="ack"> command

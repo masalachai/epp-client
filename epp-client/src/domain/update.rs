@@ -6,9 +6,9 @@ use crate::common::{
     DomainAuthInfo, DomainContact, DomainStatus, ElementName, EppObject, HostList, StringValue,
 };
 
-use crate::epp::request::Command;
-use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
+use crate::request::Command;
+use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;update&gt; command

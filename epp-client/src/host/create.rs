@@ -3,9 +3,9 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, EppObject, HostAddr, StringValue};
-use crate::epp::request::Command;
-use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_HOST_XMLNS;
+use crate::request::Command;
+use crate::response::CommandResponse;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for host &lt;create&gt; command
