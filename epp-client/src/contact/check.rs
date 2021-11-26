@@ -1,7 +1,7 @@
 /// Types for EPP contact check request
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValue};
+use crate::common::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;

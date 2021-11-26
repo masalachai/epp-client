@@ -2,8 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::HostAddr;
-use crate::epp::object::{ElementName, EppObject, StringValue};
+use crate::common::{ElementName, EppObject, HostAddr, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_HOST_XMLNS;
@@ -18,7 +17,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::object::data::HostAddr;
+/// use epp_client::common::HostAddr;
 /// use epp_client::host::create::{EppHostCreate, EppHostCreateResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///

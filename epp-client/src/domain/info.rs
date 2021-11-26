@@ -2,9 +2,10 @@
 
 use epp_client_macros::*;
 
+use crate::common::{
+    DomainAuthInfo, DomainContact, DomainStatus, ElementName, EppObject, HostAttr, StringValue,
+};
 use crate::domain::rgp::request::RgpRequestResponse;
-use crate::epp::object::data::{DomainAuthInfo, DomainContact, DomainStatus, HostAttr};
-use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponseWithExtension;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;

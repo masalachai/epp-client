@@ -2,8 +2,9 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::{ContactAuthInfo, ContactStatus, Phone, PostalInfo};
-use crate::epp::object::{ElementName, EppObject, StringValue};
+use crate::common::{
+    ContactAuthInfo, ContactStatus, ElementName, EppObject, Phone, PostalInfo, StringValue,
+};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;

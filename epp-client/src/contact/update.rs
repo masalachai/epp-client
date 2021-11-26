@@ -2,9 +2,10 @@
 
 use epp_client_macros::*;
 
+use crate::common::{
+    ContactAuthInfo, ContactStatus, ElementName, EppObject, Phone, PostalInfo, StringValue,
+};
 use crate::contact::info::EppContactInfoResponse;
-use crate::epp::object::data::{ContactAuthInfo, ContactStatus, Phone, PostalInfo};
-use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
@@ -22,7 +23,7 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::EppClient;
 /// use epp_client::contact::update::{EppContactUpdate, EppContactUpdateResponse};
 /// use epp_client::epp::generate_client_tr_id;
-/// use epp_client::epp::object::data::ContactStatus;
+/// use epp_client::common::ContactStatus;
 ///
 /// #[tokio::main]
 /// async fn main() {

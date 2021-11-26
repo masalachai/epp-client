@@ -2,8 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data;
-use crate::epp::object::{ElementName, EppObject, StringValue};
+use crate::common::{ContactAuthInfo, ElementName, EppObject, Phone, PostalInfo, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
@@ -18,7 +17,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::object::data::{Address, Phone, PostalInfo};
+/// use epp_client::common::{Address, Phone, PostalInfo};
 /// use epp_client::contact::create::{EppContactCreate, EppContactCreateResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
@@ -80,8 +79,8 @@ impl EppContactCreate {
     pub fn new(
         id: &str,
         email: &str,
-        postal_info: data::PostalInfo,
-        voice: data::Phone,
+        postal_info: PostalInfo,
+        voice: Phone,
         auth_password: &str,
         client_tr_id: &str,
     ) -> EppContactCreate {
@@ -93,7 +92,7 @@ impl EppContactCreate {
                 voice,
                 fax: None,
                 email: email.into(),
-                auth_info: data::ContactAuthInfo::new(auth_password),
+                auth_info: ContactAuthInfo::new(auth_password),
             },
         };
 
@@ -104,7 +103,7 @@ impl EppContactCreate {
     }
 
     /// Sets the &lt;fax&gt; data for the request
-    pub fn set_fax(&mut self, fax: data::Phone) {
+    pub fn set_fax(&mut self, fax: Phone) {
         self.data.command.contact.fax = Some(fax);
     }
 }
@@ -125,19 +124,19 @@ pub struct Contact {
     id: StringValue,
     /// Contact &lt;postalInfo&gt; tag
     #[serde(rename = "contact:postalInfo", alias = "postalInfo")]
-    postal_info: data::PostalInfo,
+    postal_info: PostalInfo,
     /// Contact &lt;voice&gt; tag
     #[serde(rename = "contact:voice", alias = "voice")]
-    voice: data::Phone,
+    voice: Phone,
     /// Contact &lt;fax&gt; tag,
     #[serde(rename = "contact:fax", alias = "fax")]
-    fax: Option<data::Phone>,
+    fax: Option<Phone>,
     /// Contact &lt;email&gt; tag
     #[serde(rename = "contact:email", alias = "email")]
     email: StringValue,
     /// Contact &lt;authInfo&gt; tag
     #[serde(rename = "contact:authInfo", alias = "authInfo")]
-    auth_info: data::ContactAuthInfo,
+    auth_info: ContactAuthInfo,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]

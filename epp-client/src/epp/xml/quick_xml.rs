@@ -5,7 +5,7 @@ use quick_xml::se;
 use serde::{de::DeserializeOwned, Serialize};
 use std::{error::Error, fmt::Debug};
 
-use crate::epp::object::{ElementName, EppObject};
+use crate::common::{ElementName, EppObject};
 use crate::epp::xml::{EppXml, EPP_XML_HEADER};
 use crate::error;
 

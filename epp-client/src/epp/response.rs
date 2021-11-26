@@ -4,7 +4,7 @@ use epp_client_macros::*;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::Debug;
 
-use crate::epp::object::{
+use crate::common::{
     ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services, StringValue,
 };
 

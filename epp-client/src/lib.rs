@@ -100,6 +100,7 @@
 #[macro_use]
 extern crate log;
 
+pub mod common;
 pub mod config;
 pub mod connection;
 pub mod contact;

@@ -26,7 +26,6 @@ mod response {
         EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
     };
     use crate::epp::xml::EppXml;
-    use crate::epp::*;
     use crate::host::check::EppHostCheckResponse;
     use crate::host::create::EppHostCreateResponse;
     use crate::host::delete::EppHostDeleteResponse;

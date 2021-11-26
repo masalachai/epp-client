@@ -2,8 +2,10 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::{DomainAuthInfo, DomainContact, DomainStatus, HostList};
-use crate::epp::object::{ElementName, EppObject, StringValue};
+use crate::common::{
+    DomainAuthInfo, DomainContact, DomainStatus, ElementName, EppObject, HostList, StringValue,
+};
+
 use crate::epp::request::Command;
 use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
@@ -19,7 +21,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::object::data::{DomainStatus, DomainContact};
+/// use epp_client::common::{DomainStatus, DomainContact};
 /// use epp_client::domain::update::{EppDomainUpdate, EppDomainUpdateResponse, DomainAddRemove};
 /// use epp_client::epp::generate_client_tr_id;
 ///

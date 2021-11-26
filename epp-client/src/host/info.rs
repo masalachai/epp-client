@@ -2,8 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::data::{HostAddr, HostStatus};
-use crate::epp::object::{ElementName, EppObject, StringValue};
+use crate::common::{ElementName, EppObject, HostAddr, HostStatus, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_HOST_XMLNS;

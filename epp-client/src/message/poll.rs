@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use crate::epp::object::{ElementName, EppObject, StringValue};
+use crate::common::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponse;
 use serde::{Deserialize, Serialize};

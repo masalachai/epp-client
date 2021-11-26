@@ -3,6 +3,10 @@
 mod request {
     use super::super::get_xml;
     use super::super::CLTRID;
+    use crate::common::{
+        Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
+        HostStatus, Phone, PostalInfo,
+    };
     use crate::contact::check::EppContactCheck;
     use crate::contact::create::EppContactCreate;
     use crate::contact::delete::EppContactDelete;
@@ -23,13 +27,8 @@ mod request {
     use crate::domain::update::DomainAddRemove;
     use crate::domain::update::DomainChangeInfo;
     use crate::domain::update::EppDomainUpdate;
-    use crate::epp::object::data::{
-        Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
-        HostStatus, Phone, PostalInfo,
-    };
     use crate::epp::request::{EppHello, EppLogin, EppLogout};
     use crate::epp::xml::EppXml;
-    use crate::epp::*;
     use crate::host::check::EppHostCheck;
     use crate::host::create::EppHostCreate;
     use crate::host::delete::EppHostDelete;
