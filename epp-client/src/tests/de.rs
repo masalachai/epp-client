@@ -8,6 +8,7 @@ mod response {
     use crate::domain::delete::EppDomainDeleteResponse;
     use crate::domain::info::EppDomainInfoResponse;
     use crate::domain::renew::EppDomainRenewResponse;
+    use crate::domain::rgp::request::EppDomainRgpRestoreRequestResponse;
     use crate::domain::transfer::EppDomainTransferApproveResponse;
     use crate::domain::transfer::EppDomainTransferCancelResponse;
     use crate::domain::transfer::EppDomainTransferQueryResponse;
