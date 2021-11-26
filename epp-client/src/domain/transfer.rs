@@ -5,6 +5,7 @@ use epp_client_macros::*;
 use crate::epp::object::data::{DomainAuthInfo, Period};
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::{CommandResponse, EppCommandResponse};
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +18,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainTransferRequest, EppDomainTransferRequestResponse};
+/// use epp_client::domain::transfer::{EppDomainTransferRequest, EppDomainTransferRequestResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -56,7 +57,7 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainTransferRequest = EppObject<Command<DomainTransfer>>;
+pub type EppDomainTransferRequest = EppObject<Command<DomainTransferRequest>>;
 
 /// Type that represents the &lt;epp&gt; request for transfer approval for domains
 ///
@@ -67,7 +68,7 @@ pub type EppDomainTransferRequest = EppObject<Command<DomainTransfer>>;
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainTransferApprove, EppDomainTransferApproveResponse};
+/// use epp_client::domain::transfer::{EppDomainTransferApprove, EppDomainTransferApproveResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -106,7 +107,7 @@ pub type EppDomainTransferRequest = EppObject<Command<DomainTransfer>>;
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainTransferApprove = EppObject<Command<DomainTransfer>>;
+pub type EppDomainTransferApprove = EppObject<Command<DomainTransferRequest>>;
 
 /// Type that represents the &lt;epp&gt; request for transfer rejection for domains
 ///
@@ -117,7 +118,7 @@ pub type EppDomainTransferApprove = EppObject<Command<DomainTransfer>>;
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainTransferReject, EppDomainTransferRejectResponse};
+/// use epp_client::domain::transfer::{EppDomainTransferReject, EppDomainTransferRejectResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -156,7 +157,7 @@ pub type EppDomainTransferApprove = EppObject<Command<DomainTransfer>>;
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainTransferReject = EppObject<Command<DomainTransfer>>;
+pub type EppDomainTransferReject = EppObject<Command<DomainTransferRequest>>;
 
 /// Type that represents the &lt;epp&gt; request for transfer request cancellation for domains
 ///
@@ -167,7 +168,7 @@ pub type EppDomainTransferReject = EppObject<Command<DomainTransfer>>;
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainTransferCancel, EppDomainTransferCancelResponse};
+/// use epp_client::domain::transfer::{EppDomainTransferCancel, EppDomainTransferCancelResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -206,7 +207,7 @@ pub type EppDomainTransferReject = EppObject<Command<DomainTransfer>>;
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainTransferCancel = EppObject<Command<DomainTransfer>>;
+pub type EppDomainTransferCancel = EppObject<Command<DomainTransferRequest>>;
 
 /// Type that represents the &lt;epp&gt; request for transfer request query for domains
 ///
@@ -217,7 +218,7 @@ pub type EppDomainTransferCancel = EppObject<Command<DomainTransfer>>;
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainTransferQuery, EppDomainTransferQueryResponse};
+/// use epp_client::domain::transfer::{EppDomainTransferQuery, EppDomainTransferQueryResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -256,39 +257,7 @@ pub type EppDomainTransferCancel = EppObject<Command<DomainTransfer>>;
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainTransferQuery = EppObject<Command<DomainTransfer>>;
-
-/// Type for elements under the domain &lt;transfer&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DomainTransferData {
-    /// XML namespace for domain commands
-    #[serde(rename = "xmlns:domain")]
-    xmlns: String,
-    /// The name of the domain under transfer
-    #[serde(rename = "domain:name")]
-    name: StringValue,
-    /// The period of renewal upon a successful transfer
-    /// Only applicable in case of a transfer request
-    #[serde(rename = "domain:period")]
-    period: Option<Period>,
-    /// The authInfo for the domain under transfer
-    /// Only applicable to domain transfer and domain transfer query requests
-    #[serde(rename = "domain:authInfo")]
-    auth_info: Option<DomainAuthInfo>,
-}
-
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "transfer")]
-/// Type for EPP XML &lt;transfer&gt; command for domains
-pub struct DomainTransfer {
-    /// The transfer operation to perform indicated by the 'op' attr
-    /// The values are one of transfer, approve, reject, cancel, or query
-    #[serde(rename = "op")]
-    operation: String,
-    /// The data under the &lt;transfer&gt; tag in the transfer request
-    #[serde(rename = "domain:transfer")]
-    domain: DomainTransferData,
-}
+pub type EppDomainTransferQuery = EppObject<Command<DomainTransferRequest>>;
 
 impl EppDomainTransferRequest {
     /// Creates a new EppObject for domain transfer request corresponding to the &lt;epp&gt; tag in EPP XML
@@ -298,10 +267,10 @@ impl EppDomainTransferRequest {
         auth_password: &str,
         client_tr_id: &str,
     ) -> EppDomainTransferRequest {
-        EppObject::build(Command::<DomainTransfer>::new(
-            DomainTransfer {
+        EppObject::build(Command::<DomainTransferRequest>::new(
+            DomainTransferRequest {
                 operation: "request".to_string(),
-                domain: DomainTransferData {
+                domain: DomainTransferRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
                     period: Some(Period::new(years)),
@@ -321,10 +290,10 @@ impl EppDomainTransferRequest {
 impl EppDomainTransferApprove {
     /// Creates a new EppObject for domain transfer approval corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn approve(name: &str, client_tr_id: &str) -> EppDomainTransferApprove {
-        EppObject::build(Command::<DomainTransfer>::new(
-            DomainTransfer {
+        EppObject::build(Command::<DomainTransferRequest>::new(
+            DomainTransferRequest {
                 operation: "approve".to_string(),
-                domain: DomainTransferData {
+                domain: DomainTransferRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
                     period: None,
@@ -339,10 +308,10 @@ impl EppDomainTransferApprove {
 impl EppDomainTransferCancel {
     /// Creates a new EppObject for domain transfer request cancellation corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn cancel(name: &str, client_tr_id: &str) -> EppDomainTransferCancel {
-        EppObject::build(Command::<DomainTransfer>::new(
-            DomainTransfer {
+        EppObject::build(Command::<DomainTransferRequest>::new(
+            DomainTransferRequest {
                 operation: "cancel".to_string(),
-                domain: DomainTransferData {
+                domain: DomainTransferRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
                     period: None,
@@ -357,10 +326,10 @@ impl EppDomainTransferCancel {
 impl EppDomainTransferReject {
     /// Creates a new EppObject for domain transfer rejection corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn reject(name: &str, client_tr_id: &str) -> EppDomainTransferReject {
-        EppObject::build(Command::<DomainTransfer>::new(
-            DomainTransfer {
+        EppObject::build(Command::<DomainTransferRequest>::new(
+            DomainTransferRequest {
                 operation: "reject".to_string(),
-                domain: DomainTransferData {
+                domain: DomainTransferRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
                     period: None,
@@ -375,10 +344,10 @@ impl EppDomainTransferReject {
 impl EppDomainTransferQuery {
     /// Creates a new EppObject for domain transfer request query corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn query(name: &str, auth_password: &str, client_tr_id: &str) -> EppDomainTransferQuery {
-        EppObject::build(Command::<DomainTransfer>::new(
-            DomainTransfer {
+        EppObject::build(Command::<DomainTransferRequest>::new(
+            DomainTransferRequest {
                 operation: "query".to_string(),
-                domain: DomainTransferData {
+                domain: DomainTransferRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
                     period: None,
@@ -388,4 +357,87 @@ impl EppDomainTransferQuery {
             client_tr_id,
         ))
     }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer request response
+pub type EppDomainTransferRequestResponse = EppObject<CommandResponse<DomainTransferResponse>>;
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer approval response
+pub type EppDomainTransferApproveResponse = EppCommandResponse;
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer rejection response
+pub type EppDomainTransferRejectResponse = EppCommandResponse;
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer cancellation response
+pub type EppDomainTransferCancelResponse = EppCommandResponse;
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain transfer query response
+pub type EppDomainTransferQueryResponse = EppObject<CommandResponse<DomainTransferResponse>>;
+
+// Request
+
+/// Type for elements under the domain &lt;transfer&gt; tag
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainTransferRequestData {
+    /// XML namespace for domain commands
+    #[serde(rename = "xmlns:domain")]
+    xmlns: String,
+    /// The name of the domain under transfer
+    #[serde(rename = "domain:name")]
+    name: StringValue,
+    /// The period of renewal upon a successful transfer
+    /// Only applicable in case of a transfer request
+    #[serde(rename = "domain:period")]
+    period: Option<Period>,
+    /// The authInfo for the domain under transfer
+    /// Only applicable to domain transfer and domain transfer query requests
+    #[serde(rename = "domain:authInfo")]
+    auth_info: Option<DomainAuthInfo>,
+}
+
+#[derive(Serialize, Deserialize, Debug, ElementName)]
+#[element_name(name = "transfer")]
+/// Type for EPP XML &lt;transfer&gt; command for domains
+pub struct DomainTransferRequest {
+    /// The transfer operation to perform indicated by the 'op' attr
+    /// The values are one of transfer, approve, reject, cancel, or query
+    #[serde(rename = "op")]
+    operation: String,
+    /// The data under the &lt;transfer&gt; tag in the transfer request
+    #[serde(rename = "domain:transfer")]
+    domain: DomainTransferRequestData,
+}
+
+// Response
+
+/// Type that represents the &lt;trnData&gt; tag for domain transfer response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainTransferResponseData {
+    /// XML namespace for domain response data
+    #[serde(rename = "xmlns:domain")]
+    xmlns: String,
+    /// The domain name
+    pub name: StringValue,
+    /// The domain transfer status
+    #[serde(rename = "trStatus")]
+    pub transfer_status: StringValue,
+    /// The epp user who requested the transfer
+    #[serde(rename = "reID")]
+    pub requester_id: StringValue,
+    /// The transfer rquest date
+    #[serde(rename = "reDate")]
+    pub requested_at: StringValue,
+    /// The epp user who should acknowledge the transfer request
+    #[serde(rename = "acID")]
+    pub ack_id: StringValue,
+    /// THe date by which the acknowledgment should be made
+    #[serde(rename = "acDate")]
+    pub ack_by: StringValue,
+    /// The domain expiry date
+    #[serde(rename = "exDate")]
+    pub expiring_at: StringValue,
+}
+
+/// Type that represents the &lt;resData&gt; tag for domain transfer response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DomainTransferResponse {
+    /// Data under the &lt;trnData&gt; tag
+    #[serde(rename = "trnData")]
+    pub transfer_data: DomainTransferResponseData,
 }
