@@ -4,6 +4,7 @@ use epp_client_macros::*;
 
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +17,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainDelete, EppDomainDeleteResponse};
+/// use epp_client::domain::delete::{EppDomainDelete, EppDomainDeleteResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -53,11 +54,29 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainDelete = EppObject<Command<DomainDelete>>;
+pub type EppDomainDelete = EppObject<Command<DomainDeleteRequest>>;
+
+impl EppDomainDelete {
+    /// Creates a new EppObject for domain delete corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(name: &str, client_tr_id: &str) -> EppDomainDelete {
+        EppObject::build(Command::<DomainDeleteRequest>::new(
+            DomainDeleteRequest {
+                domain: DomainDeleteRequestData {
+                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    name: name.into(),
+                },
+            },
+            client_tr_id,
+        ))
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML domain delete response
+pub type EppDomainDeleteResponse = EppCommandResponse;
 
 /// Type for &lt;name&gt; element under the domain &lt;delete&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DomainDeleteData {
+pub struct DomainDeleteRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain", alias = "xmlns")]
     xmlns: String,
@@ -69,23 +88,8 @@ pub struct DomainDeleteData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "delete")]
 /// Type for EPP XML &lt;delete&gt; command for domains
-pub struct DomainDelete {
+pub struct DomainDeleteRequest {
     /// The data under the &lt;delete&gt; tag for domain deletion
     #[serde(rename = "domain:delete", alias = "delete")]
-    domain: DomainDeleteData,
-}
-
-impl EppDomainDelete {
-    /// Creates a new EppObject for domain delete corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppDomainDelete {
-        EppObject::build(Command::<DomainDelete>::new(
-            DomainDelete {
-                domain: DomainDeleteData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.into(),
-                },
-            },
-            client_tr_id,
-        ))
-    }
+    domain: DomainDeleteRequestData,
 }
