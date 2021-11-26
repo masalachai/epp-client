@@ -3,6 +3,7 @@ use epp_client_macros::*;
 
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::CommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +16,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppContactCheck, EppContactCheckResponse};
+/// use epp_client::contact::check::{EppContactCheck, EppContactCheckResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -55,7 +56,34 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppContactCheck = EppObject<Command<ContactCheck>>;
+pub type EppContactCheck = EppObject<Command<ContactCheckRequest>>;
+
+impl EppContactCheck {
+    /// Creates an EppObject corresponding to the &lt;epp&gt; tag with data for a contact check request
+    pub fn new(contact_ids: &[&str], client_tr_id: &str) -> EppContactCheck {
+        let contact_ids = contact_ids
+            .iter()
+            .map(|&d| d.into())
+            .collect::<Vec<StringValue>>();
+
+        let contact_check = ContactCheckRequest {
+            list: ContactList {
+                xmlns: EPP_CONTACT_XMLNS.to_string(),
+                contact_ids,
+            },
+        };
+
+        EppObject::build(Command::<ContactCheckRequest>::new(
+            contact_check,
+            client_tr_id,
+        ))
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML contact check response
+pub type EppContactCheckResponse = EppObject<CommandResponse<ContactCheckResponse>>;
+
+// Request
 
 /// Type that represents the &lt;check&gt; command for contact transactions
 #[derive(Serialize, Deserialize, Debug)]
@@ -71,27 +99,50 @@ pub struct ContactList {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "check")]
 /// The &lt;command&gt; type for contact check command
-pub struct ContactCheck {
+pub struct ContactCheckRequest {
     /// The &lt;check&gt; tag for the contact check command
     #[serde(rename = "contact:check", alias = "check")]
     list: ContactList,
 }
 
-impl EppContactCheck {
-    /// Creates an EppObject corresponding to the &lt;epp&gt; tag with data for a contact check request
-    pub fn new(contact_ids: &[&str], client_tr_id: &str) -> EppContactCheck {
-        let contact_ids = contact_ids
-            .iter()
-            .map(|&d| d.into())
-            .collect::<Vec<StringValue>>();
+// Response
 
-        let contact_check = ContactCheck {
-            list: ContactList {
-                xmlns: EPP_CONTACT_XMLNS.to_string(),
-                contact_ids,
-            },
-        };
+/// Type that represents the &lt;id&gt; tag for contact check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ContactCheck {
+    /// The text of the &lt;id&gt; tag
+    #[serde(rename = "$value")]
+    pub id: StringValue,
+    /// The avail attr on the &lt;id&gt; tag
+    #[serde(rename = "avail")]
+    pub available: u16,
+}
 
-        EppObject::build(Command::<ContactCheck>::new(contact_check, client_tr_id))
-    }
+/// Type that represents the &lt;cd&gt; tag for contact check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ContactCheckResponseDataItem {
+    /// Data under the &lt;id&gt; tag
+    #[serde(rename = "id")]
+    pub contact: ContactCheck,
+    /// The reason for (un)availability
+    pub reason: Option<StringValue>,
+}
+
+/// Type that represents the &lt;chkData&gt; tag for contact check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ContactCheckResponseData {
+    /// XML namespace for contact response data
+    #[serde(rename = "xmlns:contact")]
+    xmlns: String,
+    /// Data under the &lt;cd&gt; tag
+    #[serde(rename = "cd")]
+    pub contact_list: Vec<ContactCheckResponseDataItem>,
+}
+
+/// Type that represents the &lt;resData&gt; tag for contact check response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ContactCheckResponse {
+    /// Data under the &lt;chkData&gt; tag
+    #[serde(rename = "chkData")]
+    pub check_data: ContactCheckResponseData,
 }

@@ -102,6 +102,7 @@ extern crate log;
 
 pub mod config;
 pub mod connection;
+pub mod contact;
 pub mod domain;
 pub mod epp;
 pub mod error;
