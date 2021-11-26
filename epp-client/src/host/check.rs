@@ -1,12 +1,28 @@
 //! Types for EPP host check request
 
+use std::fmt::Debug;
+
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, StringValue};
+use crate::common::{ElementName, NoExtension, StringValue};
 use crate::host::EPP_HOST_XMLNS;
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct HostCheck<E> {
+    request: HostCheckRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for HostCheck<E> {
+    type Input = HostCheckRequest;
+    type Output = HostCheckResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for host &lt;check&gt; command
 ///
@@ -17,8 +33,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::host::check::{EppHostCheck, EppHostCheckResponse};
+/// use epp_client::host::check::HostCheck;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -43,40 +60,41 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppHostCheck instance
-///     let host_check = EppHostCheck::new(
-///         &["ns1.eppdev-101.com", "ns2.eppdev-101.com"],
-///         generate_client_tr_id(&client).as_str()
+///     // Create an HostCheck instance
+///     let host_check = HostCheck::<NoExtension>::new(
+///         &["ns1.eppdev-101.com", "ns2.eppdev-101.com"]
 ///     );
 ///
-///     // send it to the registry and receive a response of type EppHostCheckResponse
-///     let response = client.transact::<_, EppHostCheckResponse>(&host_check).await.unwrap();
+///     // send it to the registry and receive a response of type HostCheckResponse
+///     let response = client.transact_new(host_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppHostCheck = EppObject<Command<HostCheckRequest>>;
-
-impl EppHostCheck {
-    /// Creates a new EppObject for host check corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(hosts: &[&str], client_tr_id: &str) -> EppHostCheck {
+impl<E: EppExtension> HostCheck<E> {
+    pub fn new(hosts: &[&str]) -> HostCheck<NoExtension> {
         let hosts = hosts.iter().map(|&d| d.into()).collect();
 
-        let host_check = HostCheckRequest {
-            list: HostList {
-                xmlns: EPP_HOST_XMLNS.to_string(),
-                hosts,
+        HostCheck {
+            request: HostCheckRequest {
+                list: HostList {
+                    xmlns: EPP_HOST_XMLNS.to_string(),
+                    hosts,
+                },
             },
-        };
+            extension: None,
+        }
+    }
 
-        EppObject::build(Command::<HostCheckRequest>::new(host_check, client_tr_id))
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostCheck<F> {
+        HostCheck {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML host check response
-pub type EppHostCheckResponse = EppObject<CommandResponse<HostCheckResult>>;
 
 // Request
 
@@ -104,7 +122,7 @@ pub struct HostCheckRequest {
 
 /// Type that represents the &lt;name&gt; tag for host check response
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HostCheck {
+pub struct HostAvailable {
     /// The host name
     #[serde(rename = "$value")]
     pub name: StringValue,
@@ -118,7 +136,7 @@ pub struct HostCheck {
 pub struct HostCheckDataItem {
     /// Data under the &lt;name&gt; tag
     #[serde(rename = "name")]
-    pub host: HostCheck,
+    pub host: HostAvailable,
     /// The reason for (un)availability
     pub reason: Option<StringValue>,
 }
@@ -136,7 +154,7 @@ pub struct HostCheckData {
 
 /// Type that represents the &lt;resData&gt; tag for host check response
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HostCheckResult {
+pub struct HostCheckResponse {
     /// Data under the &lt;chkData&gt; tag
     #[serde(rename = "chkData")]
     pub check_data: HostCheckData,

@@ -3,10 +3,25 @@
 use epp_client_macros::*;
 
 use super::EPP_DOMAIN_XMLNS;
-use crate::common::{ElementName, EppObject, StringValue};
-use crate::request::Command;
+use crate::common::{ElementName, NoExtension, StringValue};
+use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct DomainDelete<E> {
+    request: DomainDeleteRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for DomainDelete<E> {
+    type Input = DomainDeleteRequest;
+    type Output = EppCommandResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;delete&gt; command
 ///
@@ -17,8 +32,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::domain::delete::{EppDomainDelete, EppDomainDeleteResponse};
+/// use epp_client::domain::delete::DomainDelete;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -43,36 +59,37 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppDomainDelete instance
-///     let mut domain_delete = EppDomainDelete::new("eppdev-100.com", generate_client_tr_id(&client).as_str());
+///     // Create an DomainDelete instance
+///     let mut domain_delete = DomainDelete::<NoExtension>::new("eppdev-100.com");
 ///
-///     // send it to the registry and receive a response of type EppDomainDeleteResponse
-///     let response = client.transact::<_, EppDomainDeleteResponse>(&domain_delete).await.unwrap();
+///     // send it to the registry and receive a response of type DomainDeleteResponse
+///     let response = client.transact_new(domain_delete, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainDelete = EppObject<Command<DomainDeleteRequest>>;
-
-impl EppDomainDelete {
-    /// Creates a new EppObject for domain delete corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppDomainDelete {
-        EppObject::build(Command::<DomainDeleteRequest>::new(
-            DomainDeleteRequest {
+impl<E: EppExtension> DomainDelete<E> {
+    pub fn new(name: &str) -> DomainDelete<NoExtension> {
+        DomainDelete {
+            request: DomainDeleteRequest {
                 domain: DomainDeleteRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     name: name.into(),
                 },
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainDelete<F> {
+        DomainDelete {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML domain delete response
-pub type EppDomainDeleteResponse = EppCommandResponse;
 
 /// Type for &lt;name&gt; element under the domain &lt;delete&gt; tag
 #[derive(Serialize, Deserialize, Debug)]

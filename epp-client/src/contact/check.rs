@@ -1,11 +1,27 @@
+use std::fmt::Debug;
+
 /// Types for EPP contact check request
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, StringValue};
+use crate::common::{ElementName, NoExtension, StringValue};
 use crate::contact::EPP_CONTACT_XMLNS;
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct ContactCheck<E> {
+    request: ContactCheckRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for ContactCheck<E> {
+    type Input = ContactCheckRequest;
+    type Output = ContactCheckResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for contact &lt;check&gt; command
 ///
@@ -16,8 +32,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::contact::check::{EppContactCheck, EppContactCheckResponse};
+/// use epp_client::contact::check::ContactCheck;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -42,46 +59,44 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppContactCheck instance
-///     let contact_check = EppContactCheck::new(
-///         &["epp-client-c1", "epp-client-c2"],
-///         generate_client_tr_id(&client).as_str()
+///     // Create an ContactCheck instance
+///     let contact_check = ContactCheck::<NoExtension>::new(
+///         &["epp-client-c1", "epp-client-c2"]
 ///     );
 ///
-///     // send it to the registry and receive a response of type EppContactCheckResponse
-///     let response = client.transact::<_, EppContactCheckResponse>(&contact_check).await.unwrap();
+///     // send it to the registry and receive a response of type ContactCheckResponse
 ///
+///     let response = client.transact_new(contact_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppContactCheck = EppObject<Command<ContactCheckRequest>>;
-
-impl EppContactCheck {
-    /// Creates an EppObject corresponding to the &lt;epp&gt; tag with data for a contact check request
-    pub fn new(contact_ids: &[&str], client_tr_id: &str) -> EppContactCheck {
+impl<E: EppExtension> ContactCheck<E> {
+    pub fn new(contact_ids: &[&str]) -> ContactCheck<NoExtension> {
         let contact_ids = contact_ids
             .iter()
             .map(|&d| d.into())
             .collect::<Vec<StringValue>>();
 
-        let contact_check = ContactCheckRequest {
-            list: ContactList {
-                xmlns: EPP_CONTACT_XMLNS.to_string(),
-                contact_ids,
+        ContactCheck {
+            request: ContactCheckRequest {
+                list: ContactList {
+                    xmlns: EPP_CONTACT_XMLNS.to_string(),
+                    contact_ids,
+                },
             },
-        };
+            extension: None,
+        }
+    }
 
-        EppObject::build(Command::<ContactCheckRequest>::new(
-            contact_check,
-            client_tr_id,
-        ))
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> ContactCheck<F> {
+        ContactCheck {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML contact check response
-pub type EppContactCheckResponse = EppObject<CommandResponse<ContactCheckResponse>>;
 
 // Request
 
@@ -109,7 +124,7 @@ pub struct ContactCheckRequest {
 
 /// Type that represents the &lt;id&gt; tag for contact check response
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ContactCheck {
+pub struct ContactAvailable {
     /// The text of the &lt;id&gt; tag
     #[serde(rename = "$value")]
     pub id: StringValue,
@@ -123,7 +138,7 @@ pub struct ContactCheck {
 pub struct ContactCheckResponseDataItem {
     /// Data under the &lt;id&gt; tag
     #[serde(rename = "id")]
-    pub contact: ContactCheck,
+    pub contact: ContactAvailable,
     /// The reason for (un)availability
     pub reason: Option<StringValue>,
 }

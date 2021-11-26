@@ -2,11 +2,25 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ContactAuthInfo, ElementName, EppObject, Phone, PostalInfo, StringValue};
+use crate::common::{ContactAuthInfo, ElementName, NoExtension, Phone, PostalInfo, StringValue};
 use crate::contact::EPP_CONTACT_XMLNS;
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct ContactCreate<E> {
+    request: ContactCreateRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for ContactCreate<E> {
+    type Input = ContactCreateRequest;
+    type Output = ContactCreateResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for contact &lt;create&gt; command
 ///
@@ -18,8 +32,9 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::common::{Address, Phone, PostalInfo};
-/// use epp_client::contact::create::{EppContactCreate, EppContactCreateResponse};
+/// use epp_client::contact::create::ContactCreate;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -53,63 +68,60 @@ use serde::{Deserialize, Serialize};
 ///     let mut fax = Phone::new("+1.86698799");
 ///     fax.set_extension("677");
 ///
-///     // Create an EppContactCreate instance
-///     let mut contact_create = EppContactCreate::new(
+///     // Create an ContactCreate instance
+///     let mut contact_create = ContactCreate::<NoExtension>::new(
 ///         "eppdev-contact-100",
 ///         "contact@eppdev.net",
 ///         postal_info,
 ///         voice,
-///         "epP4uthd#v",
-///         generate_client_tr_id(&client).as_str()
+///         "epP4uthd#v"
 ///     );
 ///     contact_create.set_fax(fax);
 ///
-///     // send it to the registry and receive a response of type EppContactCreateResponse
-///     let response = client.transact::<_, EppContactCreateResponse>(&contact_create).await.unwrap();
+///     // send it to the registry and receive a response of type ContactCreateResponse
+///     let response = client.transact_new(contact_create, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppContactCreate = EppObject<Command<ContactCreateRequest>>;
-
-impl EppContactCreate {
-    /// Creates a new EppObject for contact create corresponding to the &lt;epp&gt; tag in EPP XML
+impl<E: EppExtension> ContactCreate<E> {
     pub fn new(
         id: &str,
         email: &str,
         postal_info: PostalInfo,
         voice: Phone,
         auth_password: &str,
-        client_tr_id: &str,
-    ) -> EppContactCreate {
-        let contact_create = ContactCreateRequest {
-            contact: Contact {
-                xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.into(),
-                postal_info,
-                voice,
-                fax: None,
-                email: email.into(),
-                auth_info: ContactAuthInfo::new(auth_password),
+    ) -> ContactCreate<NoExtension> {
+        ContactCreate {
+            request: ContactCreateRequest {
+                contact: Contact {
+                    xmlns: EPP_CONTACT_XMLNS.to_string(),
+                    id: id.into(),
+                    postal_info,
+                    voice,
+                    fax: None,
+                    email: email.into(),
+                    auth_info: ContactAuthInfo::new(auth_password),
+                },
             },
-        };
+            extension: None,
+        }
+    }
 
-        EppObject::build(Command::<ContactCreateRequest>::new(
-            contact_create,
-            client_tr_id,
-        ))
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> ContactCreate<F> {
+        ContactCreate {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 
     /// Sets the &lt;fax&gt; data for the request
     pub fn set_fax(&mut self, fax: Phone) {
-        self.data.command.contact.fax = Some(fax);
+        self.request.contact.fax = Some(fax);
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML contact create response
-pub type EppContactCreateResponse = EppObject<CommandResponse<ContactCreateResult>>;
 
 // Request
 
@@ -165,7 +177,7 @@ pub struct ContactCreateData {
 
 /// Type that represents the &lt;resData&gt; tag for contact create response
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ContactCreateResult {
+pub struct ContactCreateResponse {
     /// Data under the &lt;creData&gt; tag
     #[serde(rename = "creData")]
     pub create_data: ContactCreateData,

@@ -2,10 +2,24 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject};
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::common::{ElementName, NoExtension};
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct MessageAck<E> {
+    request: MessageAckRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for MessageAck<E> {
+    type Input = MessageAckRequest;
+    type Output = String;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for registry <poll op="ack"> command
 /// ## Usage
@@ -15,8 +29,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::message::ack::{EppMessageAck, EppMessageAckResponse};
+/// use epp_client::message::ack::MessageAck;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -41,34 +56,35 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppMessageAck instance
-///     let message_ack = EppMessageAck::new(12345, generate_client_tr_id(&client).as_str());
+///     // Create an MessageAck instance
+///     let message_ack = MessageAck::<NoExtension>::new(12345);
 ///
-///     // send it to the registry and receive a response of type EppMessageAckResponse
-///     let response = client.transact::<_, EppMessageAckResponse>(&message_ack).await.unwrap();
+///     // send it to the registry and receive a response of type MessageAckResponse
+///     let response = client.transact_new(message_ack, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppMessageAck = EppObject<Command<MessageAckRequest>>;
-
-impl EppMessageAck {
-    /// Creates a new EppObject for &lt;poll&gt; ack corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(message_id: u32, client_tr_id: &str) -> EppMessageAck {
-        EppObject::build(Command::<MessageAckRequest>::new(
-            MessageAckRequest {
+impl<E: EppExtension> MessageAck<E> {
+    pub fn new(message_id: u32) -> MessageAck<NoExtension> {
+        MessageAck {
+            request: MessageAckRequest {
                 op: "ack".to_string(),
                 message_id: message_id.to_string(),
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> MessageAck<F> {
+        MessageAck {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML message ack response
-pub type EppMessageAckResponse = EppObject<CommandResponse<String>>;
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "poll")]

@@ -2,10 +2,24 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, StringValue};
-use crate::request::Command;
-use crate::response::CommandResponse;
+use crate::common::{ElementName, NoExtension, StringValue};
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct MessagePoll<E> {
+    request: MessagePollRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for MessagePoll<E> {
+    type Input = MessagePollRequest;
+    type Output = MessagePollResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for registry <poll op="req"> command
 ///
@@ -16,8 +30,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::message::poll::{EppMessagePoll, EppMessagePollResponse};
+/// use epp_client::message::poll::MessagePoll;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -42,33 +57,34 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppMessagePoll instance
-///     let message_poll = EppMessagePoll::new(generate_client_tr_id(&client).as_str());
+///     // Create an MessagePoll instance
+///     let message_poll = MessagePoll::<NoExtension>::new();
 ///
-///     // send it to the registry and receive a response of type EppMessagePollResponse
-///     let response = client.transact::<_, EppMessagePollResponse>(&message_poll).await.unwrap();
+///     // send it to the registry and receive a response of type MessagePollResponse
+///     let response = client.transact_new(message_poll, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppMessagePoll = EppObject<Command<MessagePollRequest>>;
-
-impl EppMessagePoll {
-    /// Creates a new EppObject for &lt;poll&gt; req corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(client_tr_id: &str) -> EppMessagePoll {
-        EppObject::build(Command::<MessagePollRequest>::new(
-            MessagePollRequest {
+impl<E: EppExtension> MessagePoll<E> {
+    pub fn new() -> MessagePoll<NoExtension> {
+        MessagePoll {
+            request: MessagePollRequest {
                 op: "req".to_string(),
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> MessagePoll<F> {
+        MessagePoll {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML message poll response
-pub type EppMessagePollResponse = EppObject<CommandResponse<MessagePollResponse>>;
 
 // Request
 

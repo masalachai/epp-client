@@ -3,35 +3,37 @@
 mod response {
     use super::super::get_xml;
     use super::super::CLTRID;
-    use crate::contact::check::EppContactCheckResponse;
-    use crate::contact::create::EppContactCreateResponse;
-    use crate::contact::delete::EppContactDeleteResponse;
-    use crate::contact::info::EppContactInfoResponse;
-    use crate::contact::update::EppContactUpdateResponse;
-    use crate::domain::check::EppDomainCheckResponse;
-    use crate::domain::create::EppDomainCreateResponse;
-    use crate::domain::delete::EppDomainDeleteResponse;
-    use crate::domain::info::EppDomainInfoResponse;
-    use crate::domain::renew::EppDomainRenewResponse;
+    use crate::common::NoExtension;
+    use crate::contact::check::ContactCheck;
+    use crate::contact::create::ContactCreate;
+    use crate::contact::delete::ContactDelete;
+    use crate::contact::info::ContactInfo;
+    use crate::contact::update::ContactUpdate;
+    use crate::domain::check::DomainCheck;
+    use crate::domain::create::DomainCreate;
+    use crate::domain::delete::DomainDelete;
+    use crate::domain::info::DomainInfo;
+    use crate::domain::renew::DomainRenew;
     use crate::domain::rgp::request::EppDomainRgpRestoreRequestResponse;
-    use crate::domain::transfer::EppDomainTransferApproveResponse;
-    use crate::domain::transfer::EppDomainTransferCancelResponse;
-    use crate::domain::transfer::EppDomainTransferQueryResponse;
-    use crate::domain::transfer::EppDomainTransferRejectResponse;
-    use crate::domain::transfer::EppDomainTransferRequestResponse;
-    use crate::domain::update::EppDomainUpdateResponse;
+    use crate::domain::transfer::DomainTransferApprove;
+    use crate::domain::transfer::DomainTransferCancel;
+    use crate::domain::transfer::DomainTransferQuery;
+    use crate::domain::transfer::DomainTransferReject;
+    use crate::domain::transfer::DomainTransferRequest;
+    use crate::domain::update::DomainUpdate;
     use crate::hello::EppGreeting;
     use crate::hello::ExpiryType;
     use crate::hello::Relative;
-    use crate::host::check::EppHostCheckResponse;
-    use crate::host::create::EppHostCreateResponse;
-    use crate::host::delete::EppHostDeleteResponse;
-    use crate::host::info::EppHostInfoResponse;
-    use crate::host::update::EppHostUpdateResponse;
-    use crate::login::EppLoginResponse;
-    use crate::logout::EppLogoutResponse;
-    use crate::message::ack::EppMessageAckResponse;
-    use crate::message::poll::EppMessagePollResponse;
+    use crate::host::check::HostCheck;
+    use crate::host::create::HostCreate;
+    use crate::host::delete::HostDelete;
+    use crate::host::info::HostInfo;
+    use crate::host::update::HostUpdate;
+    use crate::login::Login;
+    use crate::logout::Logout;
+    use crate::message::ack::MessageAck;
+    use crate::message::poll::MessagePoll;
+    use crate::request::EppRequest;
     use crate::response::EppCommandResponseError;
     use crate::xml::EppXml;
 
@@ -87,37 +89,37 @@ mod response {
     #[test]
     fn login() {
         let xml = get_xml("response/login.xml").unwrap();
-        let object = EppLoginResponse::deserialize(xml.as_str()).unwrap();
+        let object = Login::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn logout() {
         let xml = get_xml("response/logout.xml").unwrap();
-        let object = EppLogoutResponse::deserialize(xml.as_str()).unwrap();
+        let object = Logout::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1500);
+        assert_eq!(object.result.code, 1500);
         assert_eq!(
-            object.data.result.message,
+            object.result.message,
             "Command completed successfully; ending session".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn contact_check() {
         let xml = get_xml("response/contact/check.xml").unwrap();
-        let object = EppContactCheckResponse::deserialize(xml.as_str()).unwrap();
+        let object = ContactCheck::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let results = object.data.res_data().unwrap();
+        let results = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(
             results.check_data.contact_list[0].contact.id,
             "eppdev-contact-1".into()
@@ -128,52 +130,52 @@ mod response {
             "eppdev-contact-2".into()
         );
         assert_eq!(results.check_data.contact_list[1].contact.available, 1);
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn contact_create() {
         let xml = get_xml("response/contact/create.xml").unwrap();
-        let object = EppContactCreateResponse::deserialize(xml.as_str()).unwrap();
+        let object = ContactCreate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let results = object.data.res_data().unwrap();
+        let results = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(results.create_data.id, "eppdev-contact-4".into());
         assert_eq!(
             results.create_data.created_at,
             "2021-07-25T16:05:32.0Z".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn contact_delete() {
         let xml = get_xml("response/contact/delete.xml").unwrap();
-        let object = EppContactDeleteResponse::deserialize(xml.as_str()).unwrap();
+        let object = ContactDelete::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn contact_info() {
         let xml = get_xml("response/contact/info.xml").unwrap();
-        let object = EppContactInfoResponse::deserialize(xml.as_str()).unwrap();
+        let object = ContactInfo::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
         let fax = result.info_data.fax.as_ref().unwrap();
         let voice_ext = result.info_data.voice.extension.as_ref().unwrap();
         let fax_ext = fax.extension.as_ref().unwrap();
         let auth_info = result.info_data.auth_info.as_ref().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.info_data.id, "eppdev-contact-3".into());
         assert_eq!(result.info_data.roid, "UNDEF-ROID".into());
         assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
@@ -218,30 +220,30 @@ mod response {
             "2021-07-23T13:09:09.0Z".into()
         );
         assert_eq!((*auth_info).password, "eppdev-387323".into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn contact_update() {
         let xml = get_xml("response/contact/update.xml").unwrap();
-        let object = EppContactUpdateResponse::deserialize(xml.as_str()).unwrap();
+        let object = ContactUpdate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_check() {
         let xml = get_xml("response/domain/check.xml").unwrap();
-        let object = EppDomainCheckResponse::deserialize(xml.as_str()).unwrap();
+        let object = DomainCheck::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(
             result.check_data.domain_list[0].domain.name,
             "eppdev.com".into()
@@ -252,19 +254,19 @@ mod response {
             "eppdev.net".into()
         );
         assert_eq!(result.check_data.domain_list[1].domain.available, 0);
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_create() {
         let xml = get_xml("response/domain/create.xml").unwrap();
-        let object = EppDomainCreateResponse::deserialize(xml.as_str()).unwrap();
+        let object = DomainCreate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.create_data.name, "eppdev-2.com".into());
         assert_eq!(
             result.create_data.created_at,
@@ -274,34 +276,34 @@ mod response {
             result.create_data.expiring_at,
             "2022-07-25T18:11:34.0Z".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_delete() {
         let xml = get_xml("response/domain/delete.xml").unwrap();
-        let object = EppDomainDeleteResponse::deserialize(xml.as_str()).unwrap();
+        let object = DomainDelete::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_info() {
         let xml = get_xml("response/domain/info.xml").unwrap();
-        let object = EppDomainInfoResponse::deserialize(xml.as_str()).unwrap();
+        let object = DomainInfo::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
         let auth_info = result.info_data.auth_info.as_ref().unwrap();
         let ns_list = result.info_data.ns.as_ref().unwrap();
         let ns = (*ns_list).host_obj.as_ref().unwrap();
         let hosts = result.info_data.hosts.as_ref().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.info_data.name, "eppdev-1.com".into());
         assert_eq!(result.info_data.roid, "125899511_DOMAIN_COM-VRSN".into());
         assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
@@ -348,38 +350,39 @@ mod response {
             "2023-07-23T15:31:20.0Z".into()
         );
         assert_eq!((*auth_info).password, "epP4uthd#v".into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_renew() {
         let xml = get_xml("response/domain/renew.xml").unwrap();
-        let object = EppDomainRenewResponse::deserialize(xml.as_str()).unwrap();
+        let object = DomainRenew::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.renew_data.name, "eppdev-1.com".into());
         assert_eq!(
             result.renew_data.expiring_at,
             "2024-07-23T15:31:20.0Z".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_transfer_request() {
         let xml = get_xml("response/domain/transfer_request.xml").unwrap();
-        let object = EppDomainTransferRequestResponse::deserialize(xml.as_str()).unwrap();
+        let object =
+            DomainTransferRequest::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1001);
+        assert_eq!(object.result.code, 1001);
         assert_eq!(
-            object.data.result.message,
+            object.result.message,
             "Command completed successfully; action pending".into()
         );
         assert_eq!(result.transfer_data.name, "eppdev-transfer.com".into());
@@ -395,52 +398,56 @@ mod response {
             result.transfer_data.expiring_at,
             "2022-07-02T14:53:19.0Z".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_transfer_approve() {
         let xml = get_xml("response/domain/transfer_approve.xml").unwrap();
-        let object = EppDomainTransferApproveResponse::deserialize(xml.as_str()).unwrap();
+        let object =
+            DomainTransferApprove::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_transfer_reject() {
         let xml = get_xml("response/domain/transfer_reject.xml").unwrap();
-        let object = EppDomainTransferRejectResponse::deserialize(xml.as_str()).unwrap();
+        let object =
+            DomainTransferReject::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_transfer_cancel() {
         let xml = get_xml("response/domain/transfer_cancel.xml").unwrap();
-        let object = EppDomainTransferCancelResponse::deserialize(xml.as_str()).unwrap();
+        let object =
+            DomainTransferCancel::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_transfer_query() {
         let xml = get_xml("response/domain/transfer_query.xml").unwrap();
-        let object = EppDomainTransferQueryResponse::deserialize(xml.as_str()).unwrap();
+        let object =
+            DomainTransferQuery::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.transfer_data.name, "eppdev-transfer.com".into());
         assert_eq!(result.transfer_data.transfer_status, "pending".into());
         assert_eq!(result.transfer_data.requester_id, "eppdev".into());
@@ -454,30 +461,30 @@ mod response {
             result.transfer_data.expiring_at,
             "2022-07-02T14:53:19.0Z".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn domain_update() {
         let xml = get_xml("response/domain/update.xml").unwrap();
-        let object = EppDomainUpdateResponse::deserialize(xml.as_str()).unwrap();
+        let object = DomainUpdate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn host_check() {
         let xml = get_xml("response/host/check.xml").unwrap();
-        let object = EppHostCheckResponse::deserialize(xml.as_str()).unwrap();
+        let object = HostCheck::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(
             result.check_data.host_list[0].host.name,
             "host1.eppdev-1.com".into()
@@ -488,37 +495,37 @@ mod response {
             "ns1.testing.com".into()
         );
         assert_eq!(result.check_data.host_list[1].host.available, 0);
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn host_create() {
         let xml = get_xml("response/host/create.xml").unwrap();
-        let object = EppHostCreateResponse::deserialize(xml.as_str()).unwrap();
+        let object = HostCreate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.create_data.name, "host2.eppdev-1.com".into());
         assert_eq!(
             result.create_data.created_at,
             "2021-07-26T05:28:55.0Z".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn host_info() {
         let xml = get_xml("response/host/info.xml").unwrap();
-        let object = EppHostInfoResponse::deserialize(xml.as_str()).unwrap();
+        let object = HostInfo::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
+        let result = object.res_data().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.info_data.name, "host2.eppdev-1.com".into());
         assert_eq!(result.info_data.roid, "UNDEF-ROID".into());
         assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
@@ -549,43 +556,43 @@ mod response {
             *(result.info_data.updated_at.as_ref().unwrap()),
             "2021-07-26T05:28:55.0Z".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn host_update() {
         let xml = get_xml("response/host/update.xml").unwrap();
-        let object = EppHostUpdateResponse::deserialize(xml.as_str()).unwrap();
+        let object = HostUpdate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn host_delete() {
         let xml = get_xml("response/host/delete.xml").unwrap();
-        let object = EppHostDeleteResponse::deserialize(xml.as_str()).unwrap();
+        let object = HostDelete::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn message_poll() {
         let xml = get_xml("response/message/poll.xml").unwrap();
-        let object = EppMessagePollResponse::deserialize(xml.as_str()).unwrap();
+        let object = MessagePoll::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let result = object.data.res_data().unwrap();
-        let msg = object.data.message_queue().unwrap();
+        let result = object.res_data().unwrap();
+        let msg = object.message_queue().unwrap();
 
-        assert_eq!(object.data.result.code, 1301);
+        assert_eq!(object.result.code, 1301);
         assert_eq!(
-            object.data.result.message,
+            object.result.message,
             "Command completed successfully; ack to dequeue".into()
         );
         assert_eq!(msg.count, 5);
@@ -611,22 +618,22 @@ mod response {
             result.message_data.expiring_at,
             "2022-07-02T14:53:19.0Z".into()
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]
     fn message_ack() {
         let xml = get_xml("response/message/ack.xml").unwrap();
-        let object = EppMessageAckResponse::deserialize(xml.as_str()).unwrap();
+        let object = MessageAck::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
-        let msg = object.data.message_queue().unwrap();
+        let msg = object.message_queue().unwrap();
 
-        assert_eq!(object.data.result.code, 1000);
-        assert_eq!(object.data.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(msg.count, 4);
         assert_eq!(msg.id, "12345".to_string());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
     #[test]

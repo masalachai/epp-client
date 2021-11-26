@@ -43,8 +43,9 @@
 //!
 //! use epp_client::config::{EppClientConfig, EppClientConnection};
 //! use epp_client::EppClient;
-//! use epp_client::domain::check::{EppDomainCheck, EppDomainCheckResponse};
+//! use epp_client::domain::check::DomainCheck;
 //! use epp_client::generate_client_tr_id;
+//! use epp_client::common::NoExtension;
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -72,15 +73,14 @@
 //!
 //! // Make a domain check call, which returns an object of type EppDomainCheckResponse
 //! // that contains the result of the call
-//! let domain_check = EppDomainCheck::new(
+//! let domain_check = DomainCheck::<NoExtension>::new(
 //!     vec!["eppdev.com", "eppdev.net"],
-//!     generate_client_tr_id(&client).as_str()
 //! );
 //!
-//! let response = client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
+//! let response = client.transact_new(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 //!
 //! // print the availability results
-//! response.data.res_data.unwrap().check_data.domain_list
+//! response.res_data.unwrap().check_data.domain_list
 //!     .iter()
 //!     .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 //!

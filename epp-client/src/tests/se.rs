@@ -3,42 +3,47 @@
 mod request {
     use super::super::get_xml;
     use super::super::CLTRID;
+    use crate::common::HostAttrList;
+    use crate::common::HostList;
+    use crate::common::HostObjList;
+    use crate::common::NoExtension;
     use crate::common::{
         Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
     };
-    use crate::contact::check::EppContactCheck;
-    use crate::contact::create::EppContactCreate;
-    use crate::contact::delete::EppContactDelete;
-    use crate::contact::info::EppContactInfo;
-    use crate::contact::update::EppContactUpdate;
-    use crate::domain::check::EppDomainCheck;
-    use crate::domain::create::EppDomainCreate;
-    use crate::domain::delete::EppDomainDelete;
-    use crate::domain::info::EppDomainInfo;
-    use crate::domain::renew::EppDomainRenew;
+    use crate::contact::check::ContactCheck;
+    use crate::contact::create::ContactCreate;
+    use crate::contact::delete::ContactDelete;
+    use crate::contact::info::ContactInfo;
+    use crate::contact::update::ContactUpdate;
+    use crate::domain::check::DomainCheck;
+    use crate::domain::create::DomainCreate;
+    use crate::domain::delete::DomainDelete;
+    use crate::domain::info::DomainInfo;
+    use crate::domain::renew::DomainRenew;
     use crate::domain::rgp::report::EppDomainRgpRestoreReport;
     use crate::domain::rgp::request::EppDomainRgpRestoreRequest;
-    use crate::domain::transfer::EppDomainTransferApprove;
-    use crate::domain::transfer::EppDomainTransferCancel;
-    use crate::domain::transfer::EppDomainTransferQuery;
-    use crate::domain::transfer::EppDomainTransferReject;
-    use crate::domain::transfer::EppDomainTransferRequest;
+    use crate::domain::transfer::DomainTransferApprove;
+    use crate::domain::transfer::DomainTransferCancel;
+    use crate::domain::transfer::DomainTransferQuery;
+    use crate::domain::transfer::DomainTransferReject;
+    use crate::domain::transfer::DomainTransferRequest;
     use crate::domain::update::DomainAddRemove;
     use crate::domain::update::DomainChangeInfo;
-    use crate::domain::update::EppDomainUpdate;
+    use crate::domain::update::DomainUpdate;
     use crate::hello::EppHello;
-    use crate::host::check::EppHostCheck;
-    use crate::host::create::EppHostCreate;
-    use crate::host::delete::EppHostDelete;
-    use crate::host::info::EppHostInfo;
-    use crate::host::update::EppHostUpdate;
+    use crate::host::check::HostCheck;
+    use crate::host::create::HostCreate;
+    use crate::host::delete::HostDelete;
+    use crate::host::info::HostInfo;
     use crate::host::update::HostAddRemove;
     use crate::host::update::HostChangeInfo;
-    use crate::login::EppLogin;
-    use crate::logout::EppLogout;
-    use crate::message::ack::EppMessageAck;
-    use crate::message::poll::EppMessagePoll;
+    use crate::host::update::HostUpdate;
+    use crate::login::Login;
+    use crate::logout::Logout;
+    use crate::message::ack::MessageAck;
+    use crate::message::poll::MessagePoll;
+    use crate::request::EppRequest;
     use crate::xml::EppXml;
     use chrono::{DateTime, NaiveDate};
     use std::str::FromStr;
@@ -59,8 +64,8 @@ mod request {
         ]);
 
         let xml = get_xml("request/login.xml").unwrap();
-        let object = EppLogin::new("username", "password", &ext_uris, CLTRID);
-        let serialized = object.serialize().unwrap();
+        let object = Login::<NoExtension>::new("username", "password", &ext_uris);
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -68,8 +73,8 @@ mod request {
     #[test]
     fn logout() {
         let xml = get_xml("request/logout.xml").unwrap();
-        let object = EppLogout::new(CLTRID);
-        let serialized = object.serialize().unwrap();
+        let object = Logout::<NoExtension>::new();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -77,8 +82,8 @@ mod request {
     #[test]
     fn contact_check() {
         let xml = get_xml("request/contact/check.xml").unwrap();
-        let object = EppContactCheck::new(&["eppdev-contact-1", "eppdev-contact-2"], CLTRID);
-        let serialized = object.serialize().unwrap();
+        let object = ContactCheck::<NoExtension>::new(&["eppdev-contact-1", "eppdev-contact-2"]);
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -95,17 +100,16 @@ mod request {
         let mut fax = Phone::new("+33.86698799");
         fax.set_extension("677");
 
-        let mut object = EppContactCreate::new(
+        let mut object = ContactCreate::<NoExtension>::new(
             "eppdev-contact-3",
             "contact@eppdev.net",
             postal_info,
             voice,
             "eppdev-387323",
-            CLTRID,
         );
         object.set_fax(fax);
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -114,9 +118,9 @@ mod request {
     fn contact_info() {
         let xml = get_xml("request/contact/info.xml").unwrap();
 
-        let object = EppContactInfo::new("eppdev-contact-3", "eppdev-387323", CLTRID);
+        let object = ContactInfo::<NoExtension>::new("eppdev-contact-3", "eppdev-387323");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -125,7 +129,7 @@ mod request {
     fn contact_update() {
         let xml = get_xml("request/contact/update.xml").unwrap();
 
-        let mut object = EppContactUpdate::new("eppdev-contact-3", CLTRID);
+        let mut object = ContactUpdate::<NoExtension>::new("eppdev-contact-3");
 
         let street = &["58", "Orchid Road"];
         let address = Address::new(street, "Paris", "Paris", "392374", "FR");
@@ -142,7 +146,7 @@ mod request {
         }];
         object.remove(remove_statuses);
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -151,9 +155,9 @@ mod request {
     fn contact_delete() {
         let xml = get_xml("request/contact/delete.xml").unwrap();
 
-        let object = EppContactDelete::new("eppdev-contact-3", CLTRID);
+        let object = ContactDelete::<NoExtension>::new("eppdev-contact-3");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -162,9 +166,9 @@ mod request {
     fn domain_check() {
         let xml = get_xml("request/domain/check.xml").unwrap();
 
-        let object = EppDomainCheck::new(vec!["eppdev.com", "eppdev.net"], CLTRID);
+        let object = DomainCheck::<NoExtension>::new(vec!["eppdev.com", "eppdev.net"]);
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -188,16 +192,16 @@ mod request {
             },
         ];
 
-        let object = EppDomainCreate::new(
+        let object = DomainCreate::<NoExtension>::new(
             "eppdev-1.com",
             1,
-            "eppdev-contact-3",
+            None,
+            Some("eppdev-contact-3"),
             "epP4uthd#v",
-            contacts,
-            CLTRID,
+            Some(contacts),
         );
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -221,17 +225,20 @@ mod request {
             },
         ];
 
-        let object = EppDomainCreate::new_with_ns(
+        let ns = Some(HostList::HostObjList(HostObjList {
+            hosts: vec!["ns1.test.com".into(), "ns2.test.com".into()],
+        }));
+
+        let object = DomainCreate::<NoExtension>::new(
             "eppdev-1.com",
             1,
-            &["ns1.test.com", "ns2.test.com"],
-            "eppdev-contact-3",
+            ns,
+            Some("eppdev-contact-3"),
             "epP4uthd#v",
-            contacts,
-            CLTRID,
+            Some(contacts),
         );
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -255,31 +262,32 @@ mod request {
             },
         ];
 
-        let host_attr = vec![
-            HostAttr {
-                name: "ns1.eppdev-1.com".into(),
-                addresses: None,
-            },
-            HostAttr {
-                name: "ns2.eppdev-1.com".into(),
-                addresses: Some(vec![
-                    HostAddr::new_v4("177.232.12.58"),
-                    HostAddr::new_v6("2404:6800:4001:801::200e"),
-                ]),
-            },
-        ];
+        let host_attr = HostList::HostAttrList(HostAttrList {
+            hosts: vec![
+                HostAttr {
+                    name: "ns1.eppdev-1.com".into(),
+                    addresses: None,
+                },
+                HostAttr {
+                    name: "ns2.eppdev-1.com".into(),
+                    addresses: Some(vec![
+                        HostAddr::new_v4("177.232.12.58"),
+                        HostAddr::new_v6("2404:6800:4001:801::200e"),
+                    ]),
+                },
+            ],
+        });
 
-        let object = EppDomainCreate::new_with_host_attr(
+        let object = DomainCreate::<NoExtension>::new(
             "eppdev-2.com",
             1,
-            host_attr,
-            "eppdev-contact-3",
+            Some(host_attr),
+            Some("eppdev-contact-3"),
             "epP4uthd#v",
-            contacts,
-            CLTRID,
+            Some(contacts),
         );
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -288,9 +296,9 @@ mod request {
     fn domain_info() {
         let xml = get_xml("request/domain/info.xml").unwrap();
 
-        let object = EppDomainInfo::new("eppdev.com", CLTRID);
+        let object = DomainInfo::<NoExtension>::new("eppdev.com");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -299,7 +307,7 @@ mod request {
     fn domain_update() {
         let xml = get_xml("request/domain/update.xml").unwrap();
 
-        let mut object = EppDomainUpdate::new("eppdev.com", CLTRID);
+        let mut object = DomainUpdate::<NoExtension>::new("eppdev.com");
 
         let add = DomainAddRemove {
             ns: None,
@@ -327,7 +335,7 @@ mod request {
         object.remove(remove);
         object.info(change_info);
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -336,9 +344,9 @@ mod request {
     fn domain_delete() {
         let xml = get_xml("request/domain/delete.xml").unwrap();
 
-        let object = EppDomainDelete::new("eppdev.com", CLTRID);
+        let object = DomainDelete::<NoExtension>::new("eppdev.com");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -348,9 +356,9 @@ mod request {
         let xml = get_xml("request/domain/renew.xml").unwrap();
 
         let exp_date = NaiveDate::from_ymd(2022, 7, 23);
-        let object = EppDomainRenew::new("eppdev.com", exp_date, 1, CLTRID);
+        let object = DomainRenew::<NoExtension>::new("eppdev.com", exp_date, 1);
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -359,9 +367,9 @@ mod request {
     fn domain_transfer_request() {
         let xml = get_xml("request/domain/transfer_request.xml").unwrap();
 
-        let object = EppDomainTransferRequest::request("testing.com", 1, "epP4uthd#v", CLTRID);
+        let object = DomainTransferRequest::<NoExtension>::new("testing.com", 1, "epP4uthd#v");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -370,9 +378,9 @@ mod request {
     fn domain_transfer_approve() {
         let xml = get_xml("request/domain/transfer_approve.xml").unwrap();
 
-        let object = EppDomainTransferApprove::approve("testing.com", CLTRID);
+        let object = DomainTransferApprove::<NoExtension>::new("testing.com");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -381,9 +389,9 @@ mod request {
     fn domain_transfer_reject() {
         let xml = get_xml("request/domain/transfer_reject.xml").unwrap();
 
-        let object = EppDomainTransferReject::reject("testing.com", CLTRID);
+        let object = DomainTransferReject::<NoExtension>::new("testing.com");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -392,9 +400,9 @@ mod request {
     fn domain_transfer_cancel() {
         let xml = get_xml("request/domain/transfer_cancel.xml").unwrap();
 
-        let object = EppDomainTransferCancel::cancel("testing.com", CLTRID);
+        let object = DomainTransferCancel::<NoExtension>::new("testing.com");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -403,9 +411,9 @@ mod request {
     fn domain_transfer_query() {
         let xml = get_xml("request/domain/transfer_query.xml").unwrap();
 
-        let object = EppDomainTransferQuery::query("testing.com", "epP4uthd#v", CLTRID);
+        let object = DomainTransferQuery::<NoExtension>::new("testing.com", "epP4uthd#v");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -414,9 +422,9 @@ mod request {
     fn host_check() {
         let xml = get_xml("request/host/check.xml").unwrap();
 
-        let object = EppHostCheck::new(&["ns1.eppdev-1.com", "host1.eppdev-1.com"], CLTRID);
+        let object = HostCheck::<NoExtension>::new(&["ns1.eppdev-1.com", "host1.eppdev-1.com"]);
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -430,9 +438,9 @@ mod request {
             HostAddr::new("v6", "2404:6800:4001:801::200e"),
         ];
 
-        let object = EppHostCreate::new("host1.eppdev-1.com", addresses, CLTRID);
+        let object = HostCreate::<NoExtension>::new("host1.eppdev-1.com", addresses);
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -441,9 +449,9 @@ mod request {
     fn host_info() {
         let xml = get_xml("request/host/info.xml").unwrap();
 
-        let object = EppHostInfo::new("ns1.eppdev-1.com", CLTRID);
+        let object = HostInfo::<NoExtension>::new("ns1.eppdev-1.com");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -466,7 +474,7 @@ mod request {
             }]),
         };
 
-        let mut object = EppHostUpdate::new("host1.eppdev-1.com", CLTRID);
+        let mut object = HostUpdate::<NoExtension>::new("host1.eppdev-1.com");
 
         object.add(add);
         object.remove(remove);
@@ -474,7 +482,7 @@ mod request {
             name: "host2.eppdev-1.com".into(),
         });
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -483,9 +491,9 @@ mod request {
     fn host_delete() {
         let xml = get_xml("request/host/delete.xml").unwrap();
 
-        let object = EppHostDelete::new("ns1.eppdev-1.com", CLTRID);
+        let object = HostDelete::<NoExtension>::new("ns1.eppdev-1.com");
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -494,9 +502,9 @@ mod request {
     fn message_poll() {
         let xml = get_xml("request/message/poll.xml").unwrap();
 
-        let object = EppMessagePoll::new(CLTRID);
+        let object = MessagePoll::<NoExtension>::new();
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -505,9 +513,9 @@ mod request {
     fn message_ack() {
         let xml = get_xml("request/message/ack.xml").unwrap();
 
-        let object = EppMessageAck::new(12345, CLTRID);
+        let object = MessageAck::<NoExtension>::new(12345);
 
-        let serialized = object.serialize().unwrap();
+        let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);
     }

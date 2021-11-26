@@ -4,12 +4,25 @@ use epp_client_macros::*;
 
 use super::EPP_DOMAIN_XMLNS;
 use crate::common::{
-    DomainAuthInfo, DomainContact, DomainStatus, ElementName, EppObject, HostAttr, StringValue,
+    DomainAuthInfo, DomainContact, DomainStatus, ElementName, HostAttr, NoExtension, StringValue,
 };
-use crate::domain::rgp::request::RgpRequestResponse;
-use crate::request::Command;
-use crate::response::CommandResponseWithExtension;
+use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct DomainInfo<E> {
+    request: DomainInfoRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for DomainInfo<E> {
+    type Input = DomainInfoRequest;
+    type Output = DomainInfoResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;info&gt; command
 ///
@@ -20,8 +33,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::domain::info::{EppDomainInfo, EppDomainInfoResponse};
+/// use epp_client::domain::info::DomainInfo;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -46,24 +60,21 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppDomainInfo instance
-///     let domain_info = EppDomainInfo::new("eppdev-100.com", generate_client_tr_id(&client).as_str());
+///     // Create an DomainInfo instance
+///     let domain_info = DomainInfo::<NoExtension>::new("eppdev-100.com");
 ///
-///     // send it to the registry and receive a response of type EppDomainInfoResponse
-///     let response = client.transact::<_, EppDomainInfoResponse>(&domain_info).await.unwrap();
+///     // send it to the registry and receive a response of type DomainInfoResponse
+///     let response = client.transact_new(domain_info, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainInfo = EppObject<Command<DomainInfoRequest>>;
-
-impl EppDomainInfo {
-    /// Creates a new EppObject for domain info corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppDomainInfo {
-        EppObject::build(Command::<DomainInfoRequest>::new(
-            DomainInfoRequest {
+impl<E: EppExtension> DomainInfo<E> {
+    pub fn new(name: &str) -> DomainInfo<NoExtension> {
+        DomainInfo {
+            request: DomainInfoRequest {
                 info: DomainInfoRequestData {
                     xmlns: EPP_DOMAIN_XMLNS.to_string(),
                     domain: Domain {
@@ -72,14 +83,17 @@ impl EppDomainInfo {
                     },
                 },
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainInfo<F> {
+        DomainInfo {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML domain info response
-pub type EppDomainInfoResponse =
-    EppObject<CommandResponseWithExtension<DomainInfoResponse, RgpRequestResponse>>;
 
 // Request
 

@@ -2,11 +2,26 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, HostAddr, HostStatus, StringValue};
+use crate::common::{ElementName, HostAddr, HostStatus, NoExtension, StringValue};
 use crate::host::EPP_HOST_XMLNS;
-use crate::request::Command;
+use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
+
+#[derive(Debug)]
+pub struct HostUpdate<E> {
+    request: HostUpdateRequest,
+    extension: Option<E>,
+}
+
+impl<E: EppExtension> EppRequest<E> for HostUpdate<E> {
+    type Input = HostUpdateRequest;
+    type Output = EppCommandResponse;
+
+    fn into_parts(self) -> (Self::Input, Option<E>) {
+        (self.request, self.extension)
+    }
+}
 
 /// Type that represents the &lt;epp&gt; request for host &lt;update&gt; command
 ///
@@ -18,8 +33,9 @@ use serde::{Deserialize, Serialize};
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
 /// use epp_client::common::{HostAddr, HostStatus};
-/// use epp_client::host::update::{EppHostUpdate, EppHostUpdateResponse, HostAddRemove, HostChangeInfo};
+/// use epp_client::host::update::{HostUpdate, HostAddRemove, HostChangeInfo};
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -44,8 +60,8 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppHostUpdate instance
-///     let mut host_update = EppHostUpdate::new("ns1.eppdev-101.com", generate_client_tr_id(&client).as_str());
+///     // Create an HostUpdate instance
+///     let mut host_update = HostUpdate::<NoExtension>::new("ns1.eppdev-101.com");
 ///
 ///     /// Prepare the add and remove sections for the update
 ///     let add = HostAddRemove {
@@ -68,21 +84,18 @@ use serde::{Deserialize, Serialize};
 ///     // Send a &lt;chg&gt; section as well
 ///     host_update.info(HostChangeInfo { name: "ns2.eppdev-101.com".into() });
 ///
-///     // send it to the registry and receive a response of type EppHostUpdateResponse
-///     let response = client.transact::<_, EppHostUpdateResponse>(&host_update).await.unwrap();
+///     // send it to the registry and receive a response of type HostUpdateResponse
+///     let response = client.transact_new(host_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppHostUpdate = EppObject<Command<HostUpdateRequest>>;
-
-impl EppHostUpdate {
-    /// Creates a new EppObject for host update corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppHostUpdate {
-        EppObject::build(Command::<HostUpdateRequest>::new(
-            HostUpdateRequest {
+impl<E: EppExtension> HostUpdate<E> {
+    pub fn new(name: &str) -> HostUpdate<NoExtension> {
+        HostUpdate {
+            request: HostUpdateRequest {
                 host: HostUpdateRequestData {
                     xmlns: EPP_HOST_XMLNS.to_string(),
                     name: name.into(),
@@ -91,28 +104,32 @@ impl EppHostUpdate {
                     change_info: None,
                 },
             },
-            client_tr_id,
-        ))
+            extension: None,
+        }
+    }
+
+    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostUpdate<F> {
+        HostUpdate {
+            request: self.request,
+            extension: Some(extension),
+        }
     }
 
     /// Sets the data for the &lt;chg&gt; element of the host update
     pub fn info(&mut self, info: HostChangeInfo) {
-        self.data.command.host.change_info = Some(info);
+        self.request.host.change_info = Some(info);
     }
 
     /// Sets the data for the &lt;add&gt; element of the host update
     pub fn add(&mut self, add: HostAddRemove) {
-        self.data.command.host.add = Some(add);
+        self.request.host.add = Some(add);
     }
 
     /// Sets the data for the &lt;rem&gt; element of the host update
     pub fn remove(&mut self, remove: HostAddRemove) {
-        self.data.command.host.remove = Some(remove);
+        self.request.host.remove = Some(remove);
     }
 }
-
-/// Type that represents the &lt;epp&gt; tag for the EPP XML host update response
-pub type EppHostUpdateResponse = EppCommandResponse;
 
 /// Type for data under the &lt;chg&gt; tag
 #[derive(Serialize, Deserialize, Debug)]
