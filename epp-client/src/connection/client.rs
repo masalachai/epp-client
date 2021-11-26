@@ -41,7 +41,7 @@
 //!
 //! // Execute an EPP Command against the registry with distinct request and response objects
 //! let domain_check = DomainCheck::<NoExtension>::new(vec!["eppdev.com", "eppdev.net"]);
-//! let response = client.transact_new(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
+//! let response = client.transact(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 //! println!("{:?}", response);
 //!
 //! }
@@ -58,10 +58,7 @@ use crate::hello::{EppGreeting, EppHello};
 use crate::login::Login;
 use crate::logout::Logout;
 use crate::request::{generate_client_tr_id, EppExtension, EppRequest};
-use crate::response::{
-    CommandResponseStatus, CommandResponseWithExtension, EppCommandResponse,
-    EppCommandResponseError,
-};
+use crate::response::{CommandResponseStatus, CommandResponseWithExtension};
 use crate::xml::EppXml;
 /// Instances of the EppClient type are used to transact with the registry.
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
@@ -125,7 +122,7 @@ impl EppClient {
         );
 
         client
-            .transact_new(login_request, client_tr_id.as_str())
+            .transact(login_request, client_tr_id.as_str())
             .await?;
 
         Ok(client)
@@ -141,28 +138,7 @@ impl EppClient {
         Ok(EppGreeting::deserialize(&response)?)
     }
 
-    /// Accepts an EPP request object to convert to a request to send to the registry. The response from the
-    /// registry is deserialized to response type E and returned.
-    pub async fn transact<T: EppXml + Debug, E: EppXml + Debug>(
-        &mut self,
-        request: &T,
-    ) -> Result<E::Output, error::Error> {
-        let epp_xml = request.serialize()?;
-
-        let response = self.connection.transact(&epp_xml).await?;
-
-        let status = EppCommandResponse::deserialize(&response)?;
-
-        if status.data.result.code < 2000 {
-            let response = E::deserialize(&response)?;
-            Ok(response)
-        } else {
-            let epp_error = EppCommandResponseError::deserialize(&response)?;
-            Err(error::Error::EppCommandError(epp_error))
-        }
-    }
-
-    pub async fn transact_new<T, E>(
+    pub async fn transact<T, E>(
         &mut self,
         request: T,
         id: &str,
@@ -209,7 +185,7 @@ impl EppClient {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = Logout::<NoExtension>::new();
 
-        let response = self.transact_new(epp_logout, client_tr_id.as_str()).await?;
+        let response = self.transact(epp_logout, client_tr_id.as_str()).await?;
 
         self.connection.shutdown().await?;
 

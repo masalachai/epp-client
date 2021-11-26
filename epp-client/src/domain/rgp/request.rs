@@ -52,7 +52,7 @@ use serde::{Deserialize, Serialize};
 ///     let mut domain_update = DomainUpdate::<RgpRestoreRequest>::new("eppdev-100.com").with_extension(domain_restore_req);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
-///     let response = client.transact_new(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

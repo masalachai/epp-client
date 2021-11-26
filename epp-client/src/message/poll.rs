@@ -61,7 +61,7 @@ impl<E: EppExtension> EppRequest<E> for MessagePoll<E> {
 ///     let message_poll = MessagePoll::<NoExtension>::new();
 ///
 ///     // send it to the registry and receive a response of type MessagePollResponse
-///     let response = client.transact_new(message_poll, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(message_poll, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

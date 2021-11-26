@@ -85,7 +85,7 @@ impl<E: EppExtension> EppRequest<E> for HostUpdate<E> {
 ///     host_update.info(HostChangeInfo { name: "ns2.eppdev-101.com".into() });
 ///
 ///     // send it to the registry and receive a response of type HostUpdateResponse
-///     let response = client.transact_new(host_update, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(host_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

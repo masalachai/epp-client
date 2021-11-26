@@ -64,7 +64,7 @@ impl<E: EppExtension> EppRequest<E> for DomainInfo<E> {
 ///     let domain_info = DomainInfo::<NoExtension>::new("eppdev-100.com");
 ///
 ///     // send it to the registry and receive a response of type DomainInfoResponse
-///     let response = client.transact_new(domain_info, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_info, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

@@ -68,7 +68,7 @@ impl<E: EppExtension> EppRequest<E> for DomainRenew<E> {
 ///     let domain_renew = DomainRenew::<NoExtension>::new("eppdev-100.com", exp_date, 1);
 ///
 ///     // send it to the registry and receive a response of type DomainRenewResponse
-///     let response = client.transact_new(domain_renew, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_renew, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

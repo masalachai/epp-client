@@ -63,7 +63,7 @@ impl<E: EppExtension> EppRequest<E> for DomainDelete<E> {
 ///     let mut domain_delete = DomainDelete::<NoExtension>::new("eppdev-100.com");
 ///
 ///     // send it to the registry and receive a response of type DomainDeleteResponse
-///     let response = client.transact_new(domain_delete, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_delete, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

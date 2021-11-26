@@ -65,7 +65,7 @@ impl<E: EppExtension> EppRequest<E> for ContactDelete<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type ContactDeleteResponse
-///     let response = client.transact_new(contact_delete, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(contact_delete, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

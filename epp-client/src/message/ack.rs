@@ -60,7 +60,7 @@ impl<E: EppExtension> EppRequest<E> for MessageAck<E> {
 ///     let message_ack = MessageAck::<NoExtension>::new(12345);
 ///
 ///     // send it to the registry and receive a response of type MessageAckResponse
-///     let response = client.transact_new(message_ack, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(message_ack, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
