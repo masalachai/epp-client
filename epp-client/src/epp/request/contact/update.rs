@@ -2,10 +2,10 @@
 
 use epp_client_macros::*;
 
+use crate::contact::info::EppContactInfoResponse;
 use crate::epp::object::data::{ContactAuthInfo, ContactStatus, Phone, PostalInfo};
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
-use crate::epp::response::contact::info::EppContactInfoResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use crate::error;
 use serde::{Deserialize, Serialize};
