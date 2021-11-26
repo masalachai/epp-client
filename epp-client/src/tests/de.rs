@@ -8,6 +8,11 @@ mod response {
     use crate::domain::delete::EppDomainDeleteResponse;
     use crate::domain::info::EppDomainInfoResponse;
     use crate::domain::renew::EppDomainRenewResponse;
+    use crate::domain::transfer::EppDomainTransferApproveResponse;
+    use crate::domain::transfer::EppDomainTransferCancelResponse;
+    use crate::domain::transfer::EppDomainTransferQueryResponse;
+    use crate::domain::transfer::EppDomainTransferRejectResponse;
+    use crate::domain::transfer::EppDomainTransferRequestResponse;
     use crate::epp::response::ExpiryType;
     use crate::epp::response::Relative;
     use crate::epp::response::{

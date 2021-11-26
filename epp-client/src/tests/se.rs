@@ -8,6 +8,11 @@ mod request {
     use crate::domain::delete::EppDomainDelete;
     use crate::domain::info::EppDomainInfo;
     use crate::domain::renew::EppDomainRenew;
+    use crate::domain::transfer::EppDomainTransferApprove;
+    use crate::domain::transfer::EppDomainTransferCancel;
+    use crate::domain::transfer::EppDomainTransferQuery;
+    use crate::domain::transfer::EppDomainTransferReject;
+    use crate::domain::transfer::EppDomainTransferRequest;
     use crate::epp::object::data::{
         Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
