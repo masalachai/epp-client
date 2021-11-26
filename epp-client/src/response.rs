@@ -4,10 +4,11 @@ use epp_client_macros::*;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-use crate::common::{ElementName, EmptyTag, EppObject, Extension, StringValue};
+use crate::common::NoExtension;
+use crate::common::{ElementName, EppObject, Extension, StringValue};
 
 /// Type corresponding to the &lt;response&gt; tag in an EPP response without an &lt;extension&gt; section
-pub type CommandResponse<T> = CommandResponseWithExtension<T, EmptyTag>;
+pub type CommandResponse<T> = CommandResponseWithExtension<T, NoExtension>;
 
 /// A generic EPP Response to an EPP command with a result section, a status code and a message
 pub type EppCommandResponse = EppObject<CommandResponseStatus>;

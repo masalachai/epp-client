@@ -6,7 +6,8 @@ use std::fmt::Debug;
 use std::time::SystemTime;
 
 use crate::{
-    common::{ElementName, EmptyTag, EppObject, Extension, StringValue},
+    common::NoExtension,
+    common::{ElementName, EppObject, Extension, StringValue},
     response::{CommandResponseStatus, CommandResponseWithExtension},
     xml::EppXml,
 };
@@ -57,7 +58,7 @@ pub trait EppExtension: ElementName + DeserializeOwned + Serialize + Sized + Deb
 
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// without an &lt;extension&gt; tag
-pub type Command<T> = CommandWithExtension<T, EmptyTag>;
+pub type Command<T> = CommandWithExtension<T, NoExtension>;
 
 #[derive(Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "command")]
