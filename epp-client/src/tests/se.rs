@@ -34,6 +34,9 @@ mod request {
     use crate::host::create::EppHostCreate;
     use crate::host::delete::EppHostDelete;
     use crate::host::info::EppHostInfo;
+    use crate::host::update::EppHostUpdate;
+    use crate::host::update::HostAddRemove;
+    use crate::host::update::HostChangeInfo;
     use chrono::{DateTime, NaiveDate};
     use std::str::FromStr;
 

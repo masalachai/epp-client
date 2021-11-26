@@ -1,6 +1,5 @@
 //! Types for EPP responses
 
-pub mod host;
 pub mod message;
 
 use epp_client_macros::*;
