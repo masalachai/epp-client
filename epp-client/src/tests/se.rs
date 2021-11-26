@@ -9,6 +9,7 @@ mod request {
     use crate::domain::info::EppDomainInfo;
     use crate::domain::renew::EppDomainRenew;
     use crate::domain::rgp::report::EppDomainRgpRestoreReport;
+    use crate::domain::rgp::request::EppDomainRgpRestoreRequest;
     use crate::domain::transfer::EppDomainTransferApprove;
     use crate::domain::transfer::EppDomainTransferCancel;
     use crate::domain::transfer::EppDomainTransferQuery;

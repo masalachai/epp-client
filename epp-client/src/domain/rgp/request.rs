@@ -3,8 +3,9 @@
 use epp_client_macros::*;
 
 use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
-use crate::epp::object::{ElementName, EppObject};
-use crate::epp::request::{CommandWithExtension, Extension};
+use crate::epp::object::{ElementName, EmptyTag, EppObject, Extension};
+use crate::epp::request::CommandWithExtension;
+use crate::epp::response::CommandResponseWithExtension;
 use crate::epp::xml::{EPP_DOMAIN_RGP_EXT_XMLNS, EPP_DOMAIN_XMLNS};
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +18,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppDomainRgpRestoreRequest, EppDomainRgpRestoreRequestResponse};
+/// use epp_client::domain::rgp::request::{EppDomainRgpRestoreRequest, EppDomainRgpRestoreRequestResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -60,25 +61,6 @@ use serde::{Deserialize, Serialize};
 pub type EppDomainRgpRestoreRequest =
     EppObject<CommandWithExtension<DomainUpdateRequest, RgpRestoreRequest>>;
 
-/// Type corresponding to the &lt;restore&gt; tag for an rgp restore request
-#[derive(Serialize, Deserialize, Debug)]
-pub struct RgpRestoreRequestData {
-    /// The value of the op attribute in the &lt;restore&gt; tag
-    pub op: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "rgp:update")]
-/// Type for EPP XML &lt;check&gt; command for domains
-pub struct RgpRestoreRequest {
-    /// XML namespace for the RGP restore extension
-    #[serde(rename = "xmlns:rgp", alias = "xmlns")]
-    xmlns: String,
-    /// The object holding the list of domains to be checked
-    #[serde(rename = "rgp:restore", alias = "restore")]
-    restore: RgpRestoreRequestData,
-}
-
 impl EppDomainRgpRestoreRequest {
     /// Creates a new EppObject for domain rgp restore request corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(name: &str, client_tr_id: &str) -> EppDomainRgpRestoreRequest {
@@ -108,4 +90,51 @@ impl EppDomainRgpRestoreRequest {
 
         EppObject::build(command)
     }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML rgp restore request response
+pub type EppDomainRgpRestoreRequestResponse =
+    EppObject<CommandResponseWithExtension<EmptyTag, RgpRequestResponse>>;
+
+// Request
+
+/// Type corresponding to the &lt;restore&gt; tag for an rgp restore request
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RgpRestoreRequestData {
+    /// The value of the op attribute in the &lt;restore&gt; tag
+    pub op: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, ElementName)]
+#[element_name(name = "rgp:update")]
+/// Type for EPP XML &lt;check&gt; command for domains
+pub struct RgpRestoreRequest {
+    /// XML namespace for the RGP restore extension
+    #[serde(rename = "xmlns:rgp", alias = "xmlns")]
+    xmlns: String,
+    /// The object holding the list of domains to be checked
+    #[serde(rename = "rgp:restore", alias = "restore")]
+    restore: RgpRestoreRequestData,
+}
+
+// Response
+
+/// Type that represents the &lt;rgpStatus&gt; tag for domain rgp restore request response
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RgpStatus {
+    /// The domain RGP status
+    #[serde(rename = "s")]
+    pub status: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, ElementName)]
+#[serde(rename = "upData")]
+#[element_name(name = "upData")]
+/// Type that represents the &lt;resData&gt; tag for domain transfer response
+pub struct RgpRequestResponse {
+    #[serde(rename = "xmlns:rgp")]
+    xmlns: String,
+    /// Data under the &lt;rgpStatus&gt; tag
+    #[serde(rename = "rgpStatus")]
+    pub rgp_status: RgpStatus,
 }

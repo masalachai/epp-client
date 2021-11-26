@@ -2,12 +2,12 @@
 
 use epp_client_macros::*;
 
+use crate::domain::rgp::request::RgpRequestResponse;
 use crate::epp::object::data::{DomainAuthInfo, DomainContact, DomainStatus, HostAttr};
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
 use crate::epp::response::CommandResponseWithExtension;
 use crate::epp::xml::EPP_DOMAIN_XMLNS;
-use crate::epp::RgpRequestResult;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;info&gt; command
@@ -78,7 +78,7 @@ impl EppDomainInfo {
 
 /// Type that represents the &lt;epp&gt; tag for the EPP XML domain info response
 pub type EppDomainInfoResponse =
-    EppObject<CommandResponseWithExtension<DomainInfoResponse, RgpRequestResult>>;
+    EppObject<CommandResponseWithExtension<DomainInfoResponse, RgpRequestResponse>>;
 
 // Request
 
