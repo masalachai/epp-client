@@ -4,6 +4,7 @@ use epp_client_macros::*;
 
 use crate::epp::object::{ElementName, EppObject, StringValue};
 use crate::epp::request::Command;
+use crate::epp::response::EppCommandResponse;
 use crate::epp::xml::EPP_CONTACT_XMLNS;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +17,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppContactDelete, EppContactDeleteResponse};
+/// use epp_client::contact::delete::{EppContactDelete, EppContactDeleteResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -56,11 +57,31 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppContactDelete = EppObject<Command<ContactDelete>>;
+pub type EppContactDelete = EppObject<Command<ContactDeleteRequest>>;
+
+impl EppContactDelete {
+    /// Creates a new EppObject for contact delete corresponding to the &lt;epp&gt; tag in EPP XML
+    pub fn new(id: &str, client_tr_id: &str) -> EppContactDelete {
+        let contact_delete = ContactDeleteRequest {
+            contact: ContactDeleteRequestData {
+                xmlns: EPP_CONTACT_XMLNS.to_string(),
+                id: id.into(),
+            },
+        };
+
+        EppObject::build(Command::<ContactDeleteRequest>::new(
+            contact_delete,
+            client_tr_id,
+        ))
+    }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML contact delete response
+pub type EppContactDeleteResponse = EppCommandResponse;
 
 /// Type containing the data for the &lt;delete&gt; tag for contacts
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ContactDeleteData {
+pub struct ContactDeleteRequestData {
     /// XML namespace for the &lt;delete&gt; command for contacts
     #[serde(rename = "xmlns:contact", alias = "xmlns")]
     xmlns: String,
@@ -72,22 +93,8 @@ pub struct ContactDeleteData {
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "delete")]
 /// The &lt;delete&gt; type for the contact delete EPP command
-pub struct ContactDelete {
+pub struct ContactDeleteRequest {
     #[serde(rename = "contact:delete", alias = "delete")]
     /// The data for the &lt;delete&gt; tag for a contact delete command
-    contact: ContactDeleteData,
-}
-
-impl EppContactDelete {
-    /// Creates a new EppObject for contact delete corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(id: &str, client_tr_id: &str) -> EppContactDelete {
-        let contact_delete = ContactDelete {
-            contact: ContactDeleteData {
-                xmlns: EPP_CONTACT_XMLNS.to_string(),
-                id: id.into(),
-            },
-        };
-
-        EppObject::build(Command::<ContactDelete>::new(contact_delete, client_tr_id))
-    }
+    contact: ContactDeleteRequestData,
 }

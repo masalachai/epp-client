@@ -5,6 +5,7 @@ mod request {
     use super::super::CLTRID;
     use crate::contact::check::EppContactCheck;
     use crate::contact::create::EppContactCreate;
+    use crate::contact::delete::EppContactDelete;
     use crate::domain::check::EppDomainCheck;
     use crate::domain::create::EppDomainCreate;
     use crate::domain::delete::EppDomainDelete;
