@@ -4,6 +4,7 @@ use epp_client_macros::*;
 
 use crate::epp::object::{ElementName, EppObject};
 use crate::epp::request::Command;
+use crate::epp::response::CommandResponse;
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for registry <poll op="ack"> command
@@ -14,7 +15,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::epp::{EppMessageAck, EppMessageAckResponse};
+/// use epp_client::message::ack::{EppMessageAck, EppMessageAckResponse};
 /// use epp_client::epp::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -51,29 +52,32 @@ use serde::{Deserialize, Serialize};
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppMessageAck = EppObject<Command<MessageAck>>;
-
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "poll")]
-/// Type for EPP XML &lt;poll&gt; command for message ack
-pub struct MessageAck {
-    /// The type of operation to perform
-    /// The value is "ack" for message acknowledgement
-    op: String,
-    /// The ID of the message to be acknowledged
-    #[serde(rename = "msgID")]
-    message_id: String,
-}
+pub type EppMessageAck = EppObject<Command<MessageAckRequest>>;
 
 impl EppMessageAck {
     /// Creates a new EppObject for &lt;poll&gt; ack corresponding to the &lt;epp&gt; tag in EPP XML
     pub fn new(message_id: u32, client_tr_id: &str) -> EppMessageAck {
-        EppObject::build(Command::<MessageAck>::new(
-            MessageAck {
+        EppObject::build(Command::<MessageAckRequest>::new(
+            MessageAckRequest {
                 op: "ack".to_string(),
                 message_id: message_id.to_string(),
             },
             client_tr_id,
         ))
     }
+}
+
+/// Type that represents the &lt;epp&gt; tag for the EPP XML message ack response
+pub type EppMessageAckResponse = EppObject<CommandResponse<String>>;
+
+#[derive(Serialize, Deserialize, Debug, ElementName)]
+#[element_name(name = "poll")]
+/// Type for EPP XML &lt;poll&gt; command for message ack
+pub struct MessageAckRequest {
+    /// The type of operation to perform
+    /// The value is "ack" for message acknowledgement
+    op: String,
+    /// The ID of the message to be acknowledged
+    #[serde(rename = "msgID")]
+    message_id: String,
 }
