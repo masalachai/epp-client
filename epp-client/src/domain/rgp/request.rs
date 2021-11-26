@@ -2,12 +2,11 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, Extension, NoExtension};
+use crate::common::ElementName;
 use crate::domain::rgp::EPP_DOMAIN_RGP_EXT_XMLNS;
-use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
-use crate::domain::EPP_DOMAIN_XMLNS;
-use crate::request::CommandWithExtension;
-use crate::response::CommandResponseWithExtension;
+
+use crate::request::EppExtension;
+
 use serde::{Deserialize, Serialize};
 
 /// Type that represents the &lt;epp&gt; request for a domain rgp restore request command
@@ -19,7 +18,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::domain::rgp::request::{EppDomainRgpRestoreRequest, EppDomainRgpRestoreRequestResponse};
+/// use epp_client::domain::rgp::request::RgpRestoreRequest;
+/// use epp_client::domain::update::DomainUpdate;
 /// use epp_client::generate_client_tr_id;
 ///
 /// #[tokio::main]
@@ -45,57 +45,41 @@ use serde::{Deserialize, Serialize};
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     // Create an EppDomainRgpRestoreRequest instance
-///     let domain_restore_req = EppDomainRgpRestoreRequest::new(
-///         "eppdev.com",
-///         generate_client_tr_id(&client).as_str()
-///     );
+///     // Create an RgpRestoreRequest instance
+///     let domain_restore_req = RgpRestoreRequest::new();
 ///
-///     // send it to the registry and receive a response of type EppDomainRgpRestoreRequestResponse
-///     let response = client.transact::<_, EppDomainRgpRestoreRequestResponse>(&domain_restore_req).await.unwrap();
+///     // Create an DomainUpdate instance
+///     let mut domain_update = DomainUpdate::<RgpRestoreRequest>::new("eppdev-100.com").with_extension(domain_restore_req);
+///
+///     // send it to the registry and receive a response of type EppDomainUpdateResponse
+///     let response = client.transact_new(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainRgpRestoreRequest =
-    EppObject<CommandWithExtension<DomainUpdateRequest, RgpRestoreRequest>>;
-
-impl EppDomainRgpRestoreRequest {
-    /// Creates a new EppObject for domain rgp restore request corresponding to the &lt;epp&gt; tag in EPP XML
-    pub fn new(name: &str, client_tr_id: &str) -> EppDomainRgpRestoreRequest {
-        let command = CommandWithExtension::<DomainUpdateRequest, RgpRestoreRequest> {
-            command: DomainUpdateRequest {
-                domain: DomainUpdateRequestData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.into(),
-                    add: None,
-                    remove: None,
-                    change_info: Some(DomainChangeInfo {
-                        registrant: None,
-                        auth_info: None,
-                    }),
-                },
+impl RgpRestoreRequest {
+    /// Creates a new instance of EppDomainRgpRestoreRequest
+    pub fn new() -> RgpRestoreRequest {
+        RgpRestoreRequest {
+            xmlns: EPP_DOMAIN_RGP_EXT_XMLNS.to_string(),
+            restore: RgpRestoreRequestData {
+                op: "request".to_string(),
             },
-            extension: Some(Extension {
-                data: RgpRestoreRequest {
-                    xmlns: EPP_DOMAIN_RGP_EXT_XMLNS.to_string(),
-                    restore: RgpRestoreRequestData {
-                        op: "request".to_string(),
-                    },
-                },
-            }),
-            client_tr_id: client_tr_id.into(),
-        };
-
-        EppObject::build(command)
+        }
     }
 }
 
-/// Type that represents the &lt;epp&gt; tag for the EPP XML rgp restore request response
-pub type EppDomainRgpRestoreRequestResponse =
-    EppObject<CommandResponseWithExtension<NoExtension, RgpRequestResponse>>;
+impl Default for RgpRestoreRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl EppExtension for RgpRestoreRequest {
+    type Response = RgpRequestResponse;
+}
 
 // Request
 

@@ -2,16 +2,13 @@
 
 use epp_client_macros::*;
 
-use crate::common::{ElementName, EppObject, Extension, StringValue};
+use crate::common::{ElementName, NoExtension, StringValue};
 use crate::domain::rgp::EPP_DOMAIN_RGP_EXT_XMLNS;
-use crate::domain::update::{DomainChangeInfo, DomainUpdateRequest, DomainUpdateRequestData};
-use crate::domain::EPP_DOMAIN_XMLNS;
-use crate::request::CommandWithExtension;
-use crate::response::EppCommandResponse;
+use crate::request::EppExtension;
 use chrono::{DateTime, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 
-/// Type that represents the &lt;epp&gt; request for domain rgp restore report command
+/// Type that represents the domain rgp restore report extension
 ///
 /// ## Usage
 ///
@@ -20,8 +17,11 @@ use serde::{Deserialize, Serialize};
 ///
 /// use epp_client::config::{EppClientConfig, EppClientConnection};
 /// use epp_client::EppClient;
-/// use epp_client::domain::rgp::report::{EppDomainRgpRestoreReport, EppDomainRgpRestoreReportResponse};
+/// use epp_client::common::{DomainStatus, DomainContact};
+/// use epp_client::domain::rgp::report::RgpRestoreReport;
+/// use epp_client::domain::update::DomainUpdate;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::common::NoExtension;
 /// use chrono::{DateTime, NaiveDate};
 /// use std::str::FromStr;
 ///
@@ -61,35 +61,30 @@ use serde::{Deserialize, Serialize};
 ///     ];
 ///     let other = "Supporting information goes here.";
 ///
-///     // Create an EppDomainRgpRestoreReport instance
-///     let domain_restore_report = EppDomainRgpRestoreReport::new(
-///         "eppdev.com",
+///     let domain_restore_report = RgpRestoreReport::new(
 ///         pre_data,
 ///         post_data,
 ///         deleted_at,
 ///         restored_at,
 ///         restore_reason,
 ///         &statements,
-///         other,
-///         generate_client_tr_id(&client).as_str()
+///         other
 ///     );
 ///
-///     // send it to the registry and receive a response of type EppDomainRgpRestoreReportResponse
-///     let response = client.transact::<_, EppDomainRgpRestoreReportResponse>(&domain_restore_report).await.unwrap();
+///     // Create an DomainUpdate instance
+///     let mut domain_update = DomainUpdate::<RgpRestoreReport>::new("eppdev-100.com").with_extension(domain_restore_report);
+///
+///     // send it to the registry and receive a response of type EppDomainUpdateResponse
+///     let response = client.transact_new(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();
 /// }
 /// ```
-pub type EppDomainRgpRestoreReport =
-    EppObject<CommandWithExtension<DomainUpdateRequest, RgpRestoreReportRequest>>;
-
-impl EppDomainRgpRestoreReport {
-    /// Creates a new EppObject for domain rgp restore report corresponding to the &lt;epp&gt; tag in EPP XML
-    #[allow(clippy::too_many_arguments)]
+impl RgpRestoreReport {
+    /// Create a new RGP restore report request
     pub fn new(
-        name: &str,
         pre_data: &str,
         post_data: &str,
         deleted_at: DateTime<Utc>,
@@ -97,57 +92,38 @@ impl EppDomainRgpRestoreReport {
         restore_reason: &str,
         statements: &[&str],
         other: &str,
-        client_tr_id: &str,
-    ) -> EppDomainRgpRestoreReport {
+    ) -> RgpRestoreReport {
         let statements = statements.iter().map(|&s| s.into()).collect();
 
-        let command = CommandWithExtension::<DomainUpdateRequest, RgpRestoreReportRequest> {
-            command: DomainUpdateRequest {
-                domain: DomainUpdateRequestData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
-                    name: name.into(),
-                    add: None,
-                    remove: None,
-                    change_info: Some(DomainChangeInfo {
-                        registrant: None,
-                        auth_info: None,
-                    }),
+        RgpRestoreReport {
+            xmlns: EPP_DOMAIN_RGP_EXT_XMLNS.to_string(),
+            restore: RgpRestoreReportSection {
+                op: "report".to_string(),
+                report: RgpRestoreReportSectionData {
+                    pre_data: pre_data.into(),
+                    post_data: post_data.into(),
+                    deleted_at: deleted_at
+                        .to_rfc3339_opts(SecondsFormat::AutoSi, true)
+                        .into(),
+                    restored_at: restored_at
+                        .to_rfc3339_opts(SecondsFormat::AutoSi, true)
+                        .into(),
+                    restore_reason: restore_reason.into(),
+                    statements,
+                    other: other.into(),
                 },
             },
-            extension: Some(Extension {
-                data: RgpRestoreReportRequest {
-                    xmlns: EPP_DOMAIN_RGP_EXT_XMLNS.to_string(),
-                    restore: RgpRestoreReportRequestSection {
-                        op: "report".to_string(),
-                        report: RgpRestoreReportRequestData {
-                            pre_data: pre_data.into(),
-                            post_data: post_data.into(),
-                            deleted_at: deleted_at
-                                .to_rfc3339_opts(SecondsFormat::AutoSi, true)
-                                .into(),
-                            restored_at: restored_at
-                                .to_rfc3339_opts(SecondsFormat::AutoSi, true)
-                                .into(),
-                            restore_reason: restore_reason.into(),
-                            statements,
-                            other: other.into(),
-                        },
-                    },
-                },
-            }),
-            client_tr_id: client_tr_id.into(),
-        };
-
-        EppObject::build(command)
+        }
     }
 }
 
-/// Type that represents the &lt;epp&gt; tag for the EPP XML rgp restore report response
-pub type EppDomainRgpRestoreReportResponse = EppCommandResponse;
+impl EppExtension for RgpRestoreReport {
+    type Response = NoExtension;
+}
 
 /// Type corresponding to the &lt;report&gt; section in the EPP rgp restore extension
 #[derive(Serialize, Deserialize, Debug)]
-pub struct RgpRestoreReportRequestData {
+pub struct RgpRestoreReportSectionData {
     /// The pre-delete registration date
     #[serde(rename = "rgp:preData", alias = "preData")]
     pre_data: StringValue,
@@ -173,22 +149,22 @@ pub struct RgpRestoreReportRequestData {
 
 /// Type corresponding to the &lt;restore&gt; section in the rgp restore extension
 #[derive(Serialize, Deserialize, Debug)]
-pub struct RgpRestoreReportRequestSection {
+pub struct RgpRestoreReportSection {
     /// The value of the op attribute for the &lt;restore&gt; tag
     op: String,
     /// Data for the &lt;report&gt; tag
     #[serde(rename = "rgp:report", alias = "report")]
-    report: RgpRestoreReportRequestData,
+    report: RgpRestoreReportSectionData,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
 #[element_name(name = "rgp:update")]
 /// Type for EPP XML &lt;check&gt; command for domains
-pub struct RgpRestoreReportRequest {
+pub struct RgpRestoreReport {
     /// XML namespace for the RGP restore extension
     #[serde(rename = "xmlns:rgp", alias = "xmlns")]
     xmlns: String,
     /// The object holding the list of domains to be checked
     #[serde(rename = "rgp:restore", alias = "restore")]
-    restore: RgpRestoreReportRequestSection,
+    restore: RgpRestoreReportSection,
 }
