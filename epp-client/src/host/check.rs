@@ -66,7 +66,7 @@ impl<E: EppExtension> EppRequest<E> for HostCheck<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type HostCheckResponse
-///     let response = client.transact_new(host_check, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(host_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

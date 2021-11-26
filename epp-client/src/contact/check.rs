@@ -66,7 +66,7 @@ impl<E: EppExtension> EppRequest<E> for ContactCheck<E> {
 ///
 ///     // send it to the registry and receive a response of type ContactCheckResponse
 ///
-///     let response = client.transact_new(contact_check, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(contact_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///     println!("{:?}", response);
 ///
 ///     client.logout().await.unwrap();

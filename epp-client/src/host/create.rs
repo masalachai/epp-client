@@ -69,7 +69,7 @@ impl<E: EppExtension> EppRequest<E> for HostCreate<E> {
 ///     let host_create = HostCreate::<NoExtension>::new("ns1.eppdev-101.com", addresses);
 ///
 ///     // send it to the registry and receive a response of type HostCreateResponse
-///     let response = client.transact_new(host_create, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(host_create, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

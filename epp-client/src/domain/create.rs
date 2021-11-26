@@ -94,7 +94,7 @@ impl<E: EppExtension> EppRequest<E> for DomainCreate<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type EppDomainCreateResponse
-///     let response = client.transact_new(domain_create, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_create, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

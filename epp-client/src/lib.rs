@@ -77,7 +77,7 @@
 //!     vec!["eppdev.com", "eppdev.net"],
 //! );
 //!
-//! let response = client.transact_new(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
+//! let response = client.transact(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
 //!
 //! // print the availability results
 //! response.res_data.unwrap().check_data.domain_list

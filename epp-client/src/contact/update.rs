@@ -76,7 +76,7 @@ impl<E: EppExtension> EppRequest<E> for ContactUpdate<E> {
 ///     contact_update.add(add_statuses);
 ///
 ///     // send it to the registry and receive a response of type ContactUpdateResponse
-///     let response = client.transact_new(contact_update, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(contact_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

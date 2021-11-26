@@ -62,7 +62,7 @@ impl<E: EppExtension> EppRequest<E> for HostInfo<E> {
 ///     let host_info = HostInfo::<NoExtension>::new("ns2.eppdev-101.com");
 ///
 ///     // send it to the registry and receive a response of type HostInfoResponse
-///     let response = client.transact_new(host_info, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(host_info, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

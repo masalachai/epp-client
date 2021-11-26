@@ -67,7 +67,7 @@ impl<E: EppExtension> EppRequest<E> for ContactInfo<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type ContactInfoResponse
-///     let response = client.transact_new(contact_info, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(contact_info, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

@@ -79,7 +79,7 @@ impl<E: EppExtension> EppRequest<E> for ContactCreate<E> {
 ///     contact_create.set_fax(fax);
 ///
 ///     // send it to the registry and receive a response of type ContactCreateResponse
-///     let response = client.transact_new(contact_create, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(contact_create, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

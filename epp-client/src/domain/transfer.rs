@@ -125,7 +125,7 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferRequestResponse
-///     let response = client.transact_new(domain_transfer_request, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_request, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
@@ -198,7 +198,7 @@ impl<E: EppExtension> DomainTransferRequest<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferApproveResponse
-///     let response = client.transact_new(domain_transfer_approve, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_approve, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
@@ -271,7 +271,7 @@ impl<E: EppExtension> DomainTransferApprove<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferRejectResponse
-///     let response = client.transact_new(domain_transfer_reject, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_reject, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
@@ -344,7 +344,7 @@ impl<E: EppExtension> DomainTransferReject<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferCancelResponse
-///     let response = client.transact_new(domain_transfer_cancel, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_cancel, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
@@ -417,7 +417,7 @@ impl<E: EppExtension> DomainTransferCancel<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferQueryResponse
-///     let response = client.transact_new(domain_transfer_query, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_query, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///

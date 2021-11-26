@@ -96,7 +96,7 @@ impl<E: EppExtension> EppRequest<E> for DomainUpdate<E> {
 ///     domain_update.remove(remove);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
-///     let response = client.transact_new(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
