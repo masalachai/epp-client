@@ -35,9 +35,10 @@ mod request {
     use crate::host::update::EppHostUpdate;
     use crate::host::update::HostAddRemove;
     use crate::host::update::HostChangeInfo;
+    use crate::login::EppLogin;
     use crate::message::ack::EppMessageAck;
     use crate::message::poll::EppMessagePoll;
-    use crate::request::{EppLogin, EppLogout};
+    use crate::request::EppLogout;
     use crate::xml::EppXml;
     use chrono::{DateTime, NaiveDate};
     use std::str::FromStr;

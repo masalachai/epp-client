@@ -28,9 +28,10 @@ mod response {
     use crate::host::delete::EppHostDeleteResponse;
     use crate::host::info::EppHostInfoResponse;
     use crate::host::update::EppHostUpdateResponse;
+    use crate::login::EppLoginResponse;
     use crate::message::ack::EppMessageAckResponse;
     use crate::message::poll::EppMessagePollResponse;
-    use crate::response::{EppCommandResponseError, EppLoginResponse, EppLogoutResponse};
+    use crate::response::{EppCommandResponseError, EppLogoutResponse};
     use crate::xml::EppXml;
 
     const SVTRID: &str = "RO-6879-1627224678242975";
