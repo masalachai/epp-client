@@ -106,6 +106,7 @@ pub mod connection;
 pub mod contact;
 pub mod domain;
 pub mod error;
+pub mod hello;
 pub mod host;
 pub mod message;
 pub mod request;

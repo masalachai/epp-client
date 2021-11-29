@@ -20,6 +20,9 @@ mod response {
     use crate::domain::transfer::EppDomainTransferRejectResponse;
     use crate::domain::transfer::EppDomainTransferRequestResponse;
     use crate::domain::update::EppDomainUpdateResponse;
+    use crate::hello::EppGreeting;
+    use crate::hello::ExpiryType;
+    use crate::hello::Relative;
     use crate::host::check::EppHostCheckResponse;
     use crate::host::create::EppHostCreateResponse;
     use crate::host::delete::EppHostDeleteResponse;
@@ -27,11 +30,7 @@ mod response {
     use crate::host::update::EppHostUpdateResponse;
     use crate::message::ack::EppMessageAckResponse;
     use crate::message::poll::EppMessagePollResponse;
-    use crate::response::ExpiryType;
-    use crate::response::Relative;
-    use crate::response::{
-        EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
-    };
+    use crate::response::{EppCommandResponseError, EppLoginResponse, EppLogoutResponse};
     use crate::xml::EppXml;
 
     const SVTRID: &str = "RO-6879-1627224678242975";
