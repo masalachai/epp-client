@@ -22,8 +22,6 @@ pub const EPP_LANG: &str = "en";
 /// without an &lt;extension&gt; tag
 pub type Command<T> = CommandWithExtension<T, EmptyTag>;
 
-/// The EPP Hello request
-pub type EppHello = EppObject<Hello>;
 /// The EPP Login Request
 pub type EppLogin = EppObject<Command<Login>>;
 /// The EPP Logout request
@@ -84,24 +82,6 @@ impl<T: ElementName, E: ElementName> CommandWithExtension<T, E> {
 pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
     let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
     Ok(format!("{}:{}", username, timestamp.as_secs()))
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[element_name(name = "hello")]
-/// Type corresponding to the <hello> tag in an EPP XML hello request
-pub struct Hello;
-
-impl EppHello {
-    /// Creates a new Epp Hello request
-    pub fn new() -> EppHello {
-        EppObject::build(Hello {})
-    }
-}
-
-impl Default for EppHello {
-    fn default() -> Self {
-        Self::new()
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]

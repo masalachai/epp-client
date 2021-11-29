@@ -52,9 +52,10 @@ use std::{error::Error, fmt::Debug};
 use crate::config::EppClientConfig;
 use crate::connection::registry::{epp_connect, EppConnection};
 use crate::error;
-use crate::request::{generate_client_tr_id, EppHello, EppLogin, EppLogout};
+use crate::hello::{EppGreeting, EppHello};
+use crate::request::{generate_client_tr_id, EppLogin, EppLogout};
 use crate::response::{
-    EppCommandResponse, EppCommandResponseError, EppGreeting, EppLoginResponse, EppLogoutResponse,
+    EppCommandResponse, EppCommandResponseError, EppLoginResponse, EppLogoutResponse,
 };
 use crate::xml::EppXml;
 /// Instances of the EppClient type are used to transact with the registry.
