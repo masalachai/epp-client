@@ -4,16 +4,8 @@ use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
 
-use crate::{
-    common::{
-        ElementName, EmptyTag, EppObject, Extension, Options, ServiceExtension, Services,
-        StringValue,
-    },
-    contact::EPP_CONTACT_XMLNS,
-    domain::EPP_DOMAIN_XMLNS,
-    host::EPP_HOST_XMLNS,
-};
-use epp_client_macros::*;
+use crate::common::{ElementName, EmptyTag, EppObject, Extension, StringValue};
+use epp_client_macros::ElementName;
 
 pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
@@ -22,8 +14,6 @@ pub const EPP_LANG: &str = "en";
 /// without an &lt;extension&gt; tag
 pub type Command<T> = CommandWithExtension<T, EmptyTag>;
 
-/// The EPP Login Request
-pub type EppLogin = EppObject<Command<Login>>;
 /// The EPP Logout request
 pub type EppLogout = EppObject<Command<Logout>>;
 
@@ -82,70 +72,6 @@ impl<T: ElementName, E: ElementName> CommandWithExtension<T, E> {
 pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
     let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
     Ok(format!("{}:{}", username, timestamp.as_secs()))
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[element_name(name = "login")]
-/// Type corresponding to the &lt;login&gt; tag in an EPP XML login request
-pub struct Login {
-    /// The username to use for the login
-    #[serde(rename(serialize = "clID", deserialize = "clID"))]
-    username: StringValue,
-    /// The password to use for the login
-    #[serde(rename = "pw", default)]
-    password: StringValue,
-    /// Data under the <options> tag
-    options: Options,
-    /// Data under the <svcs> tag
-    #[serde(rename = "svcs")]
-    services: Services,
-}
-
-impl EppLogin {
-    /// Creates a new EPP Login request
-    pub fn new(
-        username: &str,
-        password: &str,
-        ext_uris: &Option<Vec<String>>,
-        client_tr_id: &str,
-    ) -> EppLogin {
-        let ext_uris = ext_uris
-            .as_ref()
-            .map(|uris| uris.iter().map(|u| u.as_str().into()).collect());
-
-        let login = Login {
-            username: username.into(),
-            password: password.into(),
-            options: Options {
-                version: EPP_VERSION.into(),
-                lang: EPP_LANG.into(),
-            },
-            services: Services {
-                obj_uris: vec![
-                    EPP_HOST_XMLNS.into(),
-                    EPP_CONTACT_XMLNS.into(),
-                    EPP_DOMAIN_XMLNS.into(),
-                ],
-                svc_ext: Some(ServiceExtension { ext_uris }),
-            },
-        };
-
-        EppObject::build(Command::<Login> {
-            command: login,
-            extension: None,
-            client_tr_id: client_tr_id.into(),
-        })
-    }
-
-    /// Sets the <options> tag data
-    pub fn options(&mut self, options: Options) {
-        self.data.command.options = options;
-    }
-
-    /// Sets the <svcs> tag data
-    pub fn services(&mut self, services: Services) {
-        self.data.command.services = services;
-    }
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]

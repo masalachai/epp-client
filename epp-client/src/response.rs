@@ -13,8 +13,6 @@ pub type CommandResponse<T> = CommandResponseWithExtension<T, EmptyTag>;
 pub type EppCommandResponse = EppObject<CommandResponseStatus>;
 /// An alias of `EppCommandResponse` indicating an EPP Error
 pub type EppCommandResponseError = EppCommandResponse;
-/// An alias of `EppCommandResponse` received in response to a successful login request
-pub type EppLoginResponse = EppCommandResponse;
 /// An alias of `EppCommandResponse` received in response to a successful logout request
 pub type EppLogoutResponse = EppCommandResponse;
 
