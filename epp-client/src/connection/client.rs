@@ -54,8 +54,9 @@ use crate::connection::registry::{epp_connect, EppConnection};
 use crate::error;
 use crate::hello::{EppGreeting, EppHello};
 use crate::login::{EppLogin, EppLoginResponse};
-use crate::request::{generate_client_tr_id, EppLogout};
-use crate::response::{EppCommandResponse, EppCommandResponseError, EppLogoutResponse};
+use crate::logout::{EppLogout, EppLogoutResponse};
+use crate::request::generate_client_tr_id;
+use crate::response::{EppCommandResponse, EppCommandResponseError};
 use crate::xml::EppXml;
 /// Instances of the EppClient type are used to transact with the registry.
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them

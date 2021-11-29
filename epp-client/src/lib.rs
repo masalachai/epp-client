@@ -109,6 +109,7 @@ pub mod error;
 pub mod hello;
 pub mod host;
 pub mod login;
+pub mod logout;
 pub mod message;
 pub mod request;
 pub mod response;

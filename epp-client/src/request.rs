@@ -4,7 +4,7 @@ use serde::{ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 use std::error::Error;
 use std::time::SystemTime;
 
-use crate::common::{ElementName, EmptyTag, EppObject, Extension, StringValue};
+use crate::common::{ElementName, EmptyTag, Extension, StringValue};
 use epp_client_macros::ElementName;
 
 pub const EPP_VERSION: &str = "1.0";
@@ -13,9 +13,6 @@ pub const EPP_LANG: &str = "en";
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// without an &lt;extension&gt; tag
 pub type Command<T> = CommandWithExtension<T, EmptyTag>;
-
-/// The EPP Logout request
-pub type EppLogout = EppObject<Command<Logout>>;
 
 #[derive(Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "command")]
@@ -72,20 +69,4 @@ impl<T: ElementName, E: ElementName> CommandWithExtension<T, E> {
 pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
     let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
     Ok(format!("{}:{}", username, timestamp.as_secs()))
-}
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[element_name(name = "logout")]
-/// Type corresponding to the &lt;logout&gt; tag in an EPP XML logout request
-pub struct Logout;
-
-impl EppLogout {
-    /// Creates a new EPP Logout request
-    pub fn new(client_tr_id: &str) -> EppLogout {
-        EppObject::build(Command::<Logout> {
-            command: Logout,
-            extension: None,
-            client_tr_id: client_tr_id.into(),
-        })
-    }
 }
