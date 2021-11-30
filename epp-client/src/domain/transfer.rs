@@ -93,8 +93,9 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferRequest;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -105,9 +106,6 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -119,17 +117,21 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     // Create an DomainTransferRequest instance
 ///     let domain_transfer_request = DomainTransferRequest::<NoExtension>::new(
 ///         "eppdev-100.net", 1, "epP4uthd#v"
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferRequestResponse
-///     let response = client.transact(domain_transfer_request, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_request, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> DomainTransferRequest<E> {
@@ -166,8 +168,9 @@ impl<E: EppExtension> DomainTransferRequest<E> {
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferApprove;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -178,13 +181,19 @@ impl<E: EppExtension> DomainTransferRequest<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
 ///     let config = EppClientConfig { registry };
+///
+///     // Create an instance of EppClient, passing the config and the registry you want to connect to
+///     let mut client = match EppClient::new(&config, "registry_name").await {
+///         Ok(client) => client,
+///         Err(e) => panic!("Failed to create EppClient: {}",  e)
+///     };
+///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an instance of EppClient, passing the config and the registry you want to connect to
 ///     let mut client = match EppClient::new(&config, "registry_name").await {
@@ -198,11 +207,12 @@ impl<E: EppExtension> DomainTransferRequest<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferApproveResponse
-///     let response = client.transact(domain_transfer_approve, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_approve, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> DomainTransferApprove<E> {
@@ -239,8 +249,9 @@ impl<E: EppExtension> DomainTransferApprove<E> {
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferReject;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -251,9 +262,6 @@ impl<E: EppExtension> DomainTransferApprove<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -265,17 +273,21 @@ impl<E: EppExtension> DomainTransferApprove<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     // Create an DomainTransferReject instance
 ///     let domain_transfer_reject = DomainTransferReject::<NoExtension>::new(
 ///         "eppdev-100.net"
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferRejectResponse
-///     let response = client.transact(domain_transfer_reject, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_reject, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> DomainTransferReject<E> {
@@ -312,8 +324,9 @@ impl<E: EppExtension> DomainTransferReject<E> {
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferCancel;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -324,9 +337,6 @@ impl<E: EppExtension> DomainTransferReject<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -338,17 +348,21 @@ impl<E: EppExtension> DomainTransferReject<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     // Create an DomainTransferCancel instance
 ///     let domain_transfer_cancel = DomainTransferCancel::<NoExtension>::new(
 ///         "eppdev-100.net"
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferCancelResponse
-///     let response = client.transact(domain_transfer_cancel, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_cancel, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> DomainTransferCancel<E> {
@@ -385,8 +399,9 @@ impl<E: EppExtension> DomainTransferCancel<E> {
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferQuery;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -397,9 +412,6 @@ impl<E: EppExtension> DomainTransferCancel<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -411,17 +423,21 @@ impl<E: EppExtension> DomainTransferCancel<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     // Create an DomainTransferQuery instance
 ///     let domain_transfer_query = DomainTransferQuery::<NoExtension>::new(
 ///         "eppdev-100.net", "epP4uthd#v"
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferQueryResponse
-///     let response = client.transact(domain_transfer_query, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_transfer_query, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> DomainTransferQuery<E> {

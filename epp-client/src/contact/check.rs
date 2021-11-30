@@ -33,8 +33,9 @@ impl<E: EppExtension> EppRequest<E> for ContactCheck<E> {
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::contact::check::ContactCheck;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -45,9 +46,6 @@ impl<E: EppExtension> EppRequest<E> for ContactCheck<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -59,6 +57,9 @@ impl<E: EppExtension> EppRequest<E> for ContactCheck<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     // Create an ContactCheck instance
 ///     let contact_check = ContactCheck::<NoExtension>::new(
 ///         &["epp-client-c1", "epp-client-c2"]
@@ -66,10 +67,11 @@ impl<E: EppExtension> EppRequest<E> for ContactCheck<E> {
 ///
 ///     // send it to the registry and receive a response of type ContactCheckResponse
 ///
-///     let response = client.transact(contact_check, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(contact_check, "transaction-id").await.unwrap();
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> ContactCheck<E> {

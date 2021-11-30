@@ -35,8 +35,9 @@ impl<E: EppExtension> EppRequest<E> for DomainRenew<E> {
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::renew::DomainRenew;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -47,9 +48,6 @@ impl<E: EppExtension> EppRequest<E> for DomainRenew<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -61,6 +59,9 @@ impl<E: EppExtension> EppRequest<E> for DomainRenew<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     // Create a date object to set the current expiry date
 ///     let exp_date = NaiveDate::from_ymd(2022, 7, 27);
 ///
@@ -68,11 +69,12 @@ impl<E: EppExtension> EppRequest<E> for DomainRenew<E> {
 ///     let domain_renew = DomainRenew::<NoExtension>::new("eppdev-100.com", exp_date, 1);
 ///
 ///     // send it to the registry and receive a response of type DomainRenewResponse
-///     let response = client.transact(domain_renew, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_renew, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> DomainRenew<E> {

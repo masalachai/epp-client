@@ -36,8 +36,9 @@ impl<E: EppExtension> EppRequest<E> for DomainCreate<E> {
 /// use epp_client::EppClient;
 /// use epp_client::common::DomainContact;
 /// use epp_client::domain::create::DomainCreate;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 /// use epp_client::common::HostAttrList;
 /// use epp_client::common::HostList;
 /// use epp_client::common::HostObjList;
@@ -51,9 +52,6 @@ impl<E: EppExtension> EppRequest<E> for DomainCreate<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -64,6 +62,9 @@ impl<E: EppExtension> EppRequest<E> for DomainCreate<E> {
 ///         Ok(client) => client,
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
+///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     let contacts = vec![
 ///         DomainContact {
@@ -94,11 +95,12 @@ impl<E: EppExtension> EppRequest<E> for DomainCreate<E> {
 ///     );
 ///
 ///     // send it to the registry and receive a response of type EppDomainCreateResponse
-///     let response = client.transact(domain_create, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_create, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> DomainCreate<E> {

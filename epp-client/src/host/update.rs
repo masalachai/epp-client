@@ -34,8 +34,9 @@ impl<E: EppExtension> EppRequest<E> for HostUpdate<E> {
 /// use epp_client::EppClient;
 /// use epp_client::common::{HostAddr, HostStatus};
 /// use epp_client::host::update::{HostUpdate, HostAddRemove, HostChangeInfo};
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -46,9 +47,6 @@ impl<E: EppExtension> EppRequest<E> for HostUpdate<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -59,6 +57,9 @@ impl<E: EppExtension> EppRequest<E> for HostUpdate<E> {
 ///         Ok(client) => client,
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
+///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an HostUpdate instance
 ///     let mut host_update = HostUpdate::<NoExtension>::new("ns1.eppdev-101.com");
@@ -85,11 +86,12 @@ impl<E: EppExtension> EppRequest<E> for HostUpdate<E> {
 ///     host_update.info(HostChangeInfo { name: "ns2.eppdev-101.com".into() });
 ///
 ///     // send it to the registry and receive a response of type HostUpdateResponse
-///     let response = client.transact(host_update, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(host_update, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> HostUpdate<E> {

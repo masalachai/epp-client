@@ -1,9 +1,7 @@
 //! Types for EPP requests
 
 use serde::{de::DeserializeOwned, ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
-use std::error::Error;
 use std::fmt::Debug;
-use std::time::SystemTime;
 
 use crate::{
     common::{ElementName, EppObject, Extension, StringValue},
@@ -86,10 +84,4 @@ impl<T: ElementName, E: ElementName> Command<T, E> {
             client_tr_id: client_tr_id.into(),
         }
     }
-}
-
-/// Basic client TRID generation function. Mainly used for testing. Users of the library should use their own clTRID generation function.
-pub fn generate_client_tr_id(username: &str) -> Result<String, Box<dyn Error>> {
-    let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
-    Ok(format!("{}:{}", username, timestamp.as_secs()))
 }

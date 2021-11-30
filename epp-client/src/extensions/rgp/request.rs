@@ -21,7 +21,9 @@ use super::EPP_DOMAIN_RGP_EXT_XMLNS;
 /// use epp_client::EppClient;
 /// use epp_client::extensions::rgp::request::RgpRestoreRequest;
 /// use epp_client::domain::update::DomainUpdate;
-/// use epp_client::generate_client_tr_id;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
+/// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -32,9 +34,6 @@ use super::EPP_DOMAIN_RGP_EXT_XMLNS;
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -46,6 +45,9 @@ use super::EPP_DOMAIN_RGP_EXT_XMLNS;
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     // Create an RgpRestoreRequest instance
 ///     let domain_restore_req = RgpRestoreRequest::new();
 ///
@@ -53,11 +55,12 @@ use super::EPP_DOMAIN_RGP_EXT_XMLNS;
 ///     let mut domain_update = DomainUpdate::<RgpRestoreRequest>::new("eppdev-100.com").with_extension(domain_restore_req);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
-///     let response = client.transact(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_update, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl RgpRestoreRequest {
