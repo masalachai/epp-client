@@ -20,8 +20,10 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::check::DomainCheck;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::extensions::namestore::NameStore;
+/// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -32,9 +34,6 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -46,6 +45,9 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     let namestore_ext = NameStore::new("com");
 ///
 ///     // Create an DomainCheck instance
@@ -54,11 +56,12 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 ///     ).with_extension(namestore_ext);
 ///
 ///     // send it to the registry and receive a response of type EppDomainCheckResponse
-///     let response = client.transact(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_check, "test-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl NameStore {

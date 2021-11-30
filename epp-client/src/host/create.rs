@@ -33,8 +33,9 @@ impl<E: EppExtension> EppRequest<E> for HostCreate<E> {
 /// use epp_client::EppClient;
 /// use epp_client::common::HostAddr;
 /// use epp_client::host::create::HostCreate;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -45,9 +46,6 @@ impl<E: EppExtension> EppRequest<E> for HostCreate<E> {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -59,6 +57,9 @@ impl<E: EppExtension> EppRequest<E> for HostCreate<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     // Create a vector of IP addresses to assign to the host
 ///     let addresses = vec![
 ///         HostAddr::new("v4", "29.245.122.14"),
@@ -69,11 +70,12 @@ impl<E: EppExtension> EppRequest<E> for HostCreate<E> {
 ///     let host_create = HostCreate::<NoExtension>::new("ns1.eppdev-101.com", addresses);
 ///
 ///     // send it to the registry and receive a response of type HostCreateResponse
-///     let response = client.transact(host_create, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(host_create, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl<E: EppExtension> HostCreate<E> {

@@ -55,8 +55,10 @@ use std::collections::HashMap;
 
 use epp_client::config::{EppClientConfig, RegistryConfig};
 use epp_client::EppClient;
-use epp_client::epp::{EppDomainCheck, EppDomainCheckResponse};
-use epp_client::generate_client_tr_id;
+use epp_client::domain::check::DomainCheck;
+use epp_client::common::NoExtension;
+use epp_client::login::Login;
+use epp_client::logout::Logout;
 
 #[tokio::main]
 async fn main() {
@@ -67,37 +69,32 @@ async fn main() {
         RegistryConfig {
             host: "example.com".to_owned(),
             port: 700,
-            username: "username".to_owned(),
-            password: "password".to_owned(),
-            ext_uris: None,
             tls_files: None,
         },
     );
     let config = EppClientConfig { registry };
 
-    // Create an instance of EppClient, passing the config and the
-    // registry you want to connect to
+    // Create an instance of EppClient, passing the config and the registry you want to connect to
     let mut client = match EppClient::new(&config, "registry_name").await {
         Ok(client) => client,
         Err(e) => panic!("Failed to create EppClient: {}",  e)
     };
 
-    // Make a domain check call, which returns an object of type EppDomainCheckResponse
-    // that contains the result of the call
-    let domain_check = EppDomainCheck::new(
-        vec!["eppdev.com", "eppdev.net"]
-        generate_client_tr_id(&client).as_str()
+    let login = Login::<NoExtension>::new("username", "password", &None);
+    client.transact(login, "transaction-id").await.unwrap();
+
+    // Create an DomainCheck instance
+    let domain_check = DomainCheck::<NoExtension>::new(
+        vec!["eppdev-100.com", "eppdev-100.net"],
     );
 
-    let response = client.transact::<_, EppDomainCheckResponse>(&domain_check).await.unwrap();
+    // send it to the registry and receive a response of type EppDomainCheckResponse
+    let response = client.transact(domain_check, "transaction-id").await.unwrap();
 
-    // print the availability results
-    response.data.res_data.unwrap().check_data.domain_list
-        .iter()
-        .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
+    println!("{:?}", response);
 
-    // Close the connection
-    client.logout().await.unwrap();
+    let logout = Logout::<NoExtension>::new();
+    client.transact(logout, "transaction-id").await.unwrap();
 }
 ```
 

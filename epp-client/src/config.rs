@@ -16,9 +16,6 @@
 //!     RegistryConfig {
 //!         host: "example.com".to_owned(),
 //!         port: 700,
-//!         username: "username".to_owned(),
-//!         password: "password".to_owned(),
-//!         ext_uris: None,
 //!         tls_files: None,
 //!     },
 //! );
@@ -26,12 +23,6 @@
 //!
 //! // Get configuration for the relevant registry section
 //! let registry = config.registry("verisign").unwrap();
-//!
-//! // Get username and password
-//! let credentials = registry.credentials();
-//!
-//! // Get EPP service extensions
-//! let service_extensions = registry.ext_uris().unwrap();
 //! ```
 
 use std::collections::HashMap;
@@ -63,19 +54,5 @@ impl EppClientConfig {
 pub struct RegistryConfig {
     pub host: String,
     pub port: u16,
-    pub username: String,
-    pub password: String,
-    pub ext_uris: Option<Vec<String>>,
     pub tls_files: Option<EppClientTlsFiles>,
-}
-
-impl RegistryConfig {
-    /// Returns the EPP username and password as a tuple
-    pub fn credentials(&self) -> (String, String) {
-        (self.username.to_string(), self.password.to_string())
-    }
-    /// Returns the service extension URIs to be set in the connection to the registry
-    pub fn ext_uris(&self) -> Option<&Vec<String>> {
-        self.ext_uris.as_ref()
-    }
 }

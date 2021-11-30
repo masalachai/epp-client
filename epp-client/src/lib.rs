@@ -44,8 +44,9 @@
 //! use epp_client::config::{EppClientConfig, RegistryConfig};
 //! use epp_client::EppClient;
 //! use epp_client::domain::check::DomainCheck;
-//! use epp_client::generate_client_tr_id;
 //! use epp_client::common::NoExtension;
+//! use epp_client::login::Login;
+//! use epp_client::logout::Logout;
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -57,9 +58,6 @@
 //!     RegistryConfig {
 //!         host: "example.com".to_owned(),
 //!         port: 700,
-//!         username: "username".to_owned(),
-//!         password: "password".to_owned(),
-//!         ext_uris: None,
 //!         tls_files: None,
 //!     },
 //! );
@@ -71,13 +69,16 @@
 //!     Err(e) => panic!("Failed to create EppClient: {}",  e)
 //! };
 //!
+//! let login = Login::<NoExtension>::new("username", "password", &None);
+//! client.transact(login, "transaction-id").await.unwrap();
+//!
 //! // Make a domain check call, which returns an object of type EppDomainCheckResponse
 //! // that contains the result of the call
 //! let domain_check = DomainCheck::<NoExtension>::new(
 //!     vec!["eppdev.com", "eppdev.net"],
 //! );
 //!
-//! let response = client.transact(domain_check, generate_client_tr_id(&client).as_str()).await.unwrap();
+//! let response = client.transact(domain_check, "transaction-id").await.unwrap();
 //!
 //! // print the availability results
 //! response.res_data.unwrap().check_data.domain_list
@@ -85,8 +86,8 @@
 //!     .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 //!
 //! // Close the connection
-//! client.logout().await.unwrap();
-//!
+//! let logout = Logout::<NoExtension>::new();
+//! client.transact(logout, "transaction-id").await.unwrap();
 //! }
 //! ```
 //!
@@ -154,7 +155,6 @@ pub mod message {
     pub mod poll;
 }
 
-pub use client::default_client_tr_id_fn as generate_client_tr_id;
 pub use client::EppClient;
 
 #[cfg(test)]
