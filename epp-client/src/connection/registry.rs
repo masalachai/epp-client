@@ -38,15 +38,6 @@ impl EppConnection {
         })
     }
 
-    /// Writes to the socket
-    async fn write(&mut self, buf: &[u8]) -> Result<(), Box<dyn Error>> {
-        let wrote = self.stream.write(buf).await?;
-
-        debug!("{}: Wrote {} bytes", self.registry, wrote);
-
-        Ok(())
-    }
-
     /// Constructs an EPP XML request in the required form and sends it to the server
     async fn send_epp_request(&mut self, content: &str) -> Result<(), Box<dyn Error>> {
         let len = content.len();
@@ -60,7 +51,9 @@ impl EppConnection {
         buf[..4].clone_from_slice(&len_u32);
         buf[4..].clone_from_slice(content.as_bytes());
 
-        self.write(&buf).await
+        let wrote = self.stream.write(&buf).await?;
+        debug!("{}: Wrote {} bytes", self.registry, wrote);
+        Ok(())
     }
 
     /// Reads response from the socket
