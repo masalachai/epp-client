@@ -6,30 +6,30 @@ use serde::{Deserialize, Deserializer, Serialize};
 use crate::common::{ElementName, EppObject, Options, ServiceExtension, Services, StringValue};
 
 /// The EPP Hello request
-pub type EppHello = EppObject<Hello>;
+pub type Hello = EppObject<HelloRequest>;
 
-impl EppHello {
+impl Hello {
     /// Creates a new Epp Hello request
-    pub fn new() -> EppHello {
-        EppObject::build(Hello {})
+    pub fn new() -> Hello {
+        EppObject::build(HelloRequest {})
     }
 }
 
-impl Default for EppHello {
+impl Default for Hello {
     fn default() -> Self {
         Self::new()
     }
 }
 
 /// The EPP Greeting that is received on a successful connection and in response to an EPP hello
-pub type EppGreeting = EppObject<Greeting>;
+pub type Greeting = EppObject<GreetingResponse>;
 
 // Request
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "hello")]
 /// Type corresponding to the <hello> tag in an EPP XML hello request
-pub struct Hello;
+pub struct HelloRequest;
 
 // Response
 
@@ -284,7 +284,7 @@ pub struct Dcp {
 #[serde(rename_all = "lowercase")]
 #[element_name(name = "greeting")]
 /// Type corresponding to the <greeting> tag in the EPP greeting XML
-pub struct Greeting {
+pub struct GreetingResponse {
     /// The service ID
     #[serde(rename = "svID")]
     pub service_id: String,
