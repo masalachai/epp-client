@@ -1,6 +1,5 @@
 //! Manages registry connections and reading/writing to them
 
-use bytes::BytesMut;
 use rustls::{OwnedTrustAnchor, RootCertStore};
 use std::convert::TryInto;
 use std::sync::Arc;
@@ -66,7 +65,7 @@ impl EppConnection {
         let message_size = buf_size - 4;
         debug!("{}: Response buffer size: {}", self.registry, message_size);
 
-        let mut buf = BytesMut::with_capacity(4096);
+        let mut buf = Vec::with_capacity(4096);
         let mut read_buf = vec![0u8; 4096];
 
         let mut read_size: usize = 0;
@@ -86,9 +85,7 @@ impl EppConnection {
             }
         }
 
-        let data = buf.to_vec();
-
-        Ok(data)
+        Ok(buf)
     }
 
     /// Receives response from the socket and converts it into an EPP XML string
