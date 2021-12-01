@@ -100,9 +100,9 @@
 #[macro_use]
 extern crate log;
 
+pub mod client;
 pub mod common;
 pub mod config;
-pub mod connection;
 pub mod contact;
 pub mod domain;
 pub mod error;
@@ -111,12 +111,13 @@ pub mod host;
 pub mod login;
 pub mod logout;
 pub mod message;
+pub mod registry;
 pub mod request;
 pub mod response;
 pub mod xml;
-pub use connection::client::EppClient;
 
-pub use crate::connection::client::default_client_tr_id_fn as generate_client_tr_id;
+pub use client::default_client_tr_id_fn as generate_client_tr_id;
+pub use client::EppClient;
 
 #[cfg(test)]
 pub mod tests;

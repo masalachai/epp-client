@@ -52,14 +52,15 @@ use std::{error::Error, fmt::Debug};
 
 use crate::common::{EppObject, NoExtension};
 use crate::config::EppClientConfig;
-use crate::connection::registry::{epp_connect, EppConnection};
 use crate::error;
 use crate::hello::{Greeting, Hello};
 use crate::login::Login;
 use crate::logout::Logout;
+use crate::registry::{epp_connect, EppConnection};
 use crate::request::{generate_client_tr_id, EppExtension, EppRequest};
 use crate::response::{CommandResponseStatus, CommandResponseWithExtension};
 use crate::xml::EppXml;
+
 /// Instances of the EppClient type are used to transact with the registry.
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
 /// to the registry and deserialize the XML responses from the registry to local types
