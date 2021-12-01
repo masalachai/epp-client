@@ -61,12 +61,14 @@ impl fmt::Display for GMonthDay {
 /// ```no_run
 /// use std::collections::HashMap;
 ///
-/// use epp_client::config::{EppClientConfig, EppClientConnection};
+/// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::common::{DomainStatus, DomainContact};
-/// use epp_client::extensions::rgp::report::RgpRestoreReport;
+/// use epp_client::extensions::consolidate::Sync;
 /// use epp_client::domain::update::DomainUpdate;
 /// use epp_client::generate_client_tr_id;
+/// use epp_client::extensions::consolidate;
+/// use epp_client::extensions::consolidate::GMonthDay;
 /// use epp_client::common::NoExtension;
 /// use chrono::{DateTime, NaiveDate};
 /// use std::str::FromStr;
@@ -74,10 +76,10 @@ impl fmt::Display for GMonthDay {
 /// #[tokio::main]
 /// async fn main() {
 ///     // Create a config
-///     let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
 ///     registry.insert(
 ///         "registry_name".to_owned(),
-///         EppClientConnection {
+///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
 ///             username: "username".to_owned(),
@@ -94,18 +96,11 @@ impl fmt::Display for GMonthDay {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let domain_restore_report = RgpRestoreReport::new(
-///         pre_data,
-///         post_data,
-///         deleted_at,
-///         restored_at,
-///         restore_reason,
-///         &statements,
-///         other
-///     );
+///     let exp = GMonthDay::new(5, 31, None).unwrap();
+///     let consolidate_ext = consolidate::Sync::new(exp);
 ///
 ///     // Create an DomainUpdate instance
-///     let mut domain_update = DomainUpdate::<RgpRestoreReport>::new("eppdev-100.com").with_extension(domain_restore_report);
+///     let mut domain_update = DomainUpdate::<consolidate::Sync>::new("eppdev-100.com").with_extension(consolidate_ext);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
 ///     let response = client.transact(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
