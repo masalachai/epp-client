@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <command>
+        <update>
+            <domain:update xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>eppdev.com</domain:name>
+                <domain:chg/>
+            </domain:update>
+        </update>
+        <extension>
+            <sync:update xmlns:sync="http://www.verisign.com/epp/sync-1.0">
+                <sync:expMonthDay>--05-31</sync:expMonthDay>
+            </sync:update>
+        </extension>
+        <clTRID>cltrid:1626454866</clTRID>
+    </command>
+</epp>
