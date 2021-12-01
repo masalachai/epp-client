@@ -27,9 +27,6 @@
 //! // Get configuration for the relevant registry section
 //! let registry = config.registry("verisign").unwrap();
 //!
-//! // Get EPP host name and port no.
-//! let remote = registry.connection_details();
-//!
 //! // Get username and password
 //! let credentials = registry.credentials();
 //!
@@ -73,10 +70,6 @@ pub struct EppClientConnection {
 }
 
 impl EppClientConnection {
-    /// Returns the EPP host and port no as a tuple
-    pub fn connection_details(&self) -> (String, u16) {
-        (self.host.to_string(), self.port)
-    }
     /// Returns the EPP username and password as a tuple
     pub fn credentials(&self) -> (String, String) {
         (self.username.to_string(), self.password.to_string())
