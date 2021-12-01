@@ -35,9 +35,6 @@
 //!
 //! // Get EPP service extensions
 //! let service_extensions = registry.ext_uris().unwrap();
-//!
-//! // Get client certificate and private key
-//! let tls = registry.tls_files().unwrap();
 //! ```
 
 use std::collections::HashMap;
@@ -96,31 +93,15 @@ impl EppClientConnection {
     }
     /// Returns the parsed client certificate and private key for client TLS auth
     pub fn tls_files(&self) -> Result<Option<(Vec<Certificate>, PrivateKey)>, Error> {
-        match (self.client_certificate()?, self.key()?) {
-            (Some(certificates), Some(key)) => Ok(Some((certificates, key))),
-            _ => Ok(None),
-        }
-    }
-    /// Parses the client certificate chain
-    fn client_certificate(&self) -> Result<Option<Vec<Certificate>>, Error> {
-        let certs_file = match &self.tls_files {
-            Some(files) => &files.cert_chain,
+        let (certs_file, key_file) = match &self.tls_files {
+            Some(files) => (&files.cert_chain, &files.key),
             None => return Ok(None),
         };
 
-        Ok(Some(
-            rustls_pemfile::certs(&mut BufReader::new(File::open(certs_file)?))?
-                .into_iter()
-                .map(Certificate)
-                .collect::<Vec<_>>(),
-        ))
-    }
-    /// Parses the client private key
-    fn key(&self) -> Result<Option<PrivateKey>, Error> {
-        let key_file = match &self.tls_files {
-            Some(files) => &files.key,
-            None => return Ok(None),
-        };
+        let certs = rustls_pemfile::certs(&mut BufReader::new(File::open(certs_file)?))?
+            .into_iter()
+            .map(Certificate)
+            .collect::<Vec<_>>();
 
         let mut r = BufReader::new(File::open(key_file).unwrap());
 
@@ -128,7 +109,7 @@ impl EppClientConnection {
         if rsa_keys.len() > 1 {
             warn!("Multiple RSA keys found in PEM file {}", key_file);
         } else if let Some(key) = rsa_keys.pop() {
-            return Ok(Some(rustls::PrivateKey(key)));
+            return Ok(Some((certs, rustls::PrivateKey(key))));
         }
 
         r.seek(SeekFrom::Start(0))?;
@@ -137,7 +118,7 @@ impl EppClientConnection {
         if pkcs8_keys.len() > 1 {
             warn!("Multiple PKCS8 keys found in PEM file {}", key_file);
         } else if let Some(key) = pkcs8_keys.pop() {
-            return Ok(Some(rustls::PrivateKey(key)));
+            return Ok(Some((certs, rustls::PrivateKey(key))));
         }
 
         Err(Error::Other("No private key found in PEM file".to_owned()))
