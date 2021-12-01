@@ -29,6 +29,8 @@ mod request {
     use crate::domain::update::DomainAddRemove;
     use crate::domain::update::DomainChangeInfo;
     use crate::domain::update::DomainUpdate;
+    use crate::extensions::consolidate;
+    use crate::extensions::consolidate::GMonthDay;
     use crate::extensions::namestore::NameStore;
     use crate::extensions::rgp::report::RgpRestoreReport;
     use crate::extensions::rgp::request::RgpRestoreRequest;
@@ -592,6 +594,27 @@ mod request {
         let object =
             DomainCheck::<NameStore>::new(vec!["example1.com", "example2.com", "example3.com"])
                 .with_extension(namestore_ext);
+
+        let serialized = object.serialize_request(CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn consolidate() {
+        let xml = get_xml("request/extensions/consolidate.xml").unwrap();
+
+        let exp = GMonthDay::new(5, 31, None).unwrap();
+
+        let consolidate_ext = consolidate::Sync::new(exp);
+
+        let mut object =
+            DomainUpdate::<consolidate::Sync>::new("eppdev.com").with_extension(consolidate_ext);
+
+        object.info(DomainChangeInfo {
+            registrant: None,
+            auth_info: None,
+        });
 
         let serialized = object.serialize_request(CLTRID).unwrap();
 
