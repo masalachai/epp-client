@@ -4,7 +4,7 @@ use rustls::{OwnedTrustAnchor, RootCertStore};
 use std::convert::TryInto;
 use std::sync::Arc;
 use std::{error::Error, io as stdio, net::ToSocketAddrs};
-use std::{str, u32};
+use std::{io, str, u32};
 use tokio::{io::AsyncReadExt, io::AsyncWriteExt, net::TcpStream};
 use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
 
@@ -76,7 +76,11 @@ impl EppConnection {
             debug!("{}: Total read: {} bytes", self.registry, read_size);
 
             if read == 0 {
-                panic!("{}: Unexpected eof", self.registry)
+                return Err(io::Error::new(
+                    io::ErrorKind::UnexpectedEof,
+                    format!("{}: unexpected eof", self.registry),
+                )
+                .into());
             } else if read_size >= message_size {
                 break;
             }
