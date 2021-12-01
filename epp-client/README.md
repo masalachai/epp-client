@@ -53,7 +53,7 @@ You can create a mut variable of type `EppClient` with the domain registry confi
 ```rust
 use std::collections::HashMap;
 
-use epp_client::config::{EppClientConfig, EppClientConnection};
+use epp_client::config::{EppClientConfig, RegistryConfig};
 use epp_client::EppClient;
 use epp_client::epp::{EppDomainCheck, EppDomainCheckResponse};
 use epp_client::generate_client_tr_id;
@@ -61,10 +61,10 @@ use epp_client::generate_client_tr_id;
 #[tokio::main]
 async fn main() {
     // Configure the client to connect to one of more registries
-    let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+    let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
     registry.insert(
         "registry_name".to_owned(),
-        EppClientConnection {
+        RegistryConfig {
             host: "example.com".to_owned(),
             port: 700,
             username: "username".to_owned(),
@@ -125,7 +125,6 @@ cert_chain = '/path/to/certificate/chain/pemfile'
 # the RSA private key for your certificate
 key = '/path/to/private/key/pemfile'
 ```
-
 
 ```rust
 use epp_client::config::{EppClientConfig};
