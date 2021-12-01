@@ -120,11 +120,12 @@ impl EppConnection {
 pub async fn epp_connect(
     registry_creds: &EppClientConnection,
 ) -> Result<TlsStream<TcpStream>, error::Error> {
-    let (host, port) = registry_creds.connection_details();
+    info!(
+        "Connecting: EPP Server: {} Port: {}",
+        registry_creds.host, registry_creds.port
+    );
 
-    info!("Connecting: EPP Server: {} Port: {}", host, port);
-
-    let addr = (host.as_str(), port)
+    let addr = (registry_creds.host.as_str(), registry_creds.port)
         .to_socket_addrs()?
         .next()
         .ok_or(stdio::ErrorKind::NotFound)?;
@@ -184,10 +185,10 @@ pub async fn epp_connect(
     let connector = TlsConnector::from(Arc::new(config));
     let stream = TcpStream::connect(&addr).await?;
 
-    let domain = host.as_str().try_into().map_err(|_| {
+    let domain = registry_creds.host.as_str().try_into().map_err(|_| {
         stdio::Error::new(
             stdio::ErrorKind::InvalidInput,
-            format!("Invalid domain: {}", host),
+            format!("Invalid domain: {}", registry_creds.host),
         )
     })?;
 
