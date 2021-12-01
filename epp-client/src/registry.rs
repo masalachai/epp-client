@@ -13,7 +13,7 @@ use rustls_pemfile;
 use tokio::{io::AsyncReadExt, io::AsyncWriteExt, net::TcpStream};
 use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
 
-use crate::config::EppClientConnection;
+use crate::config::RegistryConfig;
 use crate::error;
 
 /// EPP Connection struct with some metadata for the connection
@@ -118,7 +118,7 @@ impl EppConnection {
 /// Establishes a TLS connection to a registry and returns a ConnectionStream instance containing the
 /// socket stream to read/write to the connection
 pub async fn epp_connect(
-    registry_creds: &EppClientConnection,
+    registry_creds: &RegistryConfig,
 ) -> Result<TlsStream<TcpStream>, error::Error> {
     info!(
         "Connecting: EPP Server: {} Port: {}",

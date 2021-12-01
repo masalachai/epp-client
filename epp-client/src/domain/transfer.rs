@@ -90,7 +90,7 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 /// ```no_run
 /// use std::collections::HashMap;
 ///
-/// use epp_client::config::{EppClientConfig, EppClientConnection};
+/// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferRequest;
 /// use epp_client::generate_client_tr_id;
@@ -99,10 +99,10 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 /// #[tokio::main]
 /// async fn main() {
 ///     // Create a config
-///     let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
 ///     registry.insert(
 ///         "registry_name".to_owned(),
-///         EppClientConnection {
+///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
 ///             username: "username".to_owned(),
@@ -163,7 +163,7 @@ impl<E: EppExtension> DomainTransferRequest<E> {
 /// ```no_run
 /// use std::collections::HashMap;
 ///
-/// use epp_client::config::{EppClientConfig, EppClientConnection};
+/// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferApprove;
 /// use epp_client::generate_client_tr_id;
@@ -172,10 +172,10 @@ impl<E: EppExtension> DomainTransferRequest<E> {
 /// #[tokio::main]
 /// async fn main() {
 ///     // Create a config
-///     let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
 ///     registry.insert(
 ///         "registry_name".to_owned(),
-///         EppClientConnection {
+///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
 ///             username: "username".to_owned(),
@@ -236,7 +236,7 @@ impl<E: EppExtension> DomainTransferApprove<E> {
 /// ```no_run
 /// use std::collections::HashMap;
 ///
-/// use epp_client::config::{EppClientConfig, EppClientConnection};
+/// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferReject;
 /// use epp_client::generate_client_tr_id;
@@ -245,10 +245,10 @@ impl<E: EppExtension> DomainTransferApprove<E> {
 /// #[tokio::main]
 /// async fn main() {
 ///     // Create a config
-///     let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
 ///     registry.insert(
 ///         "registry_name".to_owned(),
-///         EppClientConnection {
+///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
 ///             username: "username".to_owned(),
@@ -309,7 +309,7 @@ impl<E: EppExtension> DomainTransferReject<E> {
 /// ```no_run
 /// use std::collections::HashMap;
 ///
-/// use epp_client::config::{EppClientConfig, EppClientConnection};
+/// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferCancel;
 /// use epp_client::generate_client_tr_id;
@@ -318,10 +318,10 @@ impl<E: EppExtension> DomainTransferReject<E> {
 /// #[tokio::main]
 /// async fn main() {
 ///     // Create a config
-///     let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
 ///     registry.insert(
 ///         "registry_name".to_owned(),
-///         EppClientConnection {
+///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
 ///             username: "username".to_owned(),
@@ -382,7 +382,7 @@ impl<E: EppExtension> DomainTransferCancel<E> {
 /// ```no_run
 /// use std::collections::HashMap;
 ///
-/// use epp_client::config::{EppClientConfig, EppClientConnection};
+/// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::transfer::DomainTransferQuery;
 /// use epp_client::generate_client_tr_id;
@@ -391,10 +391,10 @@ impl<E: EppExtension> DomainTransferCancel<E> {
 /// #[tokio::main]
 /// async fn main() {
 ///     // Create a config
-///     let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
 ///     registry.insert(
 ///         "registry_name".to_owned(),
-///         EppClientConnection {
+///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
 ///             username: "username".to_owned(),

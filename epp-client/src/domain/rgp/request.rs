@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 /// ```no_run
 /// use std::collections::HashMap;
 ///
-/// use epp_client::config::{EppClientConfig, EppClientConnection};
+/// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::domain::rgp::request::RgpRestoreRequest;
 /// use epp_client::domain::update::DomainUpdate;
@@ -25,10 +25,10 @@ use serde::{Deserialize, Serialize};
 /// #[tokio::main]
 /// async fn main() {
 ///     // Create a config
-///     let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
 ///     registry.insert(
 ///         "registry_name".to_owned(),
-///         EppClientConnection {
+///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
 ///             username: "username".to_owned(),

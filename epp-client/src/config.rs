@@ -7,13 +7,13 @@
 //! ```no_run
 //! use std::collections::HashMap;
 //!
-//! use epp_client::config::{EppClientConfig, EppClientConnection};
+//! use epp_client::config::{EppClientConfig, RegistryConfig};
 //!
 //! // Create a config
-//! let mut registry: HashMap<String, EppClientConnection> = HashMap::new();
+//! let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
 //! registry.insert(
 //!     "registry_name".to_owned(),
-//!     EppClientConnection {
+//!     RegistryConfig {
 //!         host: "example.com".to_owned(),
 //!         port: 700,
 //!         username: "username".to_owned(),
@@ -48,19 +48,19 @@ pub struct EppClientTlsFiles {
 /// Config that stores settings for multiple registries
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientConfig {
-    pub registry: HashMap<String, EppClientConnection>,
+    pub registry: HashMap<String, RegistryConfig>,
 }
 
 impl EppClientConfig {
     /// Returns the config for a particular registry
-    pub fn registry(&self, registry: &str) -> Option<&EppClientConnection> {
+    pub fn registry(&self, registry: &str) -> Option<&RegistryConfig> {
         self.registry.get(registry)
     }
 }
 
 /// Connection details to connect to and authenticate with a registry
 #[derive(Serialize, Deserialize, Debug)]
-pub struct EppClientConnection {
+pub struct RegistryConfig {
     pub host: String,
     pub port: u16,
     pub username: String,
@@ -69,7 +69,7 @@ pub struct EppClientConnection {
     pub tls_files: Option<EppClientTlsFiles>,
 }
 
-impl EppClientConnection {
+impl RegistryConfig {
     /// Returns the EPP username and password as a tuple
     pub fn credentials(&self) -> (String, String) {
         (self.username.to_string(), self.password.to_string())
