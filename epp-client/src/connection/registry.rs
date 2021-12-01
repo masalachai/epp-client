@@ -55,8 +55,8 @@ impl EppConnection {
         Ok(())
     }
 
-    /// Reads response from the socket
-    async fn read_epp_response(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
+    /// Receives response from the socket and converts it into an EPP XML string
+    async fn get_epp_response(&mut self) -> Result<String, Box<dyn Error>> {
         let mut buf = [0u8; 4];
         self.stream.read_exact(&mut buf).await?;
 
@@ -86,16 +86,7 @@ impl EppConnection {
             }
         }
 
-        Ok(buf)
-    }
-
-    /// Receives response from the socket and converts it into an EPP XML string
-    async fn get_epp_response(&mut self) -> Result<String, Box<dyn Error>> {
-        let contents = self.read_epp_response().await?;
-
-        let response = str::from_utf8(&contents)?.to_string();
-
-        Ok(response)
+        Ok(String::from_utf8(buf)?)
     }
 
     /// Sends an EPP XML request to the registry and return the response
