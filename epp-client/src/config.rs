@@ -57,6 +57,19 @@ pub struct EppClientTlsFiles {
     pub key: String,
 }
 
+/// Config that stores settings for multiple registries
+#[derive(Serialize, Deserialize, Debug)]
+pub struct EppClientConfig {
+    pub registry: HashMap<String, EppClientConnection>,
+}
+
+impl EppClientConfig {
+    /// Returns the config for a particular registry
+    pub fn registry(&self, registry: &str) -> Option<&EppClientConnection> {
+        self.registry.get(registry)
+    }
+}
+
 /// Connection details to connect to and authenticate with a registry
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientConnection {
@@ -66,12 +79,6 @@ pub struct EppClientConnection {
     pub password: String,
     pub ext_uris: Option<Vec<String>>,
     pub tls_files: Option<EppClientTlsFiles>,
-}
-
-/// Config that stores settings for multiple registries
-#[derive(Serialize, Deserialize, Debug)]
-pub struct EppClientConfig {
-    pub registry: HashMap<String, EppClientConnection>,
 }
 
 impl EppClientConnection {
@@ -134,12 +141,5 @@ impl EppClientConnection {
         }
 
         Err(Error::Other("No private key found in PEM file".to_owned()))
-    }
-}
-
-impl EppClientConfig {
-    /// Returns the config for a particular registry
-    pub fn registry(&self, registry: &str) -> Option<&EppClientConnection> {
-        self.registry.get(registry)
     }
 }
