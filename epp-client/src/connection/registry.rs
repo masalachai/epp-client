@@ -65,15 +65,12 @@ impl EppConnection {
         let message_size = buf_size - 4;
         debug!("{}: Response buffer size: {}", self.registry, message_size);
 
-        let mut buf = Vec::with_capacity(4096);
-        let mut read_buf = vec![0u8; 4096];
-
+        let mut buf = vec![0; message_size];
         let mut read_size: usize = 0;
 
         loop {
-            let read = self.stream.read(&mut read_buf).await?;
+            let read = self.stream.read(&mut buf[read_size..]).await?;
             debug!("{}: Read: {} bytes", self.registry, read);
-            buf.extend_from_slice(&read_buf[0..read]);
 
             read_size += read;
             debug!("{}: Total read: {} bytes", self.registry, read_size);
