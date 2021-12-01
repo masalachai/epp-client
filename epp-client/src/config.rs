@@ -40,12 +40,15 @@
 //! let tls = registry.tls_files().unwrap();
 //! ```
 
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::{BufReader, Seek, SeekFrom};
+
 use rustls::{Certificate, PrivateKey};
 use rustls_pemfile;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::io::{Seek, SeekFrom};
-use std::{fs, io};
+
+use crate::error::Error;
 
 /// Paths to the client certificate and client key PEM files
 #[derive(Serialize, Deserialize, Debug)]
@@ -85,51 +88,52 @@ impl EppClientConnection {
         self.ext_uris.as_ref()
     }
     /// Returns the parsed client certificate and private key for client TLS auth
-    pub fn tls_files(&self) -> Option<(Vec<Certificate>, PrivateKey)> {
-        let certificates = self.client_certificate();
-        let key = self.key();
-
-        if certificates == None || key == None {
-            None
-        } else {
-            Some((certificates.unwrap(), key.unwrap()))
+    pub fn tls_files(&self) -> Result<Option<(Vec<Certificate>, PrivateKey)>, Error> {
+        match (self.client_certificate()?, self.key()?) {
+            (Some(certificates), Some(key)) => Ok(Some((certificates, key))),
+            _ => Ok(None),
         }
     }
     /// Parses the client certificate chain
-    fn client_certificate(&self) -> Option<Vec<Certificate>> {
-        self.tls_files.as_ref().map(|tls| {
-            rustls_pemfile::certs(&mut io::BufReader::new(
-                fs::File::open(tls.cert_chain.to_string()).unwrap(),
-            ))
-            .unwrap()
-            .iter()
-            .map(|v| Certificate(v.clone()))
-            .collect()
-        })
+    fn client_certificate(&self) -> Result<Option<Vec<Certificate>>, Error> {
+        let certs_file = match &self.tls_files {
+            Some(files) => &files.cert_chain,
+            None => return Ok(None),
+        };
+
+        Ok(Some(
+            rustls_pemfile::certs(&mut BufReader::new(File::open(certs_file)?))?
+                .into_iter()
+                .map(Certificate)
+                .collect::<Vec<_>>(),
+        ))
     }
     /// Parses the client private key
-    fn key(&self) -> Option<PrivateKey> {
-        self.tls_files.as_ref().map(|tls| {
-            let mut r = io::BufReader::new(fs::File::open(tls.key.to_string()).unwrap());
+    fn key(&self) -> Result<Option<PrivateKey>, Error> {
+        let key_file = match &self.tls_files {
+            Some(files) => &files.key,
+            None => return Ok(None),
+        };
 
-            let rsa_keys = rustls_pemfile::rsa_private_keys(&mut r).unwrap();
-            if rsa_keys.len() > 1 {
-                warn!("Multiple RSA keys found in PEM file {}", tls.key);
-            } else if !rsa_keys.is_empty() {
-                return rustls::PrivateKey(rsa_keys[0].clone());
-            }
+        let mut r = BufReader::new(File::open(key_file).unwrap());
 
-            r.seek(SeekFrom::Start(0)).unwrap();
+        let mut rsa_keys = rustls_pemfile::rsa_private_keys(&mut r).unwrap();
+        if rsa_keys.len() > 1 {
+            warn!("Multiple RSA keys found in PEM file {}", key_file);
+        } else if let Some(key) = rsa_keys.pop() {
+            return Ok(Some(rustls::PrivateKey(key)));
+        }
 
-            let pkcs8_keys = rustls_pemfile::pkcs8_private_keys(&mut r).unwrap();
-            if pkcs8_keys.len() > 1 {
-                warn!("Multiple PKCS8 keys found in PEM file {}", tls.key);
-            } else if !pkcs8_keys.is_empty() {
-                return rustls::PrivateKey(pkcs8_keys[0].clone());
-            }
+        r.seek(SeekFrom::Start(0))?;
 
-            panic!("No private key found in PEM file");
-        })
+        let mut pkcs8_keys = rustls_pemfile::pkcs8_private_keys(&mut r).unwrap();
+        if pkcs8_keys.len() > 1 {
+            warn!("Multiple PKCS8 keys found in PEM file {}", key_file);
+        } else if let Some(key) = pkcs8_keys.pop() {
+            return Ok(Some(rustls::PrivateKey(key)));
+        }
+
+        Err(Error::Other("No private key found in PEM file".to_owned()))
     }
 }
 
