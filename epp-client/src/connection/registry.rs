@@ -137,7 +137,7 @@ pub async fn epp_connect(
         .with_safe_defaults()
         .with_root_certificates(roots);
 
-    let config = match registry_creds.tls_files() {
+    let config = match registry_creds.tls_files()? {
         Some((cert_chain, key)) => match builder.with_single_cert(cert_chain, key) {
             Ok(config) => config,
             Err(e) => return Err(format!("Failed to set client TLS credentials: {}", e).into()),
