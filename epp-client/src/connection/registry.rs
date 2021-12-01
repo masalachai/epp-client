@@ -6,24 +6,16 @@ use std::convert::TryInto;
 use std::sync::Arc;
 use std::{error::Error, io as stdio, net::ToSocketAddrs};
 use std::{str, u32};
-use tokio::{
-    io::split, io::AsyncReadExt, io::AsyncWriteExt, io::ReadHalf, io::WriteHalf, net::TcpStream,
-};
+use tokio::{io::AsyncReadExt, io::AsyncWriteExt, net::TcpStream};
 use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
 
 use crate::config::EppClientConnection;
 use crate::error;
 
-/// Socket stream for the connection to the registry
-pub struct ConnectionStream {
-    reader: ReadHalf<TlsStream<TcpStream>>,
-    writer: WriteHalf<TlsStream<TcpStream>>,
-}
-
 /// EPP Connection struct with some metadata for the connection
 pub struct EppConnection {
     registry: String,
-    stream: ConnectionStream,
+    stream: TlsStream<TcpStream>,
     pub greeting: String,
 }
 
@@ -31,10 +23,10 @@ impl EppConnection {
     /// Create an EppConnection instance with the stream to the registry
     pub async fn new(
         registry: String,
-        mut stream: ConnectionStream,
+        mut stream: TlsStream<TcpStream>,
     ) -> Result<EppConnection, Box<dyn Error>> {
         let mut buf = vec![0u8; 4096];
-        stream.reader.read(&mut buf).await?;
+        stream.read(&mut buf).await?;
         let greeting = str::from_utf8(&buf[4..])?.to_string();
 
         debug!("{}: greeting: {}", registry, greeting);
@@ -48,7 +40,7 @@ impl EppConnection {
 
     /// Writes to the socket
     async fn write(&mut self, buf: &[u8]) -> Result<(), Box<dyn Error>> {
-        let wrote = self.stream.writer.write(buf).await?;
+        let wrote = self.stream.write(buf).await?;
 
         debug!("{}: Wrote {} bytes", self.registry, wrote);
 
@@ -74,7 +66,7 @@ impl EppConnection {
     /// Reads response from the socket
     async fn read_epp_response(&mut self) -> Result<Vec<u8>, Box<dyn Error>> {
         let mut buf = [0u8; 4];
-        self.stream.reader.read_exact(&mut buf).await?;
+        self.stream.read_exact(&mut buf).await?;
 
         let buf_size: usize = u32::from_be_bytes(buf).try_into()?;
 
@@ -87,7 +79,7 @@ impl EppConnection {
         let mut read_size: usize = 0;
 
         loop {
-            let read = self.stream.reader.read(&mut read_buf).await?;
+            let read = self.stream.read(&mut read_buf).await?;
             debug!("{}: Read: {} bytes", self.registry, read);
             buf.extend_from_slice(&read_buf[0..read]);
 
@@ -131,7 +123,7 @@ impl EppConnection {
     pub async fn shutdown(&mut self) -> Result<(), Box<dyn Error>> {
         info!("{}: Closing connection", self.registry);
 
-        self.stream.writer.shutdown().await?;
+        self.stream.shutdown().await?;
         Ok(())
     }
 }
@@ -140,7 +132,7 @@ impl EppConnection {
 /// socket stream to read/write to the connection
 pub async fn epp_connect(
     registry_creds: &EppClientConnection,
-) -> Result<ConnectionStream, error::Error> {
+) -> Result<TlsStream<TcpStream>, error::Error> {
     let (host, port) = registry_creds.connection_details();
 
     info!("Connecting: EPP Server: {} Port: {}", host, port);
@@ -181,9 +173,5 @@ pub async fn epp_connect(
         )
     })?;
 
-    let stream = connector.connect(domain, stream).await?;
-
-    let (reader, writer) = split(stream);
-
-    Ok(ConnectionStream { reader, writer })
+    Ok(connector.connect(domain, stream).await?)
 }
