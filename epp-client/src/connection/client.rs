@@ -54,7 +54,7 @@ use crate::common::{EppObject, NoExtension};
 use crate::config::EppClientConfig;
 use crate::connection::registry::{epp_connect, EppConnection};
 use crate::error;
-use crate::hello::{EppGreeting, EppHello};
+use crate::hello::{Greeting, Hello};
 use crate::login::Login;
 use crate::logout::Logout;
 use crate::request::{generate_client_tr_id, EppExtension, EppRequest};
@@ -129,13 +129,13 @@ impl EppClient {
     }
 
     /// Executes an EPP Hello call and returns the response as an `EppGreeting`
-    pub async fn hello(&mut self) -> Result<EppGreeting, Box<dyn Error>> {
-        let hello = EppHello::new();
+    pub async fn hello(&mut self) -> Result<Greeting, Box<dyn Error>> {
+        let hello = Hello::new();
         let hello_xml = hello.serialize()?;
 
         let response = self.connection.transact(&hello_xml).await?;
 
-        Ok(EppGreeting::deserialize(&response)?)
+        Ok(Greeting::deserialize(&response)?)
     }
 
     pub async fn transact<T, E>(
@@ -171,8 +171,8 @@ impl EppClient {
     }
 
     /// Returns the greeting received on establishment of the connection as an `EppGreeting`
-    pub fn greeting(&self) -> Result<EppGreeting, error::Error> {
-        EppGreeting::deserialize(&self.connection.greeting)
+    pub fn greeting(&self) -> Result<Greeting, error::Error> {
+        Greeting::deserialize(&self.connection.greeting)
     }
 
     /// Sends the EPP Logout command to log out of the EPP session

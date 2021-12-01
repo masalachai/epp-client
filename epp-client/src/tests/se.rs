@@ -31,7 +31,7 @@ mod request {
     use crate::domain::update::DomainAddRemove;
     use crate::domain::update::DomainChangeInfo;
     use crate::domain::update::DomainUpdate;
-    use crate::hello::EppHello;
+    use crate::hello::Hello;
     use crate::host::check::HostCheck;
     use crate::host::create::HostCreate;
     use crate::host::delete::HostDelete;
@@ -51,7 +51,7 @@ mod request {
     #[test]
     fn hello() {
         let xml = get_xml("request/hello.xml").unwrap();
-        let object = EppHello::new();
+        let object = Hello::new();
         let serialized = object.serialize().unwrap();
 
         assert_eq!(xml, serialized);

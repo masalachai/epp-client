@@ -21,8 +21,8 @@ mod response {
     use crate::domain::transfer::DomainTransferReject;
     use crate::domain::transfer::DomainTransferRequest;
     use crate::domain::update::DomainUpdate;
-    use crate::hello::EppGreeting;
     use crate::hello::ExpiryType;
+    use crate::hello::Greeting;
     use crate::hello::Relative;
     use crate::host::check::HostCheck;
     use crate::host::create::HostCreate;
@@ -43,7 +43,7 @@ mod response {
     #[test]
     fn greeting() {
         let xml = get_xml("response/greeting.xml").unwrap();
-        let object = EppGreeting::deserialize(xml.as_str()).unwrap();
+        let object = Greeting::deserialize(xml.as_str()).unwrap();
 
         assert_eq!(object.data.service_id, "ISPAPI EPP Server");
         assert_eq!(object.data.service_date, "2021-07-25T14:51:17.0Z");
