@@ -38,14 +38,8 @@
 //! ```
 
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::{BufReader, Seek, SeekFrom};
 
-use rustls::{Certificate, PrivateKey};
-use rustls_pemfile;
 use serde::{Deserialize, Serialize};
-
-use crate::error::Error;
 
 /// Paths to the client certificate and client key PEM files
 #[derive(Serialize, Deserialize, Debug)]
@@ -90,37 +84,5 @@ impl EppClientConnection {
     /// Returns the service extension URIs to be set in the connection to the registry
     pub fn ext_uris(&self) -> Option<&Vec<String>> {
         self.ext_uris.as_ref()
-    }
-    /// Returns the parsed client certificate and private key for client TLS auth
-    pub fn tls_files(&self) -> Result<Option<(Vec<Certificate>, PrivateKey)>, Error> {
-        let (certs_file, key_file) = match &self.tls_files {
-            Some(files) => (&files.cert_chain, &files.key),
-            None => return Ok(None),
-        };
-
-        let certs = rustls_pemfile::certs(&mut BufReader::new(File::open(certs_file)?))?
-            .into_iter()
-            .map(Certificate)
-            .collect::<Vec<_>>();
-
-        let mut r = BufReader::new(File::open(key_file).unwrap());
-
-        let mut rsa_keys = rustls_pemfile::rsa_private_keys(&mut r).unwrap();
-        if rsa_keys.len() > 1 {
-            warn!("Multiple RSA keys found in PEM file {}", key_file);
-        } else if let Some(key) = rsa_keys.pop() {
-            return Ok(Some((certs, rustls::PrivateKey(key))));
-        }
-
-        r.seek(SeekFrom::Start(0))?;
-
-        let mut pkcs8_keys = rustls_pemfile::pkcs8_private_keys(&mut r).unwrap();
-        if pkcs8_keys.len() > 1 {
-            warn!("Multiple PKCS8 keys found in PEM file {}", key_file);
-        } else if let Some(key) = pkcs8_keys.pop() {
-            return Ok(Some((certs, rustls::PrivateKey(key))));
-        }
-
-        Err(Error::Other("No private key found in PEM file".to_owned()))
     }
 }

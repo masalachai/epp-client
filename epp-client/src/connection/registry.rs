@@ -1,10 +1,15 @@
 //! Manages registry connections and reading/writing to them
 
-use rustls::{OwnedTrustAnchor, RootCertStore};
 use std::convert::TryInto;
+use std::fs::File;
+use std::io::{BufReader, Seek, SeekFrom};
 use std::sync::Arc;
 use std::{error::Error, io as stdio, net::ToSocketAddrs};
 use std::{io, str, u32};
+
+use rustls::{Certificate, PrivateKey};
+use rustls::{OwnedTrustAnchor, RootCertStore};
+use rustls_pemfile;
 use tokio::{io::AsyncReadExt, io::AsyncWriteExt, net::TcpStream};
 use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
 
@@ -137,11 +142,42 @@ pub async fn epp_connect(
         .with_safe_defaults()
         .with_root_certificates(roots);
 
-    let config = match registry_creds.tls_files()? {
-        Some((cert_chain, key)) => match builder.with_single_cert(cert_chain, key) {
-            Ok(config) => config,
-            Err(e) => return Err(format!("Failed to set client TLS credentials: {}", e).into()),
-        },
+    let config = match &registry_creds.tls_files {
+        Some(files) => {
+            let (certs_file, key_file) = (&files.cert_chain, &files.key);
+            let certs = rustls_pemfile::certs(&mut BufReader::new(File::open(certs_file)?))?
+                .into_iter()
+                .map(Certificate)
+                .collect::<Vec<_>>();
+
+            let mut key;
+            let mut r = BufReader::new(File::open(key_file).unwrap());
+            let mut rsa_keys = rustls_pemfile::rsa_private_keys(&mut r).unwrap();
+            if rsa_keys.len() > 1 {
+                warn!("Multiple RSA keys found in PEM file {}", key_file);
+            }
+            key = rsa_keys.pop();
+
+            if key.is_none() {
+                r.seek(SeekFrom::Start(0))?;
+                let mut pkcs8_keys = rustls_pemfile::pkcs8_private_keys(&mut r).unwrap();
+                if pkcs8_keys.len() > 1 {
+                    warn!("Multiple PKCS8 keys found in PEM file {}", key_file);
+                }
+                key = pkcs8_keys.pop();
+            }
+
+            match key {
+                Some(key) => builder
+                    .with_single_cert(certs, PrivateKey(key))
+                    .map_err(|e| error::Error::Other(e.to_string()))?,
+                None => {
+                    return Err(error::Error::Other(
+                        "No private key found in PEM file".to_owned(),
+                    ))
+                }
+            }
+        }
         None => builder.with_no_client_auth(),
     };
 
