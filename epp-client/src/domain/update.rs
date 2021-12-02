@@ -12,7 +12,7 @@ use crate::{
 
 use super::XMLNS;
 
-use crate::response::EppCommandResponse;
+use crate::response::ResponseStatus;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -23,7 +23,7 @@ pub struct DomainUpdate<E> {
 
 impl<E: EppExtension> EppRequest<E> for DomainUpdate<E> {
     type Input = DomainUpdateRequest;
-    type Output = EppCommandResponse;
+    type Output = ResponseStatus;
 
     fn into_parts(self) -> (Self::Input, Option<E>) {
         (self.request, self.extension)

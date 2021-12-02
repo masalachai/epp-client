@@ -7,7 +7,7 @@ use crate::common::{
     ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
 };
 use crate::request::{EppExtension, EppRequest};
-use crate::response::EppCommandResponse;
+use crate::response::ResponseStatus;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -18,7 +18,7 @@ pub struct ContactUpdate<E> {
 
 impl<E: EppExtension> EppRequest<E> for ContactUpdate<E> {
     type Input = ContactUpdateRequest;
-    type Output = EppCommandResponse;
+    type Output = ResponseStatus;
 
     fn into_parts(self) -> (Self::Input, Option<E>) {
         (self.request, self.extension)
