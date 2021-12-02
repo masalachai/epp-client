@@ -5,7 +5,7 @@ use epp_client_macros::*;
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
 use crate::request::{EppExtension, EppRequest};
-use crate::response::EppCommandResponse;
+use crate::response::ResponseStatus;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -16,7 +16,7 @@ pub struct HostDelete<E> {
 
 impl<E: EppExtension> EppRequest<E> for HostDelete<E> {
     type Input = HostDeleteRequest;
-    type Output = EppCommandResponse;
+    type Output = ResponseStatus;
 
     fn into_parts(self) -> (Self::Input, Option<E>) {
         (self.request, self.extension)

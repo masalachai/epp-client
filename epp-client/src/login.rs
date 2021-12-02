@@ -7,7 +7,7 @@ use crate::{
     common::{ElementName, NoExtension, Options, ServiceExtension, Services, StringValue},
     contact, domain, host,
     request::{EppExtension, EppRequest, EPP_LANG, EPP_VERSION},
-    response::EppCommandResponse,
+    response::ResponseStatus,
 };
 
 #[derive(Debug)]
@@ -18,7 +18,7 @@ pub struct Login<E> {
 
 impl<E: EppExtension> EppRequest<E> for Login<E> {
     type Input = LoginRequest;
-    type Output = EppCommandResponse;
+    type Output = ResponseStatus;
 
     fn into_parts(self) -> (Self::Input, Option<E>) {
         (self.request, self.extension)

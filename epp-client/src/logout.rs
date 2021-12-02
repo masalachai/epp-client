@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     common::{ElementName, NoExtension},
     request::{EppExtension, EppRequest},
-    response::EppCommandResponse,
+    response::ResponseStatus,
 };
 
 #[derive(Debug)]
@@ -17,7 +17,7 @@ pub struct Logout<E> {
 
 impl<E: EppExtension> EppRequest<E> for Logout<E> {
     type Input = LogoutRequest;
-    type Output = EppCommandResponse;
+    type Output = ResponseStatus;
 
     fn into_parts(self) -> (Self::Input, Option<E>) {
         (self.request, self.extension)

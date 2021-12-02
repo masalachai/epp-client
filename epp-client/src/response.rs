@@ -6,9 +6,6 @@ use std::fmt::Debug;
 
 use crate::common::{ElementName, Extension, StringValue};
 
-/// A generic EPP Response to an EPP command with a result section, a status code and a message
-pub type EppCommandResponse = ResponseStatus;
-
 /// Type corresponding to the <undef> tag an EPP response XML
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Undef;

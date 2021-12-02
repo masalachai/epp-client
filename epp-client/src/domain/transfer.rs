@@ -5,7 +5,7 @@ use epp_client_macros::*;
 use super::XMLNS;
 use crate::common::{DomainAuthInfo, ElementName, NoExtension, Period, StringValue};
 use crate::request::{EppExtension, EppRequest};
-use crate::response::EppCommandResponse;
+use crate::response::ResponseStatus;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -31,7 +31,7 @@ pub struct DomainTransferApprove<E> {
 
 impl<E: EppExtension> EppRequest<E> for DomainTransferApprove<E> {
     type Input = DomainTransferReq;
-    type Output = EppCommandResponse;
+    type Output = ResponseStatus;
 
     fn into_parts(self) -> (Self::Input, Option<E>) {
         (self.request, self.extension)
@@ -46,7 +46,7 @@ pub struct DomainTransferReject<E> {
 
 impl<E: EppExtension> EppRequest<E> for DomainTransferReject<E> {
     type Input = DomainTransferReq;
-    type Output = EppCommandResponse;
+    type Output = ResponseStatus;
 
     fn into_parts(self) -> (Self::Input, Option<E>) {
         (self.request, self.extension)
@@ -61,7 +61,7 @@ pub struct DomainTransferCancel<E> {
 
 impl<E: EppExtension> EppRequest<E> for DomainTransferCancel<E> {
     type Input = DomainTransferReq;
-    type Output = EppCommandResponse;
+    type Output = ResponseStatus;
 
     fn into_parts(self) -> (Self::Input, Option<E>) {
         (self.request, self.extension)
