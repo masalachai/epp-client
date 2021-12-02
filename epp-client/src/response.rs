@@ -8,8 +8,6 @@ use crate::common::{ElementName, EppObject, Extension, StringValue};
 
 /// A generic EPP Response to an EPP command with a result section, a status code and a message
 pub type EppCommandResponse = EppObject<CommandResponseStatus>;
-/// An alias of `EppCommandResponse` indicating an EPP Error
-pub type EppCommandResponseError = EppCommandResponse;
 
 /// Type corresponding to the <undef> tag an EPP response XML
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

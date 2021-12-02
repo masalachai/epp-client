@@ -34,7 +34,7 @@ mod response {
     use crate::message::ack::MessageAck;
     use crate::message::poll::MessagePoll;
     use crate::request::EppRequest;
-    use crate::response::EppCommandResponseError;
+    use crate::response::EppCommandResponse;
     use crate::xml::EppXml;
 
     const SVTRID: &str = "RO-6879-1627224678242975";
@@ -74,7 +74,7 @@ mod response {
     #[test]
     fn error() {
         let xml = get_xml("response/error.xml").unwrap();
-        let object = EppCommandResponseError::deserialize(xml.as_str()).unwrap();
+        let object = EppCommandResponse::deserialize(xml.as_str()).unwrap();
 
         assert_eq!(object.data.result.code, 2303);
         assert_eq!(object.data.result.message, "Object does not exist".into());
