@@ -1,13 +1,13 @@
 //! Error types to wrap internal errors and make EPP errors easier to read
 
-use crate::response::EppCommandResponseError;
+use crate::response::EppCommandResponse;
 use std::fmt::Display;
 
 /// Error enum holding the possible error types
 #[derive(Debug)]
 pub enum Error {
     EppConnectionError(std::io::Error),
-    EppCommandError(EppCommandResponseError),
+    EppCommandError(EppCommandResponse),
     EppDeserializationError(String),
     Other(String),
 }
@@ -15,7 +15,7 @@ pub enum Error {
 /// An EPP XML error
 #[derive(Debug)]
 pub struct EppCommandError {
-    pub epp_error: EppCommandResponseError,
+    pub epp_error: EppCommandResponse,
 }
 
 impl std::error::Error for Error {}
