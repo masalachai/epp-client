@@ -50,7 +50,7 @@
 use std::time::SystemTime;
 use std::{error::Error, fmt::Debug};
 
-use crate::common::NoExtension;
+use crate::common::{EppObject, NoExtension};
 use crate::config::EppClientConfig;
 use crate::error;
 use crate::hello::{Greeting, Hello};
@@ -131,12 +131,11 @@ impl EppClient {
 
     /// Executes an EPP Hello call and returns the response as an `EppGreeting`
     pub async fn hello(&mut self) -> Result<Greeting, Box<dyn Error>> {
-        let hello = Hello::new();
-        let hello_xml = hello.serialize()?;
+        let hello_xml = EppObject::<Hello>::build(Hello).serialize()?;
 
         let response = self.connection.transact(&hello_xml).await?;
 
-        Ok(Greeting::deserialize(&response)?)
+        Ok(EppObject::<Greeting>::deserialize(&response)?.data)
     }
 
     pub async fn transact<T, E>(
@@ -173,7 +172,7 @@ impl EppClient {
 
     /// Returns the greeting received on establishment of the connection as an `EppGreeting`
     pub fn greeting(&self) -> Result<Greeting, error::Error> {
-        Greeting::deserialize(&self.connection.greeting)
+        EppObject::<Greeting>::deserialize(&self.connection.greeting).map(|obj| obj.data)
     }
 
     /// Sends the EPP Logout command to log out of the EPP session

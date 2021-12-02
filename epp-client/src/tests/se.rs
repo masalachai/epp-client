@@ -8,8 +8,8 @@ mod request {
     use crate::common::HostObjList;
     use crate::common::NoExtension;
     use crate::common::{
-        Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
-        HostStatus, Phone, PostalInfo,
+        Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, EppObject, HostAddr,
+        HostAttr, HostStatus, Phone, PostalInfo,
     };
     use crate::contact::check::ContactCheck;
     use crate::contact::create::ContactCreate;
@@ -51,8 +51,7 @@ mod request {
     #[test]
     fn hello() {
         let xml = get_xml("request/hello.xml").unwrap();
-        let object = Hello::new();
-        let serialized = object.serialize().unwrap();
+        let serialized = EppObject::<Hello>::build(Hello).serialize().unwrap();
 
         assert_eq!(xml, serialized);
     }

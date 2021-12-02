@@ -43,7 +43,7 @@ mod response {
     #[test]
     fn greeting() {
         let xml = get_xml("response/greeting.xml").unwrap();
-        let object = Greeting::deserialize(xml.as_str()).unwrap();
+        let object = EppObject::<Greeting>::deserialize(xml.as_str()).unwrap();
 
         assert_eq!(object.data.service_id, "ISPAPI EPP Server");
         assert_eq!(object.data.service_date, "2021-07-25T14:51:17.0Z");
