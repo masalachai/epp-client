@@ -119,7 +119,7 @@ pub mod contact {
     pub mod info;
     pub mod update;
 
-    pub const EPP_CONTACT_XMLNS: &str = "urn:ietf:params:xml:ns:contact-1.0";
+    pub const XMLNS: &str = "urn:ietf:params:xml:ns:contact-1.0";
 }
 
 pub mod domain {
@@ -132,7 +132,7 @@ pub mod domain {
     pub mod transfer;
     pub mod update;
 
-    pub const EPP_DOMAIN_XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
+    pub const XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
 }
 
 pub mod host {
@@ -142,7 +142,7 @@ pub mod host {
     pub mod info;
     pub mod update;
 
-    pub const EPP_HOST_XMLNS: &str = "urn:ietf:params:xml:ns:host-1.0";
+    pub const XMLNS: &str = "urn:ietf:params:xml:ns:host-1.0";
 }
 
 pub mod message {

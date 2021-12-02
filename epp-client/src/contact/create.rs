@@ -2,8 +2,8 @@
 
 use epp_client_macros::*;
 
+use super::XMLNS;
 use crate::common::{ContactAuthInfo, ElementName, NoExtension, Phone, PostalInfo, StringValue};
-use crate::contact::EPP_CONTACT_XMLNS;
 use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
 
@@ -97,7 +97,7 @@ impl<E: EppExtension> ContactCreate<E> {
         ContactCreate {
             request: ContactCreateRequest {
                 contact: Contact {
-                    xmlns: EPP_CONTACT_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     id: id.into(),
                     postal_info,
                     voice,

@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use super::EPP_DOMAIN_XMLNS;
+use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
 use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
@@ -76,7 +76,7 @@ impl<E: EppExtension> DomainCheck<E> {
         DomainCheck {
             request: DomainCheckRequest {
                 list: DomainList {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     domains: domains
                         .into_iter()
                         .map(|d| d.into())

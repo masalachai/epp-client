@@ -2,10 +2,10 @@
 
 use epp_client_macros::*;
 
+use super::XMLNS;
 use crate::common::{
     ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
 };
-use crate::contact::EPP_CONTACT_XMLNS;
 use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
@@ -88,7 +88,7 @@ impl<E: EppExtension> ContactUpdate<E> {
         ContactUpdate {
             request: ContactUpdateRequest {
                 contact: ContactUpdateRequestData {
-                    xmlns: EPP_CONTACT_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     id: id.into(),
                     add_statuses: None,
                     remove_statuses: None,

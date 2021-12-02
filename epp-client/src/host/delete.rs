@@ -2,8 +2,8 @@
 
 use epp_client_macros::*;
 
+use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::host::EPP_HOST_XMLNS;
 use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
@@ -75,7 +75,7 @@ impl<E: EppExtension> HostDelete<E> {
         HostDelete {
             request: HostDeleteRequest {
                 host: HostDeleteRequestData {
-                    xmlns: EPP_HOST_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                 },
             },
