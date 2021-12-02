@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use super::EPP_DOMAIN_XMLNS;
+use super::XMLNS;
 use crate::common::{
     DomainAuthInfo, DomainContact, DomainStatus, ElementName, HostAttr, NoExtension, StringValue,
 };
@@ -76,7 +76,7 @@ impl<E: EppExtension> DomainInfo<E> {
         DomainInfo {
             request: DomainInfoRequest {
                 info: DomainInfoRequestData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     domain: Domain {
                         hosts: "all".to_string(),
                         name: name.to_string(),

@@ -3,8 +3,8 @@ use std::fmt::Debug;
 /// Types for EPP contact check request
 use epp_client_macros::*;
 
+use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::contact::EPP_CONTACT_XMLNS;
 use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
 
@@ -82,7 +82,7 @@ impl<E: EppExtension> ContactCheck<E> {
         ContactCheck {
             request: ContactCheckRequest {
                 list: ContactList {
-                    xmlns: EPP_CONTACT_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     contact_ids,
                 },
             },

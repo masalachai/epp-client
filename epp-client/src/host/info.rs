@@ -2,8 +2,8 @@
 
 use epp_client_macros::*;
 
+use super::XMLNS;
 use crate::common::{ElementName, HostAddr, HostStatus, NoExtension, StringValue};
-use crate::host::EPP_HOST_XMLNS;
 use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
 
@@ -74,7 +74,7 @@ impl<E: EppExtension> HostInfo<E> {
         HostInfo {
             request: HostInfoRequest {
                 info: HostInfoRequestData {
-                    xmlns: EPP_HOST_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                 },
             },

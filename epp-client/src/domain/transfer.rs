@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use super::EPP_DOMAIN_XMLNS;
+use super::XMLNS;
 use crate::common::{DomainAuthInfo, ElementName, NoExtension, Period, StringValue};
 use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
@@ -138,7 +138,7 @@ impl<E: EppExtension> DomainTransferRequest<E> {
             request: DomainTransferReq {
                 operation: "request".to_string(),
                 domain: DomainTransferReqData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                     period: Some(Period::new(years)),
                     auth_info: Some(DomainAuthInfo::new(auth_password)),
@@ -211,7 +211,7 @@ impl<E: EppExtension> DomainTransferApprove<E> {
             request: DomainTransferReq {
                 operation: "approve".to_string(),
                 domain: DomainTransferReqData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                     period: None,
                     auth_info: None,
@@ -284,7 +284,7 @@ impl<E: EppExtension> DomainTransferReject<E> {
             request: DomainTransferReq {
                 operation: "reject".to_string(),
                 domain: DomainTransferReqData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                     period: None,
                     auth_info: None,
@@ -357,7 +357,7 @@ impl<E: EppExtension> DomainTransferCancel<E> {
             request: DomainTransferReq {
                 operation: "cancel".to_string(),
                 domain: DomainTransferReqData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                     period: None,
                     auth_info: None,
@@ -430,7 +430,7 @@ impl<E: EppExtension> DomainTransferQuery<E> {
             request: DomainTransferReq {
                 operation: "query".to_string(),
                 domain: DomainTransferReqData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                     period: None,
                     auth_info: Some(DomainAuthInfo::new(auth_password)),

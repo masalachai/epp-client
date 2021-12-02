@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use super::EPP_DOMAIN_XMLNS;
+use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
 use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
@@ -75,7 +75,7 @@ impl<E: EppExtension> DomainDelete<E> {
         DomainDelete {
             request: DomainDeleteRequest {
                 domain: DomainDeleteRequestData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                 },
             },

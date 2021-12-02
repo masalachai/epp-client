@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use super::EPP_DOMAIN_XMLNS;
+use super::XMLNS;
 use crate::common::{
     DomainAuthInfo, DomainContact, ElementName, HostList, NoExtension, Period, StringValue,
 };
@@ -113,7 +113,7 @@ impl<E: EppExtension> DomainCreate<E> {
         let registrant = registrant_id.map(|id| id.into());
         let domain_create = DomainCreateRequest {
             domain: DomainCreateRequestData {
-                xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                xmlns: XMLNS.to_string(),
                 name: name.into(),
                 period: Period::new(period),
                 ns,

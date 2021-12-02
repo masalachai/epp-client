@@ -5,9 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     common::{ElementName, NoExtension, Options, ServiceExtension, Services, StringValue},
-    contact::EPP_CONTACT_XMLNS,
-    domain::EPP_DOMAIN_XMLNS,
-    host::EPP_HOST_XMLNS,
+    contact, domain, host,
     request::{EppExtension, EppRequest, EPP_LANG, EPP_VERSION},
     response::EppCommandResponse,
 };
@@ -47,9 +45,9 @@ impl<E: EppExtension> Login<E> {
                 },
                 services: Services {
                     obj_uris: vec![
-                        EPP_HOST_XMLNS.into(),
-                        EPP_CONTACT_XMLNS.into(),
-                        EPP_DOMAIN_XMLNS.into(),
+                        host::XMLNS.into(),
+                        contact::XMLNS.into(),
+                        domain::XMLNS.into(),
                     ],
                     svc_ext: Some(ServiceExtension { ext_uris }),
                 },

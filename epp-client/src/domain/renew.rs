@@ -2,7 +2,7 @@
 
 use epp_client_macros::*;
 
-use super::EPP_DOMAIN_XMLNS;
+use super::XMLNS;
 use crate::common::{ElementName, NoExtension, Period, StringValue};
 use crate::request::{EppExtension, EppRequest};
 use chrono::NaiveDate;
@@ -81,7 +81,7 @@ impl<E: EppExtension> DomainRenew<E> {
         DomainRenew {
             request: DomainRenewRequest {
                 domain: DomainRenewRequestData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                     current_expiry_date: exp_date_str,
                     period: Period::new(years),

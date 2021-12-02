@@ -10,7 +10,7 @@ use crate::{
     request::{EppExtension, EppRequest},
 };
 
-use super::EPP_DOMAIN_XMLNS;
+use super::XMLNS;
 
 use crate::response::EppCommandResponse;
 use serde::{Deserialize, Serialize};
@@ -108,7 +108,7 @@ impl<E: EppExtension> DomainUpdate<E> {
         DomainUpdate {
             request: DomainUpdateRequest {
                 domain: DomainUpdateRequestData {
-                    xmlns: EPP_DOMAIN_XMLNS.to_string(),
+                    xmlns: XMLNS.to_string(),
                     name: name.into(),
                     add: None,
                     remove: None,
