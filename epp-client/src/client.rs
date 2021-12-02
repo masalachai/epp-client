@@ -58,7 +58,7 @@ use crate::login::Login;
 use crate::logout::Logout;
 use crate::registry::{epp_connect, EppConnection};
 use crate::request::{generate_client_tr_id, EppExtension, EppRequest};
-use crate::response::{CommandResponseStatus, CommandResponseWithExtension};
+use crate::response::{ResponseStatus, ResponseWithExtension};
 use crate::xml::EppXml;
 
 /// Instances of the EppClient type are used to transact with the registry.
@@ -143,7 +143,7 @@ impl EppClient {
         &mut self,
         request: T,
         id: &str,
-    ) -> Result<CommandResponseWithExtension<<T as EppRequest<E>>::Output, E::Response>, error::Error>
+    ) -> Result<ResponseWithExtension<<T as EppRequest<E>>::Output, E::Response>, error::Error>
     where
         T: EppRequest<E> + Debug,
         E: EppExtension,
@@ -179,10 +179,7 @@ impl EppClient {
     /// Sends the EPP Logout command to log out of the EPP session
     pub async fn logout(
         &mut self,
-    ) -> Result<
-        CommandResponseWithExtension<EppObject<CommandResponseStatus>, NoExtension>,
-        error::Error,
-    > {
+    ) -> Result<ResponseWithExtension<EppObject<ResponseStatus>, NoExtension>, error::Error> {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = Logout::<NoExtension>::new();
 

@@ -8,7 +8,7 @@ use std::time::SystemTime;
 use crate::{
     common::NoExtension,
     common::{ElementName, EppObject, Extension, StringValue},
-    response::{CommandResponseStatus, CommandResponseWithExtension},
+    response::{ResponseStatus, ResponseWithExtension},
     xml::EppXml,
 };
 use epp_client_macros::ElementName;
@@ -35,15 +35,15 @@ pub trait EppRequest<E: EppExtension>: Sized + Debug {
 
     fn deserialize_response(
         epp_xml: &str,
-    ) -> Result<CommandResponseWithExtension<Self::Output, E::Response>, crate::error::Error> {
+    ) -> Result<ResponseWithExtension<Self::Output, E::Response>, crate::error::Error> {
         let rsp =
-            <EppObject<CommandResponseWithExtension<Self::Output, E::Response>> as EppXml>::deserialize(
+            <EppObject<ResponseWithExtension<Self::Output, E::Response>> as EppXml>::deserialize(
                 epp_xml,
             )?;
         match rsp.data.result.code {
             0..=2000 => Ok(rsp.data),
             _ => Err(crate::error::Error::EppCommandError(EppObject::build(
-                CommandResponseStatus {
+                ResponseStatus {
                     result: rsp.data.result,
                     tr_ids: rsp.data.tr_ids,
                 },
