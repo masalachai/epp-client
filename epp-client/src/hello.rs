@@ -3,33 +3,14 @@ use std::fmt::Debug;
 use epp_client_macros::ElementName;
 use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::common::{ElementName, EppObject, Options, ServiceExtension, Services, StringValue};
-
-/// The EPP Hello request
-pub type Hello = EppObject<HelloRequest>;
-
-impl Hello {
-    /// Creates a new Epp Hello request
-    pub fn new() -> Hello {
-        EppObject::build(HelloRequest {})
-    }
-}
-
-impl Default for Hello {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// The EPP Greeting that is received on a successful connection and in response to an EPP hello
-pub type Greeting = EppObject<GreetingResponse>;
+use crate::common::{ElementName, Options, ServiceExtension, Services, StringValue};
 
 // Request
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "hello")]
 /// Type corresponding to the <hello> tag in an EPP XML hello request
-pub struct HelloRequest;
+pub struct Hello;
 
 // Response
 
@@ -284,7 +265,7 @@ pub struct Dcp {
 #[serde(rename_all = "lowercase")]
 #[element_name(name = "greeting")]
 /// Type corresponding to the <greeting> tag in the EPP greeting XML
-pub struct GreetingResponse {
+pub struct Greeting {
     /// The service ID
     #[serde(rename = "svID")]
     pub service_id: String,
