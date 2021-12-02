@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <response>
+        <result code="1000">
+            <msg>Command completed successfully</msg>
+        </result>
+        <resData>
+            <domain:infData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>eppdev-1.com</domain:name>
+                <domain:roid>128410211_DOMAIN_COM-VRSN</domain:roid>
+                <domain:status s="clientDeleteProhibited"/>
+                <domain:status s="clientTransferProhibited"/>
+                <domain:status s="clientHold"/>
+                <domain:status s="clientUpdateProhibited"/>
+                <domain:ns>
+                    <domain:hostObj>ONE.NS.IDSTEST111.COM</domain:hostObj>
+                    <domain:hostObj>TWO.NS.IDSTEST111.COM</domain:hostObj>
+                </domain:ns>
+                <domain:host>TWO.NS.IDSTEST111.COM</domain:host>
+                <domain:host>ONE.NS.IDSTEST111.COM</domain:host>
+                <domain:clID>29000333</domain:clID>
+                <domain:crID>insdom1</domain:crID>
+                <domain:crDate>2021-12-01T23:41:40Z</domain:crDate>
+                <domain:upID>insdom1</domain:upID>
+                <domain:upDate>2021-12-01T23:41:40Z</domain:upDate>
+                <domain:exDate>2023-12-01T23:41:40Z</domain:exDate>
+                <domain:authInfo>
+                    <domain:pw>epP4uthd#v</domain:pw>
+                </domain:authInfo>
+            </domain:infData>
+        </resData>
+        <trID>
+            <clTRID>insdom1:1638402100</clTRID>
+            <svTRID>1123110370-1638402100935</svTRID>
+        </trID>
+    </response>
+</epp>

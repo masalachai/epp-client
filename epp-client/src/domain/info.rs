@@ -62,7 +62,7 @@ impl<E: EppExtension> EppRequest<E> for DomainInfo<E> {
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an DomainInfo instance
-///     let domain_info = DomainInfo::<NoExtension>::new("eppdev-100.com");
+///     let domain_info = DomainInfo::<NoExtension>::new("eppdev-100.com", None);
 ///
 ///     // send it to the registry and receive a response of type DomainInfoResponse
 ///     let response = client.transact(domain_info, "transaction-id").await.unwrap();
@@ -74,7 +74,7 @@ impl<E: EppExtension> EppRequest<E> for DomainInfo<E> {
 /// }
 /// ```
 impl<E: EppExtension> DomainInfo<E> {
-    pub fn new(name: &str) -> DomainInfo<NoExtension> {
+    pub fn new(name: &str, auth_password: Option<&str>) -> DomainInfo<NoExtension> {
         DomainInfo {
             request: DomainInfoRequest {
                 info: DomainInfoRequestData {
@@ -83,6 +83,9 @@ impl<E: EppExtension> DomainInfo<E> {
                         hosts: "all".to_string(),
                         name: name.to_string(),
                     },
+                    auth_info: auth_password.map(|password| DomainAuthInfo {
+                        password: password.into(),
+                    }),
                 },
             },
             extension: None,
@@ -118,6 +121,9 @@ pub struct DomainInfoRequestData {
     /// The data for the domain to be queried
     #[serde(rename = "domain:name", alias = "name")]
     domain: Domain,
+    /// The auth info for the domain
+    #[serde(rename = "domain:authInfo", alias = "authInfo")]
+    auth_info: Option<DomainAuthInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]
@@ -154,12 +160,12 @@ pub struct DomainInfoResponseData {
     pub roid: StringValue,
     /// The list of domain statuses
     #[serde(rename = "status")]
-    pub statuses: Vec<DomainStatus>,
+    pub statuses: Option<Vec<DomainStatus>>,
     /// The domain registrant
-    pub registrant: StringValue,
+    pub registrant: Option<StringValue>,
     /// The list of domain contacts
     #[serde(rename = "contact")]
-    pub contacts: Vec<DomainContact>,
+    pub contacts: Option<Vec<DomainContact>>,
     /// The list of domain nameservers
     #[serde(rename = "ns")]
     pub ns: Option<DomainNsList>,
@@ -171,19 +177,19 @@ pub struct DomainInfoResponseData {
     pub client_id: StringValue,
     /// The epp user who created the domain
     #[serde(rename = "crID")]
-    pub creator_id: StringValue,
+    pub creator_id: Option<StringValue>,
     /// The domain creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue,
-    /// The epp user who last updated the domain
-    #[serde(rename = "upID")]
-    pub updater_id: StringValue,
-    /// The domain last updated date
-    #[serde(rename = "upDate")]
-    pub updated_at: StringValue,
+    pub created_at: Option<StringValue>,
     /// The domain expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: StringValue,
+    pub expiring_at: Option<StringValue>,
+    /// The epp user who last updated the domain
+    #[serde(rename = "upID")]
+    pub updater_id: Option<StringValue>,
+    /// The domain last updated date
+    #[serde(rename = "upDate")]
+    pub updated_at: Option<StringValue>,
     /// The domain transfer date
     #[serde(rename = "trDate")]
     pub transferred_at: Option<StringValue>,

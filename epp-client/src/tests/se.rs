@@ -298,7 +298,7 @@ mod request {
     fn domain_info() {
         let xml = get_xml("request/domain/info.xml").unwrap();
 
-        let object = DomainInfo::<NoExtension>::new("eppdev.com");
+        let object = DomainInfo::<NoExtension>::new("eppdev.com", Some("2fooBAR"));
 
         let serialized = object.serialize_request(CLTRID).unwrap();
 
