@@ -1,6 +1,6 @@
 //! Common data types included in EPP Requests and Responses
 
-use std::fmt::Display;
+use std::{fmt::Display, str::FromStr};
 
 use epp_client_macros::ElementName;
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
@@ -303,7 +303,26 @@ pub struct Address {
     pub postal_code: StringValue,
     /// The &lt;cc&gt; tag under &lt;addr&gt;
     #[serde(rename = "contact:cc", alias = "cc")]
-    pub country_code: StringValue,
+    pub country: Country,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Country(celes::Country);
+
+impl FromStr for Country {
+    type Err = <celes::Country as FromStr>::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(celes::Country::from_str(s)?))
+    }
+}
+
+impl std::ops::Deref for Country {
+    type Target = celes::Country;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
 }
 
 /// The &lt;postalInfo&gt; type on contact transactions
@@ -379,7 +398,7 @@ impl Address {
         city: &str,
         province: &str,
         postal_code: &str,
-        country_code: &str,
+        country: Country,
     ) -> Address {
         let street = street.iter().map(|&s| s.into()).collect();
 
@@ -388,7 +407,7 @@ impl Address {
             city: city.into(),
             province: province.into(),
             postal_code: postal_code.into(),
-            country_code: country_code.into(),
+            country,
         }
     }
 }
