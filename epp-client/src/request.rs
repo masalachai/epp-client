@@ -25,7 +25,7 @@ pub trait EppRequest<E: EppExtension>: Sized + Debug {
     fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
         let (command, extension) = self.into_parts();
         let extension = extension.map(|data| Extension { data });
-        EppXml::serialize(&EppObject::build(CommandWithExtension {
+        EppXml::serialize(&EppObject::build(Command {
             command,
             extension,
             client_tr_id: client_tr_id.into(),
@@ -54,7 +54,7 @@ pub trait EppExtension: ElementName + DeserializeOwned + Serialize + Sized + Deb
 #[element_name(name = "command")]
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// with an &lt;extension&gt; tag
-pub struct CommandWithExtension<T: ElementName, E: ElementName> {
+pub struct Command<T: ElementName, E: ElementName> {
     /// The instance that will be used to populate the &lt;command&gt; tag
     pub command: T,
     /// The client TRID
@@ -63,9 +63,7 @@ pub struct CommandWithExtension<T: ElementName, E: ElementName> {
     pub client_tr_id: StringValue,
 }
 
-impl<T: ElementName + Serialize, E: ElementName + Serialize> Serialize
-    for CommandWithExtension<T, E>
-{
+impl<T: ElementName + Serialize, E: ElementName + Serialize> Serialize for Command<T, E> {
     /// Serializes the generic type T to the proper XML tag (set by the `#[element_name(name = <tagname>)]` attribute) for the request
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -79,10 +77,10 @@ impl<T: ElementName + Serialize, E: ElementName + Serialize> Serialize
     }
 }
 
-impl<T: ElementName, E: ElementName> CommandWithExtension<T, E> {
+impl<T: ElementName, E: ElementName> Command<T, E> {
     /// Creates a new &lt;command&gt; tag for an EPP document with a containing &lt;extension&gt; tag
-    pub fn build(command: T, ext: E, client_tr_id: &str) -> CommandWithExtension<T, E> {
-        CommandWithExtension {
+    pub fn build(command: T, ext: E, client_tr_id: &str) -> Command<T, E> {
+        Command {
             command,
             extension: Some(Extension { data: ext }),
             client_tr_id: client_tr_id.into(),
