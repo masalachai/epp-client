@@ -7,7 +7,7 @@ use std::fmt::Debug;
 use crate::common::{ElementName, EppObject, Extension, StringValue};
 
 /// A generic EPP Response to an EPP command with a result section, a status code and a message
-pub type EppCommandResponse = EppObject<CommandResponseStatus>;
+pub type EppCommandResponse = EppObject<ResponseStatus>;
 
 /// Type corresponding to the <undef> tag an EPP response XML
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -76,7 +76,7 @@ pub struct MessageQueue {
 #[element_name(name = "response")]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// containing an &lt;extension&gt; tag
-pub struct CommandResponseWithExtension<T, E: ElementName> {
+pub struct ResponseWithExtension<T, E: ElementName> {
     /// Data under the <result> tag
     pub result: EppResult,
     /// Data under the <msgQ> tag
@@ -96,7 +96,7 @@ pub struct CommandResponseWithExtension<T, E: ElementName> {
 #[element_name(name = "response")]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// without <msgQ> or &lt;resData&gt; sections. Generally used for error handling
-pub struct CommandResponseStatus {
+pub struct ResponseStatus {
     /// Data under the <result> tag
     pub result: EppResult,
     #[serde(rename = "trID")]
@@ -104,7 +104,7 @@ pub struct CommandResponseStatus {
     pub tr_ids: ResponseTRID,
 }
 
-impl<T, E: ElementName> CommandResponseWithExtension<T, E> {
+impl<T, E: ElementName> ResponseWithExtension<T, E> {
     /// Returns the data under the corresponding &lt;resData&gt; from the EPP XML
     pub fn res_data(&self) -> Option<&T> {
         match &self.res_data {
