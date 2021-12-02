@@ -15,8 +15,9 @@ steps:
       - name: cache
         path: /tmp/cargo
     commands:
-      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
-      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - export CACHE_DIR=$(echo -n "$DRONE_COMMIT_LINK" | md5sum | cut -f1 -d" ")
+      - export CARGO_HOME=/tmp/cargo/$CACHE_DIR
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$CACHE_DIR
       - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cargo check --all-targets
 
@@ -28,8 +29,9 @@ steps:
       - name: cache
         path: /tmp/cargo
     commands:
-      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
-      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - export CACHE_DIR=$(echo -n "$DRONE_COMMIT_LINK" | md5sum | cut -f1 -d" ")
+      - export CARGO_HOME=/tmp/cargo/$CACHE_DIR
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$CACHE_DIR
       - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cargo fmt --all -- --check
 
@@ -41,8 +43,9 @@ steps:
       - name: cache
         path: /tmp/cargo
     commands:
-      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
-      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - export CACHE_DIR=$(echo -n "$DRONE_COMMIT_LINK" | md5sum | cut -f1 -d" ")
+      - export CARGO_HOME=/tmp/cargo/$CACHE_DIR
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$CACHE_DIR
       - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cargo clippy --workspace --all-targets -- -D warnings
 
@@ -54,8 +57,9 @@ steps:
       - name: cache
         path: /tmp/cargo
     commands:
-      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
-      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - export CACHE_DIR=$(echo -n "$DRONE_COMMIT_LINK" | md5sum | cut -f1 -d" ")
+      - export CARGO_HOME=/tmp/cargo/$CACHE_DIR
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$CACHE_DIR
       - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cargo test -- --nocapture
 
@@ -70,8 +74,9 @@ steps:
       CARGO_TOKEN:
         from_secret: cargo_token
     commands:
-      - export CARGO_HOME=/tmp/cargo/$DRONE_BRANCH
-      - export CARGO_TARGET_DIR=/tmp/cargo-target/$DRONE_BRANCH
+      - export CACHE_DIR=$(echo -n "$DRONE_COMMIT_LINK" | md5sum | cut -f1 -d" ")
+      - export CARGO_HOME=/tmp/cargo/$CACHE_DIR
+      - export CARGO_TARGET_DIR=/tmp/cargo-target/$CACHE_DIR
       - mkdir -p $CARGO_HOME $CARGO_TARGET_DIR
       - cd epp-client
       - cargo publish --token $CARGO_TOKEN
