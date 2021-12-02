@@ -8,6 +8,8 @@ use crate::{
     request::EppExtension,
 };
 
+use super::rgp::request::RgpRequestResponse;
+
 pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 
 /// Type that represents the &lt;epp&gt; request for domain &lt;check&gt; command
@@ -71,8 +73,16 @@ impl NameStore {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, ElementName)]
+pub enum ExtensionResponse {
+    #[serde(rename = "namestoreExt:namestoreExt")]
+    NameStore(NameStore),
+    #[serde(rename = "rgp:infData")]
+    Rgp(RgpRequestResponse),
+}
+
 impl EppExtension for NameStore {
-    type Response = NameStore;
+    type Response = ExtensionResponse;
 }
 
 #[derive(Serialize, Deserialize, Debug, ElementName)]

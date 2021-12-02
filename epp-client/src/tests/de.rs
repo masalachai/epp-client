@@ -20,6 +20,7 @@ mod response {
     use crate::domain::transfer::DomainTransferReject;
     use crate::domain::transfer::DomainTransferRequest;
     use crate::domain::update::DomainUpdate;
+    use crate::extensions::namestore::ExtensionResponse;
     use crate::extensions::namestore::NameStore;
     use crate::extensions::rgp::request::RgpRestoreRequest;
     use crate::hello::ExpiryType;
@@ -655,6 +656,27 @@ mod response {
 
         let ext = object.extension.unwrap();
 
-        assert_eq!(ext.data.subproduct, "com".into());
+        let ext = match ext.data {
+            ExtensionResponse::NameStore(data) => data,
+            ExtensionResponse::Rgp(_) => unreachable!("Rgp extension found"),
+        };
+
+        assert_eq!(ext.subproduct, "com".into());
+    }
+
+    #[test]
+    fn namestore_rgp() {
+        let xml = get_xml("response/extensions/domain_info_rgp.xml").unwrap();
+
+        let object = DomainInfo::<NameStore>::deserialize_response(xml.as_str()).unwrap();
+
+        let ext = object.extension.unwrap();
+
+        let ext = match ext.data {
+            ExtensionResponse::NameStore(_) => unreachable!("NameStore extension found"),
+            ExtensionResponse::Rgp(data) => data,
+        };
+
+        assert_eq!(ext.rgp_status.status, "addPeriod");
     }
 }
