@@ -135,6 +135,7 @@ pub mod domain {
 }
 
 pub mod extensions {
+    pub mod namestore;
     pub mod rgp;
 }
 
