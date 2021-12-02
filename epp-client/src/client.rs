@@ -50,7 +50,7 @@
 use std::time::SystemTime;
 use std::{error::Error, fmt::Debug};
 
-use crate::common::{EppObject, NoExtension};
+use crate::common::NoExtension;
 use crate::config::EppClientConfig;
 use crate::error;
 use crate::hello::{Greeting, Hello};
@@ -177,9 +177,7 @@ impl EppClient {
     }
 
     /// Sends the EPP Logout command to log out of the EPP session
-    pub async fn logout(
-        &mut self,
-    ) -> Result<Response<EppObject<ResponseStatus>, NoExtension>, error::Error> {
+    pub async fn logout(&mut self) -> Result<Response<ResponseStatus, NoExtension>, error::Error> {
         let client_tr_id = generate_client_tr_id(&self.credentials.0).unwrap();
         let epp_logout = Logout::<NoExtension>::new();
 
