@@ -6,7 +6,6 @@ use std::fmt::Debug;
 use std::time::SystemTime;
 
 use crate::{
-    common::NoExtension,
     common::{ElementName, EppObject, Extension, StringValue},
     response::{Response, ResponseStatus},
     xml::EppXml,
@@ -51,10 +50,6 @@ pub trait EppExtension: ElementName + DeserializeOwned + Serialize + Sized + Deb
     type Response: ElementName + DeserializeOwned + Serialize + Debug;
 }
 
-/// Type corresponding to the &lt;command&gt; tag in an EPP XML request
-/// without an &lt;extension&gt; tag
-pub type Command<T> = CommandWithExtension<T, NoExtension>;
-
 #[derive(Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "command")]
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
@@ -81,17 +76,6 @@ impl<T: ElementName + Serialize, E: ElementName + Serialize> Serialize
         state.serialize_field("extension", &self.extension)?;
         state.serialize_field("clTRID", &self.client_tr_id)?;
         state.end()
-    }
-}
-
-impl<T: ElementName> Command<T> {
-    /// Creates a new &lt;command&gt; tag for an EPP document
-    pub fn new(command: T, client_tr_id: &str) -> Command<T> {
-        Command {
-            command,
-            extension: None,
-            client_tr_id: client_tr_id.into(),
-        }
     }
 }
 
