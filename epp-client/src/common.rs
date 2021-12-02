@@ -316,7 +316,7 @@ impl Serialize for Status {
             Status::ServerUpdateProhibited => "serverUpdateProhibited",
         };
 
-        serializer.serialize_str(&enum_str)
+        serializer.serialize_str(enum_str)
     }
 }
 
@@ -348,7 +348,7 @@ impl<'de> Deserialize<'de> for ContactStatusWithEnum {
             _ => return Err("Status Deserialization Error").map_err(DeError::custom),
         };
 
-        Ok(ContactStatusWithEnum { status: status })
+        Ok(ContactStatusWithEnum { status })
     }
 }
 

@@ -4,7 +4,8 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{
-    ContactAuthInfo, ContactStatusWithEnum, ElementName, NoExtension, Phone, PostalInfo, StringValue,
+    ContactAuthInfo, ContactStatusWithEnum, ElementName, NoExtension, Phone, PostalInfo,
+    StringValue,
 };
 use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
@@ -36,7 +37,7 @@ impl<E: EppExtension> EppRequest<E> for ContactUpdate<E> {
 /// use epp_client::EppClient;
 /// use epp_client::contact::update::ContactUpdate;
 /// use epp_client::generate_client_tr_id;
-/// use epp_client::common::ContactStatus;
+/// use epp_client::common::ContactStatusWithExtension;
 /// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
@@ -68,8 +69,8 @@ impl<E: EppExtension> EppRequest<E> for ContactUpdate<E> {
 ///     );
 ///
 ///     let add_statuses = vec![
-///         ContactStatus {
-///             status: "clientTransferProhibited".to_string()
+///         ContactStatusWithExtension {
+///             status: Status::ClientTransferProhibited,
 ///         }
 ///     ];
 ///

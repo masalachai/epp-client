@@ -8,8 +8,8 @@ mod request {
     use crate::common::HostObjList;
     use crate::common::NoExtension;
     use crate::common::{
-        Address, ContactStatusWithEnum, Status, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
-        HostStatus, Phone, PostalInfo,
+        Address, ContactStatusWithEnum, DomainAuthInfo, DomainContact, DomainStatus, HostAddr,
+        HostAttr, HostStatus, Phone, PostalInfo, Status,
     };
     use crate::contact::check::ContactCheck;
     use crate::contact::create::ContactCreate;
