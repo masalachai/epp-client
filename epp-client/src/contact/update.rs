@@ -37,7 +37,7 @@ impl<E: EppExtension> EppRequest<E> for ContactUpdate<E> {
 /// use epp_client::EppClient;
 /// use epp_client::contact::update::ContactUpdate;
 /// use epp_client::generate_client_tr_id;
-/// use epp_client::common::ContactStatusWithExtension;
+/// use epp_client::common::{ContactStatusWithEnum, Status};
 /// use epp_client::common::NoExtension;
 ///
 /// #[tokio::main]
@@ -69,7 +69,7 @@ impl<E: EppExtension> EppRequest<E> for ContactUpdate<E> {
 ///     );
 ///
 ///     let add_statuses = vec![
-///         ContactStatusWithExtension {
+///         ContactStatusWithEnum {
 ///             status: Status::ClientTransferProhibited,
 ///         }
 ///     ];
