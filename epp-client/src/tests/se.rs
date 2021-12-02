@@ -93,7 +93,7 @@ mod request {
         let xml = get_xml("request/contact/create.xml").unwrap();
 
         let street = &["58", "Orchid Road"];
-        let address = Address::new(street, "Paris", "Paris", "392374", "FR");
+        let address = Address::new(street, "Paris", "Paris", "392374", "FR".parse().unwrap());
         let postal_info = PostalInfo::new("int", "John Doe", "Acme Widgets", address);
         let mut voice = Phone::new("+33.47237942");
         voice.set_extension("123");
@@ -132,7 +132,7 @@ mod request {
         let mut object = ContactUpdate::<NoExtension>::new("eppdev-contact-3");
 
         let street = &["58", "Orchid Road"];
-        let address = Address::new(street, "Paris", "Paris", "392374", "FR");
+        let address = Address::new(street, "Paris", "Paris", "392374", "FR".parse().unwrap());
         let postal_info = PostalInfo::new("loc", "John Doe", "Acme Widgets", address);
         let voice = Phone::new("+33.47237942");
 

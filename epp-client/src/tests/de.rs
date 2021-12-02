@@ -199,10 +199,7 @@ mod response {
             result.info_data.postal_info.address.postal_code,
             "392374".into()
         );
-        assert_eq!(
-            result.info_data.postal_info.address.country_code,
-            "FR".into()
-        );
+        assert_eq!(result.info_data.postal_info.address.country.alpha2, "FR");
         assert_eq!(result.info_data.voice.number, "+33.47237942".to_string());
         assert_eq!(*voice_ext, "123".to_string());
         assert_eq!(fax.number, "+33.86698799".to_string());

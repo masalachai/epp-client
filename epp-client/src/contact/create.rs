@@ -61,7 +61,7 @@ impl<E: EppExtension> EppRequest<E> for ContactCreate<E> {
 ///
 ///     // Create the address, postal_info, voice instances
 ///     let street = vec!["58", "Orchid Road"];
-///     let address = Address::new(&street, "New York", "New York", "392374", "US");
+///     let address = Address::new(&street, "New York", "New York", "392374", "US".parse().unwrap());
 ///     let postal_info = PostalInfo::new("int", "John Doe", "Acme Widgets", address);
 ///     let mut voice = Phone::new("+1.47237942");
 ///     voice.set_extension("123");
