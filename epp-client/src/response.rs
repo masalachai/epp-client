@@ -76,7 +76,7 @@ pub struct MessageQueue {
 #[element_name(name = "response")]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// containing an &lt;extension&gt; tag
-pub struct ResponseWithExtension<T, E: ElementName> {
+pub struct Response<T, E: ElementName> {
     /// Data under the <result> tag
     pub result: EppResult,
     /// Data under the <msgQ> tag
@@ -104,7 +104,7 @@ pub struct ResponseStatus {
     pub tr_ids: ResponseTRID,
 }
 
-impl<T, E: ElementName> ResponseWithExtension<T, E> {
+impl<T, E: ElementName> Response<T, E> {
     /// Returns the data under the corresponding &lt;resData&gt; from the EPP XML
     pub fn res_data(&self) -> Option<&T> {
         match &self.res_data {
