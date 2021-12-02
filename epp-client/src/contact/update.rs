@@ -4,7 +4,7 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{
-    ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
+    ContactAuthInfo, ContactStatusWithEnum, ElementName, NoExtension, Phone, PostalInfo, StringValue,
 };
 use crate::request::{EppExtension, EppRequest};
 use crate::response::EppCommandResponse;
@@ -131,12 +131,12 @@ impl<E: EppExtension> ContactUpdate<E> {
     }
 
     /// Sets the data for the &lt;add&gt; tag for the contact update request
-    pub fn add(&mut self, statuses: Vec<ContactStatus>) {
+    pub fn add(&mut self, statuses: Vec<ContactStatusWithEnum>) {
         self.request.contact.add_statuses = Some(StatusList { status: statuses });
     }
 
     /// Sets the data for the &lt;rem&gt; tag for the contact update request
-    pub fn remove(&mut self, statuses: Vec<ContactStatus>) {
+    pub fn remove(&mut self, statuses: Vec<ContactStatusWithEnum>) {
         self.request.contact.remove_statuses = Some(StatusList { status: statuses });
     }
 }
@@ -160,7 +160,7 @@ pub struct ContactChangeInfo {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StatusList {
     #[serde(rename = "contact:status", alias = "status")]
-    status: Vec<ContactStatus>,
+    status: Vec<ContactStatusWithEnum>,
 }
 
 /// Type for elements under the contact &lt;update&gt; tag

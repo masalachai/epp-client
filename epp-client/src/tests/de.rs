@@ -3,7 +3,7 @@
 mod response {
     use super::super::get_xml;
     use super::super::CLTRID;
-    use crate::common::NoExtension;
+    use crate::common::{NoExtension, Status};
     use crate::contact::check::ContactCheck;
     use crate::contact::create::ContactCreate;
     use crate::contact::delete::ContactDelete;
@@ -168,6 +168,8 @@ mod response {
         let xml = get_xml("response/contact/info.xml").unwrap();
         let object = ContactInfo::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
 
+        println!("{:?}", object);
+
         let result = object.res_data().unwrap();
         let fax = result.info_data.fax.as_ref().unwrap();
         let voice_ext = result.info_data.voice.extension.as_ref().unwrap();
@@ -178,7 +180,7 @@ mod response {
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.info_data.id, "eppdev-contact-3".into());
         assert_eq!(result.info_data.roid, "UNDEF-ROID".into());
-        assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
+        assert_eq!(result.info_data.statuses[0].status, Status::OK);
         assert_eq!(result.info_data.postal_info.info_type, "loc".to_string());
         assert_eq!(result.info_data.postal_info.name, "John Doe".into());
         assert_eq!(

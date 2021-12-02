@@ -4,7 +4,8 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{
-    ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
+    ContactAuthInfo, ContactStatusWithEnum, ElementName, NoExtension, Phone, PostalInfo,
+    StringValue,
 };
 use crate::request::{EppExtension, EppRequest};
 use serde::{Deserialize, Serialize};
@@ -135,7 +136,7 @@ pub struct ContactInfoData {
     pub roid: StringValue,
     /// The list of contact statuses
     #[serde(rename = "status")]
-    pub statuses: Vec<ContactStatus>,
+    pub statuses: Vec<ContactStatusWithEnum>,
     /// The postal info for the contact
     #[serde(rename = "postalInfo")]
     pub postal_info: PostalInfo,

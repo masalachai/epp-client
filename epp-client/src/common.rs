@@ -3,7 +3,9 @@
 use std::{fmt::Display, str::FromStr};
 
 use epp_client_macros::ElementName;
-use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
+use serde::{
+    de::Error as DeError, ser::SerializeStruct, Deserialize, Deserializer, Serialize, Serializer,
+};
 
 use crate::request::EppExtension;
 
@@ -265,6 +267,99 @@ impl Period {
     pub fn set_unit(&mut self, unit: &str) {
         self.unit = unit.to_string();
     }
+}
+
+#[derive(Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
+pub enum Status {
+    OK,
+    ClientDeleteProhibited,
+    ClientHold,
+    ClientRenewProhibited,
+    ClientTransferProhibited,
+    ClientUpdateProhibited,
+    Inactive,
+    PendingCreate,
+    PendingDelete,
+    PendingRenew,
+    PendingTransfer,
+    PendingUpdate,
+    ServerDeleteProhibited,
+    ServerHold,
+    ServerRenewProhibited,
+    ServerTransferProhibited,
+    ServerUpdateProhibited,
+}
+
+impl Serialize for Status {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let enum_str = match self {
+            Status::OK => "ok",
+            Status::ClientDeleteProhibited => "clientDeleteProhibited",
+            Status::ClientHold => "clientHold",
+            Status::ClientRenewProhibited => "clientRenewProhibited",
+            Status::ClientTransferProhibited => "clientTransferProhibited",
+            Status::ClientUpdateProhibited => "clientUpdateProhibited",
+            Status::Inactive => "inactive",
+            Status::PendingCreate => "pendingCreate",
+            Status::PendingDelete => "pendingDelete",
+            Status::PendingRenew => "pemdingRenew",
+            Status::PendingTransfer => "pendingTransfer",
+            Status::PendingUpdate => "pendingUpdate",
+            Status::ServerDeleteProhibited => "serverDeleteProhibited",
+            Status::ServerHold => "serverHold",
+            Status::ServerRenewProhibited => "serverRenewProhibited",
+            Status::ServerTransferProhibited => "serverTransferProhibited",
+            Status::ServerUpdateProhibited => "serverUpdateProhibited",
+        };
+
+        serializer.serialize_str(&enum_str)
+    }
+}
+
+impl<'de> Deserialize<'de> for ContactStatusWithEnum {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let contact_status = DeserializeStatus::deserialize(deserializer)?;
+
+        let status = match contact_status.status.as_str() {
+            "ok" => Status::OK,
+            "clientDeleteProhibited" => Status::ClientDeleteProhibited,
+            "clientHold" => Status::ClientHold,
+            "clientRenewProhibited" => Status::ClientRenewProhibited,
+            "clientTransferProhibited" => Status::ClientTransferProhibited,
+            "clientUpdateProhibited" => Status::ClientUpdateProhibited,
+            "inactive" => Status::Inactive,
+            "pendingCreate" => Status::PendingCreate,
+            "pendingDelete" => Status::PendingDelete,
+            "pemdingRenew" => Status::PendingRenew,
+            "pendingTransfer" => Status::PendingTransfer,
+            "pendingUpdate" => Status::PendingUpdate,
+            "serverDeleteProhibited" => Status::ServerDeleteProhibited,
+            "serverHold" => Status::ServerHold,
+            "serverRenewProhibited" => Status::ServerRenewProhibited,
+            "serverTransferProhibited" => Status::ServerTransferProhibited,
+            "serverUpdateProhibited" => Status::ServerUpdateProhibited,
+            _ => return Err("Status Deserialization Error").map_err(DeError::custom),
+        };
+
+        Ok(ContactStatusWithEnum { status: status })
+    }
+}
+
+type DeserializeStatus = ContactStatus;
+
+/// The &lt;status&gt; type on contact transactions
+#[derive(Serialize, Debug)]
+pub struct ContactStatusWithEnum {
+    /// The status name, represented by the 's' attr on &lt;status&gt; tags
+    #[serde(rename = "s")]
+    pub status: Status,
 }
 
 /// The &lt;status&gt; type on contact transactions

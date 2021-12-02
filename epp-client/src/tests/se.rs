@@ -8,7 +8,7 @@ mod request {
     use crate::common::HostObjList;
     use crate::common::NoExtension;
     use crate::common::{
-        Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
+        Address, ContactStatusWithEnum, Status, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
         HostStatus, Phone, PostalInfo,
     };
     use crate::contact::check::ContactCheck;
@@ -137,12 +137,12 @@ mod request {
         let voice = Phone::new("+33.47237942");
 
         object.set_info("newemail@eppdev.net", postal_info, voice, "eppdev-387323");
-        let add_statuses = vec![ContactStatus {
-            status: "clientTransferProhibited".to_string(),
+        let add_statuses = vec![ContactStatusWithEnum {
+            status: Status::ClientTransferProhibited,
         }];
         object.add(add_statuses);
-        let remove_statuses = vec![ContactStatus {
-            status: "clientDeleteProhibited".to_string(),
+        let remove_statuses = vec![ContactStatusWithEnum {
+            status: Status::ClientDeleteProhibited,
         }];
         object.remove(remove_statuses);
 
