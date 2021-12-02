@@ -103,18 +103,52 @@ extern crate log;
 pub mod client;
 pub mod common;
 pub mod config;
-pub mod contact;
-pub mod domain;
 pub mod error;
 pub mod hello;
-pub mod host;
 pub mod login;
 pub mod logout;
-pub mod message;
 pub mod registry;
 pub mod request;
 pub mod response;
 pub mod xml;
+
+pub mod contact {
+    pub mod check;
+    pub mod create;
+    pub mod delete;
+    pub mod info;
+    pub mod update;
+
+    pub const EPP_CONTACT_XMLNS: &str = "urn:ietf:params:xml:ns:contact-1.0";
+}
+
+pub mod domain {
+    pub mod check;
+    pub mod create;
+    pub mod delete;
+    pub mod info;
+    pub mod renew;
+    pub mod rgp;
+    pub mod transfer;
+    pub mod update;
+
+    pub const EPP_DOMAIN_XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
+}
+
+pub mod host {
+    pub mod check;
+    pub mod create;
+    pub mod delete;
+    pub mod info;
+    pub mod update;
+
+    pub const EPP_HOST_XMLNS: &str = "urn:ietf:params:xml:ns:host-1.0";
+}
+
+pub mod message {
+    pub mod ack;
+    pub mod poll;
+}
 
 pub use client::default_client_tr_id_fn as generate_client_tr_id;
 pub use client::EppClient;
