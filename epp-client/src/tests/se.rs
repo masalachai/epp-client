@@ -369,7 +369,8 @@ mod request {
     fn domain_transfer_request() {
         let xml = get_xml("request/domain/transfer_request.xml").unwrap();
 
-        let object = DomainTransferRequest::<NoExtension>::new("testing.com", 1, "epP4uthd#v");
+        let object =
+            DomainTransferRequest::<NoExtension>::new("testing.com", Some(1), "epP4uthd#v");
 
         let serialized = object.serialize_request(CLTRID).unwrap();
 

@@ -122,7 +122,7 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 ///
 ///     // Create an DomainTransferRequest instance
 ///     let domain_transfer_request = DomainTransferRequest::<NoExtension>::new(
-///         "eppdev-100.net", 1, "epP4uthd#v"
+///         "eppdev-100.net", None, "epP4uthd#v"
 ///     );
 ///
 ///     // send it to the registry and receive a response of type DomainTransferRequestResponse
@@ -135,14 +135,18 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 /// }
 /// ```
 impl<E: EppExtension> DomainTransferRequest<E> {
-    pub fn new(name: &str, years: u16, auth_password: &str) -> DomainTransferRequest<NoExtension> {
+    pub fn new(
+        name: &str,
+        years: Option<u16>,
+        auth_password: &str,
+    ) -> DomainTransferRequest<NoExtension> {
         DomainTransferRequest {
             request: DomainTransferReq {
                 operation: "request".to_string(),
                 domain: DomainTransferReqData {
                     xmlns: XMLNS.to_string(),
                     name: name.into(),
-                    period: Some(Period::new(years)),
+                    period: years.map(Period::new),
                     auth_info: Some(DomainAuthInfo::new(auth_password)),
                 },
             },
