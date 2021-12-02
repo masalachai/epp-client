@@ -1,13 +1,13 @@
 //! Error types to wrap internal errors and make EPP errors easier to read
 
-use crate::response::EppCommandResponse;
+use crate::response::ResponseStatus;
 use std::fmt::Display;
 
 /// Error enum holding the possible error types
 #[derive(Debug)]
 pub enum Error {
     EppConnectionError(std::io::Error),
-    EppCommandError(EppCommandResponse),
+    EppCommandError(ResponseStatus),
     EppDeserializationError(String),
     Other(String),
 }
@@ -15,7 +15,7 @@ pub enum Error {
 /// An EPP XML error
 #[derive(Debug)]
 pub struct EppCommandError {
-    pub epp_error: EppCommandResponse,
+    pub epp_error: ResponseStatus,
 }
 
 impl std::error::Error for Error {}
@@ -24,7 +24,7 @@ impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Error::EppCommandError(e) => {
-                write!(f, "epp-client EppCommandError: {}", e.data.result.message)
+                write!(f, "epp-client EppCommandError: {}", e.result.message)
             }
             Error::Other(e) => write!(f, "epp-client Exception: {}", e),
             _ => write!(f, "epp-client Exception: {:?}", self),

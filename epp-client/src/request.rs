@@ -39,12 +39,10 @@ pub trait EppRequest<E: EppExtension>: Sized + Debug {
         let rsp = <EppObject<Response<Self::Output, E::Response>> as EppXml>::deserialize(epp_xml)?;
         match rsp.data.result.code {
             0..=2000 => Ok(rsp.data),
-            _ => Err(crate::error::Error::EppCommandError(EppObject::build(
-                ResponseStatus {
-                    result: rsp.data.result,
-                    tr_ids: rsp.data.tr_ids,
-                },
-            ))),
+            _ => Err(crate::error::Error::EppCommandError(ResponseStatus {
+                result: rsp.data.result,
+                tr_ids: rsp.data.tr_ids,
+            })),
         }
     }
 }
