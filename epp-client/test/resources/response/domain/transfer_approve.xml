@@ -1,9 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <response>
         <result code="1000">
             <msg>Command completed successfully</msg>
         </result>
+        <resData>
+            <domain:trnData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>eppdev.com</domain:name>
+                <domain:trStatus>clientApproved</domain:trStatus>
+                <domain:reID>29100134</domain:reID>
+                <domain:reDate>2021-12-02T23:55:51Z</domain:reDate>
+                <domain:acID>eppac</domain:acID>
+                <domain:acDate>2021-12-02T23:55:51Z</domain:acDate>
+                <domain:exDate>2026-12-02T23:55:51Z</domain:exDate>
+            </domain:trnData>
+        </resData>
         <trID>
             <clTRID>cltrid:1626454866</clTRID>
             <svTRID>RO-6879-1627224678242975</svTRID>
