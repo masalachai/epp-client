@@ -643,8 +643,19 @@ mod response {
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(ext.data.rgp_status.status, "pendingRestore".to_string());
+        assert_eq!(ext.data.rgp_status[0].status, "pendingRestore".to_string());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+
+    #[test]
+    fn rgp_restore_domain_info_response() {
+        let xml = get_xml("response/extensions/domain_info_rgp.xml").unwrap();
+        let object = DomainInfo::<RgpRestoreRequest>::deserialize_response(xml.as_str()).unwrap();
+
+        let ext = object.extension.unwrap();
+
+        assert_eq!(ext.data.rgp_status[0].status, "addPeriod");
+        assert_eq!(ext.data.rgp_status[1].status, "renewPeriod");
     }
 
     #[test]
