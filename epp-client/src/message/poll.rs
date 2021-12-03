@@ -103,28 +103,28 @@ pub struct MessagePollRequest {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MessageDomainTransferData {
     /// XML namespace for message response data
-    #[serde(rename = "xmlns:obj", alias = "xmlns")]
+    #[serde(rename = "xmlns:domain", alias = "xmlns")]
     xmlns: String,
     /// The name of the domain under transfer
-    #[serde(rename = "obj:name", alias = "name")]
+    #[serde(rename = "domain:name", alias = "name")]
     pub name: StringValue,
     /// The domain transfer status
-    #[serde(rename = "obj:trStatus", alias = "trStatus")]
+    #[serde(rename = "domain:trStatus", alias = "trStatus")]
     pub transfer_status: StringValue,
     /// The epp user who requested the transfer
-    #[serde(rename = "obj:reID", alias = "reID")]
+    #[serde(rename = "domain:reID", alias = "reID")]
     pub requester_id: StringValue,
     /// The date of the transfer request
-    #[serde(rename = "obj:reDate", alias = "reDate")]
+    #[serde(rename = "domain:reDate", alias = "reDate")]
     pub requested_at: StringValue,
     /// The epp user who should acknowledge the transfer request
-    #[serde(rename = "obj:acID", alias = "acID")]
+    #[serde(rename = "domain:acID", alias = "acID")]
     pub ack_id: StringValue,
     /// The date by which the transfer request should be acknowledged
-    #[serde(rename = "obj:acDate", alias = "acDate")]
+    #[serde(rename = "domain:acDate", alias = "acDate")]
     pub ack_by: StringValue,
     /// The domain expiry date
-    #[serde(rename = "obj:exDate", alias = "exDate")]
+    #[serde(rename = "domain:exDate", alias = "exDate")]
     pub expiring_at: StringValue,
 }
 
@@ -132,6 +132,6 @@ pub struct MessageDomainTransferData {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MessagePollResponse {
     /// Data under the &lt;trnData&gt; tag
-    #[serde(rename = "obj:trnData", alias = "trnData")]
+    #[serde(rename = "domain:trnData", alias = "trnData")]
     pub message_data: MessageDomainTransferData,
 }

@@ -9,15 +9,15 @@
             <msg>Transfer requested.</msg>
         </msgQ>
         <resData>
-            <obj:trnData xmlns:obj="urn:ietf:params:xml:ns:obj-1.0">
-                <obj:name>eppdev-transfer.com</obj:name>
-                <obj:trStatus>pending</obj:trStatus>
-                <obj:reID>eppdev</obj:reID>
-                <obj:reDate>2021-07-23T15:31:21.0Z</obj:reDate>
-                <obj:acID>ClientY</obj:acID>
-                <obj:acDate>2021-07-28T15:31:21.0Z</obj:acDate>
-                <obj:exDate>2022-07-02T14:53:19.0Z</obj:exDate>
-            </obj:trnData>
+            <domain:trnData xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
+                <domain:name>eppdev-transfer.com</domain:name>
+                <domain:trStatus>pending</domain:trStatus>
+                <domain:reID>eppdev</domain:reID>
+                <domain:reDate>2021-07-23T15:31:21.0Z</domain:reDate>
+                <domain:acID>ClientY</domain:acID>
+                <domain:acDate>2021-07-28T15:31:21.0Z</domain:acDate>
+                <domain:exDate>2022-07-02T14:53:19.0Z</domain:exDate>
+            </domain:trnData>
         </resData>
         <trID>
             <clTRID>cltrid:1626454866</clTRID>
