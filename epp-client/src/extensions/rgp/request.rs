@@ -45,7 +45,7 @@ use super::EPP_DOMAIN_RGP_EXT_XMLNS;
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     let login = Login::<NoExtension>::new("username", "password", None);
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an RgpRestoreRequest instance

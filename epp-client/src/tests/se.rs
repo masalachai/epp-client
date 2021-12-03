@@ -64,7 +64,7 @@ mod request {
         ]);
 
         let xml = get_xml("request/login.xml").unwrap();
-        let object = Login::<NoExtension>::new("username", "password", &ext_uris);
+        let object = Login::<NoExtension>::new("username", "password", ext_uris);
         let serialized = object.serialize_request(CLTRID).unwrap();
 
         assert_eq!(xml, serialized);

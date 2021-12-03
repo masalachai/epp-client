@@ -29,11 +29,9 @@ impl<E: EppExtension> Login<E> {
     pub fn new(
         username: &str,
         password: &str,
-        ext_uris: &Option<Vec<String>>,
+        ext_uris: Option<Vec<String>>,
     ) -> Login<NoExtension> {
-        let ext_uris = ext_uris
-            .as_ref()
-            .map(|uris| uris.iter().map(|u| u.as_str().into()).collect());
+        let ext_uris = ext_uris.map(|uris| uris.iter().map(|u| u.as_str().into()).collect());
 
         Login {
             request: LoginRequest {

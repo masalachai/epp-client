@@ -117,7 +117,7 @@ impl<E: EppExtension> EppRequest<E> for DomainTransferQuery<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     let login = Login::<NoExtension>::new("username", "password", None);
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an DomainTransferRequest instance
@@ -192,7 +192,7 @@ impl<E: EppExtension> DomainTransferRequest<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     let login = Login::<NoExtension>::new("username", "password", None);
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an instance of EppClient, passing the config and the registry you want to connect to
@@ -273,7 +273,7 @@ impl<E: EppExtension> DomainTransferApprove<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     let login = Login::<NoExtension>::new("username", "password", None);
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an DomainTransferReject instance
@@ -348,7 +348,7 @@ impl<E: EppExtension> DomainTransferReject<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     let login = Login::<NoExtension>::new("username", "password", None);
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an DomainTransferCancel instance
@@ -423,7 +423,7 @@ impl<E: EppExtension> DomainTransferCancel<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     let login = Login::<NoExtension>::new("username", "password", None);
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an DomainTransferQuery instance
