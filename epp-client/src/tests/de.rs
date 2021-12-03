@@ -393,10 +393,10 @@ mod response {
         assert_eq!(result.transfer_data.ack_id, "ClientY".into());
         assert_eq!(result.transfer_data.ack_by, "2021-07-28T15:31:21.0Z".into());
         assert_eq!(
-            result.transfer_data.expiring_at,
+            *result.transfer_data.expiring_at.as_ref().unwrap(),
             "2022-07-02T14:53:19.0Z".into()
         );
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(*object.tr_ids.client_tr_id.as_ref().unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
 
@@ -456,7 +456,7 @@ mod response {
         assert_eq!(result.transfer_data.ack_id, "ClientY".into());
         assert_eq!(result.transfer_data.ack_by, "2021-07-28T15:31:21.0Z".into());
         assert_eq!(
-            result.transfer_data.expiring_at,
+            *result.transfer_data.expiring_at.as_ref().unwrap(),
             "2022-07-02T14:53:19.0Z".into()
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
