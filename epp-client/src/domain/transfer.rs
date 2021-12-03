@@ -525,7 +525,7 @@ pub struct DomainTransferResponseData {
     pub ack_by: StringValue,
     /// The domain expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: StringValue,
+    pub expiring_at: Option<StringValue>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain transfer response
