@@ -98,7 +98,7 @@ impl Options {
 #[serde(rename = "extension")]
 pub struct Extension<E: ElementName> {
     /// Data under the &lt;extension&gt; tag
-    #[serde(alias = "upData", alias = "namestoreExt")]
+    #[serde(alias = "upData", alias = "namestoreExt", alias = "infData")]
     pub data: E,
 }
 

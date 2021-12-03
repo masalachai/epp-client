@@ -125,5 +125,5 @@ pub struct RgpRequestResponse {
     xmlns: String,
     /// Data under the &lt;rgpStatus&gt; tag
     #[serde(rename = "rgpStatus")]
-    pub rgp_status: RgpStatus,
+    pub rgp_status: Vec<RgpStatus>,
 }
