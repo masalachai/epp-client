@@ -57,7 +57,7 @@ impl<E: EppExtension> EppRequest<E> for HostCreate<E> {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     let login = Login::<NoExtension>::new("username", "password", None);
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create a vector of IP addresses to assign to the host

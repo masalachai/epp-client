@@ -45,7 +45,7 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
-///     let login = Login::<NoExtension>::new("username", "password", &None);
+///     let login = Login::<NoExtension>::new("username", "password", None);
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     let namestore_ext = NameStore::new("com");
