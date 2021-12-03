@@ -66,10 +66,11 @@ impl fmt::Display for GMonthDay {
 /// use epp_client::common::{DomainStatus, DomainContact};
 /// use epp_client::extensions::consolidate::Sync;
 /// use epp_client::domain::update::DomainUpdate;
-/// use epp_client::generate_client_tr_id;
 /// use epp_client::extensions::consolidate;
 /// use epp_client::extensions::consolidate::GMonthDay;
 /// use epp_client::common::NoExtension;
+/// use epp_client::login::Login;
+/// use epp_client::logout::Logout;
 /// use chrono::{DateTime, NaiveDate};
 /// use std::str::FromStr;
 ///
@@ -82,9 +83,6 @@ impl fmt::Display for GMonthDay {
 ///         RegistryConfig {
 ///             host: "example.com".to_owned(),
 ///             port: 700,
-///             username: "username".to_owned(),
-///             password: "password".to_owned(),
-///             ext_uris: None,
 ///             tls_files: None,
 ///         },
 ///     );
@@ -96,6 +94,9 @@ impl fmt::Display for GMonthDay {
 ///         Err(e) => panic!("Failed to create EppClient: {}",  e)
 ///     };
 ///
+///     let login = Login::<NoExtension>::new("username", "password", None);
+///     client.transact(login, "transaction-id").await.unwrap();
+///
 ///     let exp = GMonthDay::new(5, 31, None).unwrap();
 ///     let consolidate_ext = consolidate::Sync::new(exp);
 ///
@@ -103,11 +104,12 @@ impl fmt::Display for GMonthDay {
 ///     let mut domain_update = DomainUpdate::<consolidate::Sync>::new("eppdev-100.com").with_extension(consolidate_ext);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
-///     let response = client.transact(domain_update, generate_client_tr_id(&client).as_str()).await.unwrap();
+///     let response = client.transact(domain_update, "transaction-id").await.unwrap();
 ///
 ///     println!("{:?}", response);
 ///
-///     client.logout().await.unwrap();
+///     let logout = Logout::<NoExtension>::new();
+///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
 impl Sync {
