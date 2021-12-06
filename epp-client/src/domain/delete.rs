@@ -4,7 +4,7 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use crate::response::ResponseStatus;
 use serde::{Deserialize, Serialize};
 
@@ -14,7 +14,7 @@ pub struct DomainDelete<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for DomainDelete<E> {
+impl<E: EppExtension> Transaction<E> for DomainDelete<E> {
     type Input = DomainDeleteRequest;
     type Output = ResponseStatus;
 

@@ -6,7 +6,7 @@ use super::XMLNS;
 use crate::common::{
     ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
 };
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -15,7 +15,7 @@ pub struct ContactInfo<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for ContactInfo<E> {
+impl<E: EppExtension> Transaction<E> for ContactInfo<E> {
     type Input = ContactInfoRequest;
     type Output = ContactInfoResponse;
 

@@ -6,7 +6,7 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -15,7 +15,7 @@ pub struct HostCheck<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for HostCheck<E> {
+impl<E: EppExtension> Transaction<E> for HostCheck<E> {
     type Input = HostCheckRequest;
     type Output = HostCheckResponse;
 

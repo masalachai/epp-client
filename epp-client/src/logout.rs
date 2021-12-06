@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     common::{ElementName, NoExtension},
-    request::{EppExtension, EppRequest},
+    request::{EppExtension, Transaction},
     response::ResponseStatus,
 };
 
@@ -15,7 +15,7 @@ pub struct Logout<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for Logout<E> {
+impl<E: EppExtension> Transaction<E> for Logout<E> {
     type Input = LogoutRequest;
     type Output = ResponseStatus;
 

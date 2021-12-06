@@ -4,7 +4,7 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -13,7 +13,7 @@ pub struct DomainCheck<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for DomainCheck<E> {
+impl<E: EppExtension> Transaction<E> for DomainCheck<E> {
     type Input = DomainCheckRequest;
     type Output = DomainCheckResponse;
 

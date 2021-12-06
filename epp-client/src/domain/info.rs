@@ -6,7 +6,7 @@ use super::XMLNS;
 use crate::common::{
     DomainAuthInfo, DomainContact, DomainStatus, ElementName, HostAttr, NoExtension, StringValue,
 };
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -15,7 +15,7 @@ pub struct DomainInfo<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for DomainInfo<E> {
+impl<E: EppExtension> Transaction<E> for DomainInfo<E> {
     type Input = DomainInfoRequest;
     type Output = DomainInfoResponse;
 
