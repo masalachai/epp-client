@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -12,7 +12,7 @@ pub struct MessagePoll<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for MessagePoll<E> {
+impl<E: EppExtension> Transaction<E> for MessagePoll<E> {
     type Input = MessagePollRequest;
     type Output = MessagePollResponse;
 

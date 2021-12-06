@@ -34,7 +34,7 @@ mod response {
     use crate::logout::Logout;
     use crate::message::ack::MessageAck;
     use crate::message::poll::MessagePoll;
-    use crate::request::EppRequest;
+    use crate::request::Transaction;
     use crate::response::ResultDocument;
     use crate::xml::EppXml;
 

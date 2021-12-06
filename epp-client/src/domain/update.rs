@@ -7,7 +7,7 @@ use crate::{
         DomainAuthInfo, DomainContact, DomainStatus, ElementName, HostList, NoExtension,
         StringValue,
     },
-    request::{EppExtension, EppRequest},
+    request::{EppExtension, Transaction},
 };
 
 use super::XMLNS;
@@ -21,7 +21,7 @@ pub struct DomainUpdate<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for DomainUpdate<E> {
+impl<E: EppExtension> Transaction<E> for DomainUpdate<E> {
     type Input = DomainUpdateRequest;
     type Output = ResponseStatus;
 

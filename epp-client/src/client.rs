@@ -49,7 +49,7 @@ use crate::config::EppClientConfig;
 use crate::error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
 use crate::registry::{epp_connect, EppConnection};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use crate::response::Response;
 use crate::xml::EppXml;
 
@@ -91,9 +91,9 @@ impl EppClient {
         &mut self,
         request: T,
         id: &str,
-    ) -> Result<Response<<T as EppRequest<E>>::Output, E::Response>, error::Error>
+    ) -> Result<Response<<T as Transaction<E>>::Output, E::Response>, error::Error>
     where
-        T: EppRequest<E> + Debug,
+        T: Transaction<E> + Debug,
         E: EppExtension,
     {
         let epp_xml = request.serialize_request(id)?;

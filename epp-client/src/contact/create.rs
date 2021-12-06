@@ -4,7 +4,7 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ContactAuthInfo, ElementName, NoExtension, Phone, PostalInfo, StringValue};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -13,7 +13,7 @@ pub struct ContactCreate<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for ContactCreate<E> {
+impl<E: EppExtension> Transaction<E> for ContactCreate<E> {
     type Input = ContactCreateRequest;
     type Output = ContactCreateResponse;
 

@@ -4,7 +4,7 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, HostAddr, HostStatus, NoExtension, StringValue};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -13,7 +13,7 @@ pub struct HostInfo<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for HostInfo<E> {
+impl<E: EppExtension> Transaction<E> for HostInfo<E> {
     type Input = HostInfoRequest;
     type Output = HostInfoResponse;
 

@@ -6,7 +6,7 @@ use super::XMLNS;
 use crate::common::{
     DomainAuthInfo, DomainContact, ElementName, HostList, NoExtension, Period, StringValue,
 };
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -15,7 +15,7 @@ pub struct DomainCreate<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for DomainCreate<E> {
+impl<E: EppExtension> Transaction<E> for DomainCreate<E> {
     type Input = DomainCreateRequest;
     type Output = DomainCreateResponse;
 

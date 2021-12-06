@@ -4,7 +4,7 @@ use epp_client_macros::*;
 
 use super::XMLNS;
 use crate::common::{ElementName, NoExtension, Period, StringValue};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
@@ -14,7 +14,7 @@ pub struct DomainRenew<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for DomainRenew<E> {
+impl<E: EppExtension> Transaction<E> for DomainRenew<E> {
     type Input = DomainRenewRequest;
     type Output = DomainRenewResponse;
 

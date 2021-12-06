@@ -3,7 +3,7 @@
 use epp_client_macros::*;
 
 use crate::common::{ElementName, NoExtension};
-use crate::request::{EppExtension, EppRequest};
+use crate::request::{EppExtension, Transaction};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
@@ -12,7 +12,7 @@ pub struct MessageAck<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for MessageAck<E> {
+impl<E: EppExtension> Transaction<E> for MessageAck<E> {
     type Input = MessageAckRequest;
     type Output = String;
 

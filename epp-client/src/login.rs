@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     common::{ElementName, NoExtension, Options, ServiceExtension, Services, StringValue},
     contact, domain, host,
-    request::{EppExtension, EppRequest, EPP_LANG, EPP_VERSION},
+    request::{EppExtension, Transaction, EPP_LANG, EPP_VERSION},
     response::ResponseStatus,
 };
 
@@ -16,7 +16,7 @@ pub struct Login<E> {
     extension: Option<E>,
 }
 
-impl<E: EppExtension> EppRequest<E> for Login<E> {
+impl<E: EppExtension> Transaction<E> for Login<E> {
     type Input = LoginRequest;
     type Output = ResponseStatus;
 
