@@ -98,9 +98,6 @@
 //! Domain: eppdev.net, Available: 1
 //! ```
 
-#[macro_use]
-extern crate log;
-
 pub mod client;
 pub mod common;
 pub mod config;
