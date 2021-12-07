@@ -43,9 +43,3 @@ impl From<std::io::ErrorKind> for Error {
         Self::EppConnectionError(std::io::Error::from(e))
     }
 }
-
-impl From<String> for Error {
-    fn from(e: String) -> Self {
-        Self::Other(e)
-    }
-}
