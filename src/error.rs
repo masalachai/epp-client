@@ -12,12 +12,6 @@ pub enum Error {
     Other(String),
 }
 
-/// An EPP XML error
-#[derive(Debug)]
-pub struct EppCommandError {
-    pub epp_error: ResponseStatus,
-}
-
 impl std::error::Error for Error {}
 
 impl Display for Error {
