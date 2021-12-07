@@ -43,3 +43,23 @@ pub struct NameStoreData {
     #[serde(rename = "namestoreExt:subProduct", alias = "subProduct")]
     pub subproduct: StringValue,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::NameStore;
+    use crate::domain::check::DomainCheck;
+    use crate::request::Transaction;
+    use crate::tests::get_xml;
+
+    #[test]
+    fn namestore() {
+        let xml = get_xml("response/extensions/namestore.xml").unwrap();
+
+        let object =
+            <DomainCheck as Transaction<NameStore>>::deserialize_response(xml.as_str()).unwrap();
+
+        let ext = object.extension.unwrap();
+
+        assert_eq!(ext.data.subproduct, "com".into());
+    }
+}

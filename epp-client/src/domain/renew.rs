@@ -73,3 +73,28 @@ pub struct DomainRenewResponse {
     #[serde(rename = "renData")]
     pub renew_data: DomainRenewResponseData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DomainRenew;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn domain_renew() {
+        let xml = get_xml("response/domain/renew.xml").unwrap();
+        let object = DomainRenew::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(result.renew_data.name, "eppdev-1.com".into());
+        assert_eq!(
+            result.renew_data.expiring_at,
+            "2024-07-23T15:31:20.0Z".into()
+        );
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

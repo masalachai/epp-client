@@ -63,3 +63,21 @@ impl Command for Login {
     type Response = ();
     const COMMAND: &'static str = "login";
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Login;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn login() {
+        let xml = get_xml("response/login.xml").unwrap();
+        let object = Login::deserialize_response(xml.as_str()).unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

@@ -30,3 +30,24 @@ impl MessageAck {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::MessageAck;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn message_ack() {
+        let xml = get_xml("response/message/ack.xml").unwrap();
+        let object = MessageAck::deserialize_response(xml.as_str()).unwrap();
+
+        let msg = object.message_queue().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(msg.count, 4);
+        assert_eq!(msg.id, "12345".to_string());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

@@ -86,3 +86,53 @@ pub struct HostInfoResponse {
     #[serde(rename = "infData")]
     pub info_data: HostInfoResponseData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::HostInfo;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn host_info() {
+        let xml = get_xml("response/host/info.xml").unwrap();
+        let object = HostInfo::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(result.info_data.name, "host2.eppdev-1.com".into());
+        assert_eq!(result.info_data.roid, "UNDEF-ROID".into());
+        assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
+        assert_eq!(
+            *(result.info_data.addresses[0].ip_version.as_ref().unwrap()),
+            "v4".to_string()
+        );
+        assert_eq!(
+            result.info_data.addresses[0].address,
+            "29.245.122.14".to_string()
+        );
+        assert_eq!(
+            *(result.info_data.addresses[1].ip_version.as_ref().unwrap()),
+            "v6".to_string()
+        );
+        assert_eq!(
+            result.info_data.addresses[1].address,
+            "2404:6800:4001:0801:0000:0000:0000:200e".to_string()
+        );
+        assert_eq!(result.info_data.client_id, "eppdev".into());
+        assert_eq!(result.info_data.creator_id, "creator".into());
+        assert_eq!(result.info_data.created_at, "2021-07-26T05:28:55.0Z".into());
+        assert_eq!(
+            *(result.info_data.updater_id.as_ref().unwrap()),
+            "creator".into()
+        );
+        assert_eq!(
+            *(result.info_data.updated_at.as_ref().unwrap()),
+            "2021-07-26T05:28:55.0Z".into()
+        );
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}
