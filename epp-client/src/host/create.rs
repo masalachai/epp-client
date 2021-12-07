@@ -71,11 +71,28 @@ pub struct HostCreateResponse {
 #[cfg(test)]
 mod tests {
     use super::HostCreate;
+    use crate::common::HostAddr;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn host_create() {
+    fn command() {
+        let xml = get_xml("request/host/create.xml").unwrap();
+
+        let addresses = vec![
+            HostAddr::new("v4", "29.245.122.14"),
+            HostAddr::new("v6", "2404:6800:4001:801::200e"),
+        ];
+
+        let object = HostCreate::new("host1.eppdev-1.com", addresses);
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/host/create.xml").unwrap();
         let object = HostCreate::deserialize_response(xml.as_str()).unwrap();
 

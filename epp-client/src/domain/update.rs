@@ -102,13 +102,52 @@ pub struct DomainUpdate {
 
 #[cfg(test)]
 mod tests {
-    use super::DomainUpdate;
-    use crate::common::NoExtension;
+    use super::{DomainAddRemove, DomainChangeInfo, DomainUpdate};
+    use crate::common::{DomainAuthInfo, DomainContact, DomainStatus, NoExtension};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn domain_update() {
+    fn command() {
+        let xml = get_xml("request/domain/update.xml").unwrap();
+
+        let mut object = DomainUpdate::new("eppdev.com");
+
+        let add = DomainAddRemove {
+            ns: None,
+            contacts: None,
+            statuses: Some(vec![DomainStatus {
+                status: "clientDeleteProhibited".to_string(),
+            }]),
+        };
+
+        let remove = DomainAddRemove {
+            ns: None,
+            contacts: Some(vec![DomainContact {
+                contact_type: "billing".to_string(),
+                id: "eppdev-contact-2".to_string(),
+            }]),
+            statuses: None,
+        };
+
+        let change_info = DomainChangeInfo {
+            registrant: None,
+            auth_info: Some(DomainAuthInfo::new("epP5uthd#v")),
+        };
+
+        object.add(add);
+        object.remove(remove);
+        object.info(change_info);
+
+        let serialized =
+            <DomainUpdate as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+                .unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/domain/update.xml").unwrap();
         let object =
             <DomainUpdate as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();

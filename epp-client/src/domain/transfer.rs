@@ -149,7 +149,62 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn domain_transfer_request() {
+    fn request_command() {
+        let xml = get_xml("request/domain/transfer_request.xml").unwrap();
+
+        let object = DomainTransfer::new("testing.com", Some(1), "epP4uthd#v");
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn approve_command() {
+        let xml = get_xml("request/domain/transfer_approve.xml").unwrap();
+
+        let object = DomainTransfer::approve("testing.com");
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn reject_command() {
+        let xml = get_xml("request/domain/transfer_reject.xml").unwrap();
+
+        let object = DomainTransfer::reject("testing.com");
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn cancel_command() {
+        let xml = get_xml("request/domain/transfer_cancel.xml").unwrap();
+
+        let object = DomainTransfer::cancel("testing.com");
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn query_command() {
+        let xml = get_xml("request/domain/transfer_query.xml").unwrap();
+
+        let object = DomainTransfer::query("testing.com", "epP4uthd#v");
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn request_response() {
         let xml = get_xml("response/domain/transfer_request.xml").unwrap();
         let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
@@ -178,7 +233,7 @@ mod tests {
     }
 
     #[test]
-    fn domain_transfer_approve() {
+    fn approve_response() {
         let xml = get_xml("response/domain/transfer_approve.xml").unwrap();
         let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
@@ -189,7 +244,7 @@ mod tests {
     }
 
     #[test]
-    fn domain_transfer_reject() {
+    fn reject_response() {
         let xml = get_xml("response/domain/transfer_reject.xml").unwrap();
         let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
@@ -200,7 +255,7 @@ mod tests {
     }
 
     #[test]
-    fn domain_transfer_cancel() {
+    fn cancel_response() {
         let xml = get_xml("response/domain/transfer_cancel.xml").unwrap();
         let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
@@ -211,7 +266,7 @@ mod tests {
     }
 
     #[test]
-    fn domain_transfer_query() {
+    fn query_response() {
         let xml = get_xml("response/domain/transfer_query.xml").unwrap();
         let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 

@@ -94,7 +94,18 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn host_check() {
+    fn command() {
+        let xml = get_xml("request/host/check.xml").unwrap();
+
+        let object = HostCheck::new(&["ns1.eppdev-1.com", "host1.eppdev-1.com"]);
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/host/check.xml").unwrap();
         let object = HostCheck::deserialize_response(xml.as_str()).unwrap();
 

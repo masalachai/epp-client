@@ -100,12 +100,39 @@ pub struct ContactCreateResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::ContactCreate;
+    use super::{ContactCreate, Phone, PostalInfo};
+    use crate::common::Address;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn contact_create() {
+    fn command() {
+        let xml = get_xml("request/contact/create.xml").unwrap();
+
+        let street = &["58", "Orchid Road"];
+        let address = Address::new(street, "Paris", "Paris", "392374", "FR".parse().unwrap());
+        let postal_info = PostalInfo::new("int", "John Doe", "Acme Widgets", address);
+        let mut voice = Phone::new("+33.47237942");
+        voice.set_extension("123");
+        let mut fax = Phone::new("+33.86698799");
+        fax.set_extension("677");
+
+        let mut object = ContactCreate::new(
+            "eppdev-contact-3",
+            "contact@eppdev.net",
+            postal_info,
+            voice,
+            "eppdev-387323",
+        );
+        object.set_fax(fax);
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/contact/create.xml").unwrap();
         let object = ContactCreate::deserialize_response(xml.as_str()).unwrap();
 

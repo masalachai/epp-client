@@ -108,8 +108,35 @@ pub struct ContactUpdate {
 #[cfg(test)]
 mod tests {
     use super::ContactUpdate;
+    use crate::common::{Address, ContactStatus, Phone, PostalInfo};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn command() {
+        let xml = get_xml("request/contact/update.xml").unwrap();
+
+        let mut object = ContactUpdate::new("eppdev-contact-3");
+
+        let street = &["58", "Orchid Road"];
+        let address = Address::new(street, "Paris", "Paris", "392374", "FR".parse().unwrap());
+        let postal_info = PostalInfo::new("loc", "John Doe", "Acme Widgets", address);
+        let voice = Phone::new("+33.47237942");
+
+        object.set_info("newemail@eppdev.net", postal_info, voice, "eppdev-387323");
+        let add_statuses = vec![ContactStatus {
+            status: "clientTransferProhibited".to_string(),
+        }];
+        object.add(add_statuses);
+        let remove_statuses = vec![ContactStatus {
+            status: "clientDeleteProhibited".to_string(),
+        }];
+        object.remove(remove_statuses);
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
 
     #[test]
     fn contact_update() {

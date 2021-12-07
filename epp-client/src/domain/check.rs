@@ -94,7 +94,20 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn domain_check() {
+    fn command() {
+        let xml = get_xml("request/domain/check.xml").unwrap();
+
+        let object = DomainCheck::new(vec!["eppdev.com", "eppdev.net"]);
+
+        let serialized =
+            <DomainCheck as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+                .unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/domain/check.xml").unwrap();
         let object =
             <DomainCheck as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();

@@ -71,12 +71,40 @@ pub struct RgpRequestResponse {
 mod tests {
     use super::{RgpRestoreRequest, Update};
     use crate::domain::info::DomainInfo;
-    use crate::domain::update::DomainUpdate;
+    use crate::domain::update::{DomainChangeInfo, DomainUpdate};
     use crate::request::Transaction;
-    use crate::tests::{get_xml, SUCCESS_MSG, SVTRID};
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn rgp_restore_request() {
+    fn request_command() {
+        let xml = get_xml("request/extensions/rgp_restore_request.xml").unwrap();
+
+        let domain_restore_request = Update {
+            data: RgpRestoreRequest::default(),
+        };
+
+        let mut object = DomainUpdate::new("eppdev.com");
+
+        let change_info = DomainChangeInfo {
+            registrant: None,
+            auth_info: None,
+        };
+
+        object.info(change_info);
+
+        let serialized =
+            <DomainUpdate as Transaction<Update<RgpRestoreRequest>>>::serialize_request(
+                object,
+                Some(domain_restore_request),
+                CLTRID,
+            )
+            .unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn request_response() {
         let xml = get_xml("response/extensions/rgp_restore.xml").unwrap();
         let object =
             <DomainUpdate as Transaction<Update<RgpRestoreRequest>>>::deserialize_response(
@@ -93,7 +121,7 @@ mod tests {
     }
 
     #[test]
-    fn rgp_restore_domain_info_response() {
+    fn domain_info_request_response() {
         let xml = get_xml("response/extensions/domain_info_rgp.xml").unwrap();
         let object = <DomainInfo as Transaction<Update<RgpRestoreRequest>>>::deserialize_response(
             xml.as_str(),

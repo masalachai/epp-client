@@ -103,11 +103,131 @@ pub struct DomainCreateResponse {
 #[cfg(test)]
 mod tests {
     use super::DomainCreate;
+    use crate::common::{DomainContact, HostAddr, HostAttr, HostAttrList, HostList, HostObjList};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn domain_create() {
+    fn command() {
+        let xml = get_xml("request/domain/create.xml").unwrap();
+
+        let contacts = vec![
+            DomainContact {
+                contact_type: "admin".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+            DomainContact {
+                contact_type: "tech".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+            DomainContact {
+                contact_type: "billing".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+        ];
+
+        let object = DomainCreate::new(
+            "eppdev-1.com",
+            1,
+            None,
+            Some("eppdev-contact-3"),
+            "epP4uthd#v",
+            Some(contacts),
+        );
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn command_with_host_obj() {
+        let xml = get_xml("request/domain/create_with_host_obj.xml").unwrap();
+
+        let contacts = vec![
+            DomainContact {
+                contact_type: "admin".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+            DomainContact {
+                contact_type: "tech".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+            DomainContact {
+                contact_type: "billing".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+        ];
+
+        let ns = Some(HostList::HostObjList(HostObjList {
+            hosts: vec!["ns1.test.com".into(), "ns2.test.com".into()],
+        }));
+
+        let object = DomainCreate::new(
+            "eppdev-1.com",
+            1,
+            ns,
+            Some("eppdev-contact-3"),
+            "epP4uthd#v",
+            Some(contacts),
+        );
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn command_with_host_attr() {
+        let xml = get_xml("request/domain/create_with_host_attr.xml").unwrap();
+
+        let contacts = vec![
+            DomainContact {
+                contact_type: "admin".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+            DomainContact {
+                contact_type: "tech".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+            DomainContact {
+                contact_type: "billing".to_string(),
+                id: "eppdev-contact-3".to_string(),
+            },
+        ];
+
+        let host_attr = HostList::HostAttrList(HostAttrList {
+            hosts: vec![
+                HostAttr {
+                    name: "ns1.eppdev-1.com".into(),
+                    addresses: None,
+                },
+                HostAttr {
+                    name: "ns2.eppdev-1.com".into(),
+                    addresses: Some(vec![
+                        HostAddr::new_v4("177.232.12.58"),
+                        HostAddr::new_v6("2404:6800:4001:801::200e"),
+                    ]),
+                },
+            ],
+        });
+
+        let object = DomainCreate::new(
+            "eppdev-2.com",
+            1,
+            Some(host_attr),
+            Some("eppdev-contact-3"),
+            "epP4uthd#v",
+            Some(contacts),
+        );
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/domain/create.xml").unwrap();
         let object = DomainCreate::deserialize_response(xml.as_str()).unwrap();
 

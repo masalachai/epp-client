@@ -90,12 +90,44 @@ pub struct HostUpdate {
 
 #[cfg(test)]
 mod tests {
-    use super::HostUpdate;
+    use super::{HostAddRemove, HostChangeInfo, HostUpdate};
+    use crate::common::{HostAddr, HostStatus};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn host_update() {
+    fn command() {
+        let xml = get_xml("request/host/update.xml").unwrap();
+
+        let addr = vec![HostAddr::new("v6", "2404:6800:4001:801::200e")];
+
+        let add = HostAddRemove {
+            addresses: Some(addr),
+            statuses: None,
+        };
+
+        let remove = HostAddRemove {
+            addresses: None,
+            statuses: Some(vec![HostStatus {
+                status: "clientDeleteProhibited".to_string(),
+            }]),
+        };
+
+        let mut object = HostUpdate::new("host1.eppdev-1.com");
+
+        object.add(add);
+        object.remove(remove);
+        object.info(HostChangeInfo {
+            name: "host2.eppdev-1.com".into(),
+        });
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/host/update.xml").unwrap();
         let object = HostUpdate::deserialize_response(xml.as_str()).unwrap();
 

@@ -70,7 +70,18 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SVTRID};
 
     #[test]
-    fn message_poll() {
+    fn command() {
+        let xml = get_xml("request/message/poll.xml").unwrap();
+
+        let object = MessagePoll::default();
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/message/poll.xml").unwrap();
         let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
 
