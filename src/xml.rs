@@ -29,7 +29,7 @@ pub trait EppXml: Sized {
         let object: Self = match from_str(epp_xml) {
             Ok(v) => v,
             Err(e) => {
-                return Err(error::Error::EppDeserializationError(format!(
+                return Err(error::Error::Deserialize(format!(
                     "epp-client Deserialization Error: {}",
                     e
                 )))

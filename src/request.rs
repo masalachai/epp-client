@@ -34,7 +34,7 @@ pub trait Transaction<Ext: Extension>: Command + Sized {
             <ResponseDocument<Self::Response, Ext::Response> as EppXml>::deserialize(epp_xml)?;
         match rsp.data.result.code {
             0..=2000 => Ok(rsp.data),
-            _ => Err(crate::error::Error::EppCommandError(ResponseStatus {
+            _ => Err(crate::error::Error::Command(ResponseStatus {
                 result: rsp.data.result,
                 tr_ids: rsp.data.tr_ids,
             })),

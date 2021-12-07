@@ -6,9 +6,9 @@ use std::fmt::Display;
 /// Error enum holding the possible error types
 #[derive(Debug)]
 pub enum Error {
-    EppConnectionError(std::io::Error),
-    EppCommandError(ResponseStatus),
-    EppDeserializationError(String),
+    Io(std::io::Error),
+    Command(ResponseStatus),
+    Deserialize(String),
     Other(String),
 }
 
@@ -17,7 +17,7 @@ impl std::error::Error for Error {}
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::EppCommandError(e) => {
+            Error::Command(e) => {
                 write!(f, "epp-client EppCommandError: {}", e.result.message)
             }
             Error::Other(e) => write!(f, "epp-client Exception: {}", e),
@@ -34,12 +34,12 @@ impl From<std::boxed::Box<dyn std::error::Error>> for Error {
 
 impl From<std::io::Error> for Error {
     fn from(e: std::io::Error) -> Self {
-        Self::EppConnectionError(e)
+        Self::Io(e)
     }
 }
 
 impl From<std::io::ErrorKind> for Error {
     fn from(e: std::io::ErrorKind) -> Self {
-        Self::EppConnectionError(std::io::Error::from(e))
+        Self::Io(std::io::Error::from(e))
     }
 }
