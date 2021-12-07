@@ -94,8 +94,8 @@ mod tests {
 
         let serialized =
             <DomainUpdate as Transaction<Update<RgpRestoreRequest>>>::serialize_request(
-                object,
-                Some(domain_restore_request),
+                &object,
+                Some(&domain_restore_request),
                 CLTRID,
             )
             .unwrap();

@@ -92,6 +92,7 @@ pub struct ContactCheckResponse {
 #[cfg(test)]
 mod tests {
     use super::ContactCheck;
+    use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -99,7 +100,9 @@ mod tests {
     fn command() {
         let xml = get_xml("request/contact/check.xml").unwrap();
         let object = ContactCheck::new(&["eppdev-contact-1", "eppdev-contact-2"]);
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <ContactCheck as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -107,7 +110,8 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/contact/check.xml").unwrap();
-        let object = ContactCheck::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <ContactCheck as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         let results = object.res_data().unwrap();
 

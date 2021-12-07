@@ -108,7 +108,7 @@ pub struct ContactUpdate {
 #[cfg(test)]
 mod tests {
     use super::ContactUpdate;
-    use crate::common::{Address, ContactStatus, Phone, PostalInfo};
+    use crate::common::{Address, ContactStatus, NoExtension, Phone, PostalInfo};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -133,7 +133,9 @@ mod tests {
         }];
         object.remove(remove_statuses);
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <ContactUpdate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -141,7 +143,9 @@ mod tests {
     #[test]
     fn contact_update() {
         let xml = get_xml("response/contact/update.xml").unwrap();
-        let object = ContactUpdate::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <ContactUpdate as Transaction<NoExtension>>::deserialize_response(xml.as_str())
+                .unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());

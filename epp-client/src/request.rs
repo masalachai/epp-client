@@ -15,8 +15,8 @@ pub const EPP_LANG: &str = "en";
 /// Trait to set correct value for xml tags when tags are being generated from generic types
 pub trait Transaction<Ext: Extension>: Command + Sized {
     fn serialize_request(
-        self,
-        extension: Option<Ext>,
+        &self,
+        extension: Option<&Ext>,
         client_tr_id: &str,
     ) -> Result<String, Box<dyn std::error::Error>> {
         <CommandDocument<Self, Ext> as EppXml>::serialize(&CommandDocument::new(CommandWrapper {
@@ -54,23 +54,23 @@ pub trait Extension: Serialize + Debug {
 #[derive(Debug, PartialEq)]
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// with an &lt;extension&gt; tag
-pub struct CommandWrapper<D, E> {
+pub struct CommandWrapper<'a, D, E> {
     pub command: &'static str,
     /// The instance that will be used to populate the &lt;command&gt; tag
-    pub data: D,
+    pub data: &'a D,
     /// The client TRID
-    pub extension: Option<E>,
+    pub extension: Option<&'a E>,
     pub client_tr_id: StringValue,
 }
 
-impl<D: Serialize, E: Serialize> Serialize for CommandWrapper<D, E> {
+impl<'a, D: Serialize, E: Serialize> Serialize for CommandWrapper<'a, D, E> {
     /// Serializes the generic type T to the proper XML tag (set by the `#[element_name(name = <tagname>)]` attribute) for the request
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
         let mut state = serializer.serialize_struct("command", 3)?;
-        state.serialize_field(self.command, &self.data)?;
+        state.serialize_field(self.command, self.data)?;
         state.serialize_field("extension", &self.extension)?;
         state.serialize_field("clTRID", &self.client_tr_id)?;
         state.end()
@@ -79,13 +79,13 @@ impl<D: Serialize, E: Serialize> Serialize for CommandWrapper<D, E> {
 
 #[derive(Debug, PartialEq, Serialize)]
 #[serde(rename = "epp")]
-pub struct CommandDocument<D, E> {
+pub struct CommandDocument<'a, D, E> {
     xmlns: &'static str,
-    command: CommandWrapper<D, E>,
+    command: CommandWrapper<'a, D, E>,
 }
 
-impl<D, E> CommandDocument<D, E> {
-    pub fn new(command: CommandWrapper<D, E>) -> Self {
+impl<'a, D, E> CommandDocument<'a, D, E> {
+    pub fn new(command: CommandWrapper<'a, D, E>) -> Self {
         Self {
             xmlns: EPP_XMLNS,
             command,
@@ -93,4 +93,4 @@ impl<D, E> CommandDocument<D, E> {
     }
 }
 
-impl<D: Serialize, E: Serialize> EppXml for CommandDocument<D, E> {}
+impl<'a, D: Serialize, E: Serialize> EppXml for CommandDocument<'a, D, E> {}

@@ -90,6 +90,7 @@ pub struct HostInfoResponse {
 #[cfg(test)]
 mod tests {
     use super::HostInfo;
+    use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -99,7 +100,9 @@ mod tests {
 
         let object = HostInfo::new("ns1.eppdev-1.com");
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <HostInfo as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -107,7 +110,8 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/host/info.xml").unwrap();
-        let object = HostInfo::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <HostInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 

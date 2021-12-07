@@ -147,7 +147,7 @@ mod tests {
         let object = DomainInfo::new("eppdev.com", Some("2fooBAR"));
 
         let serialized =
-            <DomainInfo as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+            <DomainInfo as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
                 .unwrap();
 
         assert_eq!(xml, serialized);

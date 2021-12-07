@@ -70,7 +70,7 @@
 //! };
 //!
 //! let login = Login::new("username", "password", None);
-//! client.transact(login, "transaction-id").await.unwrap();
+//! client.transact(&login, "transaction-id").await.unwrap();
 //!
 //! // Make a domain check call, which returns an object of type EppDomainCheckResponse
 //! // that contains the result of the call
@@ -78,7 +78,7 @@
 //!     vec!["eppdev.com", "eppdev.net"],
 //! );
 //!
-//! let response = client.transact(domain_check, "transaction-id").await.unwrap();
+//! let response = client.transact(&domain_check, "transaction-id").await.unwrap();
 //!
 //! // print the availability results
 //! response.res_data.unwrap().check_data.domain_list
@@ -86,7 +86,7 @@
 //!     .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 //!
 //! // Close the connection
-//! client.transact(Logout, "transaction-id").await.unwrap();
+//! client.transact(&Logout, "transaction-id").await.unwrap();
 //! }
 //! ```
 //!

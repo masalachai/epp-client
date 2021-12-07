@@ -103,6 +103,7 @@ pub struct ContactInfoResponse {
 #[cfg(test)]
 mod tests {
     use super::ContactInfo;
+    use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -112,7 +113,9 @@ mod tests {
 
         let object = ContactInfo::new("eppdev-contact-3", "eppdev-387323");
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <ContactInfo as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -120,7 +123,8 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/contact/info.xml").unwrap();
-        let object = ContactInfo::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <ContactInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
         let fax = result.info_data.fax.as_ref().unwrap();

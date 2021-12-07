@@ -140,7 +140,7 @@ mod tests {
         object.info(change_info);
 
         let serialized =
-            <DomainUpdate as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+            <DomainUpdate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
                 .unwrap();
 
         assert_eq!(xml, serialized);

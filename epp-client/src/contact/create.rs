@@ -101,7 +101,7 @@ pub struct ContactCreateResponse {
 #[cfg(test)]
 mod tests {
     use super::{ContactCreate, Phone, PostalInfo};
-    use crate::common::Address;
+    use crate::common::{Address, NoExtension};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -126,7 +126,9 @@ mod tests {
         );
         object.set_fax(fax);
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <ContactCreate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -134,7 +136,9 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/contact/create.xml").unwrap();
-        let object = ContactCreate::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <ContactCreate as Transaction<NoExtension>>::deserialize_response(xml.as_str())
+                .unwrap();
 
         let results = object.res_data().unwrap();
 
