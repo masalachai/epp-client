@@ -79,9 +79,22 @@ mod tests {
     use super::DomainRenew;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use chrono::NaiveDate;
 
     #[test]
-    fn domain_renew() {
+    fn command() {
+        let xml = get_xml("request/domain/renew.xml").unwrap();
+
+        let exp_date = NaiveDate::from_ymd(2022, 7, 23);
+        let object = DomainRenew::new("eppdev.com", exp_date, 1);
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/domain/renew.xml").unwrap();
         let object = DomainRenew::deserialize_response(xml.as_str()).unwrap();
 

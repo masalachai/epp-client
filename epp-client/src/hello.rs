@@ -305,9 +305,17 @@ impl EppXml for GreetingDocument {}
 
 #[cfg(test)]
 mod tests {
-    use super::{ExpiryType, GreetingDocument, Relative};
+    use super::{ExpiryType, GreetingDocument, HelloDocument, Relative};
     use crate::tests::get_xml;
     use crate::xml::EppXml;
+
+    #[test]
+    fn hello() {
+        let xml = get_xml("request/hello.xml").unwrap();
+        let serialized = HelloDocument::default().serialize().unwrap();
+
+        assert_eq!(xml, serialized);
+    }
 
     #[test]
     fn greeting() {

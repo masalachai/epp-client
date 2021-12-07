@@ -141,7 +141,20 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn domain_info() {
+    fn command() {
+        let xml = get_xml("request/domain/info.xml").unwrap();
+
+        let object = DomainInfo::new("eppdev.com", Some("2fooBAR"));
+
+        let serialized =
+            <DomainInfo as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+                .unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/domain/info.xml").unwrap();
         let object =
             <DomainInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
@@ -199,7 +212,7 @@ mod tests {
     }
 
     #[test]
-    fn domain_info_alt() {
+    fn response_alt() {
         let xml = get_xml("response/domain/info_alt.xml").unwrap();
         <DomainInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
     }

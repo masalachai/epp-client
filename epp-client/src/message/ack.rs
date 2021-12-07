@@ -35,10 +35,21 @@ impl MessageAck {
 mod tests {
     use super::MessageAck;
     use crate::request::Transaction;
-    use crate::tests::{get_xml, SUCCESS_MSG, SVTRID};
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn message_ack() {
+    fn command() {
+        let xml = get_xml("request/message/ack.xml").unwrap();
+
+        let object = MessageAck::new(12345);
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/message/ack.xml").unwrap();
         let object = MessageAck::deserialize_response(xml.as_str()).unwrap();
 

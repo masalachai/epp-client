@@ -107,7 +107,18 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn contact_info() {
+    fn command() {
+        let xml = get_xml("request/contact/info.xml").unwrap();
+
+        let object = ContactInfo::new("eppdev-contact-3", "eppdev-387323");
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/contact/info.xml").unwrap();
         let object = ContactInfo::deserialize_response(xml.as_str()).unwrap();
 

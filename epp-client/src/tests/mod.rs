@@ -1,7 +1,5 @@
 //! Module for automated tests
 
-pub mod se;
-
 use regex::Regex;
 use std::{error::Error, fs::File, io::Read};
 

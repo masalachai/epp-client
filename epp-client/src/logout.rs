@@ -25,7 +25,16 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SVTRID};
 
     #[test]
-    fn logout() {
+    fn command() {
+        let xml = get_xml("request/logout.xml").unwrap();
+        let object = Logout;
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/logout.xml").unwrap();
         let object = Logout::deserialize_response(xml.as_str()).unwrap();
 

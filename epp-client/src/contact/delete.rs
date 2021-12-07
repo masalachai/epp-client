@@ -49,7 +49,18 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn contact_delete() {
+    fn command() {
+        let xml = get_xml("request/contact/delete.xml").unwrap();
+
+        let object = ContactDelete::new("eppdev-contact-3");
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/contact/delete.xml").unwrap();
         let object = ContactDelete::deserialize_response(xml.as_str()).unwrap();
 

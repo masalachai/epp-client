@@ -49,7 +49,18 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn domain_delete() {
+    fn command() {
+        let xml = get_xml("request/domain/delete.xml").unwrap();
+
+        let object = DomainDelete::new("eppdev.com");
+
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/domain/delete.xml").unwrap();
         let object = DomainDelete::deserialize_response(xml.as_str()).unwrap();
 

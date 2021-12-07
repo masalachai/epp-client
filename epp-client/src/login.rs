@@ -71,7 +71,20 @@ mod tests {
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
-    fn login() {
+    fn command() {
+        let ext_uris = Some(vec![
+            "http://schema.ispapi.net/epp/xml/keyvalue-1.0".to_string()
+        ]);
+
+        let xml = get_xml("request/login.xml").unwrap();
+        let object = Login::new("username", "password", ext_uris);
+        let serialized = object.serialize_request(None, CLTRID).unwrap();
+
+        assert_eq!(xml, serialized);
+    }
+
+    #[test]
+    fn response() {
         let xml = get_xml("response/login.xml").unwrap();
         let object = Login::deserialize_response(xml.as_str()).unwrap();
 
