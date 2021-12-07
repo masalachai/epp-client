@@ -25,66 +25,6 @@ impl<E: EppExtension> Transaction<E> for ContactUpdate<E> {
     }
 }
 
-/// Type that represents the &lt;epp&gt; request for contact &lt;update&gt; command
-///
-/// ## Usage
-///
-/// ```no_run
-/// use std::collections::HashMap;
-///
-/// use epp_client::config::{EppClientConfig, RegistryConfig};
-/// use epp_client::EppClient;
-/// use epp_client::contact::update::ContactUpdate;
-/// use epp_client::common::ContactStatus;
-/// use epp_client::common::NoExtension;
-/// use epp_client::login::Login;
-/// use epp_client::logout::Logout;
-///
-/// #[tokio::main]
-/// async fn main() {
-///     // Create a config
-///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-///     registry.insert(
-///         "registry_name".to_owned(),
-///         RegistryConfig {
-///             host: "example.com".to_owned(),
-///             port: 700,
-///             tls_files: None,
-///         },
-///     );
-///     let config = EppClientConfig { registry };
-///
-///     // Create an instance of EppClient, passing the config and the registry you want to connect to
-///     let mut client = match EppClient::new(&config, "registry_name").await {
-///         Ok(client) => client,
-///         Err(e) => panic!("Failed to create EppClient: {}",  e)
-///     };
-///
-///     let login = Login::<NoExtension>::new("username", "password", None);
-///     client.transact(login, "transaction-id").await.unwrap();
-///
-///     // Create an ContactUpdate instance
-///     let mut contact_update = ContactUpdate::<NoExtension>::new(
-///         "eppdev-contact-100"
-///     );
-///
-///     let add_statuses = vec![
-///         ContactStatus {
-///             status: "clientTransferProhibited".to_string()
-///         }
-///     ];
-///
-///     contact_update.add(add_statuses);
-///
-///     // send it to the registry and receive a response of type ContactUpdateResponse
-///     let response = client.transact(contact_update, "transaction-id").await.unwrap();
-///
-///     println!("{:?}", response);
-///
-///     let logout = Logout::<NoExtension>::new();
-///     client.transact(logout, "transaction-id").await.unwrap();
-/// }
-/// ```
 impl<E: EppExtension> ContactUpdate<E> {
     pub fn new(id: &str) -> ContactUpdate<NoExtension> {
         ContactUpdate {

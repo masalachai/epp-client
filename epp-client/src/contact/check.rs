@@ -23,57 +23,6 @@ impl<E: EppExtension> Transaction<E> for ContactCheck<E> {
     }
 }
 
-/// Type that represents the &lt;epp&gt; request for contact &lt;check&gt; command
-///
-/// ## Usage
-///
-/// ```no_run
-/// use std::collections::HashMap;
-///
-/// use epp_client::config::{EppClientConfig, RegistryConfig};
-/// use epp_client::EppClient;
-/// use epp_client::contact::check::ContactCheck;
-/// use epp_client::common::NoExtension;
-/// use epp_client::login::Login;
-/// use epp_client::logout::Logout;
-///
-/// #[tokio::main]
-/// async fn main() {
-///     // Create a config
-///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-///     registry.insert(
-///         "registry_name".to_owned(),
-///         RegistryConfig {
-///             host: "example.com".to_owned(),
-///             port: 700,
-///             tls_files: None,
-///         },
-///     );
-///     let config = EppClientConfig { registry };
-///
-///     // Create an instance of EppClient, passing the config
-///     let mut client = match EppClient::new(&config, "registry_name").await {
-///         Ok(client) => client,
-///         Err(e) => panic!("Failed to create EppClient: {}",  e)
-///     };
-///
-///     let login = Login::<NoExtension>::new("username", "password", None);
-///     client.transact(login, "transaction-id").await.unwrap();
-///
-///     // Create an ContactCheck instance
-///     let contact_check = ContactCheck::<NoExtension>::new(
-///         &["epp-client-c1", "epp-client-c2"]
-///     );
-///
-///     // send it to the registry and receive a response of type ContactCheckResponse
-///
-///     let response = client.transact(contact_check, "transaction-id").await.unwrap();
-///     println!("{:?}", response);
-///
-///     let logout = Logout::<NoExtension>::new();
-///     client.transact(logout, "transaction-id").await.unwrap();
-/// }
-/// ```
 impl<E: EppExtension> ContactCheck<E> {
     pub fn new(contact_ids: &[&str]) -> ContactCheck<NoExtension> {
         let contact_ids = contact_ids

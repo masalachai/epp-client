@@ -22,62 +22,6 @@ impl<E: EppExtension> Transaction<E> for HostCreate<E> {
     }
 }
 
-/// Type that represents the &lt;epp&gt; request for host &lt;create&gt; command
-///
-/// ## Usage
-///
-/// ```no_run
-/// use std::collections::HashMap;
-///
-/// use epp_client::config::{EppClientConfig, RegistryConfig};
-/// use epp_client::EppClient;
-/// use epp_client::common::HostAddr;
-/// use epp_client::host::create::HostCreate;
-/// use epp_client::common::NoExtension;
-/// use epp_client::login::Login;
-/// use epp_client::logout::Logout;
-///
-/// #[tokio::main]
-/// async fn main() {
-///     // Create a config
-///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-///     registry.insert(
-///         "registry_name".to_owned(),
-///         RegistryConfig {
-///             host: "example.com".to_owned(),
-///             port: 700,
-///             tls_files: None,
-///         },
-///     );
-///     let config = EppClientConfig { registry };
-///
-///     // Create an instance of EppClient, passing the config and the registry you want to connect to
-///     let mut client = match EppClient::new(&config, "registry_name").await {
-///         Ok(client) => client,
-///         Err(e) => panic!("Failed to create EppClient: {}",  e)
-///     };
-///
-///     let login = Login::<NoExtension>::new("username", "password", None);
-///     client.transact(login, "transaction-id").await.unwrap();
-///
-///     // Create a vector of IP addresses to assign to the host
-///     let addresses = vec![
-///         HostAddr::new("v4", "29.245.122.14"),
-///         HostAddr::new("v6", "2404:6800:4001:801::200e"),
-///     ];
-///
-///     // Create an HostCreate instance
-///     let host_create = HostCreate::<NoExtension>::new("ns1.eppdev-101.com", addresses);
-///
-///     // send it to the registry and receive a response of type HostCreateResponse
-///     let response = client.transact(host_create, "transaction-id").await.unwrap();
-///
-///     println!("{:?}", response);
-///
-///     let logout = Logout::<NoExtension>::new();
-///     client.transact(logout, "transaction-id").await.unwrap();
-/// }
-/// ```
 impl<E: EppExtension> HostCreate<E> {
     pub fn new(host: &str, addresses: Vec<HostAddr>) -> HostCreate<NoExtension> {
         HostCreate {

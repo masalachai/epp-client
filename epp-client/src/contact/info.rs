@@ -24,58 +24,6 @@ impl<E: EppExtension> Transaction<E> for ContactInfo<E> {
     }
 }
 
-/// Type for the &lt;epp&gt; request for contact &lt;info&gt; command
-///
-/// ## Usage
-///
-/// ```no_run
-/// use std::collections::HashMap;
-///
-/// use epp_client::config::{EppClientConfig, RegistryConfig};
-/// use epp_client::EppClient;
-/// use epp_client::contact::info::ContactInfo;
-/// use epp_client::common::NoExtension;
-/// use epp_client::login::Login;
-/// use epp_client::logout::Logout;
-///
-/// #[tokio::main]
-/// async fn main() {
-///     // Create a config
-///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-///     registry.insert(
-///         "registry_name".to_owned(),
-///         RegistryConfig {
-///             host: "example.com".to_owned(),
-///             port: 700,
-///             tls_files: None,
-///         },
-///     );
-///     let config = EppClientConfig { registry };
-///
-///     // Create an instance of EppClient, passing the config and the registry you want to connect to
-///     let mut client = match EppClient::new(&config, "registry_name").await {
-///         Ok(client) => client,
-///         Err(e) => panic!("Failed to create EppClient: {}",  e)
-///     };
-///
-///     let login = Login::<NoExtension>::new("username", "password", None);
-///     client.transact(login, "transaction-id").await.unwrap();
-///
-///     // Create an ContactInfo instance
-///     let contact_info = ContactInfo::<NoExtension>::new(
-///         "eppdev-contact-100",
-///         "epP4uthd#v"
-///     );
-///
-///     // send it to the registry and receive a response of type ContactInfoResponse
-///     let response = client.transact(contact_info, "transaction-id").await.unwrap();
-///
-///     println!("{:?}", response);
-///
-///     let logout = Logout::<NoExtension>::new();
-///     client.transact(logout, "transaction-id").await.unwrap();
-/// }
-/// ```
 impl<E: EppExtension> ContactInfo<E> {
     pub fn new(id: &str, auth_password: &str) -> ContactInfo<NoExtension> {
         ContactInfo {
