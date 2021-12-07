@@ -23,60 +23,6 @@ impl<E: EppExtension> Transaction<E> for DomainRenew<E> {
     }
 }
 
-/// Type that represents the &lt;epp&gt; request for domain &lt;renew&gt; command
-///
-/// ## Usage
-///
-/// ```no_run
-/// use std::collections::HashMap;
-///
-/// use chrono::NaiveDate;
-///
-/// use epp_client::config::{EppClientConfig, RegistryConfig};
-/// use epp_client::EppClient;
-/// use epp_client::domain::renew::DomainRenew;
-/// use epp_client::common::NoExtension;
-/// use epp_client::login::Login;
-/// use epp_client::logout::Logout;
-///
-/// #[tokio::main]
-/// async fn main() {
-///     // Create a config
-///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-///     registry.insert(
-///         "registry_name".to_owned(),
-///         RegistryConfig {
-///             host: "example.com".to_owned(),
-///             port: 700,
-///             tls_files: None,
-///         },
-///     );
-///     let config = EppClientConfig { registry };
-///
-///     // Create an instance of EppClient, passing the config and the registry you want to connect to
-///     let mut client = match EppClient::new(&config, "registry_name").await {
-///         Ok(client) => client,
-///         Err(e) => panic!("Failed to create EppClient: {}",  e)
-///     };
-///
-///     let login = Login::<NoExtension>::new("username", "password", None);
-///     client.transact(login, "transaction-id").await.unwrap();
-///
-///     // Create a date object to set the current expiry date
-///     let exp_date = NaiveDate::from_ymd(2022, 7, 27);
-///
-///     // Create an DomainRenew instance
-///     let domain_renew = DomainRenew::<NoExtension>::new("eppdev-100.com", exp_date, 1);
-///
-///     // send it to the registry and receive a response of type DomainRenewResponse
-///     let response = client.transact(domain_renew, "transaction-id").await.unwrap();
-///
-///     println!("{:?}", response);
-///
-///     let logout = Logout::<NoExtension>::new();
-///     client.transact(logout, "transaction-id").await.unwrap();
-/// }
-/// ```
 impl<E: EppExtension> DomainRenew<E> {
     pub fn new(name: &str, current_expiry_date: NaiveDate, years: u16) -> DomainRenew<NoExtension> {
         let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();

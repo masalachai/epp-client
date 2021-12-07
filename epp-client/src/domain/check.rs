@@ -22,57 +22,6 @@ impl<E: EppExtension> Transaction<E> for DomainCheck<E> {
     }
 }
 
-/// Type that represents the &lt;epp&gt; request for domain &lt;check&gt; command
-///
-/// ## Usage
-///
-/// ```no_run
-/// use std::collections::HashMap;
-///
-/// use epp_client::config::{EppClientConfig, RegistryConfig};
-/// use epp_client::EppClient;
-/// use epp_client::domain::check::DomainCheck;
-/// use epp_client::common::NoExtension;
-/// use epp_client::login::Login;
-/// use epp_client::logout::Logout;
-///
-/// #[tokio::main]
-/// async fn main() {
-///     // Create a config
-///     let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-///     registry.insert(
-///         "registry_name".to_owned(),
-///         RegistryConfig {
-///             host: "example.com".to_owned(),
-///             port: 700,
-///             tls_files: None,
-///         },
-///     );
-///     let config = EppClientConfig { registry };
-///
-///     // Create an instance of EppClient, passing the config and the registry you want to connect to
-///     let mut client = match EppClient::new(&config, "registry_name").await {
-///         Ok(client) => client,
-///         Err(e) => panic!("Failed to create EppClient: {}",  e)
-///     };
-///
-///     let login = Login::<NoExtension>::new("username", "password", None);
-///     client.transact(login, "transaction-id").await.unwrap();
-///
-///     // Create an DomainCheck instance
-///     let domain_check = DomainCheck::<NoExtension>::new(
-///         vec!["eppdev-100.com", "eppdev-100.net"],
-///     );
-///
-///     // send it to the registry and receive a response of type EppDomainCheckResponse
-///     let response = client.transact(domain_check, "transaction-id").await.unwrap();
-///
-///     println!("{:?}", response);
-///
-///     let logout = Logout::<NoExtension>::new();
-///     client.transact(logout, "transaction-id").await.unwrap();
-/// }
-/// ```
 impl<E: EppExtension> DomainCheck<E> {
     pub fn new(domains: Vec<&str>) -> DomainCheck<NoExtension> {
         DomainCheck {
