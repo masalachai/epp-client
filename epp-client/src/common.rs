@@ -1,10 +1,12 @@
 //! Common data types included in EPP Requests and Responses
 
+use std::error::Error as StdError;
 use std::{fmt::Display, str::FromStr};
 
 use epp_client_macros::ElementName;
-use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
+use serde::{de::DeserializeOwned, ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
+use crate::error::Error;
 use crate::request::EppExtension;
 
 const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
@@ -50,7 +52,7 @@ impl EppExtension for NoExtension {
 /// an EPP XML response
 #[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename = "epp")]
-pub struct EppObject<T: ElementName> {
+pub struct EppObject<T> {
     /// XML namespace for the &lt;epp&gt; tag
     pub xmlns: String,
     /// the request or response object that is set or received in the EPP XML document
@@ -59,6 +61,27 @@ pub struct EppObject<T: ElementName> {
     // TODO: save serialized xml in the instance for debugging or client logging purposes
     // #[serde(skip)]
     // pub xml: Option<String>,
+}
+
+impl<T: DeserializeOwned> FromStr for EppObject<T> {
+    type Err = Error;
+
+    fn from_str(xml: &str) -> Result<Self, Error> {
+        quick_xml::de::from_str(xml).map_err(|e| {
+            Error::EppDeserializationError(format!("epp-client Deserialization Error: {}", e))
+        })
+    }
+}
+
+impl<T: ElementName + Serialize> EppObject<T> {
+    /// Serializes the EppObject instance to an EPP XML document
+    pub fn to_string(&self) -> Result<String, Box<dyn StdError>> {
+        Ok(format!(
+            "{}\r\n{}",
+            EPP_XML_HEADER,
+            quick_xml::se::to_string(self)?
+        ))
+    }
 }
 
 impl<T: ElementName + Serialize> Serialize for EppObject<T> {
@@ -72,6 +95,8 @@ impl<T: ElementName + Serialize> Serialize for EppObject<T> {
         state.end()
     }
 }
+
+const EPP_XML_HEADER: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="no"?>"#;
 
 /// The <option> type in EPP XML login requests
 #[derive(Serialize, Deserialize, Debug, PartialEq)]

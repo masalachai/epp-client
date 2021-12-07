@@ -1,12 +1,14 @@
 //! Types for EPP requests
 
-use serde::{de::DeserializeOwned, ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
+use std::error::Error;
 use std::fmt::Debug;
+use std::str::FromStr;
+
+use serde::{de::DeserializeOwned, ser::SerializeStruct, ser::Serializer, Deserialize, Serialize};
 
 use crate::{
     common::{ElementName, EppObject, Extension, StringValue},
     response::{Response, ResponseStatus},
-    xml::EppXml,
 };
 use epp_client_macros::ElementName;
 
@@ -14,26 +16,27 @@ pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
-pub trait EppRequest<E: EppExtension>: Sized + Debug {
-    type Input: ElementName + DeserializeOwned + Serialize + Sized + Debug;
-    type Output: DeserializeOwned + Serialize + Debug;
+pub trait EppRequest<E: EppExtension>: Sized {
+    type Input: ElementName + Serialize + Sized;
+    type Output: DeserializeOwned;
 
     fn into_parts(self) -> (Self::Input, Option<E>);
 
-    fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn std::error::Error>> {
+    fn serialize_request(self, client_tr_id: &str) -> Result<String, Box<dyn Error>> {
         let (command, extension) = self.into_parts();
         let extension = extension.map(|data| Extension { data });
-        EppXml::serialize(&EppObject::build(Command {
+        EppObject::build(Command {
             command,
             extension,
             client_tr_id: client_tr_id.into(),
-        }))
+        })
+        .to_string()
     }
 
     fn deserialize_response(
         epp_xml: &str,
     ) -> Result<Response<Self::Output, E::Response>, crate::error::Error> {
-        let rsp = <EppObject<Response<Self::Output, E::Response>> as EppXml>::deserialize(epp_xml)?;
+        let rsp = EppObject::<Response<Self::Output, E::Response>>::from_str(epp_xml)?;
         match rsp.data.result.code {
             0..=2000 => Ok(rsp.data),
             _ => Err(crate::error::Error::EppCommandError(ResponseStatus {

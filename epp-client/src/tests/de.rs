@@ -1,6 +1,8 @@
 //! EPP XML to `EppObject` deserialization tests
 
 mod response {
+    use std::str::FromStr;
+
     use super::super::get_xml;
     use super::super::CLTRID;
     use crate::common::{EppObject, NoExtension};
@@ -36,7 +38,6 @@ mod response {
     use crate::message::poll::MessagePoll;
     use crate::request::EppRequest;
     use crate::response::ResponseStatus;
-    use crate::xml::EppXml;
 
     const SVTRID: &str = "RO-6879-1627224678242975";
     const SUCCESS_MSG: &str = "Command completed successfully";
@@ -44,7 +45,7 @@ mod response {
     #[test]
     fn greeting() {
         let xml = get_xml("response/greeting.xml").unwrap();
-        let object = EppObject::<Greeting>::deserialize(xml.as_str()).unwrap();
+        let object = EppObject::<Greeting>::from_str(&xml).unwrap();
 
         assert_eq!(object.data.service_id, "ISPAPI EPP Server");
         assert_eq!(object.data.service_date, "2021-07-25T14:51:17.0Z");
@@ -75,7 +76,7 @@ mod response {
     #[test]
     fn error() {
         let xml = get_xml("response/error.xml").unwrap();
-        let object = EppObject::<ResponseStatus>::deserialize(xml.as_str()).unwrap();
+        let object = EppObject::<ResponseStatus>::from_str(&xml).unwrap();
 
         assert_eq!(object.data.result.code, 2303);
         assert_eq!(object.data.result.message, "Object does not exist".into());

@@ -111,7 +111,6 @@ pub mod logout;
 pub mod registry;
 pub mod request;
 pub mod response;
-pub mod xml;
 
 pub mod contact {
     pub mod check;

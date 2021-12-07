@@ -47,14 +47,13 @@ mod request {
     use crate::message::ack::MessageAck;
     use crate::message::poll::MessagePoll;
     use crate::request::EppRequest;
-    use crate::xml::EppXml;
     use chrono::{DateTime, NaiveDate};
     use std::str::FromStr;
 
     #[test]
     fn hello() {
         let xml = get_xml("request/hello.xml").unwrap();
-        let serialized = EppObject::<Hello>::build(Hello).serialize().unwrap();
+        let serialized = EppObject::<Hello>::build(Hello).to_string().unwrap();
 
         assert_eq!(xml, serialized);
     }
