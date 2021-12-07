@@ -1,14 +1,16 @@
 //! Error types to wrap internal errors and make EPP errors easier to read
 
-use crate::response::ResponseStatus;
+use std::error::Error as StdError;
 use std::fmt::Display;
+
+use crate::response::ResponseStatus;
 
 /// Error enum holding the possible error types
 #[derive(Debug)]
 pub enum Error {
     Io(std::io::Error),
     Command(ResponseStatus),
-    Deserialize(String),
+    Xml(Box<dyn StdError>),
     Other(String),
 }
 

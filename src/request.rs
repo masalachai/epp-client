@@ -18,7 +18,7 @@ pub trait Transaction<Ext: Extension>: Command + Sized {
         &self,
         extension: Option<&Ext>,
         client_tr_id: &str,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    ) -> Result<String, crate::error::Error> {
         <CommandDocument<Self, Ext> as EppXml>::serialize(&CommandDocument::new(CommandWrapper {
             command: Self::COMMAND,
             data: self,
