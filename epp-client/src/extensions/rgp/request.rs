@@ -8,7 +8,7 @@ use crate::request::EppExtension;
 
 use serde::{Deserialize, Serialize};
 
-use super::EPP_DOMAIN_RGP_EXT_XMLNS;
+use super::XMLNS;
 
 /// Type that represents the &lt;epp&gt; request for a domain rgp restore request command
 ///
@@ -67,7 +67,7 @@ impl RgpRestoreRequest {
     /// Creates a new instance of EppDomainRgpRestoreRequest
     pub fn new() -> RgpRestoreRequest {
         RgpRestoreRequest {
-            xmlns: EPP_DOMAIN_RGP_EXT_XMLNS.to_string(),
+            xmlns: XMLNS.to_string(),
             restore: RgpRestoreRequestData {
                 op: "request".to_string(),
             },
