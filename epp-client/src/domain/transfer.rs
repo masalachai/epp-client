@@ -145,6 +145,7 @@ pub struct DomainTransferResponse {
 #[cfg(test)]
 mod tests {
     use super::DomainTransfer;
+    use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -154,7 +155,9 @@ mod tests {
 
         let object = DomainTransfer::new("testing.com", Some(1), "epP4uthd#v");
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -165,7 +168,9 @@ mod tests {
 
         let object = DomainTransfer::approve("testing.com");
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -176,7 +181,9 @@ mod tests {
 
         let object = DomainTransfer::reject("testing.com");
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -187,7 +194,9 @@ mod tests {
 
         let object = DomainTransfer::cancel("testing.com");
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -198,7 +207,9 @@ mod tests {
 
         let object = DomainTransfer::query("testing.com", "epP4uthd#v");
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -206,7 +217,9 @@ mod tests {
     #[test]
     fn request_response() {
         let xml = get_xml("response/domain/transfer_request.xml").unwrap();
-        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
+                .unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -235,7 +248,9 @@ mod tests {
     #[test]
     fn approve_response() {
         let xml = get_xml("response/domain/transfer_approve.xml").unwrap();
-        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
+                .unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -246,7 +261,9 @@ mod tests {
     #[test]
     fn reject_response() {
         let xml = get_xml("response/domain/transfer_reject.xml").unwrap();
-        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
+                .unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -257,7 +274,9 @@ mod tests {
     #[test]
     fn cancel_response() {
         let xml = get_xml("response/domain/transfer_cancel.xml").unwrap();
-        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
+                .unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -268,7 +287,9 @@ mod tests {
     #[test]
     fn query_response() {
         let xml = get_xml("response/domain/transfer_query.xml").unwrap();
-        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
+                .unwrap();
 
         let result = object.res_data().unwrap();
 

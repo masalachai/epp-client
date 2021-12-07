@@ -2,13 +2,50 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::common::StringValue;
-use crate::domain::check::DomainCheck;
-use crate::request::{Extension, Transaction};
+use crate::{
+    common::StringValue,
+    contact::{
+        check::ContactCheck, create::ContactCreate, delete::ContactDelete, info::ContactInfo,
+        update::ContactUpdate,
+    },
+    domain::{
+        check::DomainCheck, create::DomainCreate, delete::DomainDelete, info::DomainInfo,
+        renew::DomainRenew, transfer::DomainTransfer, update::DomainUpdate,
+    },
+    host::{
+        check::HostCheck, create::HostCreate, delete::HostDelete, info::HostInfo,
+        update::HostUpdate,
+    },
+    request::{Extension, Transaction},
+};
 
 pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 
+// Contact
+
+impl Transaction<NameStore> for ContactCheck {}
+impl Transaction<NameStore> for ContactCreate {}
+impl Transaction<NameStore> for ContactDelete {}
+impl Transaction<NameStore> for ContactInfo {}
+impl Transaction<NameStore> for ContactUpdate {}
+
+// Domain
+
 impl Transaction<NameStore> for DomainCheck {}
+impl Transaction<NameStore> for DomainCreate {}
+impl Transaction<NameStore> for DomainDelete {}
+impl Transaction<NameStore> for DomainInfo {}
+impl Transaction<NameStore> for DomainRenew {}
+impl Transaction<NameStore> for DomainTransfer {}
+impl Transaction<NameStore> for DomainUpdate {}
+
+// Host
+
+impl Transaction<NameStore> for HostCheck {}
+impl Transaction<NameStore> for HostCreate {}
+impl Transaction<NameStore> for HostDelete {}
+impl Transaction<NameStore> for HostInfo {}
+impl Transaction<NameStore> for HostUpdate {}
 
 impl NameStore {
     /// Create a new RGP restore report request
@@ -60,8 +97,8 @@ mod tests {
         let object = DomainCheck::new(vec!["example1.com", "example2.com", "example3.com"]);
 
         let serialized = <DomainCheck as Transaction<NameStore>>::serialize_request(
-            object,
-            Some(namestore_ext),
+            &object,
+            Some(&namestore_ext),
             CLTRID,
         )
         .unwrap();

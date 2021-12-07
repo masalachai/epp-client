@@ -77,6 +77,7 @@ pub struct DomainRenewResponse {
 #[cfg(test)]
 mod tests {
     use super::DomainRenew;
+    use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
     use chrono::NaiveDate;
@@ -88,7 +89,9 @@ mod tests {
         let exp_date = NaiveDate::from_ymd(2022, 7, 23);
         let object = DomainRenew::new("eppdev.com", exp_date, 1);
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <DomainRenew as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -96,7 +99,8 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/domain/renew.xml").unwrap();
-        let object = DomainRenew::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainRenew as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 

@@ -37,7 +37,7 @@
 //!
 //! // Execute an EPP Command against the registry with distinct request and response objects
 //! let domain_check = DomainCheck::new(vec!["eppdev.com", "eppdev.net"]);
-//! let response = client.transact(domain_check, "transaction-id").await.unwrap();
+//! let response = client.transact(&domain_check, "transaction-id").await.unwrap();
 //! println!("{:?}", response);
 //!
 //! }
@@ -88,9 +88,9 @@ impl EppClient {
         Ok(GreetingDocument::deserialize(&response)?.data)
     }
 
-    pub async fn transact<C, E>(
+    pub async fn transact<'a, C: 'a, E: 'a>(
         &mut self,
-        data: impl Into<RequestData<C, E>>,
+        data: impl Into<RequestData<'a, C, E>> + 'a,
         id: &str,
     ) -> Result<Response<C::Response, E::Response>, error::Error>
     where
@@ -122,13 +122,13 @@ impl EppClient {
     }
 }
 
-pub struct RequestData<C, E> {
-    command: C,
-    extension: Option<E>,
+pub struct RequestData<'a, C, E> {
+    command: &'a C,
+    extension: Option<&'a E>,
 }
 
-impl<C: Command> From<C> for RequestData<C, NoExtension> {
-    fn from(command: C) -> Self {
+impl<'a, C: Command> From<&'a C> for RequestData<'a, C, NoExtension> {
+    fn from(command: &'a C) -> Self {
         Self {
             command,
             extension: None,
@@ -136,8 +136,8 @@ impl<C: Command> From<C> for RequestData<C, NoExtension> {
     }
 }
 
-impl<C: Command, E: Extension> From<(C, E)> for RequestData<C, E> {
-    fn from((command, extension): (C, E)) -> Self {
+impl<'a, C: Command, E: Extension> From<(&'a C, &'a E)> for RequestData<'a, C, E> {
+    fn from((command, extension): (&'a C, &'a E)) -> Self {
         Self {
             command,
             extension: Some(extension),

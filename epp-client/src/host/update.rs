@@ -91,7 +91,7 @@ pub struct HostUpdate {
 #[cfg(test)]
 mod tests {
     use super::{HostAddRemove, HostChangeInfo, HostUpdate};
-    use crate::common::{HostAddr, HostStatus};
+    use crate::common::{HostAddr, HostStatus, NoExtension};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -121,7 +121,9 @@ mod tests {
             name: "host2.eppdev-1.com".into(),
         });
 
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
+        let serialized =
+            <HostUpdate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
+                .unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -129,7 +131,8 @@ mod tests {
     #[test]
     fn response() {
         let xml = get_xml("response/host/update.xml").unwrap();
-        let object = HostUpdate::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <HostUpdate as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());

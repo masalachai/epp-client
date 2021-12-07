@@ -110,8 +110,8 @@ mod tests {
         });
 
         let serialized = <DomainUpdate as Transaction<Update>>::serialize_request(
-            object,
-            Some(consolidate_ext),
+            &object,
+            Some(&consolidate_ext),
             CLTRID,
         )
         .unwrap();

@@ -100,7 +100,7 @@ mod tests {
         let object = DomainCheck::new(vec!["eppdev.com", "eppdev.net"]);
 
         let serialized =
-            <DomainCheck as Transaction<NoExtension>>::serialize_request(object, None, CLTRID)
+            <DomainCheck as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
                 .unwrap();
 
         assert_eq!(xml, serialized);
