@@ -7,7 +7,7 @@ use crate::request::EppExtension;
 use chrono::{DateTime, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::EPP_DOMAIN_RGP_EXT_XMLNS;
+use super::XMLNS;
 
 /// Type that represents the domain rgp restore report extension
 ///
@@ -99,7 +99,7 @@ impl RgpRestoreReport {
         let statements = statements.iter().map(|&s| s.into()).collect();
 
         RgpRestoreReport {
-            xmlns: EPP_DOMAIN_RGP_EXT_XMLNS.to_string(),
+            xmlns: XMLNS.to_string(),
             restore: RgpRestoreReportSection {
                 op: "report".to_string(),
                 report: RgpRestoreReportSectionData {
