@@ -67,3 +67,28 @@ pub struct HostCreateResponse {
     #[serde(rename = "creData")]
     pub create_data: HostCreateData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::HostCreate;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn host_create() {
+        let xml = get_xml("response/host/create.xml").unwrap();
+        let object = HostCreate::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(result.create_data.name, "host2.eppdev-1.com".into());
+        assert_eq!(
+            result.create_data.created_at,
+            "2021-07-26T05:28:55.0Z".into()
+        );
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

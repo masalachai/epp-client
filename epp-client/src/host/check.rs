@@ -86,3 +86,33 @@ pub struct HostCheckResponse {
     #[serde(rename = "chkData")]
     pub check_data: HostCheckData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::HostCheck;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn host_check() {
+        let xml = get_xml("response/host/check.xml").unwrap();
+        let object = HostCheck::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(
+            result.check_data.host_list[0].host.name,
+            "host1.eppdev-1.com".into()
+        );
+        assert_eq!(result.check_data.host_list[0].host.available, 1);
+        assert_eq!(
+            result.check_data.host_list[1].host.name,
+            "ns1.testing.com".into()
+        );
+        assert_eq!(result.check_data.host_list[1].host.available, 0);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

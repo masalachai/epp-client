@@ -99,3 +99,23 @@ pub struct DomainUpdate {
     #[serde(rename = "domain:update", alias = "update")]
     pub domain: DomainUpdateRequestData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DomainUpdate;
+    use crate::common::NoExtension;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn domain_update() {
+        let xml = get_xml("response/domain/update.xml").unwrap();
+        let object =
+            <DomainUpdate as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

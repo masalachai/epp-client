@@ -141,3 +141,98 @@ pub struct DomainTransferResponse {
     #[serde(rename = "trnData")]
     pub transfer_data: DomainTransferResponseData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DomainTransfer;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn domain_transfer_request() {
+        let xml = get_xml("response/domain/transfer_request.xml").unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1001);
+        assert_eq!(
+            object.result.message,
+            "Command completed successfully; action pending".into()
+        );
+        assert_eq!(result.transfer_data.name, "eppdev-transfer.com".into());
+        assert_eq!(result.transfer_data.transfer_status, "pending".into());
+        assert_eq!(result.transfer_data.requester_id, "eppdev".into());
+        assert_eq!(
+            result.transfer_data.requested_at,
+            "2021-07-23T15:31:21.0Z".into()
+        );
+        assert_eq!(result.transfer_data.ack_id, "ClientY".into());
+        assert_eq!(result.transfer_data.ack_by, "2021-07-28T15:31:21.0Z".into());
+        assert_eq!(
+            *result.transfer_data.expiring_at.as_ref().unwrap(),
+            "2022-07-02T14:53:19.0Z".into()
+        );
+        assert_eq!(*object.tr_ids.client_tr_id.as_ref().unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+
+    #[test]
+    fn domain_transfer_approve() {
+        let xml = get_xml("response/domain/transfer_approve.xml").unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+
+    #[test]
+    fn domain_transfer_reject() {
+        let xml = get_xml("response/domain/transfer_reject.xml").unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+
+    #[test]
+    fn domain_transfer_cancel() {
+        let xml = get_xml("response/domain/transfer_cancel.xml").unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+
+    #[test]
+    fn domain_transfer_query() {
+        let xml = get_xml("response/domain/transfer_query.xml").unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(result.transfer_data.name, "eppdev-transfer.com".into());
+        assert_eq!(result.transfer_data.transfer_status, "pending".into());
+        assert_eq!(result.transfer_data.requester_id, "eppdev".into());
+        assert_eq!(
+            result.transfer_data.requested_at,
+            "2021-07-23T15:31:21.0Z".into()
+        );
+        assert_eq!(result.transfer_data.ack_id, "ClientY".into());
+        assert_eq!(result.transfer_data.ack_by, "2021-07-28T15:31:21.0Z".into());
+        assert_eq!(
+            *result.transfer_data.expiring_at.as_ref().unwrap(),
+            "2022-07-02T14:53:19.0Z".into()
+        );
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

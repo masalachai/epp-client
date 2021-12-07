@@ -104,3 +104,21 @@ pub struct ContactUpdate {
     #[serde(rename = "contact:update", alias = "update")]
     contact: ContactUpdateRequestData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::ContactUpdate;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn contact_update() {
+        let xml = get_xml("response/contact/update.xml").unwrap();
+        let object = ContactUpdate::deserialize_response(xml.as_str()).unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

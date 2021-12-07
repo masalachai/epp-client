@@ -99,3 +99,32 @@ pub struct DomainCreateResponse {
     #[serde(rename = "creData")]
     pub create_data: DomainCreateResponseData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DomainCreate;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn domain_create() {
+        let xml = get_xml("response/domain/create.xml").unwrap();
+        let object = DomainCreate::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(result.create_data.name, "eppdev-2.com".into());
+        assert_eq!(
+            result.create_data.created_at,
+            "2021-07-25T18:11:35.0Z".into()
+        );
+        assert_eq!(
+            result.create_data.expiring_at,
+            "2022-07-25T18:11:34.0Z".into()
+        );
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

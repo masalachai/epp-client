@@ -99,3 +99,68 @@ pub struct ContactInfoResponse {
     #[serde(rename = "infData")]
     pub info_data: ContactInfoData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::ContactInfo;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn contact_info() {
+        let xml = get_xml("response/contact/info.xml").unwrap();
+        let object = ContactInfo::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+        let fax = result.info_data.fax.as_ref().unwrap();
+        let voice_ext = result.info_data.voice.extension.as_ref().unwrap();
+        let fax_ext = fax.extension.as_ref().unwrap();
+        let auth_info = result.info_data.auth_info.as_ref().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(result.info_data.id, "eppdev-contact-3".into());
+        assert_eq!(result.info_data.roid, "UNDEF-ROID".into());
+        assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
+        assert_eq!(result.info_data.postal_info.info_type, "loc".to_string());
+        assert_eq!(result.info_data.postal_info.name, "John Doe".into());
+        assert_eq!(
+            result.info_data.postal_info.organization,
+            "Acme Widgets".into()
+        );
+        assert_eq!(result.info_data.postal_info.address.street[0], "58".into());
+        assert_eq!(
+            result.info_data.postal_info.address.street[1],
+            "Orchid Road".into()
+        );
+        assert_eq!(result.info_data.postal_info.address.city, "Paris".into());
+        assert_eq!(
+            result.info_data.postal_info.address.province,
+            "Paris".into()
+        );
+        assert_eq!(
+            result.info_data.postal_info.address.postal_code,
+            "392374".into()
+        );
+        assert_eq!(result.info_data.postal_info.address.country.alpha2, "FR");
+        assert_eq!(result.info_data.voice.number, "+33.47237942".to_string());
+        assert_eq!(*voice_ext, "123".to_string());
+        assert_eq!(fax.number, "+33.86698799".to_string());
+        assert_eq!(*fax_ext, "243".to_string());
+        assert_eq!(result.info_data.email, "contact@eppdev.net".into());
+        assert_eq!(result.info_data.client_id, "eppdev".into());
+        assert_eq!(result.info_data.creator_id, "SYSTEM".into());
+        assert_eq!(result.info_data.created_at, "2021-07-23T13:09:09.0Z".into());
+        assert_eq!(
+            *(result.info_data.updater_id.as_ref().unwrap()),
+            "SYSTEM".into()
+        );
+        assert_eq!(
+            *(result.info_data.updated_at.as_ref().unwrap()),
+            "2021-07-23T13:09:09.0Z".into()
+        );
+        assert_eq!((*auth_info).password, "eppdev-387323".into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

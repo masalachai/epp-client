@@ -85,3 +85,35 @@ pub struct DomainCheckResponse {
     #[serde(rename = "chkData")]
     pub check_data: DomainCheckResponseData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DomainCheck;
+    use crate::common::NoExtension;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn domain_check() {
+        let xml = get_xml("response/domain/check.xml").unwrap();
+        let object =
+            <DomainCheck as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(
+            result.check_data.domain_list[0].domain.name,
+            "eppdev.com".into()
+        );
+        assert_eq!(result.check_data.domain_list[0].domain.available, 1);
+        assert_eq!(
+            result.check_data.domain_list[1].domain.name,
+            "eppdev.net".into()
+        );
+        assert_eq!(result.check_data.domain_list[1].domain.available, 0);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

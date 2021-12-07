@@ -41,3 +41,21 @@ pub struct HostDelete {
     #[serde(rename = "host:delete", alias = "delete")]
     host: HostDeleteRequestData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::HostDelete;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+
+    #[test]
+    fn host_delete() {
+        let xml = get_xml("response/host/delete.xml").unwrap();
+        let object = HostDelete::deserialize_response(xml.as_str()).unwrap();
+
+        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}

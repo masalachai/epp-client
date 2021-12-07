@@ -62,3 +62,50 @@ pub struct MessagePollResponse {
     #[serde(rename = "domain:trnData", alias = "trnData")]
     pub message_data: MessageDomainTransferData,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::MessagePoll;
+    use crate::request::Transaction;
+    use crate::tests::{get_xml, CLTRID, SVTRID};
+
+    #[test]
+    fn message_poll() {
+        let xml = get_xml("response/message/poll.xml").unwrap();
+        let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
+
+        let result = object.res_data().unwrap();
+        let msg = object.message_queue().unwrap();
+
+        assert_eq!(object.result.code, 1301);
+        assert_eq!(
+            object.result.message,
+            "Command completed successfully; ack to dequeue".into()
+        );
+        assert_eq!(msg.count, 5);
+        assert_eq!(msg.id, "12345".to_string());
+        assert_eq!(
+            *(msg.date.as_ref().unwrap()),
+            "2021-07-23T19:12:43.0Z".into()
+        );
+        assert_eq!(
+            *(msg.message.as_ref().unwrap()),
+            "Transfer requested.".into()
+        );
+        assert_eq!(result.message_data.name, "eppdev-transfer.com".into());
+        assert_eq!(result.message_data.transfer_status, "pending".into());
+        assert_eq!(result.message_data.requester_id, "eppdev".into());
+        assert_eq!(
+            result.message_data.requested_at,
+            "2021-07-23T15:31:21.0Z".into()
+        );
+        assert_eq!(result.message_data.ack_id, "ClientY".into());
+        assert_eq!(result.message_data.ack_by, "2021-07-28T15:31:21.0Z".into());
+        assert_eq!(
+            result.message_data.expiring_at,
+            "2022-07-02T14:53:19.0Z".into()
+        );
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+}
