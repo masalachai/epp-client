@@ -1,10 +1,11 @@
 //! Types for EPP responses
 
 use epp_client_macros::*;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::fmt::Debug;
 
-use crate::common::{ElementName, Extension, StringValue};
+use crate::common::{ElementName, StringValue};
+use crate::xml::EppXml;
 
 /// Type corresponding to the <undef> tag an EPP response XML
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -70,10 +71,9 @@ pub struct MessageQueue {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[serde(rename_all = "lowercase")]
-#[element_name(name = "response")]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// containing an &lt;extension&gt; tag
-pub struct Response<T, E: ElementName> {
+pub struct Response<D, E> {
     /// Data under the <result> tag
     pub result: EppResult,
     /// Data under the <msgQ> tag
@@ -81,13 +81,31 @@ pub struct Response<T, E: ElementName> {
     pub message_queue: Option<MessageQueue>,
     #[serde(rename = "resData")]
     /// Data under the &lt;resData&gt; tag
-    pub res_data: Option<T>,
+    pub res_data: Option<D>,
     /// Data under the &lt;extension&gt; tag
-    pub extension: Option<Extension<E>>,
+    pub extension: Option<E>,
     /// Data under the <trID> tag
     #[serde(rename = "trID")]
     pub tr_ids: ResponseTRID,
 }
+
+#[derive(Deserialize, Debug, PartialEq)]
+#[serde(rename = "epp")]
+pub struct ResponseDocument<D, E> {
+    #[serde(rename = "response")]
+    pub data: Response<D, E>,
+}
+
+impl<D: DeserializeOwned, E: DeserializeOwned> EppXml for ResponseDocument<D, E> {}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(rename = "epp")]
+pub struct ResultDocument {
+    #[serde(rename = "response")]
+    pub data: ResponseStatus,
+}
+
+impl EppXml for ResultDocument {}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
 #[element_name(name = "response")]

@@ -3,14 +3,31 @@ use std::fmt::Debug;
 use epp_client_macros::ElementName;
 use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::common::{ElementName, Options, ServiceExtension, Services, StringValue};
+use crate::common::{ElementName, Options, ServiceExtension, Services, StringValue, EPP_XMLNS};
+use crate::xml::EppXml;
 
 // Request
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[element_name(name = "hello")]
-/// Type corresponding to the <hello> tag in an EPP XML hello request
-pub struct Hello;
+#[derive(Debug, PartialEq, Serialize)]
+struct Hello;
+
+#[derive(Debug, PartialEq, Serialize)]
+#[serde(rename = "epp")]
+pub struct HelloDocument {
+    xmlns: &'static str,
+    hello: Hello,
+}
+
+impl Default for HelloDocument {
+    fn default() -> Self {
+        Self {
+            xmlns: EPP_XMLNS,
+            hello: Hello,
+        }
+    }
+}
+
+impl EppXml for HelloDocument {}
 
 // Response
 
@@ -278,3 +295,12 @@ pub struct Greeting {
     /// Data under the <dcp> element
     pub dcp: Dcp,
 }
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[serde(rename = "epp")]
+pub struct GreetingDocument {
+    #[serde(rename = "greeting")]
+    pub data: Greeting,
+}
+
+impl EppXml for GreetingDocument {}

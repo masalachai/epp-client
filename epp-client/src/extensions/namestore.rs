@@ -1,12 +1,8 @@
 //! Types for EPP namestore request and responses
 
-use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    common::{ElementName, StringValue},
-    request::EppExtension,
-};
+use crate::{common::StringValue, request::EppExtension};
 
 pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 
@@ -68,8 +64,10 @@ impl NameStore {
     /// Create a new RGP restore report request
     pub fn new(subproduct: &str) -> NameStore {
         NameStore {
-            xmlns: XMLNS.to_string(),
-            subproduct: subproduct.into(),
+            data: NameStoreData {
+                xmlns: XMLNS.to_string(),
+                subproduct: subproduct.into(),
+            },
         }
     }
 }
@@ -78,10 +76,16 @@ impl EppExtension for NameStore {
     type Response = NameStore;
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "namestoreExt:namestoreExt")]
-/// Type for EPP XML &lt;namestoreExt&gt; extension
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename = "namestoreExt:namestoreExt")]
 pub struct NameStore {
+    #[serde(rename = "namestoreExt:namestoreExt", alias = "namestoreExt")]
+    pub data: NameStoreData,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+/// Type for EPP XML &lt;namestoreExt&gt; extension
+pub struct NameStoreData {
     /// XML namespace for the RGP restore extension
     #[serde(rename = "xmlns:namestoreExt", alias = "xmlns")]
     pub xmlns: String,
