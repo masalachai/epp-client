@@ -7,12 +7,12 @@ use std::sync::Arc;
 use std::{error::Error, io as stdio, net::ToSocketAddrs};
 use std::{io, str, u32};
 
-use log::{debug, info, warn};
 use rustls::{Certificate, PrivateKey};
 use rustls::{OwnedTrustAnchor, RootCertStore};
 use rustls_pemfile;
 use tokio::{io::AsyncReadExt, io::AsyncWriteExt, net::TcpStream};
 use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
+use tracing::{debug, info, warn};
 
 use crate::config::RegistryConfig;
 use crate::error;
