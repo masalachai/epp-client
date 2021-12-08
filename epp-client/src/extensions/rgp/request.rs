@@ -8,7 +8,7 @@ use crate::request::EppExtension;
 
 use serde::{Deserialize, Serialize};
 
-use super::XMLNS;
+use super::{Update, XMLNS};
 
 /// Type that represents the &lt;epp&gt; request for a domain rgp restore request command
 ///
@@ -19,7 +19,7 @@ use super::XMLNS;
 ///
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
-/// use epp_client::extensions::rgp::request::RgpRestoreRequest;
+/// use epp_client::extensions::rgp::{Update, request::RgpRestoreRequest};
 /// use epp_client::domain::update::DomainUpdate;
 /// use epp_client::login::Login;
 /// use epp_client::logout::Logout;
@@ -49,10 +49,10 @@ use super::XMLNS;
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     // Create an RgpRestoreRequest instance
-///     let domain_restore_req = RgpRestoreRequest::new();
+///     let domain_restore_req = Update { data: RgpRestoreRequest::default() };
 ///
 ///     // Create an DomainUpdate instance
-///     let mut domain_update = DomainUpdate::<RgpRestoreRequest>::new("eppdev-100.com").with_extension(domain_restore_req);
+///     let mut domain_update = DomainUpdate::<Update<RgpRestoreRequest>>::new("eppdev-100.com").with_extension(domain_restore_req);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
 ///     let response = client.transact(domain_update, "transaction-id").await.unwrap();
@@ -63,26 +63,9 @@ use super::XMLNS;
 ///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
-impl RgpRestoreRequest {
-    /// Creates a new instance of EppDomainRgpRestoreRequest
-    pub fn new() -> RgpRestoreRequest {
-        RgpRestoreRequest {
-            xmlns: XMLNS.to_string(),
-            restore: RgpRestoreRequestData {
-                op: "request".to_string(),
-            },
-        }
-    }
-}
 
-impl Default for RgpRestoreRequest {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl EppExtension for RgpRestoreRequest {
-    type Response = RgpRequestResponse;
+impl EppExtension for Update<RgpRestoreRequest> {
+    type Response = Update<RgpRequestResponse>;
 }
 
 // Request
@@ -104,6 +87,17 @@ pub struct RgpRestoreRequest {
     /// The object holding the list of domains to be checked
     #[serde(rename = "rgp:restore", alias = "restore")]
     restore: RgpRestoreRequestData,
+}
+
+impl Default for RgpRestoreRequest {
+    fn default() -> Self {
+        Self {
+            xmlns: XMLNS.to_string(),
+            restore: RgpRestoreRequestData {
+                op: "request".to_string(),
+            },
+        }
+    }
 }
 
 // Response

@@ -3,11 +3,10 @@
 use std::fmt;
 
 use chrono::FixedOffset;
-use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    common::{ElementName, NoExtension, StringValue},
+    common::{NoExtension, StringValue},
     request::EppExtension,
 };
 
@@ -64,7 +63,6 @@ impl fmt::Display for GMonthDay {
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::common::{DomainStatus, DomainContact};
-/// use epp_client::extensions::consolidate::Sync;
 /// use epp_client::domain::update::DomainUpdate;
 /// use epp_client::extensions::consolidate;
 /// use epp_client::extensions::consolidate::GMonthDay;
@@ -98,10 +96,10 @@ impl fmt::Display for GMonthDay {
 ///     client.transact(login, "transaction-id").await.unwrap();
 ///
 ///     let exp = GMonthDay::new(5, 31, None).unwrap();
-///     let consolidate_ext = consolidate::Sync::new(exp);
+///     let consolidate_ext = consolidate::Update::new(exp);
 ///
 ///     // Create an DomainUpdate instance
-///     let mut domain_update = DomainUpdate::<consolidate::Sync>::new("eppdev-100.com").with_extension(consolidate_ext);
+///     let mut domain_update = DomainUpdate::<consolidate::Update>::new("eppdev-100.com").with_extension(consolidate_ext);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
 ///     let response = client.transact(domain_update, "transaction-id").await.unwrap();
@@ -112,24 +110,32 @@ impl fmt::Display for GMonthDay {
 ///     client.transact(logout, "transaction-id").await.unwrap();
 /// }
 /// ```
-impl Sync {
+impl Update {
     /// Create a new RGP restore report request
-    pub fn new(expiration: GMonthDay) -> Sync {
-        Sync {
-            xmlns: XMLNS.to_string(),
-            exp: expiration.to_string().into(),
+    pub fn new(expiration: GMonthDay) -> Self {
+        Self {
+            data: UpdateData {
+                xmlns: XMLNS.to_string(),
+                exp: expiration.to_string().into(),
+            },
         }
     }
 }
 
-impl EppExtension for Sync {
+impl EppExtension for Update {
     type Response = NoExtension;
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "sync:update")]
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename = "extension")]
+pub struct Update {
+    #[serde(rename = "sync:update")]
+    pub data: UpdateData,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 /// Type for EPP XML &lt;consolidate&gt; extension
-pub struct Sync {
+pub struct UpdateData {
     /// XML namespace for the consolidate extension
     #[serde(rename = "xmlns:sync", alias = "xmlns")]
     pub xmlns: String,

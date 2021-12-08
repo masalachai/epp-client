@@ -8,8 +8,8 @@ mod request {
     use crate::common::HostObjList;
     use crate::common::NoExtension;
     use crate::common::{
-        Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, EppObject, HostAddr,
-        HostAttr, HostStatus, Phone, PostalInfo,
+        Address, ContactStatus, DomainAuthInfo, DomainContact, DomainStatus, HostAddr, HostAttr,
+        HostStatus, Phone, PostalInfo,
     };
     use crate::contact::check::ContactCheck;
     use crate::contact::create::ContactCreate;
@@ -32,9 +32,8 @@ mod request {
     use crate::extensions::consolidate;
     use crate::extensions::consolidate::GMonthDay;
     use crate::extensions::namestore::NameStore;
-    use crate::extensions::rgp::report::RgpRestoreReport;
-    use crate::extensions::rgp::request::RgpRestoreRequest;
-    use crate::hello::Hello;
+    use crate::extensions::rgp::{self, report::RgpRestoreReport, request::RgpRestoreRequest};
+    use crate::hello::HelloDocument;
     use crate::host::check::HostCheck;
     use crate::host::create::HostCreate;
     use crate::host::delete::HostDelete;
@@ -54,7 +53,7 @@ mod request {
     #[test]
     fn hello() {
         let xml = get_xml("request/hello.xml").unwrap();
-        let serialized = EppObject::<Hello>::build(Hello).serialize().unwrap();
+        let serialized = HelloDocument::default().serialize().unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -527,9 +526,11 @@ mod request {
     fn rgp_restore_request() {
         let xml = get_xml("request/extensions/rgp_restore_request.xml").unwrap();
 
-        let domain_restore_request = RgpRestoreRequest::new();
+        let domain_restore_request = rgp::Update {
+            data: RgpRestoreRequest::default(),
+        };
 
-        let mut object = DomainUpdate::<RgpRestoreReport>::new("eppdev.com")
+        let mut object = DomainUpdate::<rgp::Update<RgpRestoreRequest>>::new("eppdev.com")
             .with_extension(domain_restore_request);
 
         let change_info = DomainChangeInfo {
@@ -561,17 +562,19 @@ mod request {
         ];
         let other = "Supporting information goes here.";
 
-        let domain_restore_report = RgpRestoreReport::new(
-            pre_data,
-            post_data,
-            deleted_at,
-            restored_at,
-            restore_reason,
-            statements,
-            other,
-        );
+        let domain_restore_report = rgp::Update {
+            data: RgpRestoreReport::new(
+                pre_data,
+                post_data,
+                deleted_at,
+                restored_at,
+                restore_reason,
+                statements,
+                other,
+            ),
+        };
 
-        let mut object = DomainUpdate::<RgpRestoreReport>::new("eppdev.com")
+        let mut object = DomainUpdate::<rgp::Update<RgpRestoreReport>>::new("eppdev.com")
             .with_extension(domain_restore_report);
 
         let change_info = DomainChangeInfo {
@@ -607,10 +610,10 @@ mod request {
 
         let exp = GMonthDay::new(5, 31, None).unwrap();
 
-        let consolidate_ext = consolidate::Sync::new(exp);
+        let consolidate_ext = consolidate::Update::new(exp);
 
         let mut object =
-            DomainUpdate::<consolidate::Sync>::new("eppdev.com").with_extension(consolidate_ext);
+            DomainUpdate::<consolidate::Update>::new("eppdev.com").with_extension(consolidate_ext);
 
         object.info(DomainChangeInfo {
             registrant: None,

@@ -45,10 +45,9 @@
 
 use std::{error::Error, fmt::Debug};
 
-use crate::common::EppObject;
 use crate::config::EppClientConfig;
 use crate::error;
-use crate::hello::{Greeting, Hello};
+use crate::hello::{Greeting, GreetingDocument, HelloDocument};
 use crate::registry::{epp_connect, EppConnection};
 use crate::request::{EppExtension, EppRequest};
 use crate::response::Response;
@@ -81,11 +80,11 @@ impl EppClient {
 
     /// Executes an EPP Hello call and returns the response as an `Greeting`
     pub async fn hello(&mut self) -> Result<Greeting, Box<dyn Error>> {
-        let hello_xml = EppObject::<Hello>::build(Hello).serialize()?;
+        let hello_xml = HelloDocument::default().serialize()?;
 
         let response = self.connection.transact(&hello_xml).await?;
 
-        Ok(EppObject::<Greeting>::deserialize(&response)?.data)
+        Ok(GreetingDocument::deserialize(&response)?.data)
     }
 
     pub async fn transact<T, E>(
@@ -117,6 +116,6 @@ impl EppClient {
 
     /// Returns the greeting received on establishment of the connection as an `Greeting`
     pub fn greeting(&self) -> Result<Greeting, error::Error> {
-        EppObject::<Greeting>::deserialize(&self.connection.greeting).map(|obj| obj.data)
+        GreetingDocument::deserialize(&self.connection.greeting).map(|obj| obj.data)
     }
 }

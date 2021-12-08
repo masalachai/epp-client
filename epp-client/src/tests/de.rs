@@ -3,7 +3,7 @@
 mod response {
     use super::super::get_xml;
     use super::super::CLTRID;
-    use crate::common::{EppObject, NoExtension};
+    use crate::common::NoExtension;
     use crate::contact::check::ContactCheck;
     use crate::contact::create::ContactCreate;
     use crate::contact::delete::ContactDelete;
@@ -21,9 +21,9 @@ mod response {
     use crate::domain::transfer::DomainTransferRequest;
     use crate::domain::update::DomainUpdate;
     use crate::extensions::namestore::NameStore;
-    use crate::extensions::rgp::request::RgpRestoreRequest;
+    use crate::extensions::rgp;
     use crate::hello::ExpiryType;
-    use crate::hello::Greeting;
+    use crate::hello::GreetingDocument;
     use crate::hello::Relative;
     use crate::host::check::HostCheck;
     use crate::host::create::HostCreate;
@@ -35,7 +35,7 @@ mod response {
     use crate::message::ack::MessageAck;
     use crate::message::poll::MessagePoll;
     use crate::request::EppRequest;
-    use crate::response::ResponseStatus;
+    use crate::response::ResultDocument;
     use crate::xml::EppXml;
 
     const SVTRID: &str = "RO-6879-1627224678242975";
@@ -44,7 +44,7 @@ mod response {
     #[test]
     fn greeting() {
         let xml = get_xml("response/greeting.xml").unwrap();
-        let object = EppObject::<Greeting>::deserialize(xml.as_str()).unwrap();
+        let object = GreetingDocument::deserialize(xml.as_str()).unwrap();
 
         assert_eq!(object.data.service_id, "ISPAPI EPP Server");
         assert_eq!(object.data.service_date, "2021-07-25T14:51:17.0Z");
@@ -75,7 +75,7 @@ mod response {
     #[test]
     fn error() {
         let xml = get_xml("response/error.xml").unwrap();
-        let object = EppObject::<ResponseStatus>::deserialize(xml.as_str()).unwrap();
+        let object = ResultDocument::deserialize(xml.as_str()).unwrap();
 
         assert_eq!(object.data.result.code, 2303);
         assert_eq!(object.data.result.message, "Object does not exist".into());
@@ -637,7 +637,11 @@ mod response {
     #[test]
     fn rgp_restore_response() {
         let xml = get_xml("response/extensions/rgp_restore.xml").unwrap();
-        let object = DomainUpdate::<RgpRestoreRequest>::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            DomainUpdate::<rgp::Update<rgp::request::RgpRestoreRequest>>::deserialize_response(
+                xml.as_str(),
+            )
+            .unwrap();
 
         let ext = object.extension.unwrap();
 
@@ -650,7 +654,11 @@ mod response {
     #[test]
     fn rgp_restore_domain_info_response() {
         let xml = get_xml("response/extensions/domain_info_rgp.xml").unwrap();
-        let object = DomainInfo::<RgpRestoreRequest>::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            DomainInfo::<rgp::Update<rgp::request::RgpRestoreRequest>>::deserialize_response(
+                xml.as_str(),
+            )
+            .unwrap();
 
         let ext = object.extension.unwrap();
 

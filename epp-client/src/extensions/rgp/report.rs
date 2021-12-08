@@ -7,7 +7,7 @@ use crate::request::EppExtension;
 use chrono::{DateTime, SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::XMLNS;
+use super::{Update, XMLNS};
 
 /// Type that represents the domain rgp restore report extension
 ///
@@ -19,7 +19,7 @@ use super::XMLNS;
 /// use epp_client::config::{EppClientConfig, RegistryConfig};
 /// use epp_client::EppClient;
 /// use epp_client::common::{DomainStatus, DomainContact};
-/// use epp_client::extensions::rgp::report::RgpRestoreReport;
+/// use epp_client::extensions::rgp::{Update, report::RgpRestoreReport};
 /// use epp_client::domain::update::DomainUpdate;
 /// use epp_client::common::NoExtension;
 /// use epp_client::login::Login;
@@ -63,7 +63,7 @@ use super::XMLNS;
 ///     ];
 ///     let other = "Supporting information goes here.";
 ///
-///     let domain_restore_report = RgpRestoreReport::new(
+///     let domain_restore_report = Update { data: RgpRestoreReport::new(
 ///         pre_data,
 ///         post_data,
 ///         deleted_at,
@@ -71,10 +71,10 @@ use super::XMLNS;
 ///         restore_reason,
 ///         &statements,
 ///         other
-///     );
+///     ) };
 ///
 ///     // Create an DomainUpdate instance
-///     let mut domain_update = DomainUpdate::<RgpRestoreReport>::new("eppdev-100.com").with_extension(domain_restore_report);
+///     let mut domain_update = DomainUpdate::<Update<RgpRestoreReport>>::new("eppdev-100.com").with_extension(domain_restore_report);
 ///
 ///     // send it to the registry and receive a response of type EppDomainUpdateResponse
 ///     let response = client.transact(domain_update, "transaction-id").await.unwrap();
@@ -120,7 +120,7 @@ impl RgpRestoreReport {
     }
 }
 
-impl EppExtension for RgpRestoreReport {
+impl EppExtension for Update<RgpRestoreReport> {
     type Response = NoExtension;
 }
 
