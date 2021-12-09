@@ -1,6 +1,2 @@
 [workspace]
-
-members = [ 
-  'epp-client-macros',
-  'epp-client'
-]
+members = ['epp-client']

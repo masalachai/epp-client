@@ -7,10 +7,7 @@ authors = ["Ritesh Chitlangi <ritesh@ayravat.com>"]
 description = "EPP (Extensible Provisioning Protocol) Client Library for Domain Registration and Management"
 repository = "https://github.com/masalachai/epp-client"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-epp-client-macros = { version = "0.1", path = "../epp-client-macros" }
 celes = "2.1"
 chrono = "0.4"
 quick-xml = { version = "0.22", features = [ "serialize" ] }
