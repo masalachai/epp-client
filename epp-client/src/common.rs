@@ -31,11 +31,6 @@ impl From<String> for StringValue {
     }
 }
 
-/// Trait to set correct value for xml tags when tags are being generated from generic types
-pub trait ElementName {
-    const ELEMENT: &'static str;
-}
-
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 /// An empty placeholder tag. To be refactored to something more compliant later.
 pub struct NoExtension;
