@@ -2,9 +2,13 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::{common::StringValue, request::EppExtension};
+use crate::common::StringValue;
+use crate::domain::check::DomainCheck;
+use crate::request::{Extension, Transaction};
 
 pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
+
+impl Transaction<NameStore> for DomainCheck {}
 
 impl NameStore {
     /// Create a new RGP restore report request
@@ -18,7 +22,7 @@ impl NameStore {
     }
 }
 
-impl EppExtension for NameStore {
+impl Extension for NameStore {
     type Response = NameStore;
 }
 

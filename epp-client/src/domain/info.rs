@@ -1,52 +1,32 @@
 //! Types for EPP domain info request
 
-use epp_client_macros::*;
-
 use super::XMLNS;
 use crate::common::{
-    DomainAuthInfo, DomainContact, DomainStatus, ElementName, HostAttr, NoExtension, StringValue,
+    DomainAuthInfo, DomainContact, DomainStatus, HostAttr, NoExtension, StringValue,
 };
-use crate::request::{EppExtension, Transaction};
+use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct DomainInfo<E> {
-    request: DomainInfoRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for DomainInfo {}
+
+impl Command for DomainInfo {
+    type Response = DomainInfoResponse;
+    const COMMAND: &'static str = "info";
 }
 
-impl<E: EppExtension> Transaction<E> for DomainInfo<E> {
-    type Input = DomainInfoRequest;
-    type Output = DomainInfoResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> DomainInfo<E> {
-    pub fn new(name: &str, auth_password: Option<&str>) -> DomainInfo<NoExtension> {
-        DomainInfo {
-            request: DomainInfoRequest {
-                info: DomainInfoRequestData {
-                    xmlns: XMLNS.to_string(),
-                    domain: Domain {
-                        hosts: "all".to_string(),
-                        name: name.to_string(),
-                    },
-                    auth_info: auth_password.map(|password| DomainAuthInfo {
-                        password: password.into(),
-                    }),
+impl DomainInfo {
+    pub fn new(name: &str, auth_password: Option<&str>) -> Self {
+        Self {
+            info: DomainInfoRequestData {
+                xmlns: XMLNS.to_string(),
+                domain: Domain {
+                    hosts: "all".to_string(),
+                    name: name.to_string(),
                 },
+                auth_info: auth_password.map(|password| DomainAuthInfo {
+                    password: password.into(),
+                }),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> DomainInfo<F> {
-        DomainInfo {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -54,7 +34,7 @@ impl<E: EppExtension> DomainInfo<E> {
 // Request
 
 /// Type for data under the &lt;name&gt; element tag for the domain &lt;info&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct Domain {
     /// The hosts attribute. Default value is "all"
     hosts: String,
@@ -64,7 +44,7 @@ pub struct Domain {
 }
 
 /// Type for &lt;name&gt; element under the domain &lt;info&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct DomainInfoRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain", alias = "xmlns")]
@@ -77,10 +57,9 @@ pub struct DomainInfoRequestData {
     auth_info: Option<DomainAuthInfo>,
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "info")]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;info&gt; command for domains
-pub struct DomainInfoRequest {
+pub struct DomainInfo {
     /// The data under the &lt;info&gt; tag for domain info
     #[serde(rename = "domain:info", alias = "info")]
     info: DomainInfoRequestData,
@@ -90,7 +69,7 @@ pub struct DomainInfoRequest {
 
 /// The two types of ns lists, hostObj and hostAttr, that may be returned in the
 /// domain info response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct DomainNsList {
     /// List of &lt;hostObj&gt; ns elements
     #[serde(rename = "hostObj")]
@@ -100,11 +79,8 @@ pub struct DomainNsList {
 }
 
 /// Type that represents the &lt;infData&gt; tag for domain info response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct DomainInfoResponseData {
-    /// XML namespace for domain response data
-    #[serde(rename = "xmlns:domain")]
-    xmlns: String,
     /// The domain name
     pub name: StringValue,
     /// The domain ROID
@@ -150,7 +126,7 @@ pub struct DomainInfoResponseData {
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain info response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct DomainInfoResponse {
     /// Data under the &lt;resData&gt; tag
     #[serde(rename = "infData")]

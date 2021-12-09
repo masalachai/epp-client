@@ -1,30 +1,32 @@
 //! Types for EPP RGP restore request
 
-use epp_client_macros::*;
-
-use crate::common::ElementName;
-
-use crate::request::EppExtension;
+use crate::{
+    domain::{info::DomainInfo, update::DomainUpdate},
+    request::{Extension, Transaction},
+};
 
 use serde::{Deserialize, Serialize};
 
 use super::{Update, XMLNS};
 
-impl EppExtension for Update<RgpRestoreRequest> {
+impl Transaction<Update<RgpRestoreRequest>> for DomainUpdate {}
+
+impl Transaction<Update<RgpRestoreRequest>> for DomainInfo {}
+
+impl Extension for Update<RgpRestoreRequest> {
     type Response = Update<RgpRequestResponse>;
 }
 
 // Request
 
 /// Type corresponding to the &lt;restore&gt; tag for an rgp restore request
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct RgpRestoreRequestData {
     /// The value of the op attribute in the &lt;restore&gt; tag
     pub op: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "rgp:update")]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;check&gt; command for domains
 pub struct RgpRestoreRequest {
     /// XML namespace for the RGP restore extension
@@ -49,20 +51,17 @@ impl Default for RgpRestoreRequest {
 // Response
 
 /// Type that represents the &lt;rgpStatus&gt; tag for domain rgp restore request response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct RgpStatus {
     /// The domain RGP status
     #[serde(rename = "s")]
     pub status: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
+#[derive(Deserialize, Debug)]
 #[serde(rename = "upData")]
-#[element_name(name = "upData")]
 /// Type that represents the &lt;resData&gt; tag for domain transfer response
 pub struct RgpRequestResponse {
-    #[serde(rename = "xmlns:rgp")]
-    xmlns: String,
     /// Data under the &lt;rgpStatus&gt; tag
     #[serde(rename = "rgpStatus")]
     pub rgp_status: Vec<RgpStatus>,

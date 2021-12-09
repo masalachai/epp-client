@@ -1,9 +1,8 @@
 use std::fmt::Debug;
 
-use epp_client_macros::ElementName;
 use serde::{Deserialize, Deserializer, Serialize};
 
-use crate::common::{ElementName, Options, ServiceExtension, Services, StringValue, EPP_XMLNS};
+use crate::common::{Options, ServiceExtension, Services, StringValue, EPP_XMLNS};
 use crate::xml::EppXml;
 
 // Request
@@ -278,9 +277,8 @@ pub struct Dcp {
     pub expiry: Option<Expiry>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
-#[element_name(name = "greeting")]
 /// Type corresponding to the <greeting> tag in the EPP greeting XML
 pub struct Greeting {
     /// The service ID

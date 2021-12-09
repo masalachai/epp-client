@@ -3,14 +3,19 @@
 use std::fmt;
 
 use chrono::FixedOffset;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
-use crate::{
-    common::{NoExtension, StringValue},
-    request::EppExtension,
-};
+use crate::common::{NoExtension, StringValue};
+use crate::domain::update::DomainUpdate;
+use crate::request::{Extension, Transaction};
 
 pub const XMLNS: &str = "http://www.verisign.com/epp/sync-1.0";
+
+impl Transaction<Update> for DomainUpdate {}
+
+impl Extension for Update {
+    type Response = NoExtension;
+}
 
 #[derive(PartialEq, Debug)]
 pub struct GMonthDay {
@@ -65,18 +70,13 @@ impl Update {
     }
 }
 
-impl EppExtension for Update {
-    type Response = NoExtension;
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename = "extension")]
+#[derive(Debug, Serialize)]
 pub struct Update {
     #[serde(rename = "sync:update")]
     pub data: UpdateData,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;consolidate&gt; extension
 pub struct UpdateData {
     /// XML namespace for the consolidate extension

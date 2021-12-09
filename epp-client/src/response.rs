@@ -1,18 +1,17 @@
 //! Types for EPP responses
 
-use epp_client_macros::*;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize};
 use std::fmt::Debug;
 
-use crate::common::{ElementName, StringValue};
+use crate::common::StringValue;
 use crate::xml::EppXml;
 
 /// Type corresponding to the <undef> tag an EPP response XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Undef;
 
 /// Type corresponding to the <value> tag under <extValue> in an EPP response XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct ResultValue {
     /// The XML namespace for the <value> tag
     #[serde(rename = "xmlns:epp")]
@@ -22,7 +21,7 @@ pub struct ResultValue {
 }
 
 /// Type corresponding to the <extValue> tag in an EPP response XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct ExtValue {
     /// Data under the <value> tag
     pub value: ResultValue,
@@ -31,7 +30,7 @@ pub struct ExtValue {
 }
 
 /// Type corresponding to the <result> tag in an EPP response XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct EppResult {
     /// The result code
     pub code: u16,
@@ -44,7 +43,7 @@ pub struct EppResult {
 }
 
 /// Type corresponding to the <trID> tag in an EPP response XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct ResponseTRID {
     /// The client TRID
     #[serde(rename = "clTRID")]
@@ -55,7 +54,7 @@ pub struct ResponseTRID {
 }
 
 /// Type corresponding to the <msgQ> tag in an EPP response XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct MessageQueue {
     /// The message count
     pub count: u32,
@@ -69,8 +68,7 @@ pub struct MessageQueue {
     pub message: Option<StringValue>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[serde(rename_all = "lowercase")]
+#[derive(Deserialize, Debug, PartialEq)]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// containing an &lt;extension&gt; tag
 pub struct Response<D, E> {
@@ -107,8 +105,7 @@ pub struct ResultDocument {
 
 impl EppXml for ResultDocument {}
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[element_name(name = "response")]
+#[derive(Deserialize, Debug, PartialEq)]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// without <msgQ> or &lt;resData&gt; sections. Generally used for error handling
 pub struct ResponseStatus {
@@ -119,7 +116,7 @@ pub struct ResponseStatus {
     pub tr_ids: ResponseTRID,
 }
 
-impl<T, E: ElementName> Response<T, E> {
+impl<T, E> Response<T, E> {
     /// Returns the data under the corresponding &lt;resData&gt; from the EPP XML
     pub fn res_data(&self) -> Option<&T> {
         match &self.res_data {

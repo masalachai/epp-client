@@ -1,45 +1,25 @@
 //! Types for EPP host create request
 
-use epp_client_macros::*;
-
 use super::XMLNS;
-use crate::common::{ElementName, HostAddr, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::common::{HostAddr, NoExtension, StringValue};
+use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct HostCreate<E> {
-    request: HostCreateRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for HostCreate {}
+
+impl Command for HostCreate {
+    type Response = HostCreateResponse;
+    const COMMAND: &'static str = "create";
 }
 
-impl<E: EppExtension> Transaction<E> for HostCreate<E> {
-    type Input = HostCreateRequest;
-    type Output = HostCreateResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> HostCreate<E> {
-    pub fn new(host: &str, addresses: Vec<HostAddr>) -> HostCreate<NoExtension> {
-        HostCreate {
-            request: HostCreateRequest {
-                host: HostCreateRequestData {
-                    xmlns: XMLNS.to_string(),
-                    name: host.into(),
-                    addresses: Some(addresses),
-                },
+impl HostCreate {
+    pub fn new(host: &str, addresses: Vec<HostAddr>) -> Self {
+        Self {
+            host: HostCreateRequestData {
+                xmlns: XMLNS.to_string(),
+                name: host.into(),
+                addresses: Some(addresses),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostCreate<F> {
-        HostCreate {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -47,7 +27,7 @@ impl<E: EppExtension> HostCreate<E> {
 // Request
 
 /// Type for data under the host &lt;create&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct HostCreateRequestData {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host", alias = "xmlns")]
@@ -60,10 +40,9 @@ pub struct HostCreateRequestData {
     pub addresses: Option<Vec<HostAddr>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "create")]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;create&gt; command for hosts
-pub struct HostCreateRequest {
+pub struct HostCreate {
     /// The instance holding the data for the host to be created
     #[serde(rename = "host:create", alias = "create")]
     host: HostCreateRequestData,
@@ -72,11 +51,8 @@ pub struct HostCreateRequest {
 // Response
 
 /// Type that represents the &lt;creData&gt; tag for host create response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HostCreateData {
-    /// XML namespace for host response data
-    #[serde(rename = "xmlns:host")]
-    xmlns: String,
     /// The host name
     pub name: StringValue,
     /// The host creation date
@@ -85,7 +61,7 @@ pub struct HostCreateData {
 }
 
 /// Type that represents the &lt;resData&gt; tag for host check response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HostCreateResponse {
     /// Data under the &lt;creData&gt; tag
     #[serde(rename = "creData")]

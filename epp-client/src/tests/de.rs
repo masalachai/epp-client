@@ -14,11 +14,7 @@ mod response {
     use crate::domain::delete::DomainDelete;
     use crate::domain::info::DomainInfo;
     use crate::domain::renew::DomainRenew;
-    use crate::domain::transfer::DomainTransferApprove;
-    use crate::domain::transfer::DomainTransferCancel;
-    use crate::domain::transfer::DomainTransferQuery;
-    use crate::domain::transfer::DomainTransferReject;
-    use crate::domain::transfer::DomainTransferRequest;
+    use crate::domain::transfer::DomainTransfer;
     use crate::domain::update::DomainUpdate;
     use crate::extensions::namestore::NameStore;
     use crate::extensions::rgp;
@@ -90,7 +86,7 @@ mod response {
     #[test]
     fn login() {
         let xml = get_xml("response/login.xml").unwrap();
-        let object = Login::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = Login::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -101,7 +97,7 @@ mod response {
     #[test]
     fn logout() {
         let xml = get_xml("response/logout.xml").unwrap();
-        let object = Logout::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = Logout::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1500);
         assert_eq!(
@@ -115,7 +111,7 @@ mod response {
     #[test]
     fn contact_check() {
         let xml = get_xml("response/contact/check.xml").unwrap();
-        let object = ContactCheck::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = ContactCheck::deserialize_response(xml.as_str()).unwrap();
 
         let results = object.res_data().unwrap();
 
@@ -138,7 +134,7 @@ mod response {
     #[test]
     fn contact_create() {
         let xml = get_xml("response/contact/create.xml").unwrap();
-        let object = ContactCreate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = ContactCreate::deserialize_response(xml.as_str()).unwrap();
 
         let results = object.res_data().unwrap();
 
@@ -156,7 +152,7 @@ mod response {
     #[test]
     fn contact_delete() {
         let xml = get_xml("response/contact/delete.xml").unwrap();
-        let object = ContactDelete::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = ContactDelete::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -167,7 +163,7 @@ mod response {
     #[test]
     fn contact_info() {
         let xml = get_xml("response/contact/info.xml").unwrap();
-        let object = ContactInfo::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = ContactInfo::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
         let fax = result.info_data.fax.as_ref().unwrap();
@@ -225,7 +221,7 @@ mod response {
     #[test]
     fn contact_update() {
         let xml = get_xml("response/contact/update.xml").unwrap();
-        let object = ContactUpdate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = ContactUpdate::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -236,7 +232,8 @@ mod response {
     #[test]
     fn domain_check() {
         let xml = get_xml("response/domain/check.xml").unwrap();
-        let object = DomainCheck::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainCheck as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -259,7 +256,7 @@ mod response {
     #[test]
     fn domain_create() {
         let xml = get_xml("response/domain/create.xml").unwrap();
-        let object = DomainCreate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = DomainCreate::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -281,7 +278,7 @@ mod response {
     #[test]
     fn domain_delete() {
         let xml = get_xml("response/domain/delete.xml").unwrap();
-        let object = DomainDelete::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = DomainDelete::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -292,7 +289,8 @@ mod response {
     #[test]
     fn domain_info() {
         let xml = get_xml("response/domain/info.xml").unwrap();
-        let object = DomainInfo::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
         let auth_info = result.info_data.auth_info.as_ref().unwrap();
@@ -349,13 +347,13 @@ mod response {
     #[test]
     fn domain_info_alt() {
         let xml = get_xml("response/domain/info_alt.xml").unwrap();
-        DomainInfo::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        <DomainInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
     }
 
     #[test]
     fn domain_renew() {
         let xml = get_xml("response/domain/renew.xml").unwrap();
-        let object = DomainRenew::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = DomainRenew::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -373,8 +371,7 @@ mod response {
     #[test]
     fn domain_transfer_request() {
         let xml = get_xml("response/domain/transfer_request.xml").unwrap();
-        let object =
-            DomainTransferRequest::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -403,8 +400,7 @@ mod response {
     #[test]
     fn domain_transfer_approve() {
         let xml = get_xml("response/domain/transfer_approve.xml").unwrap();
-        let object =
-            DomainTransferApprove::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -415,8 +411,7 @@ mod response {
     #[test]
     fn domain_transfer_reject() {
         let xml = get_xml("response/domain/transfer_reject.xml").unwrap();
-        let object =
-            DomainTransferReject::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -427,8 +422,7 @@ mod response {
     #[test]
     fn domain_transfer_cancel() {
         let xml = get_xml("response/domain/transfer_cancel.xml").unwrap();
-        let object =
-            DomainTransferCancel::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -439,8 +433,7 @@ mod response {
     #[test]
     fn domain_transfer_query() {
         let xml = get_xml("response/domain/transfer_query.xml").unwrap();
-        let object =
-            DomainTransferQuery::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = DomainTransfer::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -466,7 +459,8 @@ mod response {
     #[test]
     fn domain_update() {
         let xml = get_xml("response/domain/update.xml").unwrap();
-        let object = DomainUpdate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainUpdate as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -477,7 +471,7 @@ mod response {
     #[test]
     fn host_check() {
         let xml = get_xml("response/host/check.xml").unwrap();
-        let object = HostCheck::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = HostCheck::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -500,7 +494,7 @@ mod response {
     #[test]
     fn host_create() {
         let xml = get_xml("response/host/create.xml").unwrap();
-        let object = HostCreate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = HostCreate::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -518,7 +512,7 @@ mod response {
     #[test]
     fn host_info() {
         let xml = get_xml("response/host/info.xml").unwrap();
-        let object = HostInfo::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = HostInfo::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
 
@@ -561,7 +555,7 @@ mod response {
     #[test]
     fn host_update() {
         let xml = get_xml("response/host/update.xml").unwrap();
-        let object = HostUpdate::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = HostUpdate::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -572,7 +566,7 @@ mod response {
     #[test]
     fn host_delete() {
         let xml = get_xml("response/host/delete.xml").unwrap();
-        let object = HostDelete::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = HostDelete::deserialize_response(xml.as_str()).unwrap();
 
         assert_eq!(object.result.code, 1000);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -583,7 +577,7 @@ mod response {
     #[test]
     fn message_poll() {
         let xml = get_xml("response/message/poll.xml").unwrap();
-        let object = MessagePoll::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
 
         let result = object.res_data().unwrap();
         let msg = object.message_queue().unwrap();
@@ -623,7 +617,7 @@ mod response {
     #[test]
     fn message_ack() {
         let xml = get_xml("response/message/ack.xml").unwrap();
-        let object = MessageAck::<NoExtension>::deserialize_response(xml.as_str()).unwrap();
+        let object = MessageAck::deserialize_response(xml.as_str()).unwrap();
 
         let msg = object.message_queue().unwrap();
 
@@ -638,7 +632,7 @@ mod response {
     fn rgp_restore_response() {
         let xml = get_xml("response/extensions/rgp_restore.xml").unwrap();
         let object =
-            DomainUpdate::<rgp::Update<rgp::request::RgpRestoreRequest>>::deserialize_response(
+            <DomainUpdate as Transaction<rgp::Update<rgp::request::RgpRestoreRequest>>>::deserialize_response(
                 xml.as_str(),
             )
             .unwrap();
@@ -655,7 +649,7 @@ mod response {
     fn rgp_restore_domain_info_response() {
         let xml = get_xml("response/extensions/domain_info_rgp.xml").unwrap();
         let object =
-            DomainInfo::<rgp::Update<rgp::request::RgpRestoreRequest>>::deserialize_response(
+            <DomainInfo as Transaction<rgp::Update<rgp::request::RgpRestoreRequest>>>::deserialize_response(
                 xml.as_str(),
             )
             .unwrap();
@@ -670,7 +664,8 @@ mod response {
     fn namestore() {
         let xml = get_xml("response/extensions/namestore.xml").unwrap();
 
-        let object = DomainCheck::<NameStore>::deserialize_response(xml.as_str()).unwrap();
+        let object =
+            <DomainCheck as Transaction<NameStore>>::deserialize_response(xml.as_str()).unwrap();
 
         let ext = object.extension.unwrap();
 

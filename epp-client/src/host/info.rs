@@ -1,44 +1,24 @@
 //! Types for EPP host info request
 
-use epp_client_macros::*;
-
 use super::XMLNS;
-use crate::common::{ElementName, HostAddr, HostStatus, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::common::{HostAddr, HostStatus, NoExtension, StringValue};
+use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct HostInfo<E> {
-    request: HostInfoRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for HostInfo {}
+
+impl Command for HostInfo {
+    type Response = HostInfoResponse;
+    const COMMAND: &'static str = "info";
 }
 
-impl<E: EppExtension> Transaction<E> for HostInfo<E> {
-    type Input = HostInfoRequest;
-    type Output = HostInfoResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> HostInfo<E> {
-    pub fn new(name: &str) -> HostInfo<NoExtension> {
-        HostInfo {
-            request: HostInfoRequest {
-                info: HostInfoRequestData {
-                    xmlns: XMLNS.to_string(),
-                    name: name.into(),
-                },
+impl HostInfo {
+    pub fn new(name: &str) -> Self {
+        Self {
+            info: HostInfoRequestData {
+                xmlns: XMLNS.to_string(),
+                name: name.into(),
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostInfo<F> {
-        HostInfo {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -46,7 +26,7 @@ impl<E: EppExtension> HostInfo<E> {
 // Request
 
 /// Type for data under the host &lt;info&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct HostInfoRequestData {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host", alias = "xmlns")]
@@ -56,10 +36,9 @@ pub struct HostInfoRequestData {
     name: StringValue,
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "info")]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;info&gt; command for hosts
-pub struct HostInfoRequest {
+pub struct HostInfo {
     /// The instance holding the data for the host query
     #[serde(rename = "host:info", alias = "info")]
     info: HostInfoRequestData,
@@ -68,11 +47,8 @@ pub struct HostInfoRequest {
 // Response
 
 /// Type that represents the &lt;infData&gt; tag for host info response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HostInfoResponseData {
-    /// XML namespace for host response data
-    #[serde(rename = "xmlns:host")]
-    xmlns: String,
     /// The host name
     pub name: StringValue,
     /// The host ROID
@@ -104,7 +80,7 @@ pub struct HostInfoResponseData {
 }
 
 /// Type that represents the &lt;resData&gt; tag for host info response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HostInfoResponse {
     /// Data under the &lt;infData&gt; tag
     #[serde(rename = "infData")]

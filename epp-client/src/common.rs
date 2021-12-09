@@ -2,10 +2,9 @@
 
 use std::{fmt::Display, str::FromStr};
 
-use epp_client_macros::ElementName;
 use serde::{Deserialize, Serialize};
 
-use crate::request::EppExtension;
+use crate::request::Extension;
 
 pub(crate) const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
 
@@ -37,12 +36,11 @@ pub trait ElementName {
     const ELEMENT: &'static str;
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, ElementName)]
-#[element_name(name = "empty")]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 /// An empty placeholder tag. To be refactored to something more compliant later.
 pub struct NoExtension;
 
-impl EppExtension for NoExtension {
+impl Extension for NoExtension {
     type Response = NoExtension;
 }
 
