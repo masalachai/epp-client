@@ -1,7 +1,7 @@
 //! Types for EPP domain renew request
 
-use super::XMLNS;
-use crate::common::{NoExtension, Period, StringValue};
+use super::{Period, XMLNS};
+use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};

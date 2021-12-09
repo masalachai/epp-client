@@ -1,8 +1,9 @@
 //! Types for EPP domain create request
 
-use super::XMLNS;
-use crate::common::{DomainAuthInfo, DomainContact, HostList, NoExtension, Period, StringValue};
+use super::{DomainAuthInfo, DomainContact, HostList, Period, XMLNS};
+use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
+
 use serde::{Deserialize, Serialize};
 
 impl Transaction<NoExtension> for DomainCreate {}
@@ -102,10 +103,9 @@ pub struct DomainCreateResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::DomainCreate;
-    use crate::common::{
-        DomainContact, HostAddr, HostAttr, HostAttrList, HostList, HostObjList, NoExtension,
-    };
+    use super::{DomainContact, DomainCreate, HostList};
+    use crate::common::{HostAddr, NoExtension};
+    use crate::domain::{HostAttr, HostAttrList, HostObjList};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
