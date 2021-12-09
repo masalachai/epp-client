@@ -90,6 +90,7 @@
 pub mod client;
 pub mod common;
 pub mod connection;
+pub mod domain;
 pub mod error;
 pub mod hello;
 pub mod login;
@@ -106,18 +107,6 @@ pub mod contact {
     pub mod update;
 
     pub const XMLNS: &str = "urn:ietf:params:xml:ns:contact-1.0";
-}
-
-pub mod domain {
-    pub mod check;
-    pub mod create;
-    pub mod delete;
-    pub mod info;
-    pub mod renew;
-    pub mod transfer;
-    pub mod update;
-
-    pub const XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
 }
 
 pub mod extensions {
