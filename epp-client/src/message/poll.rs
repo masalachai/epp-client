@@ -1,63 +1,37 @@
-//! Types for EPP message poll request
-
-use epp_client_macros::*;
-
-use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::common::{NoExtension, StringValue};
+use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct MessagePoll<E> {
-    request: MessagePollRequest,
-    extension: Option<E>,
-}
+impl Transaction<NoExtension> for MessagePoll {}
 
-impl<E: EppExtension> Transaction<E> for MessagePoll<E> {
-    type Input = MessagePollRequest;
-    type Output = MessagePollResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> MessagePoll<E> {
-    pub fn new() -> MessagePoll<NoExtension> {
-        MessagePoll {
-            request: MessagePollRequest {
-                op: "req".to_string(),
-            },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> MessagePoll<F> {
-        MessagePoll {
-            request: self.request,
-            extension: Some(extension),
-        }
-    }
+impl Command for MessagePoll {
+    type Response = MessagePollResponse;
+    const COMMAND: &'static str = "poll";
 }
 
 // Request
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "poll")]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;poll&gt; command for message poll
-pub struct MessagePollRequest {
+pub struct MessagePoll {
     /// The type of operation to perform
     /// The value is "req" for message polling
     op: String,
 }
 
+impl Default for MessagePoll {
+    fn default() -> Self {
+        Self {
+            op: "req".to_owned(),
+        }
+    }
+}
+
 // Response
 
 /// Type that represents the &lt;trnData&gt; tag for message poll response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct MessageDomainTransferData {
-    /// XML namespace for message response data
-    #[serde(rename = "xmlns:domain", alias = "xmlns")]
-    xmlns: String,
     /// The name of the domain under transfer
     #[serde(rename = "domain:name", alias = "name")]
     pub name: StringValue,
@@ -82,7 +56,7 @@ pub struct MessageDomainTransferData {
 }
 
 /// Type that represents the &lt;resData&gt; tag for message poll response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct MessagePollResponse {
     /// Data under the &lt;trnData&gt; tag
     #[serde(rename = "domain:trnData", alias = "trnData")]

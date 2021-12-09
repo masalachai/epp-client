@@ -1,55 +1,21 @@
 //! Types for EPP contact info request
 
-use epp_client_macros::*;
-
 use super::XMLNS;
-use crate::common::{
-    ContactAuthInfo, ContactStatus, ElementName, NoExtension, Phone, PostalInfo, StringValue,
-};
-use crate::request::{EppExtension, Transaction};
+use crate::common::{ContactAuthInfo, ContactStatus, NoExtension, Phone, PostalInfo, StringValue};
+use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct ContactInfo<E> {
-    request: ContactInfoRequest,
-    extension: Option<E>,
-}
+impl Transaction<NoExtension> for ContactInfo {}
 
-impl<E: EppExtension> Transaction<E> for ContactInfo<E> {
-    type Input = ContactInfoRequest;
-    type Output = ContactInfoResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> ContactInfo<E> {
-    pub fn new(id: &str, auth_password: &str) -> ContactInfo<NoExtension> {
-        ContactInfo {
-            request: ContactInfoRequest {
-                info: ContactInfoRequestData {
-                    xmlns: XMLNS.to_string(),
-                    id: id.into(),
-                    auth_info: ContactAuthInfo::new(auth_password),
-                },
-            },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> ContactInfo<F> {
-        ContactInfo {
-            request: self.request,
-            extension: Some(extension),
-        }
-    }
+impl Command for ContactInfo {
+    type Response = ContactInfoResponse;
+    const COMMAND: &'static str = "info";
 }
 
 // Request
 
 /// Type for elements under the contact &lt;info&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct ContactInfoRequestData {
     /// XML namespace for contact commands
     #[serde(rename = "xmlns:contact", alias = "contact")]
@@ -62,23 +28,31 @@ pub struct ContactInfoRequestData {
     auth_info: ContactAuthInfo,
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "info")]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;info&gt; command for contacts
-pub struct ContactInfoRequest {
+pub struct ContactInfo {
     /// Data for &lt;info&gt; command for contact
     #[serde(rename = "contact:info", alias = "info")]
     info: ContactInfoRequestData,
 }
 
+impl ContactInfo {
+    pub fn new(id: &str, auth_password: &str) -> ContactInfo {
+        Self {
+            info: ContactInfoRequestData {
+                xmlns: XMLNS.to_string(),
+                id: id.into(),
+                auth_info: ContactAuthInfo::new(auth_password),
+            },
+        }
+    }
+}
+
 // Response
 
 /// Type that represents the &lt;infData&gt; tag for contact check response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct ContactInfoData {
-    /// XML namespace for contact response data
-    #[serde(rename = "xmlns:contact")]
-    xmlns: String,
     /// The contact id
     pub id: StringValue,
     /// The contact ROID
@@ -119,7 +93,7 @@ pub struct ContactInfoData {
 }
 
 /// Type that represents the &lt;resData&gt; tag for contact info response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct ContactInfoResponse {
     /// Data under the &lt;infData&gt; tag
     #[serde(rename = "infData")]

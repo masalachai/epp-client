@@ -36,20 +36,21 @@
 //! println!("{:?}", greeting);
 //!
 //! // Execute an EPP Command against the registry with distinct request and response objects
-//! let domain_check = DomainCheck::<NoExtension>::new(vec!["eppdev.com", "eppdev.net"]);
+//! let domain_check = DomainCheck::new(vec!["eppdev.com", "eppdev.net"]);
 //! let response = client.transact(domain_check, "transaction-id").await.unwrap();
 //! println!("{:?}", response);
 //!
 //! }
 //! ```
 
-use std::{error::Error, fmt::Debug};
+use std::error::Error;
 
+use crate::common::NoExtension;
 use crate::config::EppClientConfig;
 use crate::error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
 use crate::registry::{epp_connect, EppConnection};
-use crate::request::{EppExtension, Transaction};
+use crate::request::{Command, Extension, Transaction};
 use crate::response::Response;
 use crate::xml::EppXml;
 
@@ -87,20 +88,21 @@ impl EppClient {
         Ok(GreetingDocument::deserialize(&response)?.data)
     }
 
-    pub async fn transact<T, E>(
+    pub async fn transact<C, E>(
         &mut self,
-        request: T,
+        data: impl Into<RequestData<C, E>>,
         id: &str,
-    ) -> Result<Response<<T as Transaction<E>>::Output, E::Response>, error::Error>
+    ) -> Result<Response<C::Response, E::Response>, error::Error>
     where
-        T: Transaction<E> + Debug,
-        E: EppExtension,
+        C: Transaction<E> + Command,
+        E: Extension,
     {
-        let epp_xml = request.serialize_request(id)?;
+        let data = data.into();
+        let epp_xml = <C as Transaction<E>>::serialize_request(data.command, data.extension, id)?;
 
         let response = self.connection.transact(&epp_xml).await?;
 
-        T::deserialize_response(&response)
+        C::deserialize_response(&response)
     }
 
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
@@ -117,5 +119,28 @@ impl EppClient {
     /// Returns the greeting received on establishment of the connection as an `Greeting`
     pub fn greeting(&self) -> Result<Greeting, error::Error> {
         GreetingDocument::deserialize(&self.connection.greeting).map(|obj| obj.data)
+    }
+}
+
+pub struct RequestData<C, E> {
+    command: C,
+    extension: Option<E>,
+}
+
+impl<C: Command> From<C> for RequestData<C, NoExtension> {
+    fn from(command: C) -> Self {
+        Self {
+            command,
+            extension: None,
+        }
+    }
+}
+
+impl<C: Command, E: Extension> From<(C, E)> for RequestData<C, E> {
+    fn from((command, extension): (C, E)) -> Self {
+        Self {
+            command,
+            extension: Some(extension),
+        }
     }
 }

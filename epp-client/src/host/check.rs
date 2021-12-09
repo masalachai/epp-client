@@ -2,47 +2,27 @@
 
 use std::fmt::Debug;
 
-use epp_client_macros::*;
-
 use super::XMLNS;
-use crate::common::{ElementName, NoExtension, StringValue};
-use crate::request::{EppExtension, Transaction};
+use crate::common::{NoExtension, StringValue};
+use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
-pub struct HostCheck<E> {
-    request: HostCheckRequest,
-    extension: Option<E>,
+impl Transaction<NoExtension> for HostCheck {}
+
+impl Command for HostCheck {
+    type Response = HostCheckResponse;
+    const COMMAND: &'static str = "check";
 }
 
-impl<E: EppExtension> Transaction<E> for HostCheck<E> {
-    type Input = HostCheckRequest;
-    type Output = HostCheckResponse;
-
-    fn into_parts(self) -> (Self::Input, Option<E>) {
-        (self.request, self.extension)
-    }
-}
-
-impl<E: EppExtension> HostCheck<E> {
-    pub fn new(hosts: &[&str]) -> HostCheck<NoExtension> {
+impl HostCheck {
+    pub fn new(hosts: &[&str]) -> Self {
         let hosts = hosts.iter().map(|&d| d.into()).collect();
 
-        HostCheck {
-            request: HostCheckRequest {
-                list: HostList {
-                    xmlns: XMLNS.to_string(),
-                    hosts,
-                },
+        Self {
+            list: HostList {
+                xmlns: XMLNS.to_string(),
+                hosts,
             },
-            extension: None,
-        }
-    }
-
-    pub fn with_extension<F: EppExtension>(self, extension: F) -> HostCheck<F> {
-        HostCheck {
-            request: self.request,
-            extension: Some(extension),
         }
     }
 }
@@ -50,7 +30,7 @@ impl<E: EppExtension> HostCheck<E> {
 // Request
 
 /// Type for data under the host &lt;check&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct HostList {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host", alias = "xmlns")]
@@ -60,10 +40,9 @@ pub struct HostList {
     pub hosts: Vec<StringValue>,
 }
 
-#[derive(Serialize, Deserialize, Debug, ElementName)]
-#[element_name(name = "check")]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;check&gt; command for hosts
-pub struct HostCheckRequest {
+pub struct HostCheck {
     /// The instance holding the list of hosts to be checked
     #[serde(rename = "host:check", alias = "check")]
     list: HostList,
@@ -72,7 +51,7 @@ pub struct HostCheckRequest {
 // Response
 
 /// Type that represents the &lt;name&gt; tag for host check response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HostAvailable {
     /// The host name
     #[serde(rename = "$value")]
@@ -83,7 +62,7 @@ pub struct HostAvailable {
 }
 
 /// Type that represents the &lt;cd&gt; tag for host check response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HostCheckDataItem {
     /// Data under the &lt;name&gt; tag
     #[serde(rename = "name")]
@@ -93,18 +72,15 @@ pub struct HostCheckDataItem {
 }
 
 /// Type that represents the &lt;chkData&gt; tag for host check response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HostCheckData {
-    /// XML namespace for host response data
-    #[serde(rename = "xmlns:host")]
-    xmlns: String,
     /// Data under the &lt;cd&gt; tag
     #[serde(rename = "cd")]
     pub host_list: Vec<HostCheckDataItem>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for host check response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct HostCheckResponse {
     /// Data under the &lt;chkData&gt; tag
     #[serde(rename = "chkData")]

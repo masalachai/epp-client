@@ -69,12 +69,12 @@
 //!     Err(e) => panic!("Failed to create EppClient: {}",  e)
 //! };
 //!
-//! let login = Login::<NoExtension>::new("username", "password", None);
+//! let login = Login::new("username", "password", None);
 //! client.transact(login, "transaction-id").await.unwrap();
 //!
 //! // Make a domain check call, which returns an object of type EppDomainCheckResponse
 //! // that contains the result of the call
-//! let domain_check = DomainCheck::<NoExtension>::new(
+//! let domain_check = DomainCheck::new(
 //!     vec!["eppdev.com", "eppdev.net"],
 //! );
 //!
@@ -86,8 +86,7 @@
 //!     .for_each(|chk| println!("Domain: {}, Available: {}", chk.domain.name, chk.domain.available));
 //!
 //! // Close the connection
-//! let logout = Logout::<NoExtension>::new();
-//! client.transact(logout, "transaction-id").await.unwrap();
+//! client.transact(Logout, "transaction-id").await.unwrap();
 //! }
 //! ```
 //!
