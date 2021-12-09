@@ -1,7 +1,7 @@
 //! Types for EPP domain transfer request
 
-use super::XMLNS;
-use crate::common::{DomainAuthInfo, NoExtension, Period, StringValue};
+use super::{DomainAuthInfo, Period, XMLNS};
+use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 

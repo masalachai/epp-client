@@ -1,9 +1,7 @@
 //! Types for EPP domain info request
 
-use super::XMLNS;
-use crate::common::{
-    DomainAuthInfo, DomainContact, DomainStatus, HostAttr, NoExtension, StringValue,
-};
+use super::{DomainAuthInfo, DomainContact, HostAttr, XMLNS};
+use crate::common::{DomainStatus, NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 

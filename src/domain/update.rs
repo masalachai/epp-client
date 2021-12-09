@@ -1,11 +1,10 @@
 //! Types for EPP domain check request
 //!
+use super::{DomainAuthInfo, DomainContact, HostList, XMLNS};
 use crate::{
-    common::{DomainAuthInfo, DomainContact, DomainStatus, HostList, NoExtension, StringValue},
+    common::{DomainStatus, NoExtension, StringValue},
     request::{Command, Transaction},
 };
-
-use super::XMLNS;
 
 use serde::Serialize;
 
@@ -102,8 +101,8 @@ pub struct DomainUpdate {
 
 #[cfg(test)]
 mod tests {
-    use super::{DomainAddRemove, DomainChangeInfo, DomainUpdate};
-    use crate::common::{DomainAuthInfo, DomainContact, DomainStatus, NoExtension};
+    use super::{DomainAddRemove, DomainAuthInfo, DomainChangeInfo, DomainContact, DomainUpdate};
+    use crate::common::{DomainStatus, NoExtension};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
