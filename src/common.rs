@@ -119,17 +119,6 @@ impl HostAddr {
     }
 }
 
-/// The &lt;host&gt; type for host transactions
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Host {
-    /// The &lt;hostName&gt; tag
-    #[serde(rename = "host:name", alias = "name")]
-    pub name: StringValue,
-    /// The &lt;hostAddr&gt; tags
-    #[serde(rename = "host:addr", alias = "addr")]
-    pub addresses: Option<Vec<HostAddr>>,
-}
-
 /// The &lt;hostAttr&gt; type for domain transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAttr {
