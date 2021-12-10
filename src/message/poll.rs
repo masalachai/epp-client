@@ -52,7 +52,7 @@ pub struct MessageDomainTransferData {
     pub ack_by: StringValue,
     /// The domain expiry date
     #[serde(rename = "domain:exDate", alias = "exDate")]
-    pub expiring_at: StringValue,
+    pub expiring_at: Option<StringValue>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for message poll response
@@ -113,7 +113,7 @@ mod tests {
         assert_eq!(result.message_data.ack_id, "ClientY".into());
         assert_eq!(result.message_data.ack_by, "2021-07-28T15:31:21.0Z".into());
         assert_eq!(
-            result.message_data.expiring_at,
+            *result.message_data.expiring_at.as_ref().unwrap(),
             "2022-07-02T14:53:19.0Z".into()
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());

@@ -63,7 +63,7 @@ pub struct DomainRenewResponseData {
     pub name: StringValue,
     /// The new expiry date after renewal
     #[serde(rename = "exDate")]
-    pub expiring_at: StringValue,
+    pub expiring_at: Option<StringValue>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain renew response
@@ -108,7 +108,7 @@ mod tests {
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.renew_data.name, "eppdev-1.com".into());
         assert_eq!(
-            result.renew_data.expiring_at,
+            *result.renew_data.expiring_at.as_ref().unwrap(),
             "2024-07-23T15:31:20.0Z".into()
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
