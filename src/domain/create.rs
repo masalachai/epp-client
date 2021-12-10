@@ -89,7 +89,7 @@ pub struct DomainCreateResponseData {
     pub created_at: StringValue,
     /// The expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: StringValue,
+    pub expiring_at: Option<StringValue>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain create response
@@ -250,7 +250,7 @@ mod tests {
             "2021-07-25T18:11:35.0Z".into()
         );
         assert_eq!(
-            result.create_data.expiring_at,
+            *result.create_data.expiring_at.as_ref().unwrap(),
             "2022-07-25T18:11:34.0Z".into()
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
