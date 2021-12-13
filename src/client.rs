@@ -47,9 +47,9 @@ use std::error::Error;
 
 use crate::common::NoExtension;
 use crate::config::EppClientConfig;
+use crate::connection::EppConnection;
 use crate::error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
-use crate::registry::EppConnection;
 use crate::request::{Command, Extension, Transaction};
 use crate::response::Response;
 use crate::xml::EppXml;
