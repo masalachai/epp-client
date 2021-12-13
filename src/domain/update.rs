@@ -2,7 +2,7 @@
 //!
 use super::{DomainAuthInfo, DomainContact, HostList, XMLNS};
 use crate::{
-    common::{DomainStatus, NoExtension, StringValue},
+    common::{NoExtension, ObjectStatus, StringValue},
     request::{Command, Transaction},
 };
 
@@ -67,7 +67,7 @@ pub struct DomainAddRemove {
     pub contacts: Option<Vec<DomainContact>>,
     /// The list of statuses to add to or remove from the domain
     #[serde(rename = "domain:status", alias = "status")]
-    pub statuses: Option<Vec<DomainStatus>>,
+    pub statuses: Option<Vec<ObjectStatus>>,
 }
 
 /// Type for elements under the &lt;update&gt; tag for domain update
@@ -102,7 +102,7 @@ pub struct DomainUpdate {
 #[cfg(test)]
 mod tests {
     use super::{DomainAddRemove, DomainAuthInfo, DomainChangeInfo, DomainContact, DomainUpdate};
-    use crate::common::{DomainStatus, NoExtension};
+    use crate::common::{NoExtension, ObjectStatus};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -115,7 +115,7 @@ mod tests {
         let add = DomainAddRemove {
             ns: None,
             contacts: None,
-            statuses: Some(vec![DomainStatus {
+            statuses: Some(vec![ObjectStatus {
                 status: "clientDeleteProhibited".to_string(),
             }]),
         };

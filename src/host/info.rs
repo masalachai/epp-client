@@ -1,7 +1,7 @@
 //! Types for EPP host info request
 
 use super::XMLNS;
-use crate::common::{HostAddr, HostStatus, NoExtension, StringValue};
+use crate::common::{HostAddr, NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
@@ -55,7 +55,7 @@ pub struct HostInfoResponseData {
     pub roid: StringValue,
     /// The list of host statuses
     #[serde(rename = "status")]
-    pub statuses: Vec<HostStatus>,
+    pub statuses: Vec<ObjectStatus>,
     /// The list of host IP addresses
     #[serde(rename = "addr")]
     pub addresses: Vec<HostAddr>,

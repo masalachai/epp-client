@@ -1,7 +1,7 @@
 //! Types for EPP contact info request
 
 use super::XMLNS;
-use crate::common::{ContactAuthInfo, ContactStatus, NoExtension, Phone, PostalInfo, StringValue};
+use crate::common::{ContactAuthInfo, NoExtension, ObjectStatus, Phone, PostalInfo, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
@@ -59,7 +59,7 @@ pub struct ContactInfoData {
     pub roid: StringValue,
     /// The list of contact statuses
     #[serde(rename = "status")]
-    pub statuses: Vec<ContactStatus>,
+    pub statuses: Vec<ObjectStatus>,
     /// The postal info for the contact
     #[serde(rename = "postalInfo")]
     pub postal_info: PostalInfo,
