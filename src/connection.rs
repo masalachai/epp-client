@@ -18,7 +18,7 @@ use crate::config::RegistryConfig;
 use crate::error;
 
 /// EPP Connection struct with some metadata for the connection
-pub struct EppConnection {
+pub(crate) struct EppConnection {
     registry: String,
     stream: TlsStream<TcpStream>,
     pub greeting: String,
@@ -26,7 +26,7 @@ pub struct EppConnection {
 
 impl EppConnection {
     /// Create an EppConnection instance with the stream to the registry
-    pub async fn connect(
+    pub(crate) async fn connect(
         registry: String,
         config: &RegistryConfig,
     ) -> Result<EppConnection, Box<dyn Error>> {
@@ -99,7 +99,7 @@ impl EppConnection {
 
     /// Sends an EPP XML request to the registry and return the response
     /// receieved to the request
-    pub async fn transact(&mut self, content: &str) -> Result<String, Box<dyn Error>> {
+    pub(crate) async fn transact(&mut self, content: &str) -> Result<String, Box<dyn Error>> {
         debug!("{}: request: {}", self.registry, content);
         self.send_epp_request(content).await?;
 
@@ -110,7 +110,7 @@ impl EppConnection {
     }
 
     /// Closes the socket and shuts the connection
-    pub async fn shutdown(&mut self) -> Result<(), Box<dyn Error>> {
+    pub(crate) async fn shutdown(&mut self) -> Result<(), Box<dyn Error>> {
         info!("{}: Closing connection", self.registry);
 
         self.stream.shutdown().await?;
