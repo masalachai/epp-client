@@ -1,20 +1,17 @@
 //! Manages registry connections and reading/writing to them
 
 use std::convert::TryInto;
-use std::fs::File;
-use std::io::{BufReader, Seek, SeekFrom};
+use std::net::SocketAddr;
 use std::sync::Arc;
-use std::{error::Error, io as stdio, net::ToSocketAddrs};
+use std::{error::Error, io as stdio};
 use std::{io, str, u32};
 
-use rustls::{Certificate, PrivateKey};
 use rustls::{OwnedTrustAnchor, RootCertStore};
-use rustls_pemfile;
 use tokio::{io::AsyncReadExt, io::AsyncWriteExt, net::TcpStream};
 use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
-use tracing::{debug, info, warn};
+use tracing::{debug, info};
 
-use crate::config::RegistryConfig;
+use crate::common::{Certificate, PrivateKey};
 use crate::error;
 
 /// EPP Connection struct with some metadata for the connection
@@ -28,9 +25,11 @@ impl EppConnection {
     /// Create an EppConnection instance with the stream to the registry
     pub(crate) async fn connect(
         registry: String,
-        config: &RegistryConfig,
+        addr: SocketAddr,
+        hostname: &str,
+        identity: Option<(Vec<Certificate>, PrivateKey)>,
     ) -> Result<EppConnection, Box<dyn Error>> {
-        let mut stream = epp_connect(config).await?;
+        let mut stream = epp_connect(addr, hostname, identity).await?;
 
         let mut buf = vec![0u8; 4096];
         stream.read(&mut buf).await?;
@@ -121,17 +120,11 @@ impl EppConnection {
 /// Establishes a TLS connection to a registry and returns a ConnectionStream instance containing the
 /// socket stream to read/write to the connection
 async fn epp_connect(
-    registry_creds: &RegistryConfig,
+    addr: SocketAddr,
+    hostname: &str,
+    identity: Option<(Vec<Certificate>, PrivateKey)>,
 ) -> Result<TlsStream<TcpStream>, error::Error> {
-    info!(
-        "Connecting: EPP Server: {} Port: {}",
-        registry_creds.host, registry_creds.port
-    );
-
-    let addr = (registry_creds.host.as_str(), registry_creds.port)
-        .to_socket_addrs()?
-        .next()
-        .ok_or(stdio::ErrorKind::NotFound)?;
+    info!("Connecting to server: {:?}", addr,);
 
     let mut roots = RootCertStore::empty();
     roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
@@ -146,41 +139,15 @@ async fn epp_connect(
         .with_safe_defaults()
         .with_root_certificates(roots);
 
-    let config = match &registry_creds.tls_files {
-        Some(files) => {
-            let (certs_file, key_file) = (&files.cert_chain, &files.key);
-            let certs = rustls_pemfile::certs(&mut BufReader::new(File::open(certs_file)?))?
+    let config = match identity {
+        Some((certs, key)) => {
+            let certs = certs
                 .into_iter()
-                .map(Certificate)
-                .collect::<Vec<_>>();
-
-            let mut key;
-            let mut r = BufReader::new(File::open(key_file).unwrap());
-            let mut rsa_keys = rustls_pemfile::rsa_private_keys(&mut r).unwrap();
-            if rsa_keys.len() > 1 {
-                warn!("Multiple RSA keys found in PEM file {:?}", key_file);
-            }
-            key = rsa_keys.pop();
-
-            if key.is_none() {
-                r.seek(SeekFrom::Start(0))?;
-                let mut pkcs8_keys = rustls_pemfile::pkcs8_private_keys(&mut r).unwrap();
-                if pkcs8_keys.len() > 1 {
-                    warn!("Multiple PKCS8 keys found in PEM file {:?}", key_file);
-                }
-                key = pkcs8_keys.pop();
-            }
-
-            match key {
-                Some(key) => builder
-                    .with_single_cert(certs, PrivateKey(key))
-                    .map_err(|e| error::Error::Other(e.to_string()))?,
-                None => {
-                    return Err(error::Error::Other(
-                        "No private key found in PEM file".to_owned(),
-                    ))
-                }
-            }
+                .map(|cert| rustls::Certificate(cert.0))
+                .collect();
+            builder
+                .with_single_cert(certs, rustls::PrivateKey(key.0))
+                .map_err(|e| error::Error::Other(e.to_string()))?
         }
         None => builder.with_no_client_auth(),
     };
@@ -188,10 +155,10 @@ async fn epp_connect(
     let connector = TlsConnector::from(Arc::new(config));
     let stream = TcpStream::connect(&addr).await?;
 
-    let domain = registry_creds.host.as_str().try_into().map_err(|_| {
+    let domain = hostname.try_into().map_err(|_| {
         stdio::Error::new(
             stdio::ErrorKind::InvalidInput,
-            format!("Invalid domain: {}", registry_creds.host),
+            format!("Invalid domain: {}", hostname),
         )
     })?;
 

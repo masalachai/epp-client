@@ -40,8 +40,8 @@
 //!
 //! ```no_run
 //! use std::collections::HashMap;
+//! use std::net::ToSocketAddrs;
 //!
-//! use epp_client::config::{EppClientConfig, RegistryConfig};
 //! use epp_client::EppClient;
 //! use epp_client::domain::check::DomainCheck;
 //! use epp_client::common::NoExtension;
@@ -51,20 +51,10 @@
 //! #[tokio::main]
 //! async fn main() {
 //!
-//! // Create a config
-//! let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-//! registry.insert(
-//!     "registry_name".to_owned(),
-//!     RegistryConfig {
-//!         host: "example.com".to_owned(),
-//!         port: 700,
-//!         tls_files: None,
-//!     },
-//! );
-//! let config = EppClientConfig { registry };
-//!
-//! // Create an instance of EppClient, passing the config and the registry you want to connect to
-//! let mut client = match EppClient::new(&config, "registry_name").await {
+//! // Create an instance of EppClient
+//! let host = "example.com";
+//! let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
+//! let mut client = match EppClient::new("registry_name".to_string(), addr, host, None).await {
 //!     Ok(client) => client,
 //!     Err(e) => panic!("Failed to create EppClient: {}",  e)
 //! };
@@ -99,7 +89,6 @@
 
 pub mod client;
 pub mod common;
-pub mod config;
 pub mod connection;
 pub mod error;
 pub mod hello;

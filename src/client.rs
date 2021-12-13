@@ -4,8 +4,8 @@
 //!
 //! ```no_run
 //! use std::collections::HashMap;
+//! use std::net::ToSocketAddrs;
 //!
-//! use epp_client::config::{EppClientConfig, RegistryConfig};
 //! use epp_client::EppClient;
 //! use epp_client::domain::check::DomainCheck;
 //! use epp_client::common::NoExtension;
@@ -13,20 +13,10 @@
 //! #[tokio::main]
 //! async fn main() {
 //!
-//! // Create a config
-//! let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-//! registry.insert(
-//!     "registry_name".to_owned(),
-//!     RegistryConfig {
-//!         host: "example.com".to_owned(),
-//!         port: 700,
-//!         tls_files: None,
-//!     },
-//! );
-//! let config = EppClientConfig { registry };
-//!
-//! // Create an instance of EppClient, passing the config and the registry you want to connect to
-//! let mut client = match EppClient::new(&config, "registry_name").await {
+//! // Create an instance of EppClient
+//! let host = "example.com";
+//! let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
+//! let mut client = match EppClient::new("registry_name".to_string(), addr, host, None).await {
 //!     Ok(client) => client,
 //!     Err(e) => panic!("Failed to create EppClient: {}",  e)
 //! };
@@ -44,9 +34,9 @@
 //! ```
 
 use std::error::Error;
+use std::net::SocketAddr;
 
-use crate::common::NoExtension;
-use crate::config::EppClientConfig;
+use crate::common::{Certificate, NoExtension, PrivateKey};
 use crate::connection::EppConnection;
 use crate::error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
@@ -65,16 +55,13 @@ impl EppClient {
     /// Creates a new EppClient object and does an EPP Login to a given registry to become ready
     /// for subsequent transactions on this client instance
     pub async fn new(
-        config: &EppClientConfig,
-        registry: &str,
-    ) -> Result<EppClient, Box<dyn Error>> {
-        let registry_creds = match config.registry(registry) {
-            Some(creds) => creds,
-            None => return Err(format!("missing credentials for {}", registry).into()),
-        };
-
-        Ok(EppClient {
-            connection: EppConnection::connect(registry.to_string(), registry_creds).await?,
+        registry: String,
+        addr: SocketAddr,
+        hostname: &str,
+        identity: Option<(Vec<Certificate>, PrivateKey)>,
+    ) -> Result<Self, Box<dyn Error>> {
+        Ok(Self {
+            connection: EppConnection::connect(registry, addr, hostname, identity).await?,
         })
     }
 
