@@ -26,14 +26,15 @@
 //! ```
 
 use std::collections::HashMap;
+use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
 /// Paths to the client certificate and client key PEM files
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EppClientTlsFiles {
-    pub cert_chain: String,
-    pub key: String,
+    pub cert_chain: PathBuf,
+    pub key: PathBuf,
 }
 
 /// Config that stores settings for multiple registries
