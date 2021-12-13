@@ -100,11 +100,11 @@
 pub mod client;
 pub mod common;
 pub mod config;
+pub mod connection;
 pub mod error;
 pub mod hello;
 pub mod login;
 pub mod logout;
-pub mod registry;
 pub mod request;
 pub mod response;
 pub mod xml;
