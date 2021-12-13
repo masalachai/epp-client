@@ -1,7 +1,7 @@
 //! Types for EPP host update request
 
 use super::XMLNS;
-use crate::common::{HostAddr, HostStatus, NoExtension, StringValue};
+use crate::common::{HostAddr, NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
@@ -57,7 +57,7 @@ pub struct HostAddRemove {
     pub addresses: Option<Vec<HostAddr>>,
     /// The statuses to be added to or removed from the host
     #[serde(rename = "host:status", alias = "status")]
-    pub statuses: Option<Vec<HostStatus>>,
+    pub statuses: Option<Vec<ObjectStatus>>,
 }
 
 /// Type for data under the host &lt;update&gt; tag
@@ -91,7 +91,7 @@ pub struct HostUpdate {
 #[cfg(test)]
 mod tests {
     use super::{HostAddRemove, HostChangeInfo, HostUpdate};
-    use crate::common::{HostAddr, HostStatus, NoExtension};
+    use crate::common::{HostAddr, NoExtension, ObjectStatus};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -108,7 +108,7 @@ mod tests {
 
         let remove = HostAddRemove {
             addresses: None,
-            statuses: Some(vec![HostStatus {
+            statuses: Some(vec![ObjectStatus {
                 status: "clientDeleteProhibited".to_string(),
             }]),
         };

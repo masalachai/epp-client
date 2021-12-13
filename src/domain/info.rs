@@ -1,7 +1,7 @@
 //! Types for EPP domain info request
 
 use super::{DomainAuthInfo, DomainContact, HostAttr, XMLNS};
-use crate::common::{DomainStatus, NoExtension, StringValue};
+use crate::common::{NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
@@ -85,7 +85,7 @@ pub struct DomainInfoResponseData {
     pub roid: StringValue,
     /// The list of domain statuses
     #[serde(rename = "status")]
-    pub statuses: Option<Vec<DomainStatus>>,
+    pub statuses: Option<Vec<ObjectStatus>>,
     /// The domain registrant
     pub registrant: Option<StringValue>,
     /// The list of domain contacts

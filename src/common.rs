@@ -79,11 +79,6 @@ pub struct Services {
     pub svc_ext: Option<ServiceExtension>,
 }
 
-/// The &lt;status&gt; attribute on EPP XML for domain transactions
-pub type DomainStatus = ContactStatus;
-/// The &lt;status&gt; attribute on EPP XML for host transactions
-pub type HostStatus = ContactStatus;
-
 /// The &lt;hostAddr&gt; types domain or host transactions
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HostAddr {
@@ -121,7 +116,7 @@ impl HostAddr {
 
 /// The &lt;status&gt; type on contact transactions
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ContactStatus {
+pub struct ObjectStatus {
     /// The status name, represented by the 's' attr on &lt;status&gt; tags
     #[serde(rename = "s")]
     pub status: String,

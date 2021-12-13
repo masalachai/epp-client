@@ -1,7 +1,7 @@
 //! Types for EPP contact create request
 
 use super::XMLNS;
-use crate::common::{ContactAuthInfo, ContactStatus, NoExtension, Phone, PostalInfo, StringValue};
+use crate::common::{ContactAuthInfo, NoExtension, ObjectStatus, Phone, PostalInfo, StringValue};
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
@@ -50,12 +50,12 @@ impl ContactUpdate {
     }
 
     /// Sets the data for the &lt;add&gt; tag for the contact update request
-    pub fn add(&mut self, statuses: Vec<ContactStatus>) {
+    pub fn add(&mut self, statuses: Vec<ObjectStatus>) {
         self.contact.add_statuses = Some(StatusList { status: statuses });
     }
 
     /// Sets the data for the &lt;rem&gt; tag for the contact update request
-    pub fn remove(&mut self, statuses: Vec<ContactStatus>) {
+    pub fn remove(&mut self, statuses: Vec<ObjectStatus>) {
         self.contact.remove_statuses = Some(StatusList { status: statuses });
     }
 }
@@ -79,7 +79,7 @@ pub struct ContactChangeInfo {
 #[derive(Serialize, Debug)]
 pub struct StatusList {
     #[serde(rename = "contact:status", alias = "status")]
-    status: Vec<ContactStatus>,
+    status: Vec<ObjectStatus>,
 }
 
 /// Type for elements under the contact &lt;update&gt; tag
@@ -108,7 +108,7 @@ pub struct ContactUpdate {
 #[cfg(test)]
 mod tests {
     use super::ContactUpdate;
-    use crate::common::{Address, ContactStatus, NoExtension, Phone, PostalInfo};
+    use crate::common::{Address, NoExtension, ObjectStatus, Phone, PostalInfo};
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -124,11 +124,11 @@ mod tests {
         let voice = Phone::new("+33.47237942");
 
         object.set_info("newemail@eppdev.net", postal_info, voice, "eppdev-387323");
-        let add_statuses = vec![ContactStatus {
+        let add_statuses = vec![ObjectStatus {
             status: "clientTransferProhibited".to_string(),
         }];
         object.add(add_statuses);
-        let remove_statuses = vec![ContactStatus {
+        let remove_statuses = vec![ObjectStatus {
             status: "clientDeleteProhibited".to_string(),
         }];
         object.remove(remove_statuses);
