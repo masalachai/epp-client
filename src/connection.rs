@@ -158,7 +158,7 @@ async fn epp_connect(
             let mut r = BufReader::new(File::open(key_file).unwrap());
             let mut rsa_keys = rustls_pemfile::rsa_private_keys(&mut r).unwrap();
             if rsa_keys.len() > 1 {
-                warn!("Multiple RSA keys found in PEM file {}", key_file);
+                warn!("Multiple RSA keys found in PEM file {:?}", key_file);
             }
             key = rsa_keys.pop();
 
@@ -166,7 +166,7 @@ async fn epp_connect(
                 r.seek(SeekFrom::Start(0))?;
                 let mut pkcs8_keys = rustls_pemfile::pkcs8_private_keys(&mut r).unwrap();
                 if pkcs8_keys.len() > 1 {
-                    warn!("Multiple PKCS8 keys found in PEM file {}", key_file);
+                    warn!("Multiple PKCS8 keys found in PEM file {:?}", key_file);
                 }
                 key = pkcs8_keys.pop();
             }
