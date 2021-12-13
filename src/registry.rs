@@ -26,10 +26,12 @@ pub struct EppConnection {
 
 impl EppConnection {
     /// Create an EppConnection instance with the stream to the registry
-    pub async fn new(
+    pub async fn connect(
         registry: String,
-        mut stream: TlsStream<TcpStream>,
+        config: &RegistryConfig,
     ) -> Result<EppConnection, Box<dyn Error>> {
+        let mut stream = epp_connect(config).await?;
+
         let mut buf = vec![0u8; 4096];
         stream.read(&mut buf).await?;
         let greeting = str::from_utf8(&buf[4..])?.to_string();
@@ -118,7 +120,7 @@ impl EppConnection {
 
 /// Establishes a TLS connection to a registry and returns a ConnectionStream instance containing the
 /// socket stream to read/write to the connection
-pub async fn epp_connect(
+async fn epp_connect(
     registry_creds: &RegistryConfig,
 ) -> Result<TlsStream<TcpStream>, error::Error> {
     info!(
