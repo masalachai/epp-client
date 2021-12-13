@@ -119,6 +119,10 @@ impl EppClient {
     pub fn greeting(&self) -> Result<Greeting, error::Error> {
         GreetingDocument::deserialize(&self.connection.greeting).map(|obj| obj.data)
     }
+
+    pub async fn shutdown(mut self) -> Result<(), Box<dyn Error>> {
+        self.connection.shutdown().await
+    }
 }
 
 pub struct RequestData<'a, C, E> {
