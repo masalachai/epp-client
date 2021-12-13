@@ -1,7 +1,7 @@
 //! Types for EPP contact create request
 
-use super::XMLNS;
-use crate::common::{ContactAuthInfo, NoExtension, Phone, PostalInfo, StringValue};
+use super::{ContactAuthInfo, Phone, PostalInfo, XMLNS};
+use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
@@ -101,7 +101,8 @@ pub struct ContactCreateResponse {
 #[cfg(test)]
 mod tests {
     use super::{ContactCreate, Phone, PostalInfo};
-    use crate::common::{Address, NoExtension};
+    use crate::common::NoExtension;
+    use crate::contact::Address;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
