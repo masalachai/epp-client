@@ -49,7 +49,7 @@ use crate::common::NoExtension;
 use crate::config::EppClientConfig;
 use crate::error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
-use crate::registry::{epp_connect, EppConnection};
+use crate::registry::EppConnection;
 use crate::request::{Command, Extension, Transaction};
 use crate::response::Response;
 use crate::xml::EppXml;
@@ -73,10 +73,9 @@ impl EppClient {
             None => return Err(format!("missing credentials for {}", registry).into()),
         };
 
-        let stream = epp_connect(registry_creds).await?;
-        let connection = EppConnection::new(registry.to_string(), stream).await?;
-
-        Ok(EppClient { connection })
+        Ok(EppClient {
+            connection: EppConnection::connect(registry.to_string(), registry_creds).await?,
+        })
     }
 
     /// Executes an EPP Hello call and returns the response as an `Greeting`
