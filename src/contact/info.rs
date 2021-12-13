@@ -1,7 +1,7 @@
 //! Types for EPP contact info request
 
-use super::XMLNS;
-use crate::common::{ContactAuthInfo, NoExtension, ObjectStatus, Phone, PostalInfo, StringValue};
+use super::{ContactAuthInfo, Phone, PostalInfo, XMLNS};
+use crate::common::{NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
