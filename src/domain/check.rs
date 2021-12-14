@@ -31,10 +31,10 @@ impl DomainCheck {
 /// Type for &lt;name&gt; elements under the domain &lt;check&gt; tag
 #[derive(Serialize, Debug)]
 pub struct DomainList {
-    #[serde(rename = "xmlns:domain", alias = "xmlns")]
+    #[serde(rename = "xmlns:domain")]
     /// XML namespace for domain commands
     pub xmlns: String,
-    #[serde(rename = "domain:name", alias = "name")]
+    #[serde(rename = "domain:name")]
     /// List of domains to be checked for availability
     pub domains: Vec<StringValue>,
 }
@@ -43,7 +43,7 @@ pub struct DomainList {
 /// Type for EPP XML &lt;check&gt; command for domains
 pub struct DomainCheck {
     /// The object holding the list of domains to be checked
-    #[serde(rename = "domain:check", alias = "check")]
+    #[serde(rename = "domain:check")]
     list: DomainList,
 }
 

@@ -45,13 +45,13 @@ pub struct Domain {
 #[derive(Serialize, Debug)]
 pub struct DomainInfoRequestData {
     /// XML namespace for domain commands
-    #[serde(rename = "xmlns:domain", alias = "xmlns")]
+    #[serde(rename = "xmlns:domain")]
     xmlns: String,
     /// The data for the domain to be queried
-    #[serde(rename = "domain:name", alias = "name")]
+    #[serde(rename = "domain:name")]
     domain: Domain,
     /// The auth info for the domain
-    #[serde(rename = "domain:authInfo", alias = "authInfo")]
+    #[serde(rename = "domain:authInfo")]
     auth_info: Option<DomainAuthInfo>,
 }
 
@@ -59,7 +59,7 @@ pub struct DomainInfoRequestData {
 /// Type for EPP XML &lt;info&gt; command for domains
 pub struct DomainInfo {
     /// The data under the &lt;info&gt; tag for domain info
-    #[serde(rename = "domain:info", alias = "info")]
+    #[serde(rename = "domain:info")]
     info: DomainInfoRequestData,
 }
 

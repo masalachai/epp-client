@@ -27,10 +27,10 @@ impl DomainDelete {
 #[derive(Serialize, Debug)]
 pub struct DomainDeleteRequestData {
     /// XML namespace for domain commands
-    #[serde(rename = "xmlns:domain", alias = "xmlns")]
+    #[serde(rename = "xmlns:domain")]
     xmlns: String,
     /// The domain to be deleted
-    #[serde(rename = "domain:name", alias = "name")]
+    #[serde(rename = "domain:name")]
     name: StringValue,
 }
 
@@ -38,7 +38,7 @@ pub struct DomainDeleteRequestData {
 /// Type for EPP XML &lt;delete&gt; command for domains
 pub struct DomainDelete {
     /// The data under the &lt;delete&gt; tag for domain deletion
-    #[serde(rename = "domain:delete", alias = "delete")]
+    #[serde(rename = "domain:delete")]
     domain: DomainDeleteRequestData,
 }
 
