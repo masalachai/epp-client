@@ -24,7 +24,7 @@ pub struct HostAttr {
 }
 
 /// The list of &lt;hostAttr&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct HostAttrList {
     /// The list of &lt;hostAttr&gt; tags
     #[serde(rename = "domain:hostAttr", alias = "hostAttr")]
@@ -32,7 +32,7 @@ pub struct HostAttrList {
 }
 
 /// The list of &lt;hostObj&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct HostObjList {
     /// The list of &lt;hostObj&gt; tags
     #[serde(rename = "domain:hostObj", alias = "hostObj")]
@@ -41,7 +41,7 @@ pub struct HostObjList {
 
 /// Enum that can accept one type which corresponds to either the &lt;hostObj&gt; or &lt;hostAttr&gt;
 /// list of tags
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 #[serde(untagged)]
 pub enum HostList {
     HostObjList(HostObjList),
@@ -60,7 +60,7 @@ pub struct DomainContact {
 }
 
 /// The &lt;period&gt; type for registration, renewal or transfer on domain transactions
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 pub struct Period {
     /// The interval (usually 'y' indicating years)
     unit: String,

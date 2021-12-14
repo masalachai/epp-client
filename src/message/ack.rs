@@ -2,7 +2,7 @@
 
 use crate::common::NoExtension;
 use crate::request::{Command, Transaction};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 impl Transaction<NoExtension> for MessageAck {}
 
@@ -11,7 +11,7 @@ impl Command for MessageAck {
     const COMMAND: &'static str = "poll";
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;poll&gt; command for message ack
 pub struct MessageAck {
     /// The type of operation to perform

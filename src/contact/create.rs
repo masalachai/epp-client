@@ -78,11 +78,8 @@ impl ContactCreate {
 // Response
 
 /// Type that represents the &lt;creData&gt; tag for contact create response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct ContactCreateData {
-    /// XML namespace for contact response data
-    #[serde(rename = "xmlns:contact")]
-    xmlns: String,
     /// The contact id
     pub id: StringValue,
     #[serde(rename = "crDate")]
@@ -91,7 +88,7 @@ pub struct ContactCreateData {
 }
 
 /// Type that represents the &lt;resData&gt; tag for contact create response
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct ContactCreateResponse {
     /// Data under the &lt;creData&gt; tag
     #[serde(rename = "creData")]
