@@ -19,7 +19,7 @@ impl Command for ContactInfo {
 pub struct ContactInfoRequestData {
     /// XML namespace for contact commands
     #[serde(rename = "xmlns:contact")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The contact id for the info command
     #[serde(rename = "contact:id")]
     id: StringValue,
@@ -40,7 +40,7 @@ impl ContactInfo {
     pub fn new(id: &str, auth_password: &str) -> ContactInfo {
         Self {
             info: ContactInfoRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 id: id.into(),
                 auth_info: ContactAuthInfo::new(auth_password),
             },

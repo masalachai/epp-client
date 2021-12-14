@@ -16,7 +16,7 @@ impl HostUpdate {
     pub fn new(name: &str) -> Self {
         Self {
             host: HostUpdateRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 add: None,
                 remove: None,
@@ -65,7 +65,7 @@ pub struct HostAddRemove {
 pub struct HostUpdateRequestData {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The name of the host
     #[serde(rename = "host:name")]
     name: StringValue,

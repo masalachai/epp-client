@@ -19,7 +19,7 @@ impl DomainUpdate {
     pub fn new(name: &str) -> Self {
         Self {
             domain: DomainUpdateRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 add: None,
                 remove: None,
@@ -75,7 +75,7 @@ pub struct DomainAddRemove {
 pub struct DomainUpdateRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    pub xmlns: String,
+    pub xmlns: &'static str,
     /// The name of the domain to update
     #[serde(rename = "domain:name")]
     pub name: StringValue,

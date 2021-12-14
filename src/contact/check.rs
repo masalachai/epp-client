@@ -15,7 +15,7 @@ impl Transaction<NoExtension> for ContactCheck {}
 pub struct ContactList {
     /// The XML namespace for the contact &lt;check&gt;
     #[serde(rename = "xmlns:contact")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The list of contact ids to check for availability
     #[serde(rename = "contact:id")]
     pub contact_ids: Vec<StringValue>,
@@ -38,7 +38,7 @@ impl ContactCheck {
 
         Self {
             list: ContactList {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 contact_ids,
             },
         }

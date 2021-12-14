@@ -20,7 +20,7 @@ impl Command for DomainCreate {
 pub struct DomainCreateRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    pub xmlns: String,
+    pub xmlns: &'static str,
     /// The domain name
     #[serde(rename = "domain:name")]
     pub name: StringValue,
@@ -63,7 +63,7 @@ impl DomainCreate {
     ) -> Self {
         Self {
             domain: DomainCreateRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 period: Period::new(period),
                 ns,

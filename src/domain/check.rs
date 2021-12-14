@@ -16,7 +16,7 @@ impl DomainCheck {
     pub fn new(domains: Vec<&str>) -> Self {
         Self {
             list: DomainList {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 domains: domains
                     .into_iter()
                     .map(|d| d.into())
@@ -33,7 +33,7 @@ impl DomainCheck {
 pub struct DomainList {
     #[serde(rename = "xmlns:domain")]
     /// XML namespace for domain commands
-    pub xmlns: String,
+    pub xmlns: &'static str,
     #[serde(rename = "domain:name")]
     /// List of domains to be checked for availability
     pub domains: Vec<StringValue>,

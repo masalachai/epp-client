@@ -16,7 +16,7 @@ impl HostInfo {
     pub fn new(name: &str) -> Self {
         Self {
             info: HostInfoRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
             },
         }
@@ -30,7 +30,7 @@ impl HostInfo {
 pub struct HostInfoRequestData {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The name of the host to be queried
     #[serde(rename = "host:name")]
     name: StringValue,

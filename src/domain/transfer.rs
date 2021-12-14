@@ -17,7 +17,7 @@ impl DomainTransfer {
         Self {
             operation: "request".to_string(),
             domain: DomainTransferReqData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 period: years.map(Period::new),
                 auth_info: Some(DomainAuthInfo::new(auth_password)),
@@ -29,7 +29,7 @@ impl DomainTransfer {
         Self {
             operation: "query".to_string(),
             domain: DomainTransferReqData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 period: None,
                 auth_info: Some(DomainAuthInfo::new(auth_password)),
@@ -41,7 +41,7 @@ impl DomainTransfer {
         Self {
             operation: "approve".to_string(),
             domain: DomainTransferReqData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 period: None,
                 auth_info: None,
@@ -53,7 +53,7 @@ impl DomainTransfer {
         Self {
             operation: "reject".to_string(),
             domain: DomainTransferReqData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 period: None,
                 auth_info: None,
@@ -65,7 +65,7 @@ impl DomainTransfer {
         Self {
             operation: "cancel".to_string(),
             domain: DomainTransferReqData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 period: None,
                 auth_info: None,
@@ -81,7 +81,7 @@ impl DomainTransfer {
 pub struct DomainTransferReqData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The name of the domain under transfer
     #[serde(rename = "domain:name")]
     name: StringValue,

@@ -19,7 +19,7 @@ impl Command for ContactCreate {
 pub struct Contact {
     /// XML namespace for contact commands
     #[serde(rename = "xmlns:contact")]
-    xmlns: String,
+    xmlns: &'static str,
     /// Contact &lt;id&gt; tag
     #[serde(rename = "contact:id")]
     id: StringValue,
@@ -58,7 +58,7 @@ impl ContactCreate {
     ) -> Self {
         Self {
             contact: Contact {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 id: id.into(),
                 postal_info,
                 voice,

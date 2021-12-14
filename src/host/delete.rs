@@ -16,7 +16,7 @@ impl HostDelete {
     pub fn new(name: &str) -> Self {
         Self {
             host: HostDeleteRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
             },
         }
@@ -28,7 +28,7 @@ impl HostDelete {
 pub struct HostDeleteRequestData {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The host to be deleted
     #[serde(rename = "host:name")]
     name: StringValue,

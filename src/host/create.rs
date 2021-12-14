@@ -16,7 +16,7 @@ impl HostCreate {
     pub fn new(host: &str, addresses: Vec<HostAddr>) -> Self {
         Self {
             host: HostCreateRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: host.into(),
                 addresses: Some(addresses),
             },
@@ -31,7 +31,7 @@ impl HostCreate {
 pub struct HostCreateRequestData {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The name of the host to be created
     #[serde(rename = "host:name")]
     pub name: StringValue,
