@@ -55,10 +55,10 @@ pub struct HostInfoResponseData {
     pub roid: StringValue<'static>,
     /// The list of host statuses
     #[serde(rename = "status")]
-    pub statuses: Vec<ObjectStatus>,
+    pub statuses: Vec<ObjectStatus<'static>>,
     /// The list of host IP addresses
     #[serde(rename = "addr")]
-    pub addresses: Vec<HostAddr>,
+    pub addresses: Vec<HostAddr<'static>>,
     /// The epp user to whom the host belongs
     #[serde(rename = "clID")]
     pub client_id: StringValue<'static>,

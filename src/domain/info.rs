@@ -17,10 +17,7 @@ impl<'a> DomainInfo<'a> {
         Self {
             info: DomainInfoRequestData {
                 xmlns: XMLNS,
-                domain: Domain {
-                    hosts: "all".to_string(),
-                    name: name.to_string(),
-                },
+                domain: Domain { hosts: "all", name },
                 auth_info: auth_password.map(|password| DomainAuthInfo {
                     password: password.into(),
                 }),
@@ -33,12 +30,12 @@ impl<'a> DomainInfo<'a> {
 
 /// Type for data under the &lt;name&gt; element tag for the domain &lt;info&gt; tag
 #[derive(Serialize, Debug)]
-pub struct Domain {
+pub struct Domain<'a> {
     /// The hosts attribute. Default value is "all"
-    hosts: String,
+    hosts: &'a str,
     /// The name of the domain
     #[serde(rename = "$value")]
-    name: String,
+    name: &'a str,
 }
 
 /// Type for &lt;name&gt; element under the domain &lt;info&gt; tag
@@ -49,7 +46,7 @@ pub struct DomainInfoRequestData<'a> {
     xmlns: &'a str,
     /// The data for the domain to be queried
     #[serde(rename = "domain:name")]
-    domain: Domain,
+    domain: Domain<'a>,
     /// The auth info for the domain
     #[serde(rename = "domain:authInfo")]
     auth_info: Option<DomainAuthInfo<'a>>,
@@ -85,12 +82,12 @@ pub struct DomainInfoResponseData {
     pub roid: StringValue<'static>,
     /// The list of domain statuses
     #[serde(rename = "status")]
-    pub statuses: Option<Vec<ObjectStatus>>,
+    pub statuses: Option<Vec<ObjectStatus<'static>>>,
     /// The domain registrant
     pub registrant: Option<StringValue<'static>>,
     /// The list of domain contacts
     #[serde(rename = "contact")]
-    pub contacts: Option<Vec<DomainContact>>,
+    pub contacts: Option<Vec<DomainContact<'static>>>,
     /// The list of domain nameservers
     #[serde(rename = "ns")]
     pub ns: Option<DomainNsList>,

@@ -37,7 +37,7 @@ pub struct HostCreateRequestData<'a> {
     pub name: StringValue<'a>,
     /// The list of IP addresses for the host
     #[serde(rename = "host:addr")]
-    pub addresses: Option<&'a [HostAddr]>,
+    pub addresses: Option<&'a [HostAddr<'a>]>,
 }
 
 #[derive(Serialize, Debug)]

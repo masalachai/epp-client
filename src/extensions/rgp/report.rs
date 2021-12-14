@@ -26,7 +26,7 @@ impl<'a> RgpRestoreReport<'a> {
         Self {
             xmlns: XMLNS,
             restore: RgpRestoreReportSection {
-                op: "report".to_string(),
+                op: "report",
                 report: RgpRestoreReportSectionData {
                     pre_data: pre_data.into(),
                     post_data: post_data.into(),
@@ -79,7 +79,7 @@ pub struct RgpRestoreReportSectionData<'a> {
 #[derive(Serialize, Debug)]
 pub struct RgpRestoreReportSection<'a> {
     /// The value of the op attribute for the &lt;restore&gt; tag
-    op: String,
+    op: &'a str,
     /// Data for the &lt;report&gt; tag
     #[serde(rename = "rgp:report")]
     report: RgpRestoreReportSectionData<'a>,

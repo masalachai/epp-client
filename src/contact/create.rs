@@ -28,10 +28,10 @@ pub struct Contact<'a> {
     postal_info: PostalInfo<'a>,
     /// Contact &lt;voice&gt; tag
     #[serde(rename = "contact:voice")]
-    voice: Phone,
+    voice: Phone<'a>,
     /// Contact &lt;fax&gt; tag,
     #[serde(rename = "contact:fax")]
-    fax: Option<Phone>,
+    fax: Option<Phone<'a>>,
     /// Contact &lt;email&gt; tag
     #[serde(rename = "contact:email")]
     email: StringValue<'a>,
@@ -53,7 +53,7 @@ impl<'a> ContactCreate<'a> {
         id: &'a str,
         email: &'a str,
         postal_info: PostalInfo<'a>,
-        voice: Phone,
+        voice: Phone<'a>,
         auth_password: &'a str,
     ) -> Self {
         Self {
@@ -70,7 +70,7 @@ impl<'a> ContactCreate<'a> {
     }
 
     /// Sets the &lt;fax&gt; data for the request
-    pub fn set_fax(&mut self, fax: Phone) {
+    pub fn set_fax(&mut self, fax: Phone<'a>) {
         self.contact.fax = Some(fax);
     }
 }

@@ -81,45 +81,45 @@ pub struct Services<'a> {
 
 /// The &lt;hostAddr&gt; types domain or host transactions
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HostAddr {
+pub struct HostAddr<'a> {
     #[serde(rename = "ip")]
-    pub ip_version: Option<String>,
+    pub ip_version: Option<Cow<'a, str>>,
     #[serde(rename = "$value")]
-    pub address: String,
+    pub address: Cow<'a, str>,
 }
 
-impl HostAddr {
+impl<'a> HostAddr<'a> {
     /// Creates a 'v4' type HostAddr (mostly useful when you don't want to include an 'ip' attr in the XML)
-    pub fn new(ip_version: &str, address: &str) -> HostAddr {
-        HostAddr {
-            ip_version: Some(ip_version.to_string()),
-            address: address.to_string(),
+    pub fn new(ip_version: &'a str, address: &'a str) -> Self {
+        Self {
+            ip_version: Some(ip_version.into()),
+            address: address.into(),
         }
     }
 
     /// Creates a 'v4' type HostAddr
-    pub fn new_v4(address: &str) -> HostAddr {
+    pub fn new_v4(address: &'a str) -> HostAddr {
         HostAddr {
-            ip_version: Some("v4".to_string()),
-            address: address.to_string(),
+            ip_version: Some("v4".into()),
+            address: address.into(),
         }
     }
 
     /// Creates a 'v6' type HostAddr
-    pub fn new_v6(address: &str) -> HostAddr {
+    pub fn new_v6(address: &'a str) -> HostAddr {
         HostAddr {
-            ip_version: Some("v6".to_string()),
-            address: address.to_string(),
+            ip_version: Some("v6".into()),
+            address: address.into(),
         }
     }
 }
 
 /// The &lt;status&gt; type on contact transactions
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ObjectStatus {
+pub struct ObjectStatus<'a> {
     /// The status name, represented by the 's' attr on &lt;status&gt; tags
     #[serde(rename = "s")]
-    pub status: String,
+    pub status: Cow<'a, str>,
 }
 
 /// This type contains a single DER-encoded X.509 certificate.

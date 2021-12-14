@@ -50,7 +50,7 @@ impl<'a> DomainTransfer<'a> {
         auth_info: Option<DomainAuthInfo<'a>>,
     ) -> Self {
         Self {
-            operation: operation.to_string(),
+            operation,
             domain: DomainTransferReqData {
                 xmlns: XMLNS,
                 name: name.into(),
@@ -88,7 +88,7 @@ pub struct DomainTransfer<'a> {
     /// The transfer operation to perform indicated by the 'op' attr
     /// The values are one of transfer or query
     #[serde(rename = "op")]
-    operation: String,
+    operation: &'a str,
     /// The data under the &lt;transfer&gt; tag in the transfer request
     #[serde(rename = "domain:transfer")]
     domain: DomainTransferReqData<'a>,

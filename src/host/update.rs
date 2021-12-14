@@ -54,10 +54,10 @@ pub struct HostChangeInfo<'a> {
 pub struct HostAddRemove<'a> {
     /// The IP addresses to be added to or removed from the host
     #[serde(rename = "host:addr")]
-    pub addresses: Option<&'a [HostAddr]>,
+    pub addresses: Option<&'a [HostAddr<'a>]>,
     /// The statuses to be added to or removed from the host
     #[serde(rename = "host:status")]
-    pub statuses: Option<&'a [ObjectStatus]>,
+    pub statuses: Option<&'a [ObjectStatus<'a>]>,
 }
 
 /// Type for data under the host &lt;update&gt; tag
@@ -107,7 +107,7 @@ mod tests {
         };
 
         let statuses = &[ObjectStatus {
-            status: "clientDeleteProhibited".to_string(),
+            status: "clientDeleteProhibited".into(),
         }];
 
         let remove = HostAddRemove {

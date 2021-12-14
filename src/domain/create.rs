@@ -36,7 +36,7 @@ pub struct DomainCreateRequestData<'a> {
     pub registrant: Option<StringValue<'a>>,
     /// The list of contacts for the domain
     #[serde(rename = "domain:contact")]
-    pub contacts: Option<&'a [DomainContact]>,
+    pub contacts: Option<&'a [DomainContact<'a>]>,
     /// The auth info for the domain
     #[serde(rename = "domain:authInfo")]
     pub auth_info: DomainAuthInfo<'a>,
@@ -59,7 +59,7 @@ impl<'a> DomainCreate<'a> {
         ns: Option<HostList<'a>>,
         registrant_id: Option<&'a str>,
         auth_password: &'a str,
-        contacts: Option<&'a [DomainContact]>,
+        contacts: Option<&'a [DomainContact<'a>]>,
     ) -> Self {
         Self {
             domain: DomainCreateRequestData {
@@ -115,16 +115,16 @@ mod tests {
 
         let contacts = &[
             DomainContact {
-                contact_type: "admin".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "admin".into(),
+                id: "eppdev-contact-3".into(),
             },
             DomainContact {
-                contact_type: "tech".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "tech".into(),
+                id: "eppdev-contact-3".into(),
             },
             DomainContact {
-                contact_type: "billing".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "billing".into(),
+                id: "eppdev-contact-3".into(),
             },
         ];
 
@@ -150,16 +150,16 @@ mod tests {
 
         let contacts = &[
             DomainContact {
-                contact_type: "admin".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "admin".into(),
+                id: "eppdev-contact-3".into(),
             },
             DomainContact {
-                contact_type: "tech".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "tech".into(),
+                id: "eppdev-contact-3".into(),
             },
             DomainContact {
-                contact_type: "billing".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "billing".into(),
+                id: "eppdev-contact-3".into(),
             },
         ];
 
@@ -186,16 +186,16 @@ mod tests {
 
         let contacts = &[
             DomainContact {
-                contact_type: "admin".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "admin".into(),
+                id: "eppdev-contact-3".into(),
             },
             DomainContact {
-                contact_type: "tech".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "tech".into(),
+                id: "eppdev-contact-3".into(),
             },
             DomainContact {
-                contact_type: "billing".to_string(),
-                id: "eppdev-contact-3".to_string(),
+                contact_type: "billing".into(),
+                id: "eppdev-contact-3".into(),
             },
         ];
 
