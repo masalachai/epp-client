@@ -14,61 +14,48 @@ impl Command for DomainTransfer {
 
 impl DomainTransfer {
     pub fn new(name: &str, years: Option<u16>, auth_password: &str) -> Self {
-        Self {
-            operation: "request".to_string(),
-            domain: DomainTransferReqData {
-                xmlns: XMLNS,
-                name: name.into(),
-                period: years.map(Period::new),
-                auth_info: Some(DomainAuthInfo::new(auth_password)),
-            },
-        }
+        Self::build(
+            "request",
+            name,
+            years.map(Period::new),
+            Some(DomainAuthInfo::new(auth_password)),
+        )
     }
 
     pub fn query(name: &str, auth_password: &str) -> Self {
-        Self {
-            operation: "query".to_string(),
-            domain: DomainTransferReqData {
-                xmlns: XMLNS,
-                name: name.into(),
-                period: None,
-                auth_info: Some(DomainAuthInfo::new(auth_password)),
-            },
-        }
+        Self::build(
+            "query",
+            name,
+            None,
+            Some(DomainAuthInfo::new(auth_password)),
+        )
     }
 
     pub fn approve(name: &str) -> Self {
-        Self {
-            operation: "approve".to_string(),
-            domain: DomainTransferReqData {
-                xmlns: XMLNS,
-                name: name.into(),
-                period: None,
-                auth_info: None,
-            },
-        }
+        Self::build("approve", name, None, None)
     }
 
     pub fn reject(name: &str) -> Self {
-        Self {
-            operation: "reject".to_string(),
-            domain: DomainTransferReqData {
-                xmlns: XMLNS,
-                name: name.into(),
-                period: None,
-                auth_info: None,
-            },
-        }
+        Self::build("reject", name, None, None)
     }
 
     pub fn cancel(name: &str) -> Self {
+        Self::build("cancel", name, None, None)
+    }
+
+    fn build(
+        operation: &str,
+        name: &str,
+        period: Option<Period>,
+        auth_info: Option<DomainAuthInfo>,
+    ) -> Self {
         Self {
-            operation: "cancel".to_string(),
+            operation: operation.to_string(),
             domain: DomainTransferReqData {
                 xmlns: XMLNS,
                 name: name.into(),
-                period: None,
-                auth_info: None,
+                period,
+                auth_info,
             },
         }
     }
