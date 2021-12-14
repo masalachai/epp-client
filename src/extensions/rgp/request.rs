@@ -9,9 +9,9 @@ use serde::{Deserialize, Serialize};
 
 use super::{Update, XMLNS};
 
-impl Transaction<Update<RgpRestoreRequest>> for DomainUpdate {}
+impl<'a> Transaction<Update<RgpRestoreRequest>> for DomainUpdate<'a> {}
 
-impl Transaction<Update<RgpRestoreRequest>> for DomainInfo {}
+impl<'a> Transaction<Update<RgpRestoreRequest>> for DomainInfo<'a> {}
 
 impl Extension for Update<RgpRestoreRequest> {
     type Response = Update<RgpRequestResponse>;

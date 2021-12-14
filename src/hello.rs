@@ -33,22 +33,22 @@ impl EppXml for HelloDocument {}
 /// Type for data within the <svcMenu> section of an EPP greeting
 #[derive(Debug, PartialEq)]
 pub struct ServiceMenu {
-    pub options: Options,
-    pub services: Services,
+    pub options: Options<'static>,
+    pub services: Services<'static>,
 }
 
 /// Simplified service menu type for deserialization to `ServiceMenu` type from EPP greeting XML
 #[derive(Deserialize, Debug, PartialEq)]
 struct FlattenedServiceMenu {
-    pub version: StringValue,
-    pub lang: StringValue,
+    pub version: StringValue<'static>,
+    pub lang: StringValue<'static>,
     #[serde(rename = "objURI")]
-    pub obj_uris: Vec<StringValue>,
+    pub obj_uris: Vec<StringValue<'static>>,
     #[serde(rename = "svcExtension")]
-    pub svc_ext: Option<ServiceExtension>,
+    pub svc_ext: Option<ServiceExtension<'static>>,
 }
 
-impl<'de> Deserialize<'de> for ServiceMenu {
+impl<'a, 'de: 'a> Deserialize<'de> for ServiceMenu {
     /// Deserializes the <svcMenu> data to the `ServiceMenu` type
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -238,14 +238,14 @@ pub struct Statement {
 #[derive(Deserialize, Debug, PartialEq)]
 pub struct Absolute {
     #[serde(rename = "$value")]
-    pub absolute: StringValue,
+    pub absolute: StringValue<'static>,
 }
 
 /// Type corresponding to <relative> value in the EPP greeting XML
 #[derive(Deserialize, Debug, PartialEq)]
 pub struct Relative {
     #[serde(rename = "$value")]
-    pub relative: StringValue,
+    pub relative: StringValue<'static>,
 }
 
 /// Type corresponding to possible <expiry> type values

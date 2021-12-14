@@ -26,7 +26,7 @@ pub struct ExtValue {
     /// Data under the <value> tag
     pub value: ResultValue,
     /// Data under the <reason> tag
-    pub reason: StringValue,
+    pub reason: StringValue<'static>,
 }
 
 /// Type corresponding to the <result> tag in an EPP response XML
@@ -36,7 +36,7 @@ pub struct EppResult {
     pub code: u16,
     /// The result message
     #[serde(rename = "msg")]
-    pub message: StringValue,
+    pub message: StringValue<'static>,
     /// Data under the <extValue> tag
     #[serde(rename = "extValue")]
     pub ext_value: Option<ExtValue>,
@@ -47,10 +47,10 @@ pub struct EppResult {
 pub struct ResponseTRID {
     /// The client TRID
     #[serde(rename = "clTRID")]
-    pub client_tr_id: Option<StringValue>,
+    pub client_tr_id: Option<StringValue<'static>>,
     /// The server TRID
     #[serde(rename = "svTRID")]
-    pub server_tr_id: StringValue,
+    pub server_tr_id: StringValue<'static>,
 }
 
 /// Type corresponding to the <msgQ> tag in an EPP response XML
@@ -62,10 +62,10 @@ pub struct MessageQueue {
     pub id: String,
     /// The message date
     #[serde(rename = "qDate")]
-    pub date: Option<StringValue>,
+    pub date: Option<StringValue<'static>>,
     /// The message text
     #[serde(rename = "msg")]
-    pub message: Option<StringValue>,
+    pub message: Option<StringValue<'static>>,
 }
 
 #[derive(Deserialize, Debug, PartialEq)]

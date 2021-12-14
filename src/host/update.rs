@@ -5,15 +5,15 @@ use crate::common::{HostAddr, NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
-impl Transaction<NoExtension> for HostUpdate {}
+impl<'a> Transaction<NoExtension> for HostUpdate<'a> {}
 
-impl Command for HostUpdate {
+impl<'a> Command for HostUpdate<'a> {
     type Response = ();
     const COMMAND: &'static str = "update";
 }
 
-impl HostUpdate {
-    pub fn new(name: &str) -> Self {
+impl<'a> HostUpdate<'a> {
+    pub fn new(name: &'a str) -> Self {
         Self {
             host: HostUpdateRequestData {
                 xmlns: XMLNS,
@@ -26,7 +26,7 @@ impl HostUpdate {
     }
 
     /// Sets the data for the &lt;chg&gt; element of the host update
-    pub fn info(&mut self, info: HostChangeInfo) {
+    pub fn info(&mut self, info: HostChangeInfo<'a>) {
         self.host.change_info = Some(info);
     }
 
@@ -43,10 +43,10 @@ impl HostUpdate {
 
 /// Type for data under the &lt;chg&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostChangeInfo {
+pub struct HostChangeInfo<'a> {
     /// The new name for the host
     #[serde(rename = "host:name")]
-    pub name: StringValue,
+    pub name: StringValue<'a>,
 }
 
 /// Type for data under the &lt;add&gt; and &lt;rem&gt; tags
@@ -62,13 +62,13 @@ pub struct HostAddRemove {
 
 /// Type for data under the host &lt;update&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostUpdateRequestData {
+pub struct HostUpdateRequestData<'a> {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The name of the host
     #[serde(rename = "host:name")]
-    name: StringValue,
+    name: StringValue<'a>,
     /// The IP addresses and statuses to be added to the host
     #[serde(rename = "host:add")]
     add: Option<HostAddRemove>,
@@ -77,15 +77,15 @@ pub struct HostUpdateRequestData {
     remove: Option<HostAddRemove>,
     /// The host details that need to be updated
     #[serde(rename = "host:chg")]
-    change_info: Option<HostChangeInfo>,
+    change_info: Option<HostChangeInfo<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;update&gt; command for hosts
-pub struct HostUpdate {
+pub struct HostUpdate<'a> {
     /// The instance holding the data for the host to be updated
     #[serde(rename = "host:update")]
-    host: HostUpdateRequestData,
+    host: HostUpdateRequestData<'a>,
 }
 
 #[cfg(test)]

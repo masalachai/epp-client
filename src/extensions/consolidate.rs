@@ -11,7 +11,7 @@ use crate::request::{Extension, Transaction};
 
 pub const XMLNS: &str = "http://www.verisign.com/epp/sync-1.0";
 
-impl Transaction<Update> for DomainUpdate {}
+impl<'a> Transaction<Update> for DomainUpdate<'a> {}
 
 impl Extension for Update {
     type Response = NoExtension;
@@ -84,7 +84,7 @@ pub struct UpdateData {
     pub xmlns: &'static str,
     /// The expiry date of the domain
     #[serde(rename = "sync:expMonthDay")]
-    pub exp: StringValue,
+    pub exp: StringValue<'static>,
 }
 
 #[cfg(test)]

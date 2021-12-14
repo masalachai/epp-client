@@ -5,15 +5,15 @@ use crate::common::{NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
-impl Transaction<NoExtension> for ContactUpdate {}
+impl<'a> Transaction<NoExtension> for ContactUpdate<'a> {}
 
-impl Command for ContactUpdate {
+impl<'a> Command for ContactUpdate<'a> {
     type Response = ();
     const COMMAND: &'static str = "update";
 }
 
-impl ContactUpdate {
-    pub fn new(id: &str) -> ContactUpdate {
+impl<'a> ContactUpdate<'a> {
+    pub fn new(id: &'a str) -> ContactUpdate {
         Self {
             contact: ContactUpdateRequestData {
                 xmlns: XMLNS,
@@ -28,10 +28,10 @@ impl ContactUpdate {
     /// Sets the data for the &lt;chg&gt; tag for the contact update request
     pub fn set_info(
         &mut self,
-        email: &str,
-        postal_info: PostalInfo,
+        email: &'a str,
+        postal_info: PostalInfo<'a>,
         voice: Phone,
-        auth_password: &str,
+        auth_password: &'a str,
     ) {
         self.contact.change_info = Some(ContactChangeInfo {
             email: Some(email.into()),
@@ -62,17 +62,17 @@ impl ContactUpdate {
 
 /// Type for elements under the &lt;chg&gt; tag for contact update request
 #[derive(Serialize, Debug)]
-pub struct ContactChangeInfo {
+pub struct ContactChangeInfo<'a> {
     #[serde(rename = "contact:postalInfo")]
-    postal_info: Option<PostalInfo>,
+    postal_info: Option<PostalInfo<'a>>,
     #[serde(rename = "contact:voice")]
     voice: Option<Phone>,
     #[serde(rename = "contact:fax")]
     fax: Option<Phone>,
     #[serde(rename = "contact:email")]
-    email: Option<StringValue>,
+    email: Option<StringValue<'a>>,
     #[serde(rename = "contact:authInfo")]
-    auth_info: Option<ContactAuthInfo>,
+    auth_info: Option<ContactAuthInfo<'a>>,
 }
 
 /// Type for list of elements of the &lt;status&gt; tag for contact update request
@@ -84,25 +84,25 @@ pub struct StatusList {
 
 /// Type for elements under the contact &lt;update&gt; tag
 #[derive(Serialize, Debug)]
-pub struct ContactUpdateRequestData {
+pub struct ContactUpdateRequestData<'a> {
     #[serde(rename = "xmlns:contact")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     #[serde(rename = "contact:id")]
-    id: StringValue,
+    id: StringValue<'a>,
     #[serde(rename = "contact:add")]
     add_statuses: Option<StatusList>,
     #[serde(rename = "contact:rem")]
     remove_statuses: Option<StatusList>,
     #[serde(rename = "contact:chg")]
-    change_info: Option<ContactChangeInfo>,
+    change_info: Option<ContactChangeInfo<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;update&gt; command for contacts
-pub struct ContactUpdate {
+pub struct ContactUpdate<'a> {
     /// The data under the &lt;update&gt; tag for the contact update
     #[serde(rename = "contact:update")]
-    contact: ContactUpdateRequestData,
+    contact: ContactUpdateRequestData<'a>,
 }
 
 #[cfg(test)]

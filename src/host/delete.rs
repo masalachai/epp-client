@@ -5,15 +5,15 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
-impl Transaction<NoExtension> for HostDelete {}
+impl<'a> Transaction<NoExtension> for HostDelete<'a> {}
 
-impl Command for HostDelete {
+impl<'a> Command for HostDelete<'a> {
     type Response = ();
     const COMMAND: &'static str = "delete";
 }
 
-impl HostDelete {
-    pub fn new(name: &str) -> Self {
+impl<'a> HostDelete<'a> {
+    pub fn new(name: &'a str) -> Self {
         Self {
             host: HostDeleteRequestData {
                 xmlns: XMLNS,
@@ -25,21 +25,21 @@ impl HostDelete {
 
 /// Type for data under the host &lt;delete&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostDeleteRequestData {
+pub struct HostDeleteRequestData<'a> {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The host to be deleted
     #[serde(rename = "host:name")]
-    name: StringValue,
+    name: StringValue<'a>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;delete&gt; command for hosts
-pub struct HostDelete {
+pub struct HostDelete<'a> {
     /// The instance holding the data for the host to be deleted
     #[serde(rename = "host:delete")]
-    host: HostDeleteRequestData,
+    host: HostDeleteRequestData<'a>,
 }
 
 #[cfg(test)]

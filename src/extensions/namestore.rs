@@ -23,29 +23,29 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 
 // Contact
 
-impl Transaction<NameStore> for ContactCheck {}
-impl Transaction<NameStore> for ContactCreate {}
-impl Transaction<NameStore> for ContactDelete {}
-impl Transaction<NameStore> for ContactInfo {}
-impl Transaction<NameStore> for ContactUpdate {}
+impl<'a> Transaction<NameStore> for ContactCheck<'a> {}
+impl<'a> Transaction<NameStore> for ContactCreate<'a> {}
+impl<'a> Transaction<NameStore> for ContactDelete<'a> {}
+impl<'a> Transaction<NameStore> for ContactInfo<'a> {}
+impl<'a> Transaction<NameStore> for ContactUpdate<'a> {}
 
 // Domain
 
-impl Transaction<NameStore> for DomainCheck {}
-impl Transaction<NameStore> for DomainCreate {}
-impl Transaction<NameStore> for DomainDelete {}
-impl Transaction<NameStore> for DomainInfo {}
-impl Transaction<NameStore> for DomainRenew {}
-impl Transaction<NameStore> for DomainTransfer {}
-impl Transaction<NameStore> for DomainUpdate {}
+impl<'a> Transaction<NameStore> for DomainCheck<'a> {}
+impl<'a> Transaction<NameStore> for DomainCreate<'a> {}
+impl<'a> Transaction<NameStore> for DomainDelete<'a> {}
+impl<'a> Transaction<NameStore> for DomainInfo<'a> {}
+impl<'a> Transaction<NameStore> for DomainRenew<'a> {}
+impl<'a> Transaction<NameStore> for DomainTransfer<'a> {}
+impl<'a> Transaction<NameStore> for DomainUpdate<'a> {}
 
 // Host
 
-impl Transaction<NameStore> for HostCheck {}
-impl Transaction<NameStore> for HostCreate {}
-impl Transaction<NameStore> for HostDelete {}
-impl Transaction<NameStore> for HostInfo {}
-impl Transaction<NameStore> for HostUpdate {}
+impl<'a> Transaction<NameStore> for HostCheck<'a> {}
+impl<'a> Transaction<NameStore> for HostCreate<'a> {}
+impl<'a> Transaction<NameStore> for HostDelete<'a> {}
+impl<'a> Transaction<NameStore> for HostInfo<'a> {}
+impl<'a> Transaction<NameStore> for HostUpdate<'a> {}
 
 impl NameStore {
     /// Create a new RGP restore report request
@@ -53,7 +53,7 @@ impl NameStore {
         NameStore {
             data: NameStoreData {
                 xmlns: XMLNS.to_string(),
-                subproduct: subproduct.into(),
+                subproduct: subproduct.to_owned().into(),
             },
         }
     }
@@ -78,7 +78,7 @@ pub struct NameStoreData {
     pub xmlns: String,
     /// The object holding the list of domains to be checked
     #[serde(rename = "namestoreExt:subProduct", alias = "subProduct")]
-    pub subproduct: StringValue,
+    pub subproduct: StringValue<'static>,
 }
 
 #[cfg(test)]

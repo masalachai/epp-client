@@ -34,25 +34,25 @@ impl Default for MessagePoll {
 pub struct MessageDomainTransferData {
     /// The name of the domain under transfer
     #[serde(rename = "domain:name", alias = "name")]
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The domain transfer status
     #[serde(rename = "domain:trStatus", alias = "trStatus")]
-    pub transfer_status: StringValue,
+    pub transfer_status: StringValue<'static>,
     /// The epp user who requested the transfer
     #[serde(rename = "domain:reID", alias = "reID")]
-    pub requester_id: StringValue,
+    pub requester_id: StringValue<'static>,
     /// The date of the transfer request
     #[serde(rename = "domain:reDate", alias = "reDate")]
-    pub requested_at: StringValue,
+    pub requested_at: StringValue<'static>,
     /// The epp user who should acknowledge the transfer request
     #[serde(rename = "domain:acID", alias = "acID")]
-    pub ack_id: StringValue,
+    pub ack_id: StringValue<'static>,
     /// The date by which the transfer request should be acknowledged
     #[serde(rename = "domain:acDate", alias = "acDate")]
-    pub ack_by: StringValue,
+    pub ack_by: StringValue<'static>,
     /// The domain expiry date
     #[serde(rename = "domain:exDate", alias = "exDate")]
-    pub expiring_at: Option<StringValue>,
+    pub expiring_at: Option<StringValue<'static>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for message poll response

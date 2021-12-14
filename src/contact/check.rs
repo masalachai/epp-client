@@ -6,35 +6,32 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for ContactCheck {}
+impl<'a> Transaction<NoExtension> for ContactCheck<'a> {}
 
 // Request
 
 /// Type that represents the &lt;check&gt; command for contact transactions
 #[derive(Serialize, Debug)]
-pub struct ContactList {
+pub struct ContactList<'a> {
     /// The XML namespace for the contact &lt;check&gt;
     #[serde(rename = "xmlns:contact")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The list of contact ids to check for availability
     #[serde(rename = "contact:id")]
-    pub contact_ids: Vec<StringValue>,
+    pub contact_ids: Vec<StringValue<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// The &lt;command&gt; type for contact check command
-pub struct ContactCheck {
+pub struct ContactCheck<'a> {
     /// The &lt;check&gt; tag for the contact check command
     #[serde(rename = "contact:check")]
-    list: ContactList,
+    list: ContactList<'a>,
 }
 
-impl ContactCheck {
-    pub fn new(contact_ids: &[&str]) -> Self {
-        let contact_ids = contact_ids
-            .iter()
-            .map(|&d| d.into())
-            .collect::<Vec<StringValue>>();
+impl<'a> ContactCheck<'a> {
+    pub fn new(contact_ids: &[&'a str]) -> Self {
+        let contact_ids = contact_ids.iter().map(|&d| d.into()).collect();
 
         Self {
             list: ContactList {
@@ -45,7 +42,7 @@ impl ContactCheck {
     }
 }
 
-impl Command for ContactCheck {
+impl<'a> Command for ContactCheck<'a> {
     type Response = ContactCheckResponse;
     const COMMAND: &'static str = "check";
 }
@@ -57,7 +54,7 @@ impl Command for ContactCheck {
 pub struct ContactAvailable {
     /// The text of the &lt;id&gt; tag
     #[serde(rename = "$value")]
-    pub id: StringValue,
+    pub id: StringValue<'static>,
     /// The avail attr on the &lt;id&gt; tag
     #[serde(rename = "avail")]
     pub available: u16,
@@ -70,7 +67,7 @@ pub struct ContactCheckResponseDataItem {
     #[serde(rename = "id")]
     pub contact: ContactAvailable,
     /// The reason for (un)availability
-    pub reason: Option<StringValue>,
+    pub reason: Option<StringValue<'static>>,
 }
 
 /// Type that represents the &lt;chkData&gt; tag for contact check response
