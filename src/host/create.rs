@@ -13,7 +13,7 @@ impl<'a> Command for HostCreate<'a> {
 }
 
 impl<'a> HostCreate<'a> {
-    pub fn new(host: &'a str, addresses: Vec<HostAddr>) -> Self {
+    pub fn new(host: &'a str, addresses: &'a [HostAddr]) -> Self {
         Self {
             host: HostCreateRequestData {
                 xmlns: XMLNS,
@@ -37,7 +37,7 @@ pub struct HostCreateRequestData<'a> {
     pub name: StringValue<'a>,
     /// The list of IP addresses for the host
     #[serde(rename = "host:addr")]
-    pub addresses: Option<Vec<HostAddr>>,
+    pub addresses: Option<&'a [HostAddr]>,
 }
 
 #[derive(Serialize, Debug)]
@@ -79,7 +79,7 @@ mod tests {
     fn command() {
         let xml = get_xml("request/host/create.xml").unwrap();
 
-        let addresses = vec![
+        let addresses = &[
             HostAddr::new("v4", "29.245.122.14"),
             HostAddr::new("v6", "2404:6800:4001:801::200e"),
         ];

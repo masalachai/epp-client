@@ -134,7 +134,12 @@ pub struct PostalInfo<'a> {
 
 impl<'a> PostalInfo<'a> {
     /// Creates a new PostalInfo instance
-    pub fn new(info_type: &str, name: &'a str, organization: &'a str, address: Address<'a>) -> Self {
+    pub fn new(
+        info_type: &str,
+        name: &'a str,
+        organization: &'a str,
+        address: Address<'a>,
+    ) -> Self {
         Self {
             info_type: info_type.to_string(),
             name: name.into(),

@@ -50,13 +50,13 @@ impl<'a> ContactUpdate<'a> {
     }
 
     /// Sets the data for the &lt;add&gt; tag for the contact update request
-    pub fn add(&mut self, statuses: Vec<ObjectStatus>) {
-        self.contact.add_statuses = Some(StatusList { status: statuses });
+    pub fn add(&mut self, status: &'a [ObjectStatus]) {
+        self.contact.add_statuses = Some(StatusList { status });
     }
 
     /// Sets the data for the &lt;rem&gt; tag for the contact update request
-    pub fn remove(&mut self, statuses: Vec<ObjectStatus>) {
-        self.contact.remove_statuses = Some(StatusList { status: statuses });
+    pub fn remove(&mut self, status: &'a [ObjectStatus]) {
+        self.contact.remove_statuses = Some(StatusList { status });
     }
 }
 
@@ -77,9 +77,9 @@ pub struct ContactChangeInfo<'a> {
 
 /// Type for list of elements of the &lt;status&gt; tag for contact update request
 #[derive(Serialize, Debug)]
-pub struct StatusList {
+pub struct StatusList<'a> {
     #[serde(rename = "contact:status")]
-    status: Vec<ObjectStatus>,
+    status: &'a [ObjectStatus],
 }
 
 /// Type for elements under the contact &lt;update&gt; tag
@@ -90,9 +90,9 @@ pub struct ContactUpdateRequestData<'a> {
     #[serde(rename = "contact:id")]
     id: StringValue<'a>,
     #[serde(rename = "contact:add")]
-    add_statuses: Option<StatusList>,
+    add_statuses: Option<StatusList<'a>>,
     #[serde(rename = "contact:rem")]
-    remove_statuses: Option<StatusList>,
+    remove_statuses: Option<StatusList<'a>>,
     #[serde(rename = "contact:chg")]
     change_info: Option<ContactChangeInfo<'a>>,
 }
@@ -125,11 +125,11 @@ mod tests {
         let voice = Phone::new("+33.47237942");
 
         object.set_info("newemail@eppdev.net", postal_info, voice, "eppdev-387323");
-        let add_statuses = vec![ObjectStatus {
+        let add_statuses = &[ObjectStatus {
             status: "clientTransferProhibited".to_string(),
         }];
         object.add(add_statuses);
-        let remove_statuses = vec![ObjectStatus {
+        let remove_statuses = &[ObjectStatus {
             status: "clientDeleteProhibited".to_string(),
         }];
         object.remove(remove_statuses);

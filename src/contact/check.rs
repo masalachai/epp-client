@@ -30,13 +30,11 @@ pub struct ContactCheck<'a> {
 }
 
 impl<'a> ContactCheck<'a> {
-    pub fn new(contact_ids: &[&'a str]) -> Self {
-        let contact_ids = contact_ids.iter().map(|&d| d.into()).collect();
-
+    pub fn new(contact_ids: &'a [&'a str]) -> Self {
         Self {
             list: ContactList {
                 xmlns: XMLNS,
-                contact_ids,
+                contact_ids: contact_ids.iter().map(|&id| id.into()).collect(),
             },
         }
     }

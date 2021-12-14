@@ -28,7 +28,7 @@ pub struct HostAttr<'a> {
 pub struct HostAttrList<'a> {
     /// The list of &lt;hostAttr&gt; tags
     #[serde(rename = "domain:hostAttr", alias = "hostAttr")]
-    pub hosts: Vec<HostAttr<'a>>,
+    pub hosts: &'a [HostAttr<'a>],
 }
 
 /// The list of &lt;hostObj&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
@@ -36,7 +36,7 @@ pub struct HostAttrList<'a> {
 pub struct HostObjList<'a> {
     /// The list of &lt;hostObj&gt; tags
     #[serde(rename = "domain:hostObj", alias = "hostObj")]
-    pub hosts: Vec<StringValue<'a>>,
+    pub hosts: &'a [StringValue<'a>],
 }
 
 /// Enum that can accept one type which corresponds to either the &lt;hostObj&gt; or &lt;hostAttr&gt;

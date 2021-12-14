@@ -64,10 +64,10 @@ pub struct DomainAddRemove<'a> {
     pub ns: Option<HostList<'a>>,
     /// The list of contacts to add to or remove from the domain
     #[serde(rename = "domain:contact")]
-    pub contacts: Option<Vec<DomainContact>>,
+    pub contacts: Option<&'a [DomainContact]>,
     /// The list of statuses to add to or remove from the domain
     #[serde(rename = "domain:status")]
-    pub statuses: Option<Vec<ObjectStatus>>,
+    pub statuses: Option<&'a [ObjectStatus]>,
 }
 
 /// Type for elements under the &lt;update&gt; tag for domain update
@@ -112,20 +112,24 @@ mod tests {
 
         let mut object = DomainUpdate::new("eppdev.com");
 
+        let statuses = &[ObjectStatus {
+            status: "clientDeleteProhibited".to_string(),
+        }];
+
         let add = DomainAddRemove {
             ns: None,
             contacts: None,
-            statuses: Some(vec![ObjectStatus {
-                status: "clientDeleteProhibited".to_string(),
-            }]),
+            statuses: Some(statuses),
         };
+
+        let contacts = &[DomainContact {
+            contact_type: "billing".to_string(),
+            id: "eppdev-contact-2".to_string(),
+        }];
 
         let remove = DomainAddRemove {
             ns: None,
-            contacts: Some(vec![DomainContact {
-                contact_type: "billing".to_string(),
-                id: "eppdev-contact-2".to_string(),
-            }]),
+            contacts: Some(contacts),
             statuses: None,
         };
 
