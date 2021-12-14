@@ -31,12 +31,12 @@ impl<'a> HostUpdate<'a> {
     }
 
     /// Sets the data for the &lt;add&gt; element of the host update
-    pub fn add(&mut self, add: HostAddRemove) {
+    pub fn add(&mut self, add: HostAddRemove<'a>) {
         self.host.add = Some(add);
     }
 
     /// Sets the data for the &lt;rem&gt; element of the host update
-    pub fn remove(&mut self, remove: HostAddRemove) {
+    pub fn remove(&mut self, remove: HostAddRemove<'a>) {
         self.host.remove = Some(remove);
     }
 }
@@ -51,13 +51,13 @@ pub struct HostChangeInfo<'a> {
 
 /// Type for data under the &lt;add&gt; and &lt;rem&gt; tags
 #[derive(Serialize, Debug)]
-pub struct HostAddRemove {
+pub struct HostAddRemove<'a> {
     /// The IP addresses to be added to or removed from the host
     #[serde(rename = "host:addr")]
-    pub addresses: Option<Vec<HostAddr>>,
+    pub addresses: Option<&'a [HostAddr]>,
     /// The statuses to be added to or removed from the host
     #[serde(rename = "host:status")]
-    pub statuses: Option<Vec<ObjectStatus>>,
+    pub statuses: Option<&'a [ObjectStatus]>,
 }
 
 /// Type for data under the host &lt;update&gt; tag
@@ -71,10 +71,10 @@ pub struct HostUpdateRequestData<'a> {
     name: StringValue<'a>,
     /// The IP addresses and statuses to be added to the host
     #[serde(rename = "host:add")]
-    add: Option<HostAddRemove>,
+    add: Option<HostAddRemove<'a>>,
     /// The IP addresses and statuses to be removed from the host
     #[serde(rename = "host:rem")]
-    remove: Option<HostAddRemove>,
+    remove: Option<HostAddRemove<'a>>,
     /// The host details that need to be updated
     #[serde(rename = "host:chg")]
     change_info: Option<HostChangeInfo<'a>>,
@@ -99,18 +99,20 @@ mod tests {
     fn command() {
         let xml = get_xml("request/host/update.xml").unwrap();
 
-        let addr = vec![HostAddr::new("v6", "2404:6800:4001:801::200e")];
+        let addr = &[HostAddr::new("v6", "2404:6800:4001:801::200e")];
 
         let add = HostAddRemove {
             addresses: Some(addr),
             statuses: None,
         };
 
+        let statuses = &[ObjectStatus {
+            status: "clientDeleteProhibited".to_string(),
+        }];
+
         let remove = HostAddRemove {
             addresses: None,
-            statuses: Some(vec![ObjectStatus {
-                status: "clientDeleteProhibited".to_string(),
-            }]),
+            statuses: Some(statuses),
         };
 
         let mut object = HostUpdate::new("host1.eppdev-1.com");
