@@ -27,10 +27,10 @@ impl HostDelete {
 #[derive(Serialize, Debug)]
 pub struct HostDeleteRequestData {
     /// XML namespace for host commands
-    #[serde(rename = "xmlns:host", alias = "xmlns")]
+    #[serde(rename = "xmlns:host")]
     xmlns: String,
     /// The host to be deleted
-    #[serde(rename = "host:name", alias = "name")]
+    #[serde(rename = "host:name")]
     name: StringValue,
 }
 
@@ -38,7 +38,7 @@ pub struct HostDeleteRequestData {
 /// Type for EPP XML &lt;delete&gt; command for hosts
 pub struct HostDelete {
     /// The instance holding the data for the host to be deleted
-    #[serde(rename = "host:delete", alias = "delete")]
+    #[serde(rename = "host:delete")]
     host: HostDeleteRequestData,
 }
 

@@ -33,10 +33,10 @@ impl HostCheck {
 #[derive(Serialize, Debug)]
 pub struct HostList {
     /// XML namespace for host commands
-    #[serde(rename = "xmlns:host", alias = "xmlns")]
+    #[serde(rename = "xmlns:host")]
     xmlns: String,
     /// List of hosts to be checked for availability
-    #[serde(rename = "host:name", alias = "name")]
+    #[serde(rename = "host:name")]
     pub hosts: Vec<StringValue>,
 }
 
@@ -44,7 +44,7 @@ pub struct HostList {
 /// Type for EPP XML &lt;check&gt; command for hosts
 pub struct HostCheck {
     /// The instance holding the list of hosts to be checked
-    #[serde(rename = "host:check", alias = "check")]
+    #[serde(rename = "host:check")]
     list: HostList,
 }
 

@@ -19,26 +19,26 @@ impl Command for DomainCreate {
 #[derive(Serialize, Debug)]
 pub struct DomainCreateRequestData {
     /// XML namespace for domain commands
-    #[serde(rename = "xmlns:domain", alias = "xmlns")]
+    #[serde(rename = "xmlns:domain")]
     pub xmlns: String,
     /// The domain name
-    #[serde(rename = "domain:name", alias = "name")]
+    #[serde(rename = "domain:name")]
     pub name: StringValue,
     /// The period of registration
-    #[serde(rename = "domain:period", alias = "period")]
+    #[serde(rename = "domain:period")]
     pub period: Period,
     /// The list of nameserver hosts
     /// either of type `HostObjList` or `HostAttrList`
-    #[serde(rename = "domain:ns", alias = "ns")]
+    #[serde(rename = "domain:ns")]
     pub ns: Option<HostList>,
     /// The domain registrant
-    #[serde(rename = "domain:registrant", alias = "registrant")]
+    #[serde(rename = "domain:registrant")]
     pub registrant: Option<StringValue>,
     /// The list of contacts for the domain
-    #[serde(rename = "domain:contact", alias = "contact")]
+    #[serde(rename = "domain:contact")]
     pub contacts: Option<Vec<DomainContact>>,
     /// The auth info for the domain
-    #[serde(rename = "domain:authInfo", alias = "authInfo")]
+    #[serde(rename = "domain:authInfo")]
     pub auth_info: DomainAuthInfo,
 }
 
@@ -48,7 +48,7 @@ pub struct DomainCreate {
     /// The data for the domain to be created with
     /// T being the type of nameserver list (`HostObjList` or `HostAttrList`)
     /// to be supplied
-    #[serde(rename = "domain:create", alias = "create")]
+    #[serde(rename = "domain:create")]
     pub domain: DomainCreateRequestData,
 }
 

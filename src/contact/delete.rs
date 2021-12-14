@@ -16,17 +16,17 @@ impl Command for ContactDelete {
 #[derive(Serialize, Debug)]
 pub struct ContactDeleteRequestData {
     /// XML namespace for the &lt;delete&gt; command for contacts
-    #[serde(rename = "xmlns:contact", alias = "xmlns")]
+    #[serde(rename = "xmlns:contact")]
     xmlns: String,
     /// The id of the contact to be deleted
-    #[serde(rename = "contact:id", alias = "id")]
+    #[serde(rename = "contact:id")]
     id: StringValue,
 }
 
 #[derive(Serialize, Debug)]
 /// The &lt;delete&gt; type for the contact delete EPP command
 pub struct ContactDelete {
-    #[serde(rename = "contact:delete", alias = "delete")]
+    #[serde(rename = "contact:delete")]
     /// The data for the &lt;delete&gt; tag for a contact delete command
     contact: ContactDeleteRequestData,
 }

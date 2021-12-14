@@ -80,10 +80,10 @@ pub struct Update {
 /// Type for EPP XML &lt;consolidate&gt; extension
 pub struct UpdateData {
     /// XML namespace for the consolidate extension
-    #[serde(rename = "xmlns:sync", alias = "xmlns")]
+    #[serde(rename = "xmlns:sync")]
     pub xmlns: String,
     /// The expiry date of the domain
-    #[serde(rename = "sync:expMonthDay", alias = "sync")]
+    #[serde(rename = "sync:expMonthDay")]
     pub exp: StringValue,
 }
 

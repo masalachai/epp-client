@@ -30,13 +30,13 @@ impl HostCreate {
 #[derive(Serialize, Debug)]
 pub struct HostCreateRequestData {
     /// XML namespace for host commands
-    #[serde(rename = "xmlns:host", alias = "xmlns")]
+    #[serde(rename = "xmlns:host")]
     xmlns: String,
     /// The name of the host to be created
-    #[serde(rename = "host:name", alias = "name")]
+    #[serde(rename = "host:name")]
     pub name: StringValue,
     /// The list of IP addresses for the host
-    #[serde(rename = "host:addr", alias = "addr")]
+    #[serde(rename = "host:addr")]
     pub addresses: Option<Vec<HostAddr>>,
 }
 
@@ -44,7 +44,7 @@ pub struct HostCreateRequestData {
 /// Type for EPP XML &lt;create&gt; command for hosts
 pub struct HostCreate {
     /// The instance holding the data for the host to be created
-    #[serde(rename = "host:create", alias = "create")]
+    #[serde(rename = "host:create")]
     host: HostCreateRequestData,
 }
 

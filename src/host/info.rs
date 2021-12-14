@@ -29,10 +29,10 @@ impl HostInfo {
 #[derive(Serialize, Debug)]
 pub struct HostInfoRequestData {
     /// XML namespace for host commands
-    #[serde(rename = "xmlns:host", alias = "xmlns")]
+    #[serde(rename = "xmlns:host")]
     xmlns: String,
     /// The name of the host to be queried
-    #[serde(rename = "host:name", alias = "name")]
+    #[serde(rename = "host:name")]
     name: StringValue,
 }
 
@@ -40,7 +40,7 @@ pub struct HostInfoRequestData {
 /// Type for EPP XML &lt;info&gt; command for hosts
 pub struct HostInfo {
     /// The instance holding the data for the host query
-    #[serde(rename = "host:info", alias = "info")]
+    #[serde(rename = "host:info")]
     info: HostInfoRequestData,
 }
 

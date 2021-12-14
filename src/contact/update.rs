@@ -63,37 +63,37 @@ impl ContactUpdate {
 /// Type for elements under the &lt;chg&gt; tag for contact update request
 #[derive(Serialize, Debug)]
 pub struct ContactChangeInfo {
-    #[serde(rename = "contact:postalInfo", alias = "postalInfo")]
+    #[serde(rename = "contact:postalInfo")]
     postal_info: Option<PostalInfo>,
-    #[serde(rename = "contact:voice", alias = "voice")]
+    #[serde(rename = "contact:voice")]
     voice: Option<Phone>,
-    #[serde(rename = "contact:fax", alias = "fax")]
+    #[serde(rename = "contact:fax")]
     fax: Option<Phone>,
-    #[serde(rename = "contact:email", alias = "email")]
+    #[serde(rename = "contact:email")]
     email: Option<StringValue>,
-    #[serde(rename = "contact:authInfo", alias = "authInfo")]
+    #[serde(rename = "contact:authInfo")]
     auth_info: Option<ContactAuthInfo>,
 }
 
 /// Type for list of elements of the &lt;status&gt; tag for contact update request
 #[derive(Serialize, Debug)]
 pub struct StatusList {
-    #[serde(rename = "contact:status", alias = "status")]
+    #[serde(rename = "contact:status")]
     status: Vec<ObjectStatus>,
 }
 
 /// Type for elements under the contact &lt;update&gt; tag
 #[derive(Serialize, Debug)]
 pub struct ContactUpdateRequestData {
-    #[serde(rename = "xmlns:contact", alias = "xmlns")]
+    #[serde(rename = "xmlns:contact")]
     xmlns: String,
-    #[serde(rename = "contact:id", alias = "id")]
+    #[serde(rename = "contact:id")]
     id: StringValue,
-    #[serde(rename = "contact:add", alias = "add")]
+    #[serde(rename = "contact:add")]
     add_statuses: Option<StatusList>,
-    #[serde(rename = "contact:rem", alias = "rem")]
+    #[serde(rename = "contact:rem")]
     remove_statuses: Option<StatusList>,
-    #[serde(rename = "contact:chg", alias = "chg")]
+    #[serde(rename = "contact:chg")]
     change_info: Option<ContactChangeInfo>,
 }
 
@@ -101,7 +101,7 @@ pub struct ContactUpdateRequestData {
 /// Type for EPP XML &lt;update&gt; command for contacts
 pub struct ContactUpdate {
     /// The data under the &lt;update&gt; tag for the contact update
-    #[serde(rename = "contact:update", alias = "update")]
+    #[serde(rename = "contact:update")]
     contact: ContactUpdateRequestData,
 }
 

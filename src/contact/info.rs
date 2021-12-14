@@ -18,13 +18,13 @@ impl Command for ContactInfo {
 #[derive(Serialize, Debug)]
 pub struct ContactInfoRequestData {
     /// XML namespace for contact commands
-    #[serde(rename = "xmlns:contact", alias = "contact")]
+    #[serde(rename = "xmlns:contact")]
     xmlns: String,
     /// The contact id for the info command
-    #[serde(rename = "contact:id", alias = "id")]
+    #[serde(rename = "contact:id")]
     id: StringValue,
     /// The &lt;authInfo&gt; data
-    #[serde(rename = "contact:authInfo", alias = "authInfo")]
+    #[serde(rename = "contact:authInfo")]
     auth_info: ContactAuthInfo,
 }
 
@@ -32,7 +32,7 @@ pub struct ContactInfoRequestData {
 /// Type for EPP XML &lt;info&gt; command for contacts
 pub struct ContactInfo {
     /// Data for &lt;info&gt; command for contact
-    #[serde(rename = "contact:info", alias = "info")]
+    #[serde(rename = "contact:info")]
     info: ContactInfoRequestData,
 }
 

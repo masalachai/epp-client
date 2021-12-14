@@ -53,25 +53,25 @@ impl Extension for Update<RgpRestoreReport> {
 #[derive(Serialize, Debug)]
 pub struct RgpRestoreReportSectionData {
     /// The pre-delete registration date
-    #[serde(rename = "rgp:preData", alias = "preData")]
+    #[serde(rename = "rgp:preData")]
     pre_data: StringValue,
     /// The post-delete registration date
-    #[serde(rename = "rgp:postData", alias = "postData")]
+    #[serde(rename = "rgp:postData")]
     post_data: StringValue,
     /// The domain deletion date
-    #[serde(rename = "rgp:delTime", alias = "delTime")]
+    #[serde(rename = "rgp:delTime")]
     deleted_at: StringValue,
     /// The domain restore request date
-    #[serde(rename = "rgp:resTime", alias = "resTime")]
+    #[serde(rename = "rgp:resTime")]
     restored_at: StringValue,
     /// The reason for domain restoration
-    #[serde(rename = "rgp:resReason", alias = "resReason")]
+    #[serde(rename = "rgp:resReason")]
     restore_reason: StringValue,
     /// The registrar's statements on the domain restoration
-    #[serde(rename = "rgp:statement", alias = "statement")]
+    #[serde(rename = "rgp:statement")]
     statements: Vec<StringValue>,
     /// Other remarks for domain restoration
-    #[serde(rename = "rgp:other", alias = "other")]
+    #[serde(rename = "rgp:other")]
     other: StringValue,
 }
 
@@ -81,7 +81,7 @@ pub struct RgpRestoreReportSection {
     /// The value of the op attribute for the &lt;restore&gt; tag
     op: String,
     /// Data for the &lt;report&gt; tag
-    #[serde(rename = "rgp:report", alias = "report")]
+    #[serde(rename = "rgp:report")]
     report: RgpRestoreReportSectionData,
 }
 
@@ -89,10 +89,10 @@ pub struct RgpRestoreReportSection {
 /// Type for EPP XML &lt;check&gt; command for domains
 pub struct RgpRestoreReport {
     /// XML namespace for the RGP restore extension
-    #[serde(rename = "xmlns:rgp", alias = "xmlns")]
+    #[serde(rename = "xmlns:rgp")]
     xmlns: String,
     /// The object holding the list of domains to be checked
-    #[serde(rename = "rgp:restore", alias = "restore")]
+    #[serde(rename = "rgp:restore")]
     restore: RgpRestoreReportSection,
 }
 

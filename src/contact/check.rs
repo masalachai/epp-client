@@ -14,10 +14,10 @@ impl Transaction<NoExtension> for ContactCheck {}
 #[derive(Serialize, Debug)]
 pub struct ContactList {
     /// The XML namespace for the contact &lt;check&gt;
-    #[serde(rename = "xmlns:contact", alias = "xmlns")]
+    #[serde(rename = "xmlns:contact")]
     xmlns: String,
     /// The list of contact ids to check for availability
-    #[serde(rename = "contact:id", alias = "id")]
+    #[serde(rename = "contact:id")]
     pub contact_ids: Vec<StringValue>,
 }
 
@@ -25,7 +25,7 @@ pub struct ContactList {
 /// The &lt;command&gt; type for contact check command
 pub struct ContactCheck {
     /// The &lt;check&gt; tag for the contact check command
-    #[serde(rename = "contact:check", alias = "check")]
+    #[serde(rename = "contact:check")]
     list: ContactList,
 }
 
