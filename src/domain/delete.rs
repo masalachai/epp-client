@@ -16,7 +16,7 @@ impl DomainDelete {
     pub fn new(name: &str) -> Self {
         Self {
             domain: DomainDeleteRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
             },
         }
@@ -28,7 +28,7 @@ impl DomainDelete {
 pub struct DomainDeleteRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The domain to be deleted
     #[serde(rename = "domain:name")]
     name: StringValue,

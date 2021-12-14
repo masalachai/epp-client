@@ -16,7 +16,7 @@ impl ContactUpdate {
     pub fn new(id: &str) -> ContactUpdate {
         Self {
             contact: ContactUpdateRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 id: id.into(),
                 add_statuses: None,
                 remove_statuses: None,
@@ -86,7 +86,7 @@ pub struct StatusList {
 #[derive(Serialize, Debug)]
 pub struct ContactUpdateRequestData {
     #[serde(rename = "xmlns:contact")]
-    xmlns: String,
+    xmlns: &'static str,
     #[serde(rename = "contact:id")]
     id: StringValue,
     #[serde(rename = "contact:add")]

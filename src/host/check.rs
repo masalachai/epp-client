@@ -20,7 +20,7 @@ impl HostCheck {
 
         Self {
             list: HostList {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 hosts,
             },
         }
@@ -34,7 +34,7 @@ impl HostCheck {
 pub struct HostList {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: String,
+    xmlns: &'static str,
     /// List of hosts to be checked for availability
     #[serde(rename = "host:name")]
     pub hosts: Vec<StringValue>,

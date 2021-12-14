@@ -18,7 +18,7 @@ impl DomainRenew {
         let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();
         Self {
             domain: DomainRenewRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 name: name.into(),
                 current_expiry_date: exp_date_str,
                 period: Period::new(years),
@@ -34,7 +34,7 @@ impl DomainRenew {
 pub struct DomainRenewRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The name of the domain to be renewed
     #[serde(rename = "domain:name")]
     name: StringValue,

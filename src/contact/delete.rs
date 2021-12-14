@@ -17,7 +17,7 @@ impl Command for ContactDelete {
 pub struct ContactDeleteRequestData {
     /// XML namespace for the &lt;delete&gt; command for contacts
     #[serde(rename = "xmlns:contact")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The id of the contact to be deleted
     #[serde(rename = "contact:id")]
     id: StringValue,
@@ -35,7 +35,7 @@ impl ContactDelete {
     pub fn new(id: &str) -> ContactDelete {
         Self {
             contact: ContactDeleteRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 id: id.into(),
             },
         }

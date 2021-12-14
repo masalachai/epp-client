@@ -63,7 +63,7 @@ impl Update {
     pub fn new(expiration: GMonthDay) -> Self {
         Self {
             data: UpdateData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 exp: expiration.to_string().into(),
             },
         }
@@ -81,7 +81,7 @@ pub struct Update {
 pub struct UpdateData {
     /// XML namespace for the consolidate extension
     #[serde(rename = "xmlns:sync")]
-    pub xmlns: String,
+    pub xmlns: &'static str,
     /// The expiry date of the domain
     #[serde(rename = "sync:expMonthDay")]
     pub exp: StringValue,

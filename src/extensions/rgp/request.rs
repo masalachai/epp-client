@@ -31,7 +31,7 @@ pub struct RgpRestoreRequestData {
 pub struct RgpRestoreRequest {
     /// XML namespace for the RGP restore extension
     #[serde(rename = "xmlns:rgp")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The object holding the list of domains to be checked
     #[serde(rename = "rgp:restore")]
     restore: RgpRestoreRequestData,
@@ -40,7 +40,7 @@ pub struct RgpRestoreRequest {
 impl Default for RgpRestoreRequest {
     fn default() -> Self {
         Self {
-            xmlns: XMLNS.to_string(),
+            xmlns: XMLNS,
             restore: RgpRestoreRequestData {
                 op: "request".to_string(),
             },

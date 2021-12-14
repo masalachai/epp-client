@@ -24,7 +24,7 @@ impl RgpRestoreReport {
         let statements = statements.iter().map(|&s| s.into()).collect();
 
         RgpRestoreReport {
-            xmlns: XMLNS.to_string(),
+            xmlns: XMLNS,
             restore: RgpRestoreReportSection {
                 op: "report".to_string(),
                 report: RgpRestoreReportSectionData {
@@ -90,7 +90,7 @@ pub struct RgpRestoreReportSection {
 pub struct RgpRestoreReport {
     /// XML namespace for the RGP restore extension
     #[serde(rename = "xmlns:rgp")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The object holding the list of domains to be checked
     #[serde(rename = "rgp:restore")]
     restore: RgpRestoreReportSection,

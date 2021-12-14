@@ -16,7 +16,7 @@ impl DomainInfo {
     pub fn new(name: &str, auth_password: Option<&str>) -> Self {
         Self {
             info: DomainInfoRequestData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS,
                 domain: Domain {
                     hosts: "all".to_string(),
                     name: name.to_string(),
@@ -46,7 +46,7 @@ pub struct Domain {
 pub struct DomainInfoRequestData {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    xmlns: String,
+    xmlns: &'static str,
     /// The data for the domain to be queried
     #[serde(rename = "domain:name")]
     domain: Domain,
