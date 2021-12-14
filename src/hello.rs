@@ -31,14 +31,14 @@ impl EppXml for HelloDocument {}
 // Response
 
 /// Type for data within the <svcMenu> section of an EPP greeting
-#[derive(Serialize, Debug, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct ServiceMenu {
     pub options: Options,
     pub services: Services,
 }
 
 /// Simplified service menu type for deserialization to `ServiceMenu` type from EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 struct FlattenedServiceMenu {
     pub version: StringValue,
     pub lang: StringValue,
@@ -72,31 +72,31 @@ impl<'de> Deserialize<'de> for ServiceMenu {
 }
 
 /// Type corresponding to <all> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct All;
 
 /// Type corresponding to <none> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct NoAccess;
 
 /// Type corresponding to <null> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Null;
 
 /// Type corresponding to <personal> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Personal;
 
 /// Type corresponding to <personalAndOther> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct PersonalAndOther;
 
 /// Type corresponding to <other> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Other;
 
 /// Type corresponding to possible <retention> type values
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub enum AccessType {
     /// Data for the <all> tag
     #[serde(rename = "all")]
@@ -119,14 +119,14 @@ pub enum AccessType {
 }
 
 /// Type corresponding to <access> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Access {
     #[serde(flatten)]
     pub ty: AccessType,
 }
 
 /// Type corresponding to possible <purpose> type values
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub enum PurposeType {
     /// Data for the <admin> tag
     #[serde(rename = "admin")]
@@ -143,14 +143,14 @@ pub enum PurposeType {
 }
 
 /// Type corresponding to <purpose> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Purpose {
     #[serde(rename = "$value")]
     pub purpose: Vec<PurposeType>,
 }
 
 /// Type corresponding to possible <purpose> type values
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub enum RecipientType {
     /// Data for the <other> tag
     #[serde(rename = "other")]
@@ -170,34 +170,34 @@ pub enum RecipientType {
 }
 
 /// Type corresponding to <recipeint> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Recipient {
     #[serde(rename = "$value")]
     pub recipient: Vec<RecipientType>,
 }
 
 /// Type corresponding to <business> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Business;
 
 /// Type corresponding to <indefinite> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Indefinite;
 
 /// Type corresponding to <legal> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Legal;
 
 /// Type corresponding to <none> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct No;
 
 /// Type corresponding to <stated> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Stated;
 
 /// Type corresponding to possible <retention> type values
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub enum RetentionType {
     /// Data for the <business> tag
     #[serde(rename = "business")]
@@ -217,14 +217,14 @@ pub enum RetentionType {
 }
 
 /// Type corresponding to <retention> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Retention {
     #[serde(flatten)]
     pub ty: RetentionType,
 }
 
 /// Type corresponding to <statement> in the EPP greeting XML (pending more compliant implementation)
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Statement {
     /// Data for the <purpose> tag
     pub purpose: Purpose,
@@ -235,21 +235,21 @@ pub struct Statement {
 }
 
 /// Type corresponding to <absolute> value in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Absolute {
     #[serde(rename = "$value")]
     pub absolute: StringValue,
 }
 
 /// Type corresponding to <relative> value in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Relative {
     #[serde(rename = "$value")]
     pub relative: StringValue,
 }
 
 /// Type corresponding to possible <expiry> type values
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub enum ExpiryType {
     /// Data for the <absolute> tag
     #[serde(rename = "absolute")]
@@ -260,14 +260,14 @@ pub enum ExpiryType {
 }
 
 /// Type corresponding to <expiry> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Expiry {
     #[serde(flatten)]
     pub ty: ExpiryType,
 }
 
 /// Type corresponding to <dcp> in the EPP greeting XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 pub struct Dcp {
     /// Data for the <access> tag
     pub access: Access,
@@ -277,7 +277,7 @@ pub struct Dcp {
     pub expiry: Option<Expiry>,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "lowercase")]
 /// Type corresponding to the <greeting> tag in the EPP greeting XML
 pub struct Greeting {
@@ -294,7 +294,7 @@ pub struct Greeting {
     pub dcp: Dcp,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq)]
 #[serde(rename = "epp")]
 pub struct GreetingDocument {
     #[serde(rename = "greeting")]

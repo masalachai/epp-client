@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::{
     common::{NoExtension, Options, ServiceExtension, Services, StringValue},
@@ -10,7 +10,7 @@ use crate::{
 
 impl Transaction<NoExtension> for Login {}
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Debug, PartialEq)]
 /// Type corresponding to the &lt;login&gt; tag in an EPP XML login request
 pub struct Login {
     /// The username to use for the login
