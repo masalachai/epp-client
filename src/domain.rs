@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use serde::{Deserialize, Serialize};
 
 use crate::common::{HostAddr, StringValue};
@@ -20,7 +22,7 @@ pub struct HostAttr<'a> {
     pub name: StringValue<'a>,
     /// The &lt;hostAddr&gt; tags
     #[serde(rename = "domain:hostAddr", alias = "hostAddr")]
-    pub addresses: Option<Vec<HostAddr>>,
+    pub addresses: Option<Vec<HostAddr<'a>>>,
 }
 
 /// The list of &lt;hostAttr&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
@@ -50,13 +52,13 @@ pub enum HostList<'a> {
 
 /// The &lt;contact&gt; type on domain creation and update requests
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DomainContact {
+pub struct DomainContact<'a> {
     /// The contact id
     #[serde(rename = "$value")]
-    pub id: String,
+    pub id: Cow<'a, str>,
     /// The contact type attr (usually admin, billing, or tech in most registries)
     #[serde(rename = "type")]
-    pub contact_type: String,
+    pub contact_type: Cow<'a, str>,
 }
 
 /// The &lt;period&gt; type for registration, renewal or transfer on domain transactions

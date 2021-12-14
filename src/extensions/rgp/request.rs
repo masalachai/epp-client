@@ -9,11 +9,11 @@ use serde::{Deserialize, Serialize};
 
 use super::{Update, XMLNS};
 
-impl<'a> Transaction<Update<RgpRestoreRequest>> for DomainUpdate<'a> {}
+impl<'a> Transaction<Update<RgpRestoreRequest<'a>>> for DomainUpdate<'a> {}
 
-impl<'a> Transaction<Update<RgpRestoreRequest>> for DomainInfo<'a> {}
+impl<'a> Transaction<Update<RgpRestoreRequest<'a>>> for DomainInfo<'a> {}
 
-impl Extension for Update<RgpRestoreRequest> {
+impl<'a> Extension for Update<RgpRestoreRequest<'a>> {
     type Response = Update<RgpRequestResponse>;
 }
 
@@ -21,29 +21,27 @@ impl Extension for Update<RgpRestoreRequest> {
 
 /// Type corresponding to the &lt;restore&gt; tag for an rgp restore request
 #[derive(Serialize, Debug)]
-pub struct RgpRestoreRequestData {
+pub struct RgpRestoreRequestData<'a> {
     /// The value of the op attribute in the &lt;restore&gt; tag
-    pub op: String,
+    pub op: &'a str,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;check&gt; command for domains
-pub struct RgpRestoreRequest {
+pub struct RgpRestoreRequest<'a> {
     /// XML namespace for the RGP restore extension
     #[serde(rename = "xmlns:rgp")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The object holding the list of domains to be checked
     #[serde(rename = "rgp:restore")]
-    restore: RgpRestoreRequestData,
+    restore: RgpRestoreRequestData<'a>,
 }
 
-impl Default for RgpRestoreRequest {
+impl Default for RgpRestoreRequest<'static> {
     fn default() -> Self {
         Self {
             xmlns: XMLNS,
-            restore: RgpRestoreRequestData {
-                op: "request".to_string(),
-            },
+            restore: RgpRestoreRequestData { op: "request" },
         }
     }
 }

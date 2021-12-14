@@ -2,9 +2,9 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for MessagePoll {}
+impl<'a> Transaction<NoExtension> for MessagePoll<'a> {}
 
-impl Command for MessagePoll {
+impl<'a> Command for MessagePoll<'a> {
     type Response = MessagePollResponse;
     const COMMAND: &'static str = "poll";
 }
@@ -13,17 +13,15 @@ impl Command for MessagePoll {
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;poll&gt; command for message poll
-pub struct MessagePoll {
+pub struct MessagePoll<'a> {
     /// The type of operation to perform
     /// The value is "req" for message polling
-    op: String,
+    op: &'a str,
 }
 
-impl Default for MessagePoll {
+impl Default for MessagePoll<'static> {
     fn default() -> Self {
-        Self {
-            op: "req".to_owned(),
-        }
+        Self { op: "req" }
     }
 }
 

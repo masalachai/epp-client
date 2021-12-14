@@ -64,10 +64,10 @@ pub struct DomainAddRemove<'a> {
     pub ns: Option<HostList<'a>>,
     /// The list of contacts to add to or remove from the domain
     #[serde(rename = "domain:contact")]
-    pub contacts: Option<&'a [DomainContact]>,
+    pub contacts: Option<&'a [DomainContact<'a>]>,
     /// The list of statuses to add to or remove from the domain
     #[serde(rename = "domain:status")]
-    pub statuses: Option<&'a [ObjectStatus]>,
+    pub statuses: Option<&'a [ObjectStatus<'a>]>,
 }
 
 /// Type for elements under the &lt;update&gt; tag for domain update
@@ -113,7 +113,7 @@ mod tests {
         let mut object = DomainUpdate::new("eppdev.com");
 
         let statuses = &[ObjectStatus {
-            status: "clientDeleteProhibited".to_string(),
+            status: "clientDeleteProhibited".into(),
         }];
 
         let add = DomainAddRemove {
@@ -123,8 +123,8 @@ mod tests {
         };
 
         let contacts = &[DomainContact {
-            contact_type: "billing".to_string(),
-            id: "eppdev-contact-2".to_string(),
+            contact_type: "billing".into(),
+            id: "eppdev-contact-2".into(),
         }];
 
         let remove = DomainAddRemove {

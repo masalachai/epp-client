@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
@@ -50,27 +51,27 @@ impl<'a> ContactAuthInfo<'a> {
 
 /// The data for &lt;voice&gt; and &lt;fax&gt; types on domain transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Phone {
+pub struct Phone<'a> {
     /// The inner text on the &lt;voice&gt; and &lt;fax&gt; tags
     #[serde(rename = "$value")]
-    pub number: String,
+    pub number: Cow<'a, str>,
     /// The value of the 'x' attr on &lt;voice&gt; and &lt;fax&gt; tags
     #[serde(rename = "x")]
-    pub extension: Option<String>,
+    pub extension: Option<Cow<'a, str>>,
 }
 
-impl Phone {
+impl<'a> Phone<'a> {
     /// Creates a new Phone instance with a given phone number
-    pub fn new(number: &str) -> Phone {
-        Phone {
+    pub fn new(number: &'a str) -> Self {
+        Self {
             extension: None,
-            number: number.to_string(),
+            number: number.into(),
         }
     }
 
     /// Sets the extension value of the Phone type
-    pub fn set_extension(&mut self, ext: &str) {
-        self.extension = Some(ext.to_string());
+    pub fn set_extension(&mut self, ext: &'a str) {
+        self.extension = Some(ext.into());
     }
 }
 

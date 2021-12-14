@@ -30,7 +30,7 @@ impl<'a> ContactUpdate<'a> {
         &mut self,
         email: &'a str,
         postal_info: PostalInfo<'a>,
-        voice: Phone,
+        voice: Phone<'a>,
         auth_password: &'a str,
     ) {
         self.contact.change_info = Some(ContactChangeInfo {
@@ -43,7 +43,7 @@ impl<'a> ContactUpdate<'a> {
     }
 
     /// Sets the data for the &lt;fax&gt; tag under &lt;chg&gt; for the contact update request
-    pub fn set_fax(&mut self, fax: Phone) {
+    pub fn set_fax(&mut self, fax: Phone<'a>) {
         if let Some(info) = &mut self.contact.change_info {
             info.fax = Some(fax)
         }
@@ -66,9 +66,9 @@ pub struct ContactChangeInfo<'a> {
     #[serde(rename = "contact:postalInfo")]
     postal_info: Option<PostalInfo<'a>>,
     #[serde(rename = "contact:voice")]
-    voice: Option<Phone>,
+    voice: Option<Phone<'a>>,
     #[serde(rename = "contact:fax")]
-    fax: Option<Phone>,
+    fax: Option<Phone<'a>>,
     #[serde(rename = "contact:email")]
     email: Option<StringValue<'a>>,
     #[serde(rename = "contact:authInfo")]
@@ -79,7 +79,7 @@ pub struct ContactChangeInfo<'a> {
 #[derive(Serialize, Debug)]
 pub struct StatusList<'a> {
     #[serde(rename = "contact:status")]
-    status: &'a [ObjectStatus],
+    status: &'a [ObjectStatus<'a>],
 }
 
 /// Type for elements under the contact &lt;update&gt; tag
@@ -126,11 +126,11 @@ mod tests {
 
         object.set_info("newemail@eppdev.net", postal_info, voice, "eppdev-387323");
         let add_statuses = &[ObjectStatus {
-            status: "clientTransferProhibited".to_string(),
+            status: "clientTransferProhibited".into(),
         }];
         object.add(add_statuses);
         let remove_statuses = &[ObjectStatus {
-            status: "clientDeleteProhibited".to_string(),
+            status: "clientDeleteProhibited".into(),
         }];
         object.remove(remove_statuses);
 

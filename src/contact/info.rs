@@ -59,14 +59,14 @@ pub struct ContactInfoData<'a> {
     pub roid: StringValue<'a>,
     /// The list of contact statuses
     #[serde(rename = "status")]
-    pub statuses: Vec<ObjectStatus>,
+    pub statuses: Vec<ObjectStatus<'a>>,
     /// The postal info for the contact
     #[serde(rename = "postalInfo")]
     pub postal_info: PostalInfo<'a>,
     /// The voice data for the contact
-    pub voice: Phone,
+    pub voice: Phone<'a>,
     /// The fax data for the contact
-    pub fax: Option<Phone>,
+    pub fax: Option<Phone<'a>>,
     /// The email for the contact
     pub email: StringValue<'a>,
     /// The epp user to whom the contact belongs

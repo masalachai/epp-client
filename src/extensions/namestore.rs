@@ -1,5 +1,7 @@
 //! Types for EPP namestore request and responses
 
+use std::borrow::Cow;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -23,62 +25,62 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 
 // Contact
 
-impl<'a> Transaction<NameStore> for ContactCheck<'a> {}
-impl<'a> Transaction<NameStore> for ContactCreate<'a> {}
-impl<'a> Transaction<NameStore> for ContactDelete<'a> {}
-impl<'a> Transaction<NameStore> for ContactInfo<'a> {}
-impl<'a> Transaction<NameStore> for ContactUpdate<'a> {}
+impl<'a> Transaction<NameStore<'a>> for ContactCheck<'a> {}
+impl<'a> Transaction<NameStore<'a>> for ContactCreate<'a> {}
+impl<'a> Transaction<NameStore<'a>> for ContactDelete<'a> {}
+impl<'a> Transaction<NameStore<'a>> for ContactInfo<'a> {}
+impl<'a> Transaction<NameStore<'a>> for ContactUpdate<'a> {}
 
 // Domain
 
-impl<'a> Transaction<NameStore> for DomainCheck<'a> {}
-impl<'a> Transaction<NameStore> for DomainCreate<'a> {}
-impl<'a> Transaction<NameStore> for DomainDelete<'a> {}
-impl<'a> Transaction<NameStore> for DomainInfo<'a> {}
-impl<'a> Transaction<NameStore> for DomainRenew<'a> {}
-impl<'a> Transaction<NameStore> for DomainTransfer<'a> {}
-impl<'a> Transaction<NameStore> for DomainUpdate<'a> {}
+impl<'a> Transaction<NameStore<'a>> for DomainCheck<'a> {}
+impl<'a> Transaction<NameStore<'a>> for DomainCreate<'a> {}
+impl<'a> Transaction<NameStore<'a>> for DomainDelete<'a> {}
+impl<'a> Transaction<NameStore<'a>> for DomainInfo<'a> {}
+impl<'a> Transaction<NameStore<'a>> for DomainRenew<'a> {}
+impl<'a> Transaction<NameStore<'a>> for DomainTransfer<'a> {}
+impl<'a> Transaction<NameStore<'a>> for DomainUpdate<'a> {}
 
 // Host
 
-impl<'a> Transaction<NameStore> for HostCheck<'a> {}
-impl<'a> Transaction<NameStore> for HostCreate<'a> {}
-impl<'a> Transaction<NameStore> for HostDelete<'a> {}
-impl<'a> Transaction<NameStore> for HostInfo<'a> {}
-impl<'a> Transaction<NameStore> for HostUpdate<'a> {}
+impl<'a> Transaction<NameStore<'a>> for HostCheck<'a> {}
+impl<'a> Transaction<NameStore<'a>> for HostCreate<'a> {}
+impl<'a> Transaction<NameStore<'a>> for HostDelete<'a> {}
+impl<'a> Transaction<NameStore<'a>> for HostInfo<'a> {}
+impl<'a> Transaction<NameStore<'a>> for HostUpdate<'a> {}
 
-impl NameStore {
+impl<'a> NameStore<'a> {
     /// Create a new RGP restore report request
     pub fn new(subproduct: &str) -> NameStore {
         NameStore {
             data: NameStoreData {
-                xmlns: XMLNS.to_string(),
+                xmlns: XMLNS.into(),
                 subproduct: subproduct.to_owned().into(),
             },
         }
     }
 }
 
-impl Extension for NameStore {
-    type Response = NameStore;
+impl<'a> Extension for NameStore<'a> {
+    type Response = NameStore<'static>;
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename = "namestoreExt:namestoreExt")]
-pub struct NameStore {
+pub struct NameStore<'a> {
     #[serde(rename = "namestoreExt:namestoreExt", alias = "namestoreExt")]
-    pub data: NameStoreData,
+    pub data: NameStoreData<'a>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 /// Type for EPP XML &lt;namestoreExt&gt; extension
-pub struct NameStoreData {
+pub struct NameStoreData<'a> {
     /// XML namespace for the RGP restore extension
     #[serde(rename = "xmlns:namestoreExt", alias = "xmlns")]
-    pub xmlns: String,
+    pub xmlns: Cow<'a, str>,
     /// The object holding the list of domains to be checked
     #[serde(rename = "namestoreExt:subProduct", alias = "subProduct")]
-    pub subproduct: StringValue<'static>,
+    pub subproduct: StringValue<'a>,
 }
 
 #[cfg(test)]

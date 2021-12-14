@@ -4,28 +4,28 @@ use crate::common::NoExtension;
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
-impl Transaction<NoExtension> for MessageAck {}
+impl<'a> Transaction<NoExtension> for MessageAck<'a> {}
 
-impl Command for MessageAck {
+impl<'a> Command for MessageAck<'a> {
     type Response = String;
     const COMMAND: &'static str = "poll";
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;poll&gt; command for message ack
-pub struct MessageAck {
+pub struct MessageAck<'a> {
     /// The type of operation to perform
     /// The value is "ack" for message acknowledgement
-    op: String,
+    op: &'a str,
     /// The ID of the message to be acknowledged
     #[serde(rename = "msgID")]
     message_id: String,
 }
 
-impl MessageAck {
+impl<'a> MessageAck<'a> {
     pub fn new(message_id: u32) -> Self {
         Self {
-            op: "ack".to_string(),
+            op: "ack",
             message_id: message_id.to_string(),
         }
     }
