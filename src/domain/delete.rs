@@ -5,15 +5,15 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
-impl Transaction<NoExtension> for DomainDelete {}
+impl<'a> Transaction<NoExtension> for DomainDelete<'a> {}
 
-impl Command for DomainDelete {
+impl<'a> Command for DomainDelete<'a> {
     type Response = ();
     const COMMAND: &'static str = "delete";
 }
 
-impl DomainDelete {
-    pub fn new(name: &str) -> Self {
+impl<'a> DomainDelete<'a> {
+    pub fn new(name: &'a str) -> Self {
         Self {
             domain: DomainDeleteRequestData {
                 xmlns: XMLNS,
@@ -25,21 +25,21 @@ impl DomainDelete {
 
 /// Type for &lt;name&gt; element under the domain &lt;delete&gt; tag
 #[derive(Serialize, Debug)]
-pub struct DomainDeleteRequestData {
+pub struct DomainDeleteRequestData<'a> {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The domain to be deleted
     #[serde(rename = "domain:name")]
-    name: StringValue,
+    name: StringValue<'a>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;delete&gt; command for domains
-pub struct DomainDelete {
+pub struct DomainDelete<'a> {
     /// The data under the &lt;delete&gt; tag for domain deletion
     #[serde(rename = "domain:delete")]
-    domain: DomainDeleteRequestData,
+    domain: DomainDeleteRequestData<'a>,
 }
 
 #[cfg(test)]

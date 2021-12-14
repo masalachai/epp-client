@@ -5,9 +5,9 @@ use crate::common::{NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for ContactInfo {}
+impl<'a> Transaction<NoExtension> for ContactInfo<'a> {}
 
-impl Command for ContactInfo {
+impl<'a> Command for ContactInfo<'a> {
     type Response = ContactInfoResponse;
     const COMMAND: &'static str = "info";
 }
@@ -16,28 +16,28 @@ impl Command for ContactInfo {
 
 /// Type for elements under the contact &lt;info&gt; tag
 #[derive(Serialize, Debug)]
-pub struct ContactInfoRequestData {
+pub struct ContactInfoRequestData<'a> {
     /// XML namespace for contact commands
     #[serde(rename = "xmlns:contact")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The contact id for the info command
     #[serde(rename = "contact:id")]
-    id: StringValue,
+    id: StringValue<'a>,
     /// The &lt;authInfo&gt; data
     #[serde(rename = "contact:authInfo")]
-    auth_info: ContactAuthInfo,
+    auth_info: ContactAuthInfo<'a>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;info&gt; command for contacts
-pub struct ContactInfo {
+pub struct ContactInfo<'a> {
     /// Data for &lt;info&gt; command for contact
     #[serde(rename = "contact:info")]
-    info: ContactInfoRequestData,
+    info: ContactInfoRequestData<'a>,
 }
 
-impl ContactInfo {
-    pub fn new(id: &str, auth_password: &str) -> ContactInfo {
+impl<'a> ContactInfo<'a> {
+    pub fn new(id: &'a str, auth_password: &'a str) -> ContactInfo<'a> {
         Self {
             info: ContactInfoRequestData {
                 xmlns: XMLNS,
@@ -52,44 +52,44 @@ impl ContactInfo {
 
 /// Type that represents the &lt;infData&gt; tag for contact check response
 #[derive(Deserialize, Debug)]
-pub struct ContactInfoData {
+pub struct ContactInfoData<'a> {
     /// The contact id
-    pub id: StringValue,
+    pub id: StringValue<'a>,
     /// The contact ROID
-    pub roid: StringValue,
+    pub roid: StringValue<'a>,
     /// The list of contact statuses
     #[serde(rename = "status")]
     pub statuses: Vec<ObjectStatus>,
     /// The postal info for the contact
     #[serde(rename = "postalInfo")]
-    pub postal_info: PostalInfo,
+    pub postal_info: PostalInfo<'a>,
     /// The voice data for the contact
     pub voice: Phone,
     /// The fax data for the contact
     pub fax: Option<Phone>,
     /// The email for the contact
-    pub email: StringValue,
+    pub email: StringValue<'a>,
     /// The epp user to whom the contact belongs
     #[serde(rename = "clID")]
-    pub client_id: StringValue,
+    pub client_id: StringValue<'a>,
     /// The epp user who created the contact
     #[serde(rename = "crID")]
-    pub creator_id: StringValue,
+    pub creator_id: StringValue<'a>,
     /// The creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue,
+    pub created_at: StringValue<'a>,
     /// The epp user who last updated the contact
     #[serde(rename = "upID")]
-    pub updater_id: Option<StringValue>,
+    pub updater_id: Option<StringValue<'a>>,
     /// The last update date
     #[serde(rename = "upDate")]
-    pub updated_at: Option<StringValue>,
+    pub updated_at: Option<StringValue<'a>>,
     /// The contact transfer date
     #[serde(rename = "trDate")]
-    pub transferred_at: Option<StringValue>,
+    pub transferred_at: Option<StringValue<'a>>,
     /// The contact auth info
     #[serde(rename = "authInfo")]
-    pub auth_info: Option<ContactAuthInfo>,
+    pub auth_info: Option<ContactAuthInfo<'a>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for contact info response
@@ -97,7 +97,7 @@ pub struct ContactInfoData {
 pub struct ContactInfoResponse {
     /// Data under the &lt;infData&gt; tag
     #[serde(rename = "infData")]
-    pub info_data: ContactInfoData,
+    pub info_data: ContactInfoData<'static>,
 }
 
 #[cfg(test)]

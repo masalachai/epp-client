@@ -14,10 +14,10 @@ pub const XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
 
 /// The &lt;hostAttr&gt; type for domain transactions
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HostAttr {
+pub struct HostAttr<'a> {
     /// The &lt;hostName&gt; tag
     #[serde(rename = "domain:hostName", alias = "hostName")]
-    pub name: StringValue,
+    pub name: StringValue<'a>,
     /// The &lt;hostAddr&gt; tags
     #[serde(rename = "domain:hostAddr", alias = "hostAddr")]
     pub addresses: Option<Vec<HostAddr>>,
@@ -25,27 +25,27 @@ pub struct HostAttr {
 
 /// The list of &lt;hostAttr&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostAttrList {
+pub struct HostAttrList<'a> {
     /// The list of &lt;hostAttr&gt; tags
     #[serde(rename = "domain:hostAttr", alias = "hostAttr")]
-    pub hosts: Vec<HostAttr>,
+    pub hosts: Vec<HostAttr<'a>>,
 }
 
 /// The list of &lt;hostObj&gt; types for domain transactions. Typically under an &lt;ns&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostObjList {
+pub struct HostObjList<'a> {
     /// The list of &lt;hostObj&gt; tags
     #[serde(rename = "domain:hostObj", alias = "hostObj")]
-    pub hosts: Vec<StringValue>,
+    pub hosts: Vec<StringValue<'a>>,
 }
 
 /// Enum that can accept one type which corresponds to either the &lt;hostObj&gt; or &lt;hostAttr&gt;
 /// list of tags
 #[derive(Serialize, Debug)]
 #[serde(untagged)]
-pub enum HostList {
-    HostObjList(HostObjList),
-    HostAttrList(HostAttrList),
+pub enum HostList<'a> {
+    HostObjList(HostObjList<'a>),
+    HostAttrList(HostAttrList<'a>),
 }
 
 /// The &lt;contact&gt; type on domain creation and update requests
@@ -86,16 +86,16 @@ impl Period {
 
 /// The &lt;authInfo&gt; tag for domain and contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct DomainAuthInfo {
+pub struct DomainAuthInfo<'a> {
     /// The &lt;pw&gt; tag under &lt;authInfo&gt;
     #[serde(rename = "domain:pw", alias = "pw")]
-    pub password: StringValue,
+    pub password: StringValue<'a>,
 }
 
-impl DomainAuthInfo {
+impl<'a> DomainAuthInfo<'a> {
     /// Creates a DomainAuthInfo instance with the given password
-    pub fn new(password: &str) -> DomainAuthInfo {
-        DomainAuthInfo {
+    pub fn new(password: &'a str) -> Self {
+        Self {
             password: password.into(),
         }
     }

@@ -8,15 +8,15 @@ use crate::{
 
 use serde::Serialize;
 
-impl Transaction<NoExtension> for DomainUpdate {}
+impl<'a> Transaction<NoExtension> for DomainUpdate<'a> {}
 
-impl Command for DomainUpdate {
+impl<'a> Command for DomainUpdate<'a> {
     type Response = ();
     const COMMAND: &'static str = "update";
 }
 
-impl DomainUpdate {
-    pub fn new(name: &str) -> Self {
+impl<'a> DomainUpdate<'a> {
+    pub fn new(name: &'a str) -> Self {
         Self {
             domain: DomainUpdateRequestData {
                 xmlns: XMLNS,
@@ -29,39 +29,39 @@ impl DomainUpdate {
     }
 
     /// Sets the data for the &lt;chg&gt; tag
-    pub fn info(&mut self, info: DomainChangeInfo) {
+    pub fn info(&mut self, info: DomainChangeInfo<'a>) {
         self.domain.change_info = Some(info);
     }
 
     /// Sets the data for the &lt;add&gt; tag
-    pub fn add(&mut self, add: DomainAddRemove) {
+    pub fn add(&mut self, add: DomainAddRemove<'a>) {
         self.domain.add = Some(add);
     }
 
     /// Sets the data for the &lt;rem&gt; tag
-    pub fn remove(&mut self, remove: DomainAddRemove) {
+    pub fn remove(&mut self, remove: DomainAddRemove<'a>) {
         self.domain.remove = Some(remove);
     }
 }
 
 /// Type for elements under the &lt;chg&gt; tag for domain update
 #[derive(Serialize, Debug)]
-pub struct DomainChangeInfo {
+pub struct DomainChangeInfo<'a> {
     /// The new registrant contact for the domain
     #[serde(rename = "domain:registrant")]
-    pub registrant: Option<StringValue>,
+    pub registrant: Option<StringValue<'a>>,
     /// The new auth info for the domain
     #[serde(rename = "domain:authInfo")]
-    pub auth_info: Option<DomainAuthInfo>,
+    pub auth_info: Option<DomainAuthInfo<'a>>,
 }
 
 /// Type for elements under the &lt;add&gt; and &lt;rem&gt; tags for domain update
 #[derive(Serialize, Debug)]
-pub struct DomainAddRemove {
+pub struct DomainAddRemove<'a> {
     /// The list of nameservers to add or remove
     /// Type T can be either a `HostObjList` or `HostAttrList`
     #[serde(rename = "domain:ns")]
-    pub ns: Option<HostList>,
+    pub ns: Option<HostList<'a>>,
     /// The list of contacts to add to or remove from the domain
     #[serde(rename = "domain:contact")]
     pub contacts: Option<Vec<DomainContact>>,
@@ -72,31 +72,31 @@ pub struct DomainAddRemove {
 
 /// Type for elements under the &lt;update&gt; tag for domain update
 #[derive(Serialize, Debug)]
-pub struct DomainUpdateRequestData {
+pub struct DomainUpdateRequestData<'a> {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    pub xmlns: &'static str,
+    pub xmlns: &'a str,
     /// The name of the domain to update
     #[serde(rename = "domain:name")]
-    pub name: StringValue,
+    pub name: StringValue<'a>,
     /// `DomainAddRemove` Object containing the list of elements to be added
     /// to the domain
     #[serde(rename = "domain:add")]
-    pub add: Option<DomainAddRemove>,
+    pub add: Option<DomainAddRemove<'a>>,
     /// `DomainAddRemove` Object containing the list of elements to be removed
     /// from the domain
     #[serde(rename = "domain:rem")]
-    pub remove: Option<DomainAddRemove>,
+    pub remove: Option<DomainAddRemove<'a>>,
     /// The data under the &lt;chg&gt; tag for domain update
     #[serde(rename = "domain:chg")]
-    pub change_info: Option<DomainChangeInfo>,
+    pub change_info: Option<DomainChangeInfo<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;update&gt; command for domains
-pub struct DomainUpdate {
+pub struct DomainUpdate<'a> {
     #[serde(rename = "domain:update")]
-    pub domain: DomainUpdateRequestData,
+    pub domain: DomainUpdateRequestData<'a>,
 }
 
 #[cfg(test)]

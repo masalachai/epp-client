@@ -7,15 +7,15 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for HostCheck {}
+impl<'a> Transaction<NoExtension> for HostCheck<'a> {}
 
-impl Command for HostCheck {
+impl<'a> Command for HostCheck<'a> {
     type Response = HostCheckResponse;
     const COMMAND: &'static str = "check";
 }
 
-impl HostCheck {
-    pub fn new(hosts: &[&str]) -> Self {
+impl<'a> HostCheck<'a> {
+    pub fn new(hosts: &[&'a str]) -> Self {
         let hosts = hosts.iter().map(|&d| d.into()).collect();
 
         Self {
@@ -31,21 +31,21 @@ impl HostCheck {
 
 /// Type for data under the host &lt;check&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostList {
+pub struct HostList<'a> {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// List of hosts to be checked for availability
     #[serde(rename = "host:name")]
-    pub hosts: Vec<StringValue>,
+    pub hosts: Vec<StringValue<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;check&gt; command for hosts
-pub struct HostCheck {
+pub struct HostCheck<'a> {
     /// The instance holding the list of hosts to be checked
     #[serde(rename = "host:check")]
-    list: HostList,
+    list: HostList<'a>,
 }
 
 // Response
@@ -55,7 +55,7 @@ pub struct HostCheck {
 pub struct HostAvailable {
     /// The host name
     #[serde(rename = "$value")]
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The host (un)availability
     #[serde(rename = "avail")]
     pub available: u16,
@@ -68,7 +68,7 @@ pub struct HostCheckDataItem {
     #[serde(rename = "name")]
     pub host: HostAvailable,
     /// The reason for (un)availability
-    pub reason: Option<StringValue>,
+    pub reason: Option<StringValue<'static>>,
 }
 
 /// Type that represents the &lt;chkData&gt; tag for host check response

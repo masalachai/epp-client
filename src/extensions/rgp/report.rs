@@ -8,22 +8,22 @@ use serde::Serialize;
 
 use super::{Update, XMLNS};
 
-impl Transaction<Update<RgpRestoreReport>> for DomainUpdate {}
+impl<'a> Transaction<Update<RgpRestoreReport<'a>>> for DomainUpdate<'a> {}
 
-impl RgpRestoreReport {
+impl<'a> RgpRestoreReport<'a> {
     /// Create a new RGP restore report request
     pub fn new(
-        pre_data: &str,
-        post_data: &str,
+        pre_data: &'a str,
+        post_data: &'a str,
         deleted_at: DateTime<Utc>,
         restored_at: DateTime<Utc>,
-        restore_reason: &str,
-        statements: &[&str],
-        other: &str,
-    ) -> RgpRestoreReport {
+        restore_reason: &'a str,
+        statements: &[&'a str],
+        other: &'a str,
+    ) -> Self {
         let statements = statements.iter().map(|&s| s.into()).collect();
 
-        RgpRestoreReport {
+        Self {
             xmlns: XMLNS,
             restore: RgpRestoreReportSection {
                 op: "report".to_string(),
@@ -45,55 +45,55 @@ impl RgpRestoreReport {
     }
 }
 
-impl Extension for Update<RgpRestoreReport> {
+impl<'a> Extension for Update<RgpRestoreReport<'a>> {
     type Response = NoExtension;
 }
 
 /// Type corresponding to the &lt;report&gt; section in the EPP rgp restore extension
 #[derive(Serialize, Debug)]
-pub struct RgpRestoreReportSectionData {
+pub struct RgpRestoreReportSectionData<'a> {
     /// The pre-delete registration date
     #[serde(rename = "rgp:preData")]
-    pre_data: StringValue,
+    pre_data: StringValue<'a>,
     /// The post-delete registration date
     #[serde(rename = "rgp:postData")]
-    post_data: StringValue,
+    post_data: StringValue<'a>,
     /// The domain deletion date
     #[serde(rename = "rgp:delTime")]
-    deleted_at: StringValue,
+    deleted_at: StringValue<'a>,
     /// The domain restore request date
     #[serde(rename = "rgp:resTime")]
-    restored_at: StringValue,
+    restored_at: StringValue<'a>,
     /// The reason for domain restoration
     #[serde(rename = "rgp:resReason")]
-    restore_reason: StringValue,
+    restore_reason: StringValue<'a>,
     /// The registrar's statements on the domain restoration
     #[serde(rename = "rgp:statement")]
-    statements: Vec<StringValue>,
+    statements: Vec<StringValue<'a>>,
     /// Other remarks for domain restoration
     #[serde(rename = "rgp:other")]
-    other: StringValue,
+    other: StringValue<'a>,
 }
 
 /// Type corresponding to the &lt;restore&gt; section in the rgp restore extension
 #[derive(Serialize, Debug)]
-pub struct RgpRestoreReportSection {
+pub struct RgpRestoreReportSection<'a> {
     /// The value of the op attribute for the &lt;restore&gt; tag
     op: String,
     /// Data for the &lt;report&gt; tag
     #[serde(rename = "rgp:report")]
-    report: RgpRestoreReportSectionData,
+    report: RgpRestoreReportSectionData<'a>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;check&gt; command for domains
-pub struct RgpRestoreReport {
+pub struct RgpRestoreReport<'a> {
     /// XML namespace for the RGP restore extension
     #[serde(rename = "xmlns:rgp")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The object holding the list of domains to be checked
     #[serde(rename = "rgp:restore")]
-    restore: RgpRestoreReportSection,
+    restore: RgpRestoreReportSection<'a>,
 }
 
 #[cfg(test)]

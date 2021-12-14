@@ -5,15 +5,15 @@ use crate::common::{HostAddr, NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for HostInfo {}
+impl<'a> Transaction<NoExtension> for HostInfo<'a> {}
 
-impl Command for HostInfo {
+impl<'a> Command for HostInfo<'a> {
     type Response = HostInfoResponse;
     const COMMAND: &'static str = "info";
 }
 
-impl HostInfo {
-    pub fn new(name: &str) -> Self {
+impl<'a> HostInfo<'a> {
+    pub fn new(name: &'a str) -> Self {
         Self {
             info: HostInfoRequestData {
                 xmlns: XMLNS,
@@ -27,21 +27,21 @@ impl HostInfo {
 
 /// Type for data under the host &lt;info&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostInfoRequestData {
+pub struct HostInfoRequestData<'a> {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The name of the host to be queried
     #[serde(rename = "host:name")]
-    name: StringValue,
+    name: StringValue<'a>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;info&gt; command for hosts
-pub struct HostInfo {
+pub struct HostInfo<'a> {
     /// The instance holding the data for the host query
     #[serde(rename = "host:info")]
-    info: HostInfoRequestData,
+    info: HostInfoRequestData<'a>,
 }
 
 // Response
@@ -50,9 +50,9 @@ pub struct HostInfo {
 #[derive(Deserialize, Debug)]
 pub struct HostInfoResponseData {
     /// The host name
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The host ROID
-    pub roid: StringValue,
+    pub roid: StringValue<'static>,
     /// The list of host statuses
     #[serde(rename = "status")]
     pub statuses: Vec<ObjectStatus>,
@@ -61,22 +61,22 @@ pub struct HostInfoResponseData {
     pub addresses: Vec<HostAddr>,
     /// The epp user to whom the host belongs
     #[serde(rename = "clID")]
-    pub client_id: StringValue,
+    pub client_id: StringValue<'static>,
     /// THe epp user that created the host
     #[serde(rename = "crID")]
-    pub creator_id: StringValue,
+    pub creator_id: StringValue<'static>,
     /// The host creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue,
+    pub created_at: StringValue<'static>,
     /// The epp user that last updated the host
     #[serde(rename = "upID")]
-    pub updater_id: Option<StringValue>,
+    pub updater_id: Option<StringValue<'static>>,
     /// The host last update date
     #[serde(rename = "upDate")]
-    pub updated_at: Option<StringValue>,
+    pub updated_at: Option<StringValue<'static>>,
     /// The host transfer date
     #[serde(rename = "trDate")]
-    pub transferred_at: Option<StringValue>,
+    pub transferred_at: Option<StringValue<'static>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for host info response

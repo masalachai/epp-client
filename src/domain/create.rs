@@ -6,9 +6,9 @@ use crate::request::{Command, Transaction};
 
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for DomainCreate {}
+impl<'a> Transaction<NoExtension> for DomainCreate<'a> {}
 
-impl Command for DomainCreate {
+impl<'a> Command for DomainCreate<'a> {
     type Response = DomainCreateResponse;
     const COMMAND: &'static str = "create";
 }
@@ -17,48 +17,48 @@ impl Command for DomainCreate {
 
 /// Type for elements under the domain &lt;create&gt; tag
 #[derive(Serialize, Debug)]
-pub struct DomainCreateRequestData {
+pub struct DomainCreateRequestData<'a> {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    pub xmlns: &'static str,
+    pub xmlns: &'a str,
     /// The domain name
     #[serde(rename = "domain:name")]
-    pub name: StringValue,
+    pub name: StringValue<'a>,
     /// The period of registration
     #[serde(rename = "domain:period")]
     pub period: Period,
     /// The list of nameserver hosts
     /// either of type `HostObjList` or `HostAttrList`
     #[serde(rename = "domain:ns")]
-    pub ns: Option<HostList>,
+    pub ns: Option<HostList<'a>>,
     /// The domain registrant
     #[serde(rename = "domain:registrant")]
-    pub registrant: Option<StringValue>,
+    pub registrant: Option<StringValue<'a>>,
     /// The list of contacts for the domain
     #[serde(rename = "domain:contact")]
     pub contacts: Option<Vec<DomainContact>>,
     /// The auth info for the domain
     #[serde(rename = "domain:authInfo")]
-    pub auth_info: DomainAuthInfo,
+    pub auth_info: DomainAuthInfo<'a>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;create&gt; command for domains
-pub struct DomainCreate {
+pub struct DomainCreate<'a> {
     /// The data for the domain to be created with
     /// T being the type of nameserver list (`HostObjList` or `HostAttrList`)
     /// to be supplied
     #[serde(rename = "domain:create")]
-    pub domain: DomainCreateRequestData,
+    pub domain: DomainCreateRequestData<'a>,
 }
 
-impl DomainCreate {
+impl<'a> DomainCreate<'a> {
     pub fn new(
-        name: &str,
+        name: &'a str,
         period: u16,
-        ns: Option<HostList>,
-        registrant_id: Option<&str>,
-        auth_password: &str,
+        ns: Option<HostList<'a>>,
+        registrant_id: Option<&'a str>,
+        auth_password: &'a str,
         contacts: Option<Vec<DomainContact>>,
     ) -> Self {
         Self {
@@ -84,13 +84,13 @@ pub struct DomainCreateResponseData {
     #[serde(rename = "xmlns:domain")]
     pub xmlns: String,
     /// The domain name
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue,
+    pub created_at: StringValue<'static>,
     /// The expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: Option<StringValue>,
+    pub expiring_at: Option<StringValue<'static>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain create response

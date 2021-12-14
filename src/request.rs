@@ -60,7 +60,7 @@ pub struct CommandWrapper<'a, D, E> {
     pub data: &'a D,
     /// The client TRID
     pub extension: Option<&'a E>,
-    pub client_tr_id: StringValue,
+    pub client_tr_id: StringValue<'a>,
 }
 
 impl<'a, D: Serialize, E: Serialize> Serialize for CommandWrapper<'a, D, E> {

@@ -1,6 +1,6 @@
 //! Common data types included in EPP Requests and Responses
 
-use std::fmt::Display;
+use std::{borrow::Cow, fmt::Display};
 
 use serde::{Deserialize, Serialize};
 
@@ -11,23 +11,23 @@ pub(crate) const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
 /// Wraps String for easier serialization to and from values that are inner text
 /// for tags rather than attributes
 #[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone)]
-pub struct StringValue(String);
+pub struct StringValue<'a>(Cow<'a, str>);
 
-impl Display for StringValue {
+impl Display for StringValue<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
-impl From<&str> for StringValue {
-    fn from(s: &str) -> Self {
-        Self(s.to_owned())
+impl<'a> From<&'a str> for StringValue<'a> {
+    fn from(s: &'a str) -> Self {
+        Self(s.into())
     }
 }
 
-impl From<String> for StringValue {
+impl From<String> for StringValue<'static> {
     fn from(s: String) -> Self {
-        Self(s)
+        Self(s.into())
     }
 }
 
@@ -42,17 +42,17 @@ impl Extension for NoExtension {
 /// The <option> type in EPP XML login requests
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename = "options")]
-pub struct Options {
+pub struct Options<'a> {
     /// The EPP version being used
-    pub version: StringValue,
+    pub version: StringValue<'a>,
     /// The language that will be used during EPP transactions
-    pub lang: StringValue,
+    pub lang: StringValue<'a>,
 }
 
-impl Options {
+impl<'a> Options<'a> {
     /// Creates an Options object with version and lang data
-    pub fn build(version: &str, lang: &str) -> Options {
-        Options {
+    pub fn build(version: &'a str, lang: &'a str) -> Self {
+        Self {
             version: version.into(),
             lang: lang.into(),
         }
@@ -62,21 +62,21 @@ impl Options {
 /// The <svcExtension> type in EPP XML
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename = "svcExtension")]
-pub struct ServiceExtension {
+pub struct ServiceExtension<'a> {
     /// The service extension URIs being represented by <extURI> in EPP XML
     #[serde(rename = "extURI")]
-    pub ext_uris: Option<Vec<StringValue>>,
+    pub ext_uris: Option<Vec<StringValue<'a>>>,
 }
 
 /// The <svcs> type in EPP XML
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct Services {
+pub struct Services<'a> {
     /// The service URIs being used by this EPP session represented by <objURI> in EPP XML
     #[serde(rename = "objURI")]
-    pub obj_uris: Vec<StringValue>,
+    pub obj_uris: Vec<StringValue<'a>>,
     /// The <svcExtention> being used in this EPP session
     #[serde(rename = "svcExtension")]
-    pub svc_ext: Option<ServiceExtension>,
+    pub svc_ext: Option<ServiceExtension<'a>>,
 }
 
 /// The &lt;hostAddr&gt; types domain or host transactions

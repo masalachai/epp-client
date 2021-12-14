@@ -8,27 +8,27 @@ use crate::{
     request::{Command, Transaction, EPP_LANG, EPP_VERSION},
 };
 
-impl Transaction<NoExtension> for Login {}
+impl<'a> Transaction<NoExtension> for Login<'a> {}
 
 #[derive(Serialize, Debug, PartialEq)]
 /// Type corresponding to the &lt;login&gt; tag in an EPP XML login request
-pub struct Login {
+pub struct Login<'a> {
     /// The username to use for the login
     #[serde(rename(serialize = "clID", deserialize = "clID"))]
-    username: StringValue,
+    username: StringValue<'a>,
     /// The password to use for the login
     #[serde(rename = "pw", default)]
-    password: StringValue,
+    password: StringValue<'a>,
     /// Data under the <options> tag
-    options: Options,
+    options: Options<'a>,
     /// Data under the <svcs> tag
     #[serde(rename = "svcs")]
-    services: Services,
+    services: Services<'a>,
 }
 
-impl Login {
-    pub fn new(username: &str, password: &str, ext_uris: Option<Vec<String>>) -> Self {
-        let ext_uris = ext_uris.map(|uris| uris.iter().map(|u| u.as_str().into()).collect());
+impl<'a> Login<'a> {
+    pub fn new(username: &'a str, password: &'a str, ext_uris: Option<Vec<&'a str>>) -> Self {
+        let ext_uris = ext_uris.map(|uris| uris.into_iter().map(|u| u.into()).collect());
 
         Self {
             username: username.into(),
@@ -49,17 +49,17 @@ impl Login {
     }
 
     /// Sets the <options> tag data
-    pub fn options(&mut self, options: Options) {
+    pub fn options(&mut self, options: Options<'a>) {
         self.options = options;
     }
 
     /// Sets the <svcs> tag data
-    pub fn services(&mut self, services: Services) {
+    pub fn services(&mut self, services: Services<'a>) {
         self.services = services;
     }
 }
 
-impl Command for Login {
+impl<'a> Command for Login<'a> {
     type Response = ();
     const COMMAND: &'static str = "login";
 }
@@ -72,9 +72,7 @@ mod tests {
 
     #[test]
     fn command() {
-        let ext_uris = Some(vec![
-            "http://schema.ispapi.net/epp/xml/keyvalue-1.0".to_string()
-        ]);
+        let ext_uris = Some(vec!["http://schema.ispapi.net/epp/xml/keyvalue-1.0"]);
 
         let xml = get_xml("request/login.xml").unwrap();
         let object = Login::new("username", "password", ext_uris);

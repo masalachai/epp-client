@@ -5,22 +5,19 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for DomainCheck {}
+impl<'a> Transaction<NoExtension> for DomainCheck<'a> {}
 
-impl Command for DomainCheck {
+impl<'a> Command for DomainCheck<'a> {
     type Response = DomainCheckResponse;
     const COMMAND: &'static str = "check";
 }
 
-impl DomainCheck {
-    pub fn new(domains: Vec<&str>) -> Self {
+impl<'a> DomainCheck<'a> {
+    pub fn new(domains: Vec<&'a str>) -> Self {
         Self {
             list: DomainList {
                 xmlns: XMLNS,
-                domains: domains
-                    .into_iter()
-                    .map(|d| d.into())
-                    .collect::<Vec<StringValue>>(),
+                domains: domains.into_iter().map(|d| d.into()).collect(),
             },
         }
     }
@@ -30,21 +27,21 @@ impl DomainCheck {
 
 /// Type for &lt;name&gt; elements under the domain &lt;check&gt; tag
 #[derive(Serialize, Debug)]
-pub struct DomainList {
+pub struct DomainList<'a> {
     #[serde(rename = "xmlns:domain")]
     /// XML namespace for domain commands
-    pub xmlns: &'static str,
+    pub xmlns: &'a str,
     #[serde(rename = "domain:name")]
     /// List of domains to be checked for availability
-    pub domains: Vec<StringValue>,
+    pub domains: Vec<StringValue<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;check&gt; command for domains
-pub struct DomainCheck {
+pub struct DomainCheck<'a> {
     /// The object holding the list of domains to be checked
     #[serde(rename = "domain:check")]
-    list: DomainList,
+    list: DomainList<'a>,
 }
 
 // Response
@@ -54,7 +51,7 @@ pub struct DomainCheck {
 pub struct DomainAvailable {
     /// The domain name
     #[serde(rename = "$value")]
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The domain (un)availability
     #[serde(rename = "avail")]
     pub available: u16,
@@ -67,7 +64,7 @@ pub struct DomainCheckResponseDataItem {
     #[serde(rename = "name")]
     pub domain: DomainAvailable,
     /// The reason for (un)availability
-    pub reason: Option<StringValue>,
+    pub reason: Option<StringValue<'static>>,
 }
 
 /// Type that represents the &lt;chkData&gt; tag for domain check response

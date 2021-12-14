@@ -6,15 +6,15 @@ use crate::request::{Command, Transaction};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for DomainRenew {}
+impl<'a> Transaction<NoExtension> for DomainRenew<'a> {}
 
-impl Command for DomainRenew {
+impl<'a> Command for DomainRenew<'a> {
     type Response = DomainRenewResponse;
     const COMMAND: &'static str = "renew";
 }
 
-impl DomainRenew {
-    pub fn new(name: &str, current_expiry_date: NaiveDate, years: u16) -> Self {
+impl<'a> DomainRenew<'a> {
+    pub fn new(name: &'a str, current_expiry_date: NaiveDate, years: u16) -> Self {
         let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();
         Self {
             domain: DomainRenewRequestData {
@@ -31,16 +31,16 @@ impl DomainRenew {
 
 /// Type for data under the domain &lt;renew&gt; tag
 #[derive(Serialize, Debug)]
-pub struct DomainRenewRequestData {
+pub struct DomainRenewRequestData<'a> {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The name of the domain to be renewed
     #[serde(rename = "domain:name")]
-    name: StringValue,
+    name: StringValue<'a>,
     /// The current expiry date of the domain in 'Y-m-d' format
     #[serde(rename = "domain:curExpDate")]
-    current_expiry_date: StringValue,
+    current_expiry_date: StringValue<'a>,
     /// The period of renewal
     #[serde(rename = "domain:period")]
     period: Period,
@@ -48,10 +48,10 @@ pub struct DomainRenewRequestData {
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;renew&gt; command for domains
-pub struct DomainRenew {
+pub struct DomainRenew<'a> {
     /// The data under the &lt;renew&gt; tag for the domain renewal
     #[serde(rename = "domain:renew")]
-    domain: DomainRenewRequestData,
+    domain: DomainRenewRequestData<'a>,
 }
 
 // Response
@@ -60,10 +60,10 @@ pub struct DomainRenew {
 #[derive(Deserialize, Debug)]
 pub struct DomainRenewResponseData {
     /// The name of the domain
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The new expiry date after renewal
     #[serde(rename = "exDate")]
-    pub expiring_at: Option<StringValue>,
+    pub expiring_at: Option<StringValue<'static>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain renew response

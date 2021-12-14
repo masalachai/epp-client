@@ -5,34 +5,34 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
-impl Transaction<NoExtension> for ContactDelete {}
+impl<'a> Transaction<NoExtension> for ContactDelete<'a> {}
 
-impl Command for ContactDelete {
+impl<'a> Command for ContactDelete<'a> {
     type Response = ();
     const COMMAND: &'static str = "delete";
 }
 
 /// Type containing the data for the &lt;delete&gt; tag for contacts
 #[derive(Serialize, Debug)]
-pub struct ContactDeleteRequestData {
+pub struct ContactDeleteRequestData<'a> {
     /// XML namespace for the &lt;delete&gt; command for contacts
     #[serde(rename = "xmlns:contact")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The id of the contact to be deleted
     #[serde(rename = "contact:id")]
-    id: StringValue,
+    id: StringValue<'a>,
 }
 
 #[derive(Serialize, Debug)]
 /// The &lt;delete&gt; type for the contact delete EPP command
-pub struct ContactDelete {
+pub struct ContactDelete<'a> {
     #[serde(rename = "contact:delete")]
     /// The data for the &lt;delete&gt; tag for a contact delete command
-    contact: ContactDeleteRequestData,
+    contact: ContactDeleteRequestData<'a>,
 }
 
-impl ContactDelete {
-    pub fn new(id: &str) -> ContactDelete {
+impl<'a> ContactDelete<'a> {
+    pub fn new(id: &'a str) -> Self {
         Self {
             contact: ContactDeleteRequestData {
                 xmlns: XMLNS,

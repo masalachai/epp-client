@@ -5,15 +5,15 @@ use crate::common::{NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for DomainInfo {}
+impl<'a> Transaction<NoExtension> for DomainInfo<'a> {}
 
-impl Command for DomainInfo {
+impl<'a> Command for DomainInfo<'a> {
     type Response = DomainInfoResponse;
     const COMMAND: &'static str = "info";
 }
 
-impl DomainInfo {
-    pub fn new(name: &str, auth_password: Option<&str>) -> Self {
+impl<'a> DomainInfo<'a> {
+    pub fn new(name: &'a str, auth_password: Option<&'a str>) -> Self {
         Self {
             info: DomainInfoRequestData {
                 xmlns: XMLNS,
@@ -43,24 +43,24 @@ pub struct Domain {
 
 /// Type for &lt;name&gt; element under the domain &lt;info&gt; tag
 #[derive(Serialize, Debug)]
-pub struct DomainInfoRequestData {
+pub struct DomainInfoRequestData<'a> {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The data for the domain to be queried
     #[serde(rename = "domain:name")]
     domain: Domain,
     /// The auth info for the domain
     #[serde(rename = "domain:authInfo")]
-    auth_info: Option<DomainAuthInfo>,
+    auth_info: Option<DomainAuthInfo<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;info&gt; command for domains
-pub struct DomainInfo {
+pub struct DomainInfo<'a> {
     /// The data under the &lt;info&gt; tag for domain info
     #[serde(rename = "domain:info")]
-    info: DomainInfoRequestData,
+    info: DomainInfoRequestData<'a>,
 }
 
 // Response
@@ -71,23 +71,23 @@ pub struct DomainInfo {
 pub struct DomainNsList {
     /// List of &lt;hostObj&gt; ns elements
     #[serde(rename = "hostObj")]
-    pub host_obj: Option<Vec<StringValue>>,
+    pub host_obj: Option<Vec<StringValue<'static>>>,
     /// List of &lt;hostAttr&gt; ns elements
-    pub host_attr: Option<Vec<HostAttr>>,
+    pub host_attr: Option<Vec<HostAttr<'static>>>,
 }
 
 /// Type that represents the &lt;infData&gt; tag for domain info response
 #[derive(Deserialize, Debug)]
 pub struct DomainInfoResponseData {
     /// The domain name
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The domain ROID
-    pub roid: StringValue,
+    pub roid: StringValue<'static>,
     /// The list of domain statuses
     #[serde(rename = "status")]
     pub statuses: Option<Vec<ObjectStatus>>,
     /// The domain registrant
-    pub registrant: Option<StringValue>,
+    pub registrant: Option<StringValue<'static>>,
     /// The list of domain contacts
     #[serde(rename = "contact")]
     pub contacts: Option<Vec<DomainContact>>,
@@ -96,31 +96,31 @@ pub struct DomainInfoResponseData {
     pub ns: Option<DomainNsList>,
     /// The list of domain hosts
     #[serde(rename = "host")]
-    pub hosts: Option<Vec<StringValue>>,
+    pub hosts: Option<Vec<StringValue<'static>>>,
     /// The epp user who owns the domain
     #[serde(rename = "clID")]
-    pub client_id: StringValue,
+    pub client_id: StringValue<'static>,
     /// The epp user who created the domain
     #[serde(rename = "crID")]
-    pub creator_id: Option<StringValue>,
+    pub creator_id: Option<StringValue<'static>>,
     /// The domain creation date
     #[serde(rename = "crDate")]
-    pub created_at: Option<StringValue>,
+    pub created_at: Option<StringValue<'static>>,
     /// The domain expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: Option<StringValue>,
+    pub expiring_at: Option<StringValue<'static>>,
     /// The epp user who last updated the domain
     #[serde(rename = "upID")]
-    pub updater_id: Option<StringValue>,
+    pub updater_id: Option<StringValue<'static>>,
     /// The domain last updated date
     #[serde(rename = "upDate")]
-    pub updated_at: Option<StringValue>,
+    pub updated_at: Option<StringValue<'static>>,
     /// The domain transfer date
     #[serde(rename = "trDate")]
-    pub transferred_at: Option<StringValue>,
+    pub transferred_at: Option<StringValue<'static>>,
     /// The domain auth info
     #[serde(rename = "authInfo")]
-    pub auth_info: Option<DomainAuthInfo>,
+    pub auth_info: Option<DomainAuthInfo<'static>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain info response

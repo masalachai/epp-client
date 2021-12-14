@@ -5,9 +5,9 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for ContactCreate {}
+impl<'a> Transaction<NoExtension> for ContactCreate<'a> {}
 
-impl Command for ContactCreate {
+impl<'a> Command for ContactCreate<'a> {
     type Response = ContactCreateResponse;
     const COMMAND: &'static str = "create";
 }
@@ -16,16 +16,16 @@ impl Command for ContactCreate {
 
 /// Type for elements under the contact &lt;create&gt; tag
 #[derive(Serialize, Debug)]
-pub struct Contact {
+pub struct Contact<'a> {
     /// XML namespace for contact commands
     #[serde(rename = "xmlns:contact")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// Contact &lt;id&gt; tag
     #[serde(rename = "contact:id")]
-    id: StringValue,
+    id: StringValue<'a>,
     /// Contact &lt;postalInfo&gt; tag
     #[serde(rename = "contact:postalInfo")]
-    postal_info: PostalInfo,
+    postal_info: PostalInfo<'a>,
     /// Contact &lt;voice&gt; tag
     #[serde(rename = "contact:voice")]
     voice: Phone,
@@ -34,27 +34,27 @@ pub struct Contact {
     fax: Option<Phone>,
     /// Contact &lt;email&gt; tag
     #[serde(rename = "contact:email")]
-    email: StringValue,
+    email: StringValue<'a>,
     /// Contact &lt;authInfo&gt; tag
     #[serde(rename = "contact:authInfo")]
-    auth_info: ContactAuthInfo,
+    auth_info: ContactAuthInfo<'a>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;create&gt; command for contacts
-pub struct ContactCreate {
+pub struct ContactCreate<'a> {
     /// Data for &lt;create&gt; command for contact
     #[serde(rename = "contact:create")]
-    pub contact: Contact,
+    pub contact: Contact<'a>,
 }
 
-impl ContactCreate {
+impl<'a> ContactCreate<'a> {
     pub fn new(
-        id: &str,
-        email: &str,
-        postal_info: PostalInfo,
+        id: &'a str,
+        email: &'a str,
+        postal_info: PostalInfo<'a>,
         voice: Phone,
-        auth_password: &str,
+        auth_password: &'a str,
     ) -> Self {
         Self {
             contact: Contact {
@@ -81,10 +81,10 @@ impl ContactCreate {
 #[derive(Deserialize, Debug)]
 pub struct ContactCreateData {
     /// The contact id
-    pub id: StringValue,
+    pub id: StringValue<'static>,
     #[serde(rename = "crDate")]
     /// The contact creation date
-    pub created_at: StringValue,
+    pub created_at: StringValue<'static>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for contact create response

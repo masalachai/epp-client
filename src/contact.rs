@@ -33,16 +33,16 @@ impl std::ops::Deref for Country {
 
 /// The &lt;authInfo&gt; tag for domain and contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ContactAuthInfo {
+pub struct ContactAuthInfo<'a> {
     /// The &lt;pw&gt; tag under &lt;authInfo&gt;
     #[serde(rename = "contact:pw", alias = "pw")]
-    pub password: StringValue,
+    pub password: StringValue<'a>,
 }
 
-impl ContactAuthInfo {
+impl<'a> ContactAuthInfo<'a> {
     /// Creates a ContactAuthInfo instance with the given password
-    pub fn new(password: &str) -> ContactAuthInfo {
-        ContactAuthInfo {
+    pub fn new(password: &'a str) -> Self {
+        Self {
             password: password.into(),
         }
     }
@@ -76,36 +76,36 @@ impl Phone {
 
 /// The &lt;addr&gt; type on contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Address {
+pub struct Address<'a> {
     /// The &lt;street&gt; tags under &lt;addr&gt;
     #[serde(rename = "contact:street", alias = "street")]
-    pub street: Vec<StringValue>,
+    pub street: Vec<StringValue<'a>>,
     /// The &lt;city&gt; tag under &lt;addr&gt;
     #[serde(rename = "contact:city", alias = "city")]
-    pub city: StringValue,
+    pub city: StringValue<'a>,
     /// The &lt;sp&gt; tag under &lt;addr&gt;
     #[serde(rename = "contact:sp", alias = "sp")]
-    pub province: StringValue,
+    pub province: StringValue<'a>,
     /// The &lt;pc&gt; tag under &lt;addr&gt;
     #[serde(rename = "contact:pc", alias = "pc")]
-    pub postal_code: StringValue,
+    pub postal_code: StringValue<'a>,
     /// The &lt;cc&gt; tag under &lt;addr&gt;
     #[serde(rename = "contact:cc", alias = "cc")]
     pub country: Country,
 }
 
-impl Address {
+impl<'a> Address<'a> {
     /// Creates a new Address instance
     pub fn new(
-        street: &[&str],
-        city: &str,
-        province: &str,
-        postal_code: &str,
+        street: &[&'a str],
+        city: &'a str,
+        province: &'a str,
+        postal_code: &'a str,
         country: Country,
-    ) -> Address {
+    ) -> Self {
         let street = street.iter().map(|&s| s.into()).collect();
 
-        Address {
+        Self {
             street,
             city: city.into(),
             province: province.into(),
@@ -117,25 +117,25 @@ impl Address {
 
 /// The &lt;postalInfo&gt; type on contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct PostalInfo {
+pub struct PostalInfo<'a> {
     /// The 'type' attr on &lt;postalInfo&gt;
     #[serde(rename = "type")]
     pub info_type: String,
     /// The &lt;name&gt; tag under &lt;postalInfo&gt;
     #[serde(rename = "contact:name", alias = "name")]
-    pub name: StringValue,
+    pub name: StringValue<'a>,
     /// The &lt;org&gt; tag under &lt;postalInfo&gt;
     #[serde(rename = "contact:org", alias = "org")]
-    pub organization: StringValue,
+    pub organization: StringValue<'a>,
     /// The &lt;addr&gt; tag under &lt;postalInfo&gt;
     #[serde(rename = "contact:addr", alias = "addr")]
-    pub address: Address,
+    pub address: Address<'a>,
 }
 
-impl PostalInfo {
+impl<'a> PostalInfo<'a> {
     /// Creates a new PostalInfo instance
-    pub fn new(info_type: &str, name: &str, organization: &str, address: Address) -> PostalInfo {
-        PostalInfo {
+    pub fn new(info_type: &str, name: &'a str, organization: &'a str, address: Address<'a>) -> Self {
+        Self {
             info_type: info_type.to_string(),
             name: name.into(),
             organization: organization.into(),

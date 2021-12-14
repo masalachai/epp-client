@@ -5,15 +5,15 @@ use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for DomainTransfer {}
+impl<'a> Transaction<NoExtension> for DomainTransfer<'a> {}
 
-impl Command for DomainTransfer {
+impl<'a> Command for DomainTransfer<'a> {
     type Response = DomainTransferResponse;
     const COMMAND: &'static str = "transfer";
 }
 
-impl DomainTransfer {
-    pub fn new(name: &str, years: Option<u16>, auth_password: &str) -> Self {
+impl<'a> DomainTransfer<'a> {
+    pub fn new(name: &'a str, years: Option<u16>, auth_password: &'a str) -> Self {
         Self::build(
             "request",
             name,
@@ -22,7 +22,7 @@ impl DomainTransfer {
         )
     }
 
-    pub fn query(name: &str, auth_password: &str) -> Self {
+    pub fn query(name: &'a str, auth_password: &'a str) -> Self {
         Self::build(
             "query",
             name,
@@ -31,23 +31,23 @@ impl DomainTransfer {
         )
     }
 
-    pub fn approve(name: &str) -> Self {
+    pub fn approve(name: &'a str) -> Self {
         Self::build("approve", name, None, None)
     }
 
-    pub fn reject(name: &str) -> Self {
+    pub fn reject(name: &'a str) -> Self {
         Self::build("reject", name, None, None)
     }
 
-    pub fn cancel(name: &str) -> Self {
+    pub fn cancel(name: &'a str) -> Self {
         Self::build("cancel", name, None, None)
     }
 
     fn build(
-        operation: &str,
-        name: &str,
+        operation: &'a str,
+        name: &'a str,
         period: Option<Period>,
-        auth_info: Option<DomainAuthInfo>,
+        auth_info: Option<DomainAuthInfo<'a>>,
     ) -> Self {
         Self {
             operation: operation.to_string(),
@@ -65,13 +65,13 @@ impl DomainTransfer {
 
 /// Type for elements under the domain &lt;transfer&gt; tag
 #[derive(Serialize, Debug)]
-pub struct DomainTransferReqData {
+pub struct DomainTransferReqData<'a> {
     /// XML namespace for domain commands
     #[serde(rename = "xmlns:domain")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The name of the domain under transfer
     #[serde(rename = "domain:name")]
-    name: StringValue,
+    name: StringValue<'a>,
     /// The period of renewal upon a successful transfer
     /// Only applicable in case of a transfer request
     #[serde(rename = "domain:period")]
@@ -79,19 +79,19 @@ pub struct DomainTransferReqData {
     /// The authInfo for the domain under transfer
     /// Only applicable to domain transfer and domain transfer query requests
     #[serde(rename = "domain:authInfo")]
-    auth_info: Option<DomainAuthInfo>,
+    auth_info: Option<DomainAuthInfo<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;transfer&gt; command for domains
-pub struct DomainTransfer {
+pub struct DomainTransfer<'a> {
     /// The transfer operation to perform indicated by the 'op' attr
     /// The values are one of transfer or query
     #[serde(rename = "op")]
     operation: String,
     /// The data under the &lt;transfer&gt; tag in the transfer request
     #[serde(rename = "domain:transfer")]
-    domain: DomainTransferReqData,
+    domain: DomainTransferReqData<'a>,
 }
 
 // Response
@@ -100,25 +100,25 @@ pub struct DomainTransfer {
 #[derive(Deserialize, Debug)]
 pub struct DomainTransferResponseData {
     /// The domain name
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The domain transfer status
     #[serde(rename = "trStatus")]
-    pub transfer_status: StringValue,
+    pub transfer_status: StringValue<'static>,
     /// The epp user who requested the transfer
     #[serde(rename = "reID")]
-    pub requester_id: StringValue,
+    pub requester_id: StringValue<'static>,
     /// The transfer rquest date
     #[serde(rename = "reDate")]
-    pub requested_at: StringValue,
+    pub requested_at: StringValue<'static>,
     /// The epp user who should acknowledge the transfer request
     #[serde(rename = "acID")]
-    pub ack_id: StringValue,
+    pub ack_id: StringValue<'static>,
     /// THe date by which the acknowledgment should be made
     #[serde(rename = "acDate")]
-    pub ack_by: StringValue,
+    pub ack_by: StringValue<'static>,
     /// The domain expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: Option<StringValue>,
+    pub expiring_at: Option<StringValue<'static>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain transfer response

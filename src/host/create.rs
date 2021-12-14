@@ -5,15 +5,15 @@ use crate::common::{HostAddr, NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
-impl Transaction<NoExtension> for HostCreate {}
+impl<'a> Transaction<NoExtension> for HostCreate<'a> {}
 
-impl Command for HostCreate {
+impl<'a> Command for HostCreate<'a> {
     type Response = HostCreateResponse;
     const COMMAND: &'static str = "create";
 }
 
-impl HostCreate {
-    pub fn new(host: &str, addresses: Vec<HostAddr>) -> Self {
+impl<'a> HostCreate<'a> {
+    pub fn new(host: &'a str, addresses: Vec<HostAddr>) -> Self {
         Self {
             host: HostCreateRequestData {
                 xmlns: XMLNS,
@@ -28,13 +28,13 @@ impl HostCreate {
 
 /// Type for data under the host &lt;create&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostCreateRequestData {
+pub struct HostCreateRequestData<'a> {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
-    xmlns: &'static str,
+    xmlns: &'a str,
     /// The name of the host to be created
     #[serde(rename = "host:name")]
-    pub name: StringValue,
+    pub name: StringValue<'a>,
     /// The list of IP addresses for the host
     #[serde(rename = "host:addr")]
     pub addresses: Option<Vec<HostAddr>>,
@@ -42,10 +42,10 @@ pub struct HostCreateRequestData {
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;create&gt; command for hosts
-pub struct HostCreate {
+pub struct HostCreate<'a> {
     /// The instance holding the data for the host to be created
     #[serde(rename = "host:create")]
-    host: HostCreateRequestData,
+    host: HostCreateRequestData<'a>,
 }
 
 // Response
@@ -54,10 +54,10 @@ pub struct HostCreate {
 #[derive(Deserialize, Debug)]
 pub struct HostCreateData {
     /// The host name
-    pub name: StringValue,
+    pub name: StringValue<'static>,
     /// The host creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue,
+    pub created_at: StringValue<'static>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for host check response
