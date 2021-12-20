@@ -61,6 +61,16 @@ impl<'a> NameStore<'a> {
     }
 }
 
+impl<'a> NameStoreData<'a> {
+    /// Create a new RGP restore report request
+    pub fn new(subproduct: &str) -> Self {
+        Self {
+            xmlns: XMLNS.into(),
+            subproduct: subproduct.to_owned().into(),
+        }
+    }
+}
+
 impl<'a> Extension for NameStore<'a> {
     type Response = NameStore<'static>;
 }

@@ -19,10 +19,10 @@ impl Extension for Update {
     type Response = NoExtension;
 }
 
-impl Transaction<UpdateWithNameStore> for DomainUpdate {}
+impl Transaction<UpdateWithNameStore<'_>> for DomainUpdate<'_> {}
 
-impl Extension for UpdateWithNameStore {
-    type Response = NameStore;
+impl<'a> Extension for UpdateWithNameStore<'a> {
+    type Response = NameStore<'a>;
 }
 
 #[derive(PartialEq, Debug)]
@@ -78,12 +78,12 @@ impl Update {
     }
 }
 
-impl UpdateWithNameStore {
+impl UpdateWithNameStore<'_> {
     /// Create a new sync update with namestore request
     pub fn new(expiration: GMonthDay, subproduct: &str) -> Self {
         Self {
             sync: Update::new(expiration).data,
-            namestore: NameStore::new(subproduct).data,
+            namestore: NameStoreData::new(subproduct),
         }
     }
 }
@@ -95,11 +95,11 @@ pub struct Update {
 }
 
 #[derive(Debug, Serialize)]
-pub struct UpdateWithNameStore {
+pub struct UpdateWithNameStore<'a> {
     #[serde(rename = "sync:update")]
     pub sync: UpdateData,
     #[serde(rename = "namestoreExt:namestoreExt")]
-    pub namestore: NameStoreData,
+    pub namestore: NameStoreData<'a>,
 }
 
 #[derive(Serialize, Debug)]
