@@ -21,8 +21,8 @@ impl Extension for Update {
 
 impl Transaction<UpdateWithNameStore<'_>> for DomainUpdate<'_> {}
 
-impl<'a> Extension for UpdateWithNameStore<'a> {
-    type Response = NameStore<'a>;
+impl Extension for UpdateWithNameStore<'_> {
+    type Response = NameStore<'static>;
 }
 
 #[derive(PartialEq, Debug)]
