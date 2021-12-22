@@ -33,10 +33,16 @@
 //! }
 //! ```
 
+use std::convert::TryInto;
 use std::net::SocketAddr;
+use std::sync::Arc;
+use std::io;
 
 use tokio::net::TcpStream;
 use tokio_rustls::client::TlsStream;
+use tokio_rustls::rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore};
+use tokio_rustls::TlsConnector;
+use tracing::info;
 
 use crate::common::{Certificate, NoExtension, PrivateKey};
 use crate::connection::EppConnection;
@@ -62,8 +68,9 @@ impl EppClient {
         hostname: &str,
         identity: Option<(Vec<Certificate>, PrivateKey)>,
     ) -> Result<Self, Error> {
+        let stream = epp_connect(addr, hostname, identity).await?;
         Ok(Self {
-            connection: EppConnection::connect(registry, addr, hostname, identity).await?,
+            connection: EppConnection::new(registry, stream).await?,
         })
     }
 
@@ -112,6 +119,54 @@ impl EppClient {
     pub async fn shutdown(mut self) -> Result<(), Error> {
         self.connection.shutdown().await
     }
+}
+
+/// Establishes a TLS connection to a registry and returns a ConnectionStream instance containing the
+/// socket stream to read/write to the connection
+async fn epp_connect(
+    addr: SocketAddr,
+    hostname: &str,
+    identity: Option<(Vec<Certificate>, PrivateKey)>,
+) -> Result<TlsStream<TcpStream>, Error> {
+    info!("Connecting to server: {:?}", addr,);
+
+    let mut roots = RootCertStore::empty();
+    roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
+        OwnedTrustAnchor::from_subject_spki_name_constraints(
+            ta.subject,
+            ta.spki,
+            ta.name_constraints,
+        )
+    }));
+
+    let builder = ClientConfig::builder()
+        .with_safe_defaults()
+        .with_root_certificates(roots);
+
+    let config = match identity {
+        Some((certs, key)) => {
+            let certs = certs
+                .into_iter()
+                .map(|cert| rustls::Certificate(cert.0))
+                .collect();
+            builder
+                .with_single_cert(certs, rustls::PrivateKey(key.0))
+                .map_err(|e| Error::Other(e.into()))?
+        }
+        None => builder.with_no_client_auth(),
+    };
+
+    let connector = TlsConnector::from(Arc::new(config));
+    let stream = TcpStream::connect(&addr).await?;
+
+    let domain = hostname.try_into().map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
+            format!("Invalid domain: {}", hostname),
+        )
+    })?;
+
+    Ok(connector.connect(domain, stream).await?)
 }
 
 pub struct RequestData<'a, C, E> {
