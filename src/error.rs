@@ -12,7 +12,7 @@ pub enum Error {
     Io(std::io::Error),
     Command(ResponseStatus),
     Xml(Box<dyn StdError>),
-    Other(String),
+    Other(Box<dyn StdError>),
 }
 
 impl StdError for Error {}
@@ -31,7 +31,7 @@ impl Display for Error {
 
 impl From<Box<dyn StdError>> for Error {
     fn from(e: Box<dyn StdError>) -> Self {
-        Self::Other(format!("{:?}", e))
+        Self::Other(e)
     }
 }
 
