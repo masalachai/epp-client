@@ -23,11 +23,12 @@ impl StdError for Error {}
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Error::Io(e) => write!(f, "I/O error: {}", e),
             Error::Command(e) => {
-                write!(f, "epp-client EppCommandError: {}", e.result.message)
+                write!(f, "command error: {}", e.result.message)
             }
-            Error::Other(e) => write!(f, "epp-client Exception: {}", e),
-            _ => write!(f, "epp-client Exception: {:?}", self),
+            Error::Xml(e) => write!(f, "(de)serialization error: {}", e),
+            Error::Other(e) => write!(f, "error: {}", e),
         }
     }
 }
