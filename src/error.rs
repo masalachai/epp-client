@@ -3,6 +3,9 @@
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
 use std::io;
+use std::num::TryFromIntError;
+use std::str::Utf8Error;
+use std::string::FromUtf8Error;
 
 use crate::response::ResponseStatus;
 
@@ -44,5 +47,23 @@ impl From<io::Error> for Error {
 impl From<io::ErrorKind> for Error {
     fn from(e: io::ErrorKind) -> Self {
         Self::Io(io::Error::from(e))
+    }
+}
+
+impl From<TryFromIntError> for Error {
+    fn from(e: TryFromIntError) -> Self {
+        Self::Other(e.into())
+    }
+}
+
+impl From<FromUtf8Error> for Error {
+    fn from(e: FromUtf8Error) -> Self {
+        Self::Other(e.into())
+    }
+}
+
+impl From<Utf8Error> for Error {
+    fn from(e: Utf8Error) -> Self {
+        Self::Other(e.into())
     }
 }
