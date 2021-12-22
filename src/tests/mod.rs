@@ -3,7 +3,7 @@
 use regex::Regex;
 use std::{error::Error, fs::File, io::Read};
 
-pub(crate) const RESOURCES_DIR: &str = "./test/resources";
+pub(crate) const RESOURCES_DIR: &str = "./tests/resources";
 pub(crate) const CLTRID: &str = "cltrid:1626454866";
 pub(crate) const SVTRID: &str = "RO-6879-1627224678242975";
 pub(crate) const SUCCESS_MSG: &str = "Command completed successfully";
