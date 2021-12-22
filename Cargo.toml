@@ -7,14 +7,16 @@ authors = ["Ritesh Chitlangi <ritesh@ayravat.com>"]
 description = "EPP (Extensible Provisioning Protocol) Client Library for Domain Registration and Management"
 repository = "https://github.com/masalachai/epp-client"
 
+[features]
+default = ["tokio-rustls"]
+
 [dependencies]
 celes = "2.1"
 chrono = "0.4"
 quick-xml = { version = "0.22", features = [ "serialize" ] }
-rustls = "0.20"
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.0", features = [ "full" ] }
-tokio-rustls = "0.23"
+tokio-rustls = { version = "0.23", optional = true }
 tracing = "0.1.29"
 webpki-roots = "0.22.1"
 

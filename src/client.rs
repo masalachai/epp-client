@@ -34,14 +34,17 @@
 //! ```
 
 use std::convert::TryInto;
+use std::io;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use std::io;
 
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
+#[cfg(feature = "tokio-rustls")]
 use tokio_rustls::client::TlsStream;
+#[cfg(feature = "tokio-rustls")]
 use tokio_rustls::rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore};
+#[cfg(feature = "tokio-rustls")]
 use tokio_rustls::TlsConnector;
 use tracing::info;
 
@@ -60,6 +63,7 @@ pub struct EppClient<IO> {
     connection: EppConnection<IO>,
 }
 
+#[cfg(feature = "tokio-rustls")]
 impl EppClient<TlsStream<TcpStream>> {
     /// Connect to the specified `addr` and `hostname` over TLS
     ///
@@ -94,10 +98,10 @@ impl EppClient<TlsStream<TcpStream>> {
             Some((certs, key)) => {
                 let certs = certs
                     .into_iter()
-                    .map(|cert| rustls::Certificate(cert.0))
+                    .map(|cert| tokio_rustls::rustls::Certificate(cert.0))
                     .collect();
                 builder
-                    .with_single_cert(certs, rustls::PrivateKey(key.0))
+                    .with_single_cert(certs, tokio_rustls::rustls::PrivateKey(key.0))
                     .map_err(|e| Error::Other(e.into()))?
             }
             None => builder.with_no_client_auth(),
