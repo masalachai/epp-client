@@ -7,6 +7,7 @@ use crate::{
     common::{StringValue, EPP_XMLNS},
     response::{Response, ResponseDocument, ResponseStatus},
     xml::EppXml,
+    Error,
 };
 
 pub const EPP_VERSION: &str = "1.0";
@@ -18,7 +19,7 @@ pub trait Transaction<Ext: Extension>: Command + Sized {
         &self,
         extension: Option<&Ext>,
         client_tr_id: &str,
-    ) -> Result<String, crate::error::Error> {
+    ) -> Result<String, Error> {
         <CommandDocument<Self, Ext> as EppXml>::serialize(&CommandDocument::new(CommandWrapper {
             command: Self::COMMAND,
             data: self,
@@ -29,7 +30,7 @@ pub trait Transaction<Ext: Extension>: Command + Sized {
 
     fn deserialize_response(
         epp_xml: &str,
-    ) -> Result<Response<Self::Response, Ext::Response>, crate::error::Error> {
+    ) -> Result<Response<Self::Response, Ext::Response>, Error> {
         let rsp =
             <ResponseDocument<Self::Response, Ext::Response> as EppXml>::deserialize(epp_xml)?;
         match rsp.data.result.code {
