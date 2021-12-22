@@ -33,12 +33,12 @@
 //! }
 //! ```
 
-use std::error::Error;
+use std::error::Error as StdError;
 use std::net::SocketAddr;
 
 use crate::common::{Certificate, NoExtension, PrivateKey};
 use crate::connection::EppConnection;
-use crate::error;
+use crate::error::Error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
 use crate::request::{Command, Extension, Transaction};
 use crate::response::Response;
@@ -59,14 +59,14 @@ impl EppClient {
         addr: SocketAddr,
         hostname: &str,
         identity: Option<(Vec<Certificate>, PrivateKey)>,
-    ) -> Result<Self, Box<dyn Error>> {
+    ) -> Result<Self, Box<dyn StdError>> {
         Ok(Self {
             connection: EppConnection::connect(registry, addr, hostname, identity).await?,
         })
     }
 
     /// Executes an EPP Hello call and returns the response as an `Greeting`
-    pub async fn hello(&mut self) -> Result<Greeting, Box<dyn Error>> {
+    pub async fn hello(&mut self) -> Result<Greeting, Box<dyn StdError>> {
         let hello_xml = HelloDocument::default().serialize()?;
 
         let response = self.connection.transact(&hello_xml).await?;
@@ -78,7 +78,7 @@ impl EppClient {
         &mut self,
         data: impl Into<RequestData<'a, C, E>> + 'a,
         id: &str,
-    ) -> Result<Response<C::Response, E::Response>, error::Error>
+    ) -> Result<Response<C::Response, E::Response>, Error>
     where
         C: Transaction<E> + Command,
         E: Extension,
@@ -93,7 +93,7 @@ impl EppClient {
 
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
     /// Not recommended for direct use but sometimes can be useful for debugging
-    pub async fn transact_xml(&mut self, xml: &str) -> Result<String, Box<dyn Error>> {
+    pub async fn transact_xml(&mut self, xml: &str) -> Result<String, Box<dyn StdError>> {
         self.connection.transact(xml).await
     }
 
@@ -103,11 +103,11 @@ impl EppClient {
     }
 
     /// Returns the greeting received on establishment of the connection as an `Greeting`
-    pub fn greeting(&self) -> Result<Greeting, error::Error> {
+    pub fn greeting(&self) -> Result<Greeting, Error> {
         GreetingDocument::deserialize(&self.connection.greeting).map(|obj| obj.data)
     }
 
-    pub async fn shutdown(mut self) -> Result<(), Box<dyn Error>> {
+    pub async fn shutdown(mut self) -> Result<(), Box<dyn StdError>> {
         self.connection.shutdown().await
     }
 }

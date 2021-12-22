@@ -90,16 +90,15 @@
 pub mod client;
 pub mod common;
 pub mod connection;
+pub mod contact;
 pub mod domain;
-pub mod error;
+mod error;
 pub mod hello;
 pub mod login;
 pub mod logout;
 pub mod request;
 pub mod response;
 pub mod xml;
-
-pub mod contact;
 
 pub mod extensions {
     pub mod consolidate;
@@ -123,6 +122,7 @@ pub mod message {
 }
 
 pub use client::EppClient;
+pub use error::Error;
 
 #[cfg(test)]
 pub mod tests;

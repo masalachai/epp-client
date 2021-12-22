@@ -1,9 +1,9 @@
 //! Manages registry connections and reading/writing to them
 
 use std::convert::TryInto;
+use std::error::Error as StdError;
 use std::net::SocketAddr;
 use std::sync::Arc;
-use std::{error::Error, io as stdio};
 use std::{io, str, u32};
 
 use rustls::{OwnedTrustAnchor, RootCertStore};
@@ -12,7 +12,7 @@ use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
 use tracing::{debug, info};
 
 use crate::common::{Certificate, PrivateKey};
-use crate::error;
+use crate::error::Error;
 
 /// EPP Connection struct with some metadata for the connection
 pub(crate) struct EppConnection {
@@ -28,7 +28,7 @@ impl EppConnection {
         addr: SocketAddr,
         hostname: &str,
         identity: Option<(Vec<Certificate>, PrivateKey)>,
-    ) -> Result<EppConnection, Box<dyn Error>> {
+    ) -> Result<EppConnection, Box<dyn StdError>> {
         let mut stream = epp_connect(addr, hostname, identity).await?;
 
         let mut buf = vec![0u8; 4096];
@@ -45,7 +45,7 @@ impl EppConnection {
     }
 
     /// Constructs an EPP XML request in the required form and sends it to the server
-    async fn send_epp_request(&mut self, content: &str) -> Result<(), Box<dyn Error>> {
+    async fn send_epp_request(&mut self, content: &str) -> Result<(), Box<dyn StdError>> {
         let len = content.len();
 
         let buf_size = len + 4;
@@ -63,7 +63,7 @@ impl EppConnection {
     }
 
     /// Receives response from the socket and converts it into an EPP XML string
-    async fn get_epp_response(&mut self) -> Result<String, Box<dyn Error>> {
+    async fn get_epp_response(&mut self) -> Result<String, Box<dyn StdError>> {
         let mut buf = [0u8; 4];
         self.stream.read_exact(&mut buf).await?;
 
@@ -98,7 +98,7 @@ impl EppConnection {
 
     /// Sends an EPP XML request to the registry and return the response
     /// receieved to the request
-    pub(crate) async fn transact(&mut self, content: &str) -> Result<String, Box<dyn Error>> {
+    pub(crate) async fn transact(&mut self, content: &str) -> Result<String, Box<dyn StdError>> {
         debug!("{}: request: {}", self.registry, content);
         self.send_epp_request(content).await?;
 
@@ -109,7 +109,7 @@ impl EppConnection {
     }
 
     /// Closes the socket and shuts the connection
-    pub(crate) async fn shutdown(&mut self) -> Result<(), Box<dyn Error>> {
+    pub(crate) async fn shutdown(&mut self) -> Result<(), Box<dyn StdError>> {
         info!("{}: Closing connection", self.registry);
 
         self.stream.shutdown().await?;
@@ -123,7 +123,7 @@ async fn epp_connect(
     addr: SocketAddr,
     hostname: &str,
     identity: Option<(Vec<Certificate>, PrivateKey)>,
-) -> Result<TlsStream<TcpStream>, error::Error> {
+) -> Result<TlsStream<TcpStream>, Error> {
     info!("Connecting to server: {:?}", addr,);
 
     let mut roots = RootCertStore::empty();
@@ -147,7 +147,7 @@ async fn epp_connect(
                 .collect();
             builder
                 .with_single_cert(certs, rustls::PrivateKey(key.0))
-                .map_err(|e| error::Error::Other(e.to_string()))?
+                .map_err(|e| Error::Other(e.to_string()))?
         }
         None => builder.with_no_client_auth(),
     };
@@ -156,8 +156,8 @@ async fn epp_connect(
     let stream = TcpStream::connect(&addr).await?;
 
     let domain = hostname.try_into().map_err(|_| {
-        stdio::Error::new(
-            stdio::ErrorKind::InvalidInput,
+        io::Error::new(
+            io::ErrorKind::InvalidInput,
             format!("Invalid domain: {}", hostname),
         )
     })?;
