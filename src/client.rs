@@ -35,6 +35,9 @@
 
 use std::net::SocketAddr;
 
+use tokio::net::TcpStream;
+use tokio_rustls::client::TlsStream;
+
 use crate::common::{Certificate, NoExtension, PrivateKey};
 use crate::connection::EppConnection;
 use crate::error::Error;
@@ -47,7 +50,7 @@ use crate::xml::EppXml;
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
 /// to the registry and deserialize the XML responses from the registry to local types
 pub struct EppClient {
-    connection: EppConnection,
+    connection: EppConnection<TlsStream<TcpStream>>,
 }
 
 impl EppClient {
