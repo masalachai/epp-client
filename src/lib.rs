@@ -54,7 +54,7 @@
 //! // Create an instance of EppClient
 //! let host = "example.com";
 //! let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
-//! let mut client = match EppClient::new("registry_name".to_string(), addr, host, None).await {
+//! let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None).await {
 //!     Ok(client) => client,
 //!     Err(e) => panic!("Failed to create EppClient: {}",  e)
 //! };

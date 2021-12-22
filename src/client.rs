@@ -16,7 +16,7 @@
 //! // Create an instance of EppClient
 //! let host = "example.com";
 //! let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
-//! let mut client = match EppClient::new("registry_name".to_string(), addr, host, None).await {
+//! let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None).await {
 //!     Ok(client) => client,
 //!     Err(e) => panic!("Failed to create EppClient: {}",  e)
 //! };
@@ -38,6 +38,7 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::io;
 
+use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
 use tokio_rustls::client::TlsStream;
 use tokio_rustls::rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore};
@@ -55,20 +56,70 @@ use crate::xml::EppXml;
 /// Instances of the EppClient type are used to transact with the registry.
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
 /// to the registry and deserialize the XML responses from the registry to local types
-pub struct EppClient {
-    connection: EppConnection<TlsStream<TcpStream>>,
+pub struct EppClient<IO> {
+    connection: EppConnection<IO>,
 }
 
-impl EppClient {
-    /// Creates a new EppClient object and does an EPP Login to a given registry to become ready
-    /// for subsequent transactions on this client instance
-    pub async fn new(
+impl EppClient<TlsStream<TcpStream>> {
+    /// Connect to the specified `addr` and `hostname` over TLS
+    ///
+    /// The `registry` is used as a name in internal logging; `addr` provides the address to
+    /// connect to, `hostname` is sent as the TLS server name indication and `identity` provides
+    /// optional TLS client authentication. Uses rustls as the TLS implementation.
+    ///
+    /// Alternatively, use `EppClient::new()` with any established `AsyncRead + AsyncWrite + Unpin`
+    /// implementation.
+    pub async fn connect(
         registry: String,
         addr: SocketAddr,
         hostname: &str,
         identity: Option<(Vec<Certificate>, PrivateKey)>,
     ) -> Result<Self, Error> {
-        let stream = epp_connect(addr, hostname, identity).await?;
+        info!("Connecting to server: {:?}", addr);
+
+        let mut roots = RootCertStore::empty();
+        roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
+            OwnedTrustAnchor::from_subject_spki_name_constraints(
+                ta.subject,
+                ta.spki,
+                ta.name_constraints,
+            )
+        }));
+
+        let builder = ClientConfig::builder()
+            .with_safe_defaults()
+            .with_root_certificates(roots);
+
+        let config = match identity {
+            Some((certs, key)) => {
+                let certs = certs
+                    .into_iter()
+                    .map(|cert| rustls::Certificate(cert.0))
+                    .collect();
+                builder
+                    .with_single_cert(certs, rustls::PrivateKey(key.0))
+                    .map_err(|e| Error::Other(e.into()))?
+            }
+            None => builder.with_no_client_auth(),
+        };
+
+        let domain = hostname.try_into().map_err(|_| {
+            io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!("Invalid domain: {}", hostname),
+            )
+        })?;
+
+        let connector = TlsConnector::from(Arc::new(config));
+        let tcp = TcpStream::connect(&addr).await?;
+        let stream = connector.connect(domain, tcp).await?;
+        Self::new(registry, stream).await
+    }
+}
+
+impl<IO: AsyncRead + AsyncWrite + Unpin> EppClient<IO> {
+    /// Create an `EppClient` from an already established connection
+    pub async fn new(registry: String, stream: IO) -> Result<Self, Error> {
         Ok(Self {
             connection: EppConnection::new(registry, stream).await?,
         })
@@ -119,54 +170,6 @@ impl EppClient {
     pub async fn shutdown(mut self) -> Result<(), Error> {
         self.connection.shutdown().await
     }
-}
-
-/// Establishes a TLS connection to a registry and returns a ConnectionStream instance containing the
-/// socket stream to read/write to the connection
-async fn epp_connect(
-    addr: SocketAddr,
-    hostname: &str,
-    identity: Option<(Vec<Certificate>, PrivateKey)>,
-) -> Result<TlsStream<TcpStream>, Error> {
-    info!("Connecting to server: {:?}", addr,);
-
-    let mut roots = RootCertStore::empty();
-    roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
-        OwnedTrustAnchor::from_subject_spki_name_constraints(
-            ta.subject,
-            ta.spki,
-            ta.name_constraints,
-        )
-    }));
-
-    let builder = ClientConfig::builder()
-        .with_safe_defaults()
-        .with_root_certificates(roots);
-
-    let config = match identity {
-        Some((certs, key)) => {
-            let certs = certs
-                .into_iter()
-                .map(|cert| rustls::Certificate(cert.0))
-                .collect();
-            builder
-                .with_single_cert(certs, rustls::PrivateKey(key.0))
-                .map_err(|e| Error::Other(e.into()))?
-        }
-        None => builder.with_no_client_auth(),
-    };
-
-    let connector = TlsConnector::from(Arc::new(config));
-    let stream = TcpStream::connect(&addr).await?;
-
-    let domain = hostname.try_into().map_err(|_| {
-        io::Error::new(
-            io::ErrorKind::InvalidInput,
-            format!("Invalid domain: {}", hostname),
-        )
-    })?;
-
-    Ok(connector.connect(domain, stream).await?)
 }
 
 pub struct RequestData<'a, C, E> {
