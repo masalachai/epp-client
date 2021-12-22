@@ -147,7 +147,7 @@ async fn epp_connect(
                 .collect();
             builder
                 .with_single_cert(certs, rustls::PrivateKey(key.0))
-                .map_err(|e| Error::Other(e.to_string()))?
+                .map_err(|e| Error::Other(e.into()))?
         }
         None => builder.with_no_client_auth(),
     };
