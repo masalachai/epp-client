@@ -6,7 +6,8 @@ use std::sync::Arc;
 use std::{io, str, u32};
 
 use rustls::{OwnedTrustAnchor, RootCertStore};
-use tokio::{io::AsyncReadExt, io::AsyncWriteExt, net::TcpStream};
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
+use tokio::net::TcpStream;
 use tokio_rustls::{client::TlsStream, rustls::ClientConfig, TlsConnector};
 use tracing::{debug, info};
 
@@ -14,20 +15,20 @@ use crate::common::{Certificate, PrivateKey};
 use crate::error::Error;
 
 /// EPP Connection struct with some metadata for the connection
-pub(crate) struct EppConnection {
+pub(crate) struct EppConnection<IO> {
     registry: String,
-    stream: TlsStream<TcpStream>,
+    stream: IO,
     pub greeting: String,
 }
 
-impl EppConnection {
+impl EppConnection<TlsStream<TcpStream>> {
     /// Create an EppConnection instance with the stream to the registry
     pub(crate) async fn connect(
         registry: String,
         addr: SocketAddr,
         hostname: &str,
         identity: Option<(Vec<Certificate>, PrivateKey)>,
-    ) -> Result<EppConnection, Error> {
+    ) -> Result<Self, Error> {
         let mut stream = epp_connect(addr, hostname, identity).await?;
 
         let mut buf = vec![0u8; 4096];
@@ -42,7 +43,9 @@ impl EppConnection {
             greeting,
         })
     }
+}
 
+impl<IO: AsyncRead + AsyncWrite + Unpin> EppConnection<IO> {
     /// Constructs an EPP XML request in the required form and sends it to the server
     async fn send_epp_request(&mut self, content: &str) -> Result<(), Error> {
         let len = content.len();
