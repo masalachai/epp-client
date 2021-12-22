@@ -16,17 +16,15 @@ pub(crate) struct EppConnection<IO> {
 }
 
 impl<IO: AsyncRead + AsyncWrite + Unpin> EppConnection<IO> {
-    pub(crate) async fn new(registry: String, mut stream: IO) -> Result<Self, Error> {
-        let mut buf = vec![0u8; 4096];
-        stream.read(&mut buf).await?;
-        let greeting = str::from_utf8(&buf[4..])?.to_string();
-        debug!("{}: greeting: {}", registry, greeting);
-
-        Ok(Self {
+    pub(crate) async fn new(registry: String, stream: IO) -> Result<Self, Error> {
+        let mut this = Self {
             registry,
             stream,
-            greeting,
-        })
+            greeting: String::new(),
+        };
+
+        this.greeting = this.get_epp_response().await?;
+        Ok(this)
     }
 
     /// Constructs an EPP XML request in the required form and sends it to the server
