@@ -33,7 +33,6 @@
 //! }
 //! ```
 
-use std::error::Error as StdError;
 use std::net::SocketAddr;
 
 use crate::common::{Certificate, NoExtension, PrivateKey};
@@ -59,14 +58,14 @@ impl EppClient {
         addr: SocketAddr,
         hostname: &str,
         identity: Option<(Vec<Certificate>, PrivateKey)>,
-    ) -> Result<Self, Box<dyn StdError>> {
+    ) -> Result<Self, Error> {
         Ok(Self {
             connection: EppConnection::connect(registry, addr, hostname, identity).await?,
         })
     }
 
     /// Executes an EPP Hello call and returns the response as an `Greeting`
-    pub async fn hello(&mut self) -> Result<Greeting, Box<dyn StdError>> {
+    pub async fn hello(&mut self) -> Result<Greeting, Error> {
         let hello_xml = HelloDocument::default().serialize()?;
 
         let response = self.connection.transact(&hello_xml).await?;
@@ -93,7 +92,7 @@ impl EppClient {
 
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
     /// Not recommended for direct use but sometimes can be useful for debugging
-    pub async fn transact_xml(&mut self, xml: &str) -> Result<String, Box<dyn StdError>> {
+    pub async fn transact_xml(&mut self, xml: &str) -> Result<String, Error> {
         self.connection.transact(xml).await
     }
 
@@ -107,7 +106,7 @@ impl EppClient {
         GreetingDocument::deserialize(&self.connection.greeting).map(|obj| obj.data)
     }
 
-    pub async fn shutdown(mut self) -> Result<(), Box<dyn StdError>> {
+    pub async fn shutdown(mut self) -> Result<(), Error> {
         self.connection.shutdown().await
     }
 }

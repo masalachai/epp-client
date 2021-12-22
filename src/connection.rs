@@ -1,7 +1,6 @@
 //! Manages registry connections and reading/writing to them
 
 use std::convert::TryInto;
-use std::error::Error as StdError;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::{io, str, u32};
@@ -28,7 +27,7 @@ impl EppConnection {
         addr: SocketAddr,
         hostname: &str,
         identity: Option<(Vec<Certificate>, PrivateKey)>,
-    ) -> Result<EppConnection, Box<dyn StdError>> {
+    ) -> Result<EppConnection, Error> {
         let mut stream = epp_connect(addr, hostname, identity).await?;
 
         let mut buf = vec![0u8; 4096];
@@ -45,7 +44,7 @@ impl EppConnection {
     }
 
     /// Constructs an EPP XML request in the required form and sends it to the server
-    async fn send_epp_request(&mut self, content: &str) -> Result<(), Box<dyn StdError>> {
+    async fn send_epp_request(&mut self, content: &str) -> Result<(), Error> {
         let len = content.len();
 
         let buf_size = len + 4;
@@ -63,7 +62,7 @@ impl EppConnection {
     }
 
     /// Receives response from the socket and converts it into an EPP XML string
-    async fn get_epp_response(&mut self) -> Result<String, Box<dyn StdError>> {
+    async fn get_epp_response(&mut self) -> Result<String, Error> {
         let mut buf = [0u8; 4];
         self.stream.read_exact(&mut buf).await?;
 
@@ -98,7 +97,7 @@ impl EppConnection {
 
     /// Sends an EPP XML request to the registry and return the response
     /// receieved to the request
-    pub(crate) async fn transact(&mut self, content: &str) -> Result<String, Box<dyn StdError>> {
+    pub(crate) async fn transact(&mut self, content: &str) -> Result<String, Error> {
         debug!("{}: request: {}", self.registry, content);
         self.send_epp_request(content).await?;
 
@@ -109,7 +108,7 @@ impl EppConnection {
     }
 
     /// Closes the socket and shuts the connection
-    pub(crate) async fn shutdown(&mut self) -> Result<(), Box<dyn StdError>> {
+    pub(crate) async fn shutdown(&mut self) -> Result<(), Error> {
         info!("{}: Closing connection", self.registry);
 
         self.stream.shutdown().await?;
