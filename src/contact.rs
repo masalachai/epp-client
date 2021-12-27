@@ -6,10 +6,19 @@ use serde::{Deserialize, Serialize};
 use crate::common::StringValue;
 
 pub mod check;
+pub use check::ContactCheck;
+
 pub mod create;
+pub use create::ContactCreate;
+
 pub mod delete;
+pub use delete::ContactDelete;
+
 pub mod info;
+pub use info::ContactInfo;
+
 pub mod update;
+pub use update::ContactUpdate;
 
 pub const XMLNS: &str = "urn:ietf:params:xml:ns:contact-1.0";
 

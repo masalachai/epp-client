@@ -7,7 +7,7 @@
 //! use std::net::ToSocketAddrs;
 //!
 //! use epp_client::EppClient;
-//! use epp_client::domain::check::DomainCheck;
+//! use epp_client::domain::DomainCheck;
 //! use epp_client::common::NoExtension;
 //!
 //! #[tokio::main]
