@@ -5,12 +5,25 @@ use serde::{Deserialize, Serialize};
 use crate::common::{HostAddr, StringValue};
 
 pub mod check;
+pub use check::DomainCheck;
+
 pub mod create;
+pub use create::DomainCreate;
+
 pub mod delete;
+pub use delete::DomainDelete;
+
 pub mod info;
+pub use info::DomainInfo;
+
 pub mod renew;
+pub use renew::DomainRenew;
+
 pub mod transfer;
+pub use transfer::DomainTransfer;
+
 pub mod update;
+pub use update::DomainUpdate;
 
 pub const XMLNS: &str = "urn:ietf:params:xml:ns:domain-1.0";
 

@@ -43,7 +43,7 @@
 //! use std::net::ToSocketAddrs;
 //!
 //! use epp_client::EppClient;
-//! use epp_client::domain::check::DomainCheck;
+//! use epp_client::domain::DomainCheck;
 //! use epp_client::common::NoExtension;
 //! use epp_client::login::Login;
 //! use epp_client::logout::Logout;
@@ -108,17 +108,29 @@ pub mod extensions {
 
 pub mod host {
     pub mod check;
+    pub use check::HostCheck;
+
     pub mod create;
+    pub use create::HostCreate;
+
     pub mod delete;
+    pub use delete::HostDelete;
+
     pub mod info;
+    pub use info::HostInfo;
+
     pub mod update;
+    pub use update::HostUpdate;
 
     pub const XMLNS: &str = "urn:ietf:params:xml:ns:host-1.0";
 }
 
 pub mod message {
     pub mod ack;
+    pub use ack::MessageAck;
+
     pub mod poll;
+    pub use poll::MessagePoll;
 }
 
 pub use client::EppClient;
