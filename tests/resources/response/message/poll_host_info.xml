@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <response>
+        <result code="1301">
+            <msg>Command completed successfully; ack to dequeue</msg>
+        </result>
+        <msgQ count="4" id="12345">
+            <qDate>2022-01-02T11:30:45Z</qDate>
+            <msg>Unused objects policy</msg>
+        </msgQ>
+        <resData>
+            <host:infData xmlns:host="urn:ietf:params:xml:ns:host-1.0">
+                <host:name>ns.test.com</host:name>
+                <host:roid>1234</host:roid>
+                <host:status s="ok"/>
+                <host:addr ip="v4">1.1.1.1</host:addr>
+                <host:clID>1234</host:clID>
+                <host:crID>user</host:crID>
+                <host:crDate>2021-12-01T22:40:48Z</host:crDate>
+                <host:upID>user</host:upID>
+                <host:upDate>2021-12-01T22:40:48Z</host:upDate>
+            </host:infData>
+        </resData>
+        <extension>
+            <changePoll:changeData state="before" xmlns:changePoll="urn:ietf:params:xml:ns:changePoll-1.0">
+                <changePoll:operation op="purge">delete</changePoll:operation>
+                <changePoll:date>2022-01-02T11:30:45Z</changePoll:date>
+                <changePoll:svTRID>1234</changePoll:svTRID>
+                <changePoll:who>regy_batch</changePoll:who>
+                <changePoll:reason>Unused objects policy</changePoll:reason>
+            </changePoll:changeData>
+        </extension>
+        <trID>
+            <clTRID>cltrid:1626454866</clTRID>
+            <svTRID>RO-6879-1627224678242975</svTRID>
+        </trID>
+    </response>
+</epp>
