@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <response>
+        <result code="1301">
+            <msg>Command completed successfully; ack to dequeue</msg>
+        </result>
+        <msgQ count="4" id="12346">
+            <qDate>2000-06-08T22:10:00.0Z</qDate>
+            <msg lang="en">Credit balance low.
+                <limit>100</limit>
+                <bal>5</bal>
+            </msg>
+        </msgQ>
+        <trID>
+            <clTRID>cltrid:1626454866</clTRID>
+            <svTRID>RO-6879-1627224678242975</svTRID>
+        </trID>
+    </response>
+</epp>
