@@ -148,4 +148,19 @@ mod tests {
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
+
+    #[test]
+    fn empty_queue_response() {
+        let xml = get_xml("response/message/poll_empty_queue.xml").unwrap();
+        let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
+
+        assert_eq!(object.result.code, 1300);
+        assert_eq!(
+            object.result.message,
+            "Command completed successfully; no messages".into()
+        );
+
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
 }
