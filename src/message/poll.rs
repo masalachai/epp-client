@@ -150,6 +150,34 @@ mod tests {
     }
 
     #[test]
+    fn message_only_response() {
+        let xml = get_xml("response/message/poll_message_only.xml").unwrap();
+        let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
+
+        let msg = object.message_queue().unwrap();
+
+        assert_eq!(object.result.code, 1301);
+        assert_eq!(
+            object.result.message,
+            "Command completed successfully; ack to dequeue".into()
+        );
+
+        assert_eq!(msg.count, 4);
+        assert_eq!(msg.id, "12346".to_string());
+        assert_eq!(
+            *(msg.date.as_ref().unwrap()),
+            "2000-06-08T22:10:00.0Z".into()
+        );
+        assert_eq!(
+            *(msg.message.as_ref().unwrap()),
+            "Credit balance low.".into()
+        );
+
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+    }
+
+    #[test]
     fn empty_queue_response() {
         let xml = get_xml("response/message/poll_empty_queue.xml").unwrap();
         let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
