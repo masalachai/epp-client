@@ -1,4 +1,5 @@
-use crate::common::{NoExtension, StringValue};
+use crate::common::NoExtension;
+use crate::domain::transfer::DomainTransferResponseData;
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
@@ -29,41 +30,24 @@ impl Default for MessagePoll<'static> {
 
 /// Type that represents the &lt;trnData&gt; tag for message poll response
 #[derive(Deserialize, Debug)]
-pub struct MessageDomainTransferData {
-    /// The name of the domain under transfer
-    #[serde(rename = "domain:name", alias = "name")]
-    pub name: StringValue<'static>,
-    /// The domain transfer status
-    #[serde(rename = "domain:trStatus", alias = "trStatus")]
-    pub transfer_status: StringValue<'static>,
-    /// The epp user who requested the transfer
-    #[serde(rename = "domain:reID", alias = "reID")]
-    pub requester_id: StringValue<'static>,
-    /// The date of the transfer request
-    #[serde(rename = "domain:reDate", alias = "reDate")]
-    pub requested_at: StringValue<'static>,
-    /// The epp user who should acknowledge the transfer request
-    #[serde(rename = "domain:acID", alias = "acID")]
-    pub ack_id: StringValue<'static>,
-    /// The date by which the transfer request should be acknowledged
-    #[serde(rename = "domain:acDate", alias = "acDate")]
-    pub ack_by: StringValue<'static>,
-    /// The domain expiry date
-    #[serde(rename = "domain:exDate", alias = "exDate")]
-    pub expiring_at: Option<StringValue<'static>>,
+pub enum MessageData {
+    /// Data under the &lt;domain:trnData&gt; tag
+    #[serde(rename = "domain:trnData")]
+    DomainTransfer(DomainTransferResponseData),
 }
 
 /// Type that represents the &lt;resData&gt; tag for message poll response
 #[derive(Deserialize, Debug)]
 pub struct MessagePollResponse {
     /// Data under the &lt;trnData&gt; tag
-    #[serde(rename = "domain:trnData", alias = "trnData")]
-    pub message_data: MessageDomainTransferData,
+    #[serde(alias = "trnData")]
+    pub message_data: MessageData,
 }
 
 #[cfg(test)]
 mod tests {
     use super::MessagePoll;
+    use crate::message::poll::MessageData;
     use crate::request::Transaction;
     use crate::tests::{get_xml, CLTRID, SVTRID};
 
@@ -101,19 +85,20 @@ mod tests {
             *(msg.message.as_ref().unwrap()),
             "Transfer requested.".into()
         );
-        assert_eq!(result.message_data.name, "eppdev-transfer.com".into());
-        assert_eq!(result.message_data.transfer_status, "pending".into());
-        assert_eq!(result.message_data.requester_id, "eppdev".into());
+
+        let MessageData::DomainTransfer(data) = &result.message_data;
+
+        assert_eq!(data.name, "eppdev-transfer.com".into());
+        assert_eq!(data.transfer_status, "pending".into());
+        assert_eq!(data.requester_id, "eppdev".into());
+        assert_eq!(data.requested_at, "2021-07-23T15:31:21.0Z".into());
+        assert_eq!(data.ack_id, "ClientY".into());
+        assert_eq!(data.ack_by, "2021-07-28T15:31:21.0Z".into());
         assert_eq!(
-            result.message_data.requested_at,
-            "2021-07-23T15:31:21.0Z".into()
-        );
-        assert_eq!(result.message_data.ack_id, "ClientY".into());
-        assert_eq!(result.message_data.ack_by, "2021-07-28T15:31:21.0Z".into());
-        assert_eq!(
-            *result.message_data.expiring_at.as_ref().unwrap(),
+            *data.expiring_at.as_ref().unwrap(),
             "2022-07-02T14:53:19.0Z".into()
         );
+
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
