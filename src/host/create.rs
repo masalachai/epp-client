@@ -13,12 +13,12 @@ impl<'a> Command for HostCreate<'a> {
 }
 
 impl<'a> HostCreate<'a> {
-    pub fn new(host: &'a str, addresses: &'a [HostAddr]) -> Self {
+    pub fn new(host: &'a str, addresses: Option<&'a [HostAddr]>) -> Self {
         Self {
             host: HostCreateRequestData {
                 xmlns: XMLNS,
                 name: host.into(),
-                addresses: Some(addresses),
+                addresses,
             },
         }
     }
@@ -84,7 +84,7 @@ mod tests {
             HostAddr::new("v6", "2404:6800:4001:801::200e"),
         ];
 
-        let object = HostCreate::new("host1.eppdev-1.com", addresses);
+        let object = HostCreate::new("host1.eppdev-1.com", Some(addresses));
 
         let serialized =
             <HostCreate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
