@@ -92,7 +92,7 @@ async fn client() {
             &Login::new(
                 "username",
                 "password",
-                Some(vec!["http://schema.ispapi.net/epp/xml/keyvalue-1.0"]),
+                Some(&["http://schema.ispapi.net/epp/xml/keyvalue-1.0"]),
             ),
             CLTRID,
         )
