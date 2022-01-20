@@ -27,8 +27,8 @@ pub struct Login<'a> {
 }
 
 impl<'a> Login<'a> {
-    pub fn new(username: &'a str, password: &'a str, ext_uris: Option<Vec<&'a str>>) -> Self {
-        let ext_uris = ext_uris.map(|uris| uris.into_iter().map(|u| u.into()).collect());
+    pub fn new(username: &'a str, password: &'a str, ext_uris: Option<&'_ [&'a str]>) -> Self {
+        let ext_uris = ext_uris.map(|uris| uris.iter().map(|&u| u.into()).collect());
 
         Self {
             username: username.into(),
@@ -72,7 +72,7 @@ mod tests {
 
     #[test]
     fn command() {
-        let ext_uris = Some(vec!["http://schema.ispapi.net/epp/xml/keyvalue-1.0"]);
+        let ext_uris = Some(&["http://schema.ispapi.net/epp/xml/keyvalue-1.0"][..]);
 
         let xml = get_xml("request/login.xml").unwrap();
         let object = Login::new("username", "password", ext_uris);
