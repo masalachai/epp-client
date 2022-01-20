@@ -14,8 +14,8 @@ use crate::response::ResponseStatus;
 pub enum Error {
     Io(std::io::Error),
     Command(ResponseStatus),
-    Xml(Box<dyn StdError>),
-    Other(Box<dyn StdError>),
+    Xml(Box<dyn StdError + Send + Sync>),
+    Other(Box<dyn StdError + Send + Sync>),
 }
 
 impl StdError for Error {}
@@ -33,8 +33,8 @@ impl Display for Error {
     }
 }
 
-impl From<Box<dyn StdError>> for Error {
-    fn from(e: Box<dyn StdError>) -> Self {
+impl From<Box<dyn StdError + Send + Sync>> for Error {
+    fn from(e: Box<dyn StdError + Send + Sync>) -> Self {
         Self::Other(e)
     }
 }
