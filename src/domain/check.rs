@@ -54,7 +54,7 @@ pub struct DomainAvailable {
     pub name: StringValue<'static>,
     /// The domain (un)availability
     #[serde(rename = "avail")]
-    pub available: u16,
+    pub available: bool,
 }
 
 /// Type that represents the &lt;cd&gt; tag for domain check response
@@ -117,12 +117,12 @@ mod tests {
             result.check_data.domain_list[0].domain.name,
             "eppdev.com".into()
         );
-        assert_eq!(result.check_data.domain_list[0].domain.available, 1);
+        assert!(result.check_data.domain_list[0].domain.available);
         assert_eq!(
             result.check_data.domain_list[1].domain.name,
             "eppdev.net".into()
         );
-        assert_eq!(result.check_data.domain_list[1].domain.available, 0);
+        assert!(!result.check_data.domain_list[1].domain.available);
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
