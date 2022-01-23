@@ -10,7 +10,7 @@
                     <domain:name avail="1">eppdev.com</domain:name>
                 </domain:cd>
                 <domain:cd>
-                    <domain:name avail="0">eppdev.net</domain:name>
+                    <domain:name avail="false">eppdev.net</domain:name>
                 </domain:cd>
             </domain:chkData>
         </resData>
