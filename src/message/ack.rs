@@ -35,6 +35,7 @@ impl<'a> MessageAck<'a> {
 mod tests {
     use super::MessageAck;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -55,7 +56,7 @@ mod tests {
 
         let msg = object.message_queue().unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(msg.count, 4);
         assert_eq!(msg.id, "12345".to_string());

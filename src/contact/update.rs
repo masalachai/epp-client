@@ -111,6 +111,7 @@ mod tests {
     use crate::common::{NoExtension, ObjectStatus};
     use crate::contact::Address;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -148,7 +149,7 @@ mod tests {
             <ContactUpdate as Transaction<NoExtension>>::deserialize_response(xml.as_str())
                 .unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

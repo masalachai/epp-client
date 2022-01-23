@@ -71,6 +71,7 @@ mod tests {
     use crate::domain::info::DomainInfo;
     use crate::domain::update::{DomainChangeInfo, DomainUpdate};
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -112,7 +113,7 @@ mod tests {
 
         let ext = object.extension.unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(ext.data.rgp_status[0].status, "pendingRestore".to_string());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
