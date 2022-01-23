@@ -79,6 +79,7 @@ mod tests {
     use super::DomainRenew;
     use crate::common::NoExtension;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
     use chrono::NaiveDate;
 
@@ -104,7 +105,7 @@ mod tests {
 
         let result = object.res_data().unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.renew_data.name, "eppdev-1.com".into());
         assert_eq!(

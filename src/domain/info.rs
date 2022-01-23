@@ -133,6 +133,7 @@ mod tests {
     use super::DomainInfo;
     use crate::common::NoExtension;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -163,7 +164,7 @@ mod tests {
         let registrant = result.info_data.registrant.as_ref().unwrap();
         let contacts = result.info_data.contacts.as_ref().unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.info_data.name, "eppdev-1.com".into());
         assert_eq!(result.info_data.roid, "125899511_DOMAIN_COM-VRSN".into());

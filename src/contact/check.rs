@@ -89,6 +89,7 @@ mod tests {
     use super::ContactCheck;
     use crate::common::NoExtension;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -110,7 +111,7 @@ mod tests {
 
         let results = object.res_data().unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(
             results.check_data.contact_list[0].contact.id,

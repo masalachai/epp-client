@@ -107,6 +107,7 @@ mod tests {
     use crate::common::{HostAddr, NoExtension};
     use crate::domain::{HostAttr, HostAttrList, HostObjList};
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -237,7 +238,7 @@ mod tests {
 
         let result = object.res_data().unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.create_data.name, "eppdev-2.com".into());
         assert_eq!(

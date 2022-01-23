@@ -1,7 +1,7 @@
 //! Types for EPP responses
 
 use serde::{de::DeserializeOwned, Deserialize};
-use std::fmt::Debug;
+use std::fmt::{self, Debug};
 
 use crate::common::StringValue;
 use crate::xml::EppXml;
@@ -33,13 +33,135 @@ pub struct ExtValue {
 #[derive(Deserialize, Debug, PartialEq)]
 pub struct EppResult {
     /// The result code
-    pub code: u16,
+    pub code: ResultCode,
     /// The result message
     #[serde(rename = "msg")]
     pub message: StringValue<'static>,
     /// Data under the <extValue> tag
     #[serde(rename = "extValue")]
     pub ext_value: Option<ExtValue>,
+}
+
+/// Response codes as enumerated in section 3 of RFC 5730
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum ResultCode {
+    CommandCompletedSuccessfully = 1000,
+    CommandCompletedSuccessfullyActionPending = 1001,
+    CommandCompletedSuccessfullyNoMessages = 1300,
+    CommandCompletedSuccessfullyAckToDequeue = 1301,
+    CommandCompletedSuccessfullyEndingSession = 1500,
+    UnknownCommand = 2000,
+    CommandSyntaxError = 2001,
+    CommandUseError = 2002,
+    RequiredParameterMissing = 2003,
+    ParameterValueRangeError = 2004,
+    ParameterValueSyntaxError = 2005,
+    UnimplementedProtocolVersion = 2100,
+    UnimplementedCommand = 2101,
+    UnimplementedOption = 2102,
+    UnimplementedExtension = 2103,
+    BillingFailure = 2104,
+    ObjectIsNotEligibleForRenewal = 2105,
+    ObjectIsNotEligibleForTransfer = 2106,
+    AuthenticationError = 2200,
+    AuthorizationError = 2201,
+    InvalidAuthorizationInformation = 2202,
+    ObjectPendingTransfer = 2300,
+    ObjectNotPendingTransfer = 2301,
+    ObjectExists = 2302,
+    ObjectDoesNotExist = 2303,
+    ObjectStatusProhibitsOperation = 2304,
+    ObjectAssociationProhibitsOperation = 2305,
+    ParameterValuePolicyError = 2306,
+    UnimplementedObjectService = 2307,
+    DataManagementPolicyViolation = 2308,
+    CommandFailed = 2400,
+    CommandFailedServerClosingConnection = 2500,
+    AuthenticationErrorServerClosingConnection = 2501,
+    SessionLimitExceededServerClosingConnection = 2502,
+}
+
+impl ResultCode {
+    pub fn from_u16(code: u16) -> Option<Self> {
+        match code {
+            1000 => Some(ResultCode::CommandCompletedSuccessfully),
+            1001 => Some(ResultCode::CommandCompletedSuccessfullyActionPending),
+            1300 => Some(ResultCode::CommandCompletedSuccessfullyNoMessages),
+            1301 => Some(ResultCode::CommandCompletedSuccessfullyAckToDequeue),
+            1500 => Some(ResultCode::CommandCompletedSuccessfullyEndingSession),
+            2000 => Some(ResultCode::UnknownCommand),
+            2001 => Some(ResultCode::CommandSyntaxError),
+            2002 => Some(ResultCode::CommandUseError),
+            2003 => Some(ResultCode::RequiredParameterMissing),
+            2004 => Some(ResultCode::ParameterValueRangeError),
+            2005 => Some(ResultCode::ParameterValueSyntaxError),
+            2100 => Some(ResultCode::UnimplementedProtocolVersion),
+            2101 => Some(ResultCode::UnimplementedCommand),
+            2102 => Some(ResultCode::UnimplementedOption),
+            2103 => Some(ResultCode::UnimplementedExtension),
+            2104 => Some(ResultCode::BillingFailure),
+            2105 => Some(ResultCode::ObjectIsNotEligibleForRenewal),
+            2106 => Some(ResultCode::ObjectIsNotEligibleForTransfer),
+            2200 => Some(ResultCode::AuthenticationError),
+            2201 => Some(ResultCode::AuthorizationError),
+            2202 => Some(ResultCode::InvalidAuthorizationInformation),
+            2300 => Some(ResultCode::ObjectPendingTransfer),
+            2301 => Some(ResultCode::ObjectNotPendingTransfer),
+            2302 => Some(ResultCode::ObjectExists),
+            2303 => Some(ResultCode::ObjectDoesNotExist),
+            2304 => Some(ResultCode::ObjectStatusProhibitsOperation),
+            2305 => Some(ResultCode::ObjectAssociationProhibitsOperation),
+            2306 => Some(ResultCode::ParameterValuePolicyError),
+            2307 => Some(ResultCode::UnimplementedObjectService),
+            2308 => Some(ResultCode::DataManagementPolicyViolation),
+            2400 => Some(ResultCode::CommandFailed),
+            2500 => Some(ResultCode::CommandFailedServerClosingConnection),
+            2501 => Some(ResultCode::AuthenticationErrorServerClosingConnection),
+            2502 => Some(ResultCode::SessionLimitExceededServerClosingConnection),
+            _ => None,
+        }
+    }
+
+    pub fn is_success(&self) -> bool {
+        use ResultCode::*;
+        matches!(
+            self,
+            CommandCompletedSuccessfully
+                | CommandCompletedSuccessfullyActionPending
+                | CommandCompletedSuccessfullyNoMessages
+                | CommandCompletedSuccessfullyAckToDequeue
+                | CommandCompletedSuccessfullyEndingSession
+        )
+    }
+}
+
+impl<'de> Deserialize<'de> for ResultCode {
+    fn deserialize<D>(deserializer: D) -> Result<ResultCode, D::Error>
+    where
+        D: serde::de::Deserializer<'de>,
+    {
+        deserializer.deserialize_u16(ResultCodeVisitor)
+    }
+}
+
+struct ResultCodeVisitor;
+
+impl<'de> serde::de::Visitor<'de> for ResultCodeVisitor {
+    type Value = ResultCode;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+        formatter.write_str("a valid EPP result code")
+    }
+
+    fn visit_u16<E>(self, v: u16) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        use serde::de::Unexpected;
+        ResultCode::from_u16(v).ok_or_else(|| {
+            E::invalid_value(Unexpected::Unsigned(v as u64), &"unexpected result code")
+        })
+    }
 }
 
 /// Type corresponding to the <trID> tag in an EPP response XML
@@ -135,7 +257,7 @@ impl<T, E> Response<T, E> {
 
 #[cfg(test)]
 mod tests {
-    use super::ResultDocument;
+    use super::{ResultCode, ResultDocument};
     use crate::tests::{get_xml, CLTRID, SVTRID};
     use crate::xml::EppXml;
 
@@ -144,7 +266,7 @@ mod tests {
         let xml = get_xml("response/error.xml").unwrap();
         let object = ResultDocument::deserialize(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, 2303);
+        assert_eq!(object.data.result.code, ResultCode::ObjectDoesNotExist);
         assert_eq!(object.data.result.message, "Object does not exist".into());
         assert_eq!(
             object.data.result.ext_value.unwrap().reason,

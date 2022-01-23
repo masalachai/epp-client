@@ -7,6 +7,7 @@ use tokio_test::io::Builder;
 
 use epp_client::domain::check::DomainCheck;
 use epp_client::login::Login;
+use epp_client::response::ResultCode;
 use epp_client::EppClient;
 
 const CLTRID: &str = "cltrid:1626454866";
@@ -103,7 +104,7 @@ async fn client() {
         .transact(&DomainCheck::new(vec!["eppdev.com", "eppdev.net"]), CLTRID)
         .await
         .unwrap();
-    assert_eq!(rsp.result.code, 1000);
+    assert_eq!(rsp.result.code, ResultCode::CommandCompletedSuccessfully);
 
     let result = rsp.res_data().unwrap();
     assert_eq!(

@@ -22,6 +22,7 @@ pub struct Logout;
 mod tests {
     use super::Logout;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SVTRID};
 
     #[test]
@@ -38,7 +39,10 @@ mod tests {
         let xml = get_xml("response/logout.xml").unwrap();
         let object = Logout::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.result.code, 1500);
+        assert_eq!(
+            object.result.code,
+            ResultCode::CommandCompletedSuccessfullyEndingSession
+        );
         assert_eq!(
             object.result.message,
             "Command completed successfully; ending session".into()

@@ -134,6 +134,7 @@ mod tests {
     use super::DomainTransfer;
     use crate::common::NoExtension;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -210,7 +211,10 @@ mod tests {
 
         let result = object.res_data().unwrap();
 
-        assert_eq!(object.result.code, 1001);
+        assert_eq!(
+            object.result.code,
+            ResultCode::CommandCompletedSuccessfullyActionPending
+        );
         assert_eq!(
             object.result.message,
             "Command completed successfully; action pending".into()
@@ -239,7 +243,7 @@ mod tests {
             <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
                 .unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
@@ -252,7 +256,7 @@ mod tests {
             <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
                 .unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
@@ -265,7 +269,7 @@ mod tests {
             <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
                 .unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
@@ -280,7 +284,7 @@ mod tests {
 
         let result = object.res_data().unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.transfer_data.name, "eppdev-transfer.com".into());
         assert_eq!(result.transfer_data.transfer_status, "pending".into());

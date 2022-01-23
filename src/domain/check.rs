@@ -88,6 +88,7 @@ mod tests {
     use super::DomainCheck;
     use crate::common::NoExtension;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -111,7 +112,7 @@ mod tests {
 
         let result = object.res_data().unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(
             result.check_data.domain_list[0].domain.name,

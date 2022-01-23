@@ -105,6 +105,7 @@ mod tests {
     use super::ContactInfo;
     use crate::common::NoExtension;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
@@ -132,7 +133,7 @@ mod tests {
         let fax_ext = fax.extension.as_ref().unwrap();
         let auth_info = result.info_data.auth_info.as_ref().unwrap();
 
-        assert_eq!(object.result.code, 1000);
+        assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(result.info_data.id, "eppdev-contact-3".into());
         assert_eq!(result.info_data.roid, "UNDEF-ROID".into());

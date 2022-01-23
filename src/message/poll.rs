@@ -53,6 +53,7 @@ mod tests {
     use super::MessagePoll;
     use crate::message::poll::MessageData;
     use crate::request::Transaction;
+    use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SVTRID};
 
     #[test]
@@ -74,7 +75,10 @@ mod tests {
         let result = object.res_data().unwrap();
         let msg = object.message_queue().unwrap();
 
-        assert_eq!(object.result.code, 1301);
+        assert_eq!(
+            object.result.code,
+            ResultCode::CommandCompletedSuccessfullyAckToDequeue
+        );
         assert_eq!(
             object.result.message,
             "Command completed successfully; ack to dequeue".into()
@@ -117,7 +121,10 @@ mod tests {
         let result = object.res_data().unwrap();
         let msg = object.message_queue().unwrap();
 
-        assert_eq!(object.result.code, 1301);
+        assert_eq!(
+            object.result.code,
+            ResultCode::CommandCompletedSuccessfullyAckToDequeue
+        );
         assert_eq!(
             object.result.message,
             "Command completed successfully; ack to dequeue".into()
@@ -156,7 +163,10 @@ mod tests {
 
         let msg = object.message_queue().unwrap();
 
-        assert_eq!(object.result.code, 1301);
+        assert_eq!(
+            object.result.code,
+            ResultCode::CommandCompletedSuccessfullyAckToDequeue
+        );
         assert_eq!(
             object.result.message,
             "Command completed successfully; ack to dequeue".into()
@@ -182,7 +192,10 @@ mod tests {
         let xml = get_xml("response/message/poll_empty_queue.xml").unwrap();
         let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
 
-        assert_eq!(object.result.code, 1300);
+        assert_eq!(
+            object.result.code,
+            ResultCode::CommandCompletedSuccessfullyNoMessages
+        );
         assert_eq!(
             object.result.message,
             "Command completed successfully; no messages".into()
