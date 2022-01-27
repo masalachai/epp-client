@@ -50,6 +50,32 @@ pub struct Available {
     pub available: bool,
 }
 
+/// Type that represents the &lt;cd&gt; tag for domain check response
+#[derive(Deserialize, Debug)]
+pub struct CheckResponseDataItem {
+    /// Data under the &lt;name&gt; tag
+    #[serde(rename = "name")]
+    pub resource: Available,
+    /// The reason for (un)availability
+    pub reason: Option<StringValue<'static>>,
+}
+
+/// Type that represents the &lt;chkData&gt; tag for host check response
+#[derive(Deserialize, Debug)]
+pub struct CheckData {
+    /// Data under the &lt;cd&gt; tag
+    #[serde(rename = "cd")]
+    pub list: Vec<CheckResponseDataItem>,
+}
+
+/// Type that represents the &lt;resData&gt; tag for host check response
+#[derive(Deserialize, Debug)]
+pub struct CheckResponse {
+    /// Data under the &lt;chkData&gt; tag
+    #[serde(rename = "chkData")]
+    pub check_data: CheckData,
+}
+
 /// The <option> type in EPP XML login requests
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename = "options")]

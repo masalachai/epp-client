@@ -107,8 +107,5 @@ async fn client() {
     assert_eq!(rsp.result.code, ResultCode::CommandCompletedSuccessfully);
 
     let result = rsp.res_data().unwrap();
-    assert_eq!(
-        result.check_data.domain_list[0].domain.name,
-        "eppdev.com".into()
-    );
+    assert_eq!(result.check_data.list[0].resource.name, "eppdev.com".into());
 }

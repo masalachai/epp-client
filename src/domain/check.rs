@@ -1,14 +1,14 @@
 //! Types for EPP domain check request
 
 use super::XMLNS;
-use crate::common::{NoExtension, StringValue, Available};
+use crate::common::{CheckResponse, NoExtension, StringValue};
 use crate::request::{Command, Transaction};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 impl<'a> Transaction<NoExtension> for DomainCheck<'a> {}
 
 impl<'a> Command for DomainCheck<'a> {
-    type Response = DomainCheckResponse;
+    type Response = CheckResponse;
     const COMMAND: &'static str = "check";
 }
 
@@ -44,34 +44,6 @@ pub struct DomainCheck<'a> {
     list: DomainList<'a>,
 }
 
-// Response
-
-/// Type that represents the &lt;cd&gt; tag for domain check response
-#[derive(Deserialize, Debug)]
-pub struct DomainCheckResponseDataItem {
-    /// Data under the &lt;name&gt; tag
-    #[serde(rename = "name")]
-    pub domain: Available,
-    /// The reason for (un)availability
-    pub reason: Option<StringValue<'static>>,
-}
-
-/// Type that represents the &lt;chkData&gt; tag for domain check response
-#[derive(Deserialize, Debug)]
-pub struct DomainCheckResponseData {
-    /// Data under the &lt;cd&gt; tag
-    #[serde(rename = "cd")]
-    pub domain_list: Vec<DomainCheckResponseDataItem>,
-}
-
-/// Type that represents the &lt;resData&gt; tag for domain check response
-#[derive(Deserialize, Debug)]
-pub struct DomainCheckResponse {
-    /// Data under the &lt;chkData&gt; tag
-    #[serde(rename = "chkData")]
-    pub check_data: DomainCheckResponseData,
-}
-
 #[cfg(test)]
 mod tests {
     use super::DomainCheck;
@@ -103,16 +75,10 @@ mod tests {
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(
-            result.check_data.domain_list[0].domain.name,
-            "eppdev.com".into()
-        );
-        assert!(result.check_data.domain_list[0].domain.available);
-        assert_eq!(
-            result.check_data.domain_list[1].domain.name,
-            "eppdev.net".into()
-        );
-        assert!(!result.check_data.domain_list[1].domain.available);
+        assert_eq!(result.check_data.list[0].resource.name, "eppdev.com".into());
+        assert!(result.check_data.list[0].resource.available);
+        assert_eq!(result.check_data.list[1].resource.name, "eppdev.net".into());
+        assert!(!result.check_data.list[1].resource.available);
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
