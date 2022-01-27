@@ -12,36 +12,42 @@ impl<'a> Command for DomainCheck<'a> {
     const COMMAND: &'static str = "check";
 }
 
-impl<'a> DomainCheck<'a> {
-    pub fn new(domains: Vec<&'a str>) -> Self {
+// Request
+
+/// Type for &lt;name&gt; elements under the domain &lt;check&gt; tag
+#[derive(Serialize, Debug)]
+struct DomainList<'a> {
+    #[serde(rename = "xmlns:domain")]
+    /// XML namespace for domain commands
+    xmlns: &'a str,
+    #[serde(rename = "domain:name")]
+    /// List of domains to be checked for availability
+    domains: Vec<StringValue<'a>>,
+}
+
+#[derive(Serialize, Debug)]
+struct SerializeDomainCheck<'a> {
+    #[serde(rename = "domain:check")]
+    list: DomainList<'a>,
+}
+
+impl<'a> From<DomainCheck<'a>> for SerializeDomainCheck<'a> {
+    fn from(check: DomainCheck<'a>) -> Self {
         Self {
             list: DomainList {
                 xmlns: XMLNS,
-                domains: domains.into_iter().map(|d| d.into()).collect(),
+                domains: check.domains.iter().map(|&d| d.into()).collect(),
             },
         }
     }
 }
 
-// Request
-
-/// Type for &lt;name&gt; elements under the domain &lt;check&gt; tag
-#[derive(Serialize, Debug)]
-pub struct DomainList<'a> {
-    #[serde(rename = "xmlns:domain")]
-    /// XML namespace for domain commands
-    pub xmlns: &'a str,
-    #[serde(rename = "domain:name")]
-    /// List of domains to be checked for availability
-    pub domains: Vec<StringValue<'a>>,
-}
-
-#[derive(Serialize, Debug)]
-/// Type for EPP XML &lt;check&gt; command for domains
+/// The EPP `check` command for domains
+#[derive(Clone, Debug, Serialize)]
+#[serde(into = "SerializeDomainCheck")]
 pub struct DomainCheck<'a> {
-    /// The object holding the list of domains to be checked
-    #[serde(rename = "domain:check")]
-    list: DomainList<'a>,
+    /// The list of domains to be checked
+    pub domains: &'a [&'a str],
 }
 
 #[cfg(test)]
@@ -56,7 +62,9 @@ mod tests {
     fn command() {
         let xml = get_xml("request/domain/check.xml").unwrap();
 
-        let object = DomainCheck::new(vec!["eppdev.com", "eppdev.net"]);
+        let object = DomainCheck {
+            domains: &["eppdev.com", "eppdev.net"],
+        };
 
         let serialized =
             <DomainCheck as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)

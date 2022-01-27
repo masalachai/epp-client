@@ -101,7 +101,12 @@ async fn client() {
         .unwrap();
 
     let rsp = client
-        .transact(&DomainCheck::new(vec!["eppdev.com", "eppdev.net"]), CLTRID)
+        .transact(
+            &DomainCheck {
+                domains: &["eppdev.com", "eppdev.net"],
+            },
+            CLTRID,
+        )
         .await
         .unwrap();
     assert_eq!(rsp.result.code, ResultCode::CommandCompletedSuccessfully);

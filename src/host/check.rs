@@ -14,38 +14,44 @@ impl<'a> Command for HostCheck<'a> {
     const COMMAND: &'static str = "check";
 }
 
-impl<'a> HostCheck<'a> {
-    pub fn new(hosts: &[&'a str]) -> Self {
-        let hosts = hosts.iter().map(|&d| d.into()).collect();
-
-        Self {
-            list: HostList {
-                xmlns: XMLNS,
-                hosts,
-            },
-        }
-    }
-}
-
 // Request
 
 /// Type for data under the host &lt;check&gt; tag
 #[derive(Serialize, Debug)]
-pub struct HostList<'a> {
+struct HostList<'a> {
     /// XML namespace for host commands
     #[serde(rename = "xmlns:host")]
     xmlns: &'a str,
     /// List of hosts to be checked for availability
     #[serde(rename = "host:name")]
-    pub hosts: Vec<StringValue<'a>>,
+    hosts: Vec<StringValue<'a>>,
 }
 
 #[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;check&gt; command for hosts
-pub struct HostCheck<'a> {
+struct SerializeHostCheck<'a> {
     /// The instance holding the list of hosts to be checked
     #[serde(rename = "host:check")]
     list: HostList<'a>,
+}
+
+impl<'a> From<HostCheck<'a>> for SerializeHostCheck<'a> {
+    fn from(check: HostCheck<'a>) -> Self {
+        Self {
+            list: HostList {
+                xmlns: XMLNS,
+                hosts: check.hosts.iter().map(|&id| id.into()).collect(),
+            },
+        }
+    }
+}
+
+/// The EPP `check` command for hosts
+#[derive(Clone, Debug, Serialize)]
+#[serde(into = "SerializeHostCheck")]
+pub struct HostCheck<'a> {
+    /// The list of hosts to be checked
+    pub hosts: &'a [&'a str],
 }
 
 #[cfg(test)]
@@ -60,7 +66,9 @@ mod tests {
     fn command() {
         let xml = get_xml("request/host/check.xml").unwrap();
 
-        let object = HostCheck::new(&["ns1.eppdev-1.com", "host1.eppdev-1.com"]);
+        let object = HostCheck {
+            hosts: &["ns1.eppdev-1.com", "host1.eppdev-1.com"],
+        };
 
         let serialized =
             <HostCheck as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
