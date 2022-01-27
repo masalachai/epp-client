@@ -80,12 +80,12 @@ mod tests {
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(
-            result.check_data.list[0].resource.name,
+            result.check_data.list[0].resource.id,
             "host1.eppdev-1.com".into()
         );
         assert!(result.check_data.list[0].resource.available);
         assert_eq!(
-            result.check_data.list[1].resource.name,
+            result.check_data.list[1].resource.id,
             "ns1.testing.com".into()
         );
         assert!(!result.check_data.list[1].resource.available);

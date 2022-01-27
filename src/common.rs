@@ -44,7 +44,7 @@ impl Extension for NoExtension {
 pub struct Available {
     /// The resource name
     #[serde(rename = "$value")]
-    pub name: StringValue<'static>,
+    pub id: StringValue<'static>,
     /// The resource (un)availability
     #[serde(rename = "avail")]
     pub available: bool,
@@ -54,7 +54,7 @@ pub struct Available {
 #[derive(Deserialize, Debug)]
 pub struct CheckResponseDataItem {
     /// Data under the &lt;name&gt; tag
-    #[serde(rename = "name")]
+    #[serde(rename = "name", alias = "id")]
     pub resource: Available,
     /// The reason for (un)availability
     pub reason: Option<StringValue<'static>>,
