@@ -41,7 +41,7 @@ impl Extension for NoExtension {
 
 /// Type that represents the &lt;name&gt; tag for host check response
 #[derive(Deserialize, Debug)]
-pub struct Available {
+struct Available {
     /// The resource name
     #[serde(rename = "$value")]
     pub id: StringValue<'static>,
@@ -52,7 +52,7 @@ pub struct Available {
 
 /// Type that represents the &lt;cd&gt; tag for domain check response
 #[derive(Deserialize, Debug)]
-pub struct CheckResponseDataItem {
+struct CheckResponseDataItem {
     /// Data under the &lt;name&gt; tag
     #[serde(rename = "name", alias = "id")]
     pub resource: Available,
@@ -62,7 +62,7 @@ pub struct CheckResponseDataItem {
 
 /// Type that represents the &lt;chkData&gt; tag for host check response
 #[derive(Deserialize, Debug)]
-pub struct CheckData {
+struct CheckData {
     /// Data under the &lt;cd&gt; tag
     #[serde(rename = "cd")]
     pub list: Vec<CheckResponseDataItem>,
@@ -70,10 +70,40 @@ pub struct CheckData {
 
 /// Type that represents the &lt;resData&gt; tag for host check response
 #[derive(Deserialize, Debug)]
-pub struct CheckResponse {
+struct DeserializedCheckResponse {
     /// Data under the &lt;chkData&gt; tag
     #[serde(rename = "chkData")]
     pub check_data: CheckData,
+}
+
+#[derive(Debug)]
+pub struct Checked {
+    pub id: String,
+    pub available: bool,
+    pub reason: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(from = "DeserializedCheckResponse")]
+pub struct CheckResponse {
+    pub list: Vec<Checked>,
+}
+
+impl From<DeserializedCheckResponse> for CheckResponse {
+    fn from(rsp: DeserializedCheckResponse) -> Self {
+        Self {
+            list: rsp
+                .check_data
+                .list
+                .into_iter()
+                .map(|item| Checked {
+                    id: item.resource.id.0.into_owned(),
+                    available: item.resource.available,
+                    reason: item.reason.map(|r| r.0.into_owned()),
+                })
+                .collect(),
+        }
+    }
 }
 
 /// The <option> type in EPP XML login requests

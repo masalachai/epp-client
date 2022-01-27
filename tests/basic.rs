@@ -107,5 +107,5 @@ async fn client() {
     assert_eq!(rsp.result.code, ResultCode::CommandCompletedSuccessfully);
 
     let result = rsp.res_data().unwrap();
-    assert_eq!(result.check_data.list[0].resource.id, "eppdev.com".into());
+    assert_eq!(result.list[0].id, "eppdev.com");
 }

@@ -71,9 +71,9 @@
 //! let response = client.transact(&domain_check, "transaction-id").await.unwrap();
 //!
 //! // print the availability results
-//! response.res_data.unwrap().check_data.list
+//! response.res_data.unwrap().list
 //!     .iter()
-//!     .for_each(|chk| println!("Domain: {}, Available: {}", chk.resource.id, chk.resource.available));
+//!     .for_each(|chk| println!("Domain: {}, Available: {}", chk.id, chk.available));
 //!
 //! // Close the connection
 //! client.transact(&Logout, "transaction-id").await.unwrap();
