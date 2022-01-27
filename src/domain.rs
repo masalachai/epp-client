@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use serde::{Deserialize, Serialize};
 
 use crate::common::{HostAddr, StringValue};
+use crate::Error;
 
 pub mod check;
 pub use check::DomainCheck;
@@ -75,27 +76,31 @@ pub struct DomainContact<'a> {
 }
 
 /// The &lt;period&gt; type for registration, renewal or transfer on domain transactions
-#[derive(Serialize, Debug)]
+#[derive(Clone, Copy, Debug, Serialize)]
 pub struct Period {
     /// The interval (usually 'y' indicating years)
-    unit: String,
+    unit: char,
     /// The length of the registration, renewal or transfer period (usually in years)
     #[serde(rename = "$value")]
-    length: u16,
+    length: u8,
 }
 
 impl Period {
-    /// Creates a new period in years
-    pub fn new(length: u16) -> Period {
-        Period {
-            unit: "y".to_string(),
-            length,
-        }
+    pub fn years(length: u8) -> Result<Self, Error> {
+        Self::new(length, 'y')
     }
 
-    /// Sets the period unit ('y' for years, most commonly)
-    pub fn set_unit(&mut self, unit: &str) {
-        self.unit = unit.to_string();
+    pub fn months(length: u8) -> Result<Self, Error> {
+        Self::new(length, 'm')
+    }
+
+    fn new(length: u8, unit: char) -> Result<Self, Error> {
+        match length {
+            1..=99 => Ok(Period { length, unit }),
+            0 | 100.. => Err(Error::Other(
+                "Period length must be greater than 0 and less than 100".into(),
+            )),
+        }
     }
 }
 
