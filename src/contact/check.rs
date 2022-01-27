@@ -55,7 +55,7 @@ pub struct ContactAvailable {
     pub id: StringValue<'static>,
     /// The avail attr on the &lt;id&gt; tag
     #[serde(rename = "avail")]
-    pub available: u16,
+    pub available: bool,
 }
 
 /// Type that represents the &lt;cd&gt; tag for contact check response
@@ -117,12 +117,12 @@ mod tests {
             results.check_data.contact_list[0].contact.id,
             "eppdev-contact-1".into()
         );
-        assert_eq!(results.check_data.contact_list[0].contact.available, 0);
+        assert!(!results.check_data.contact_list[0].contact.available);
         assert_eq!(
             results.check_data.contact_list[1].contact.id,
             "eppdev-contact-2".into()
         );
-        assert_eq!(results.check_data.contact_list[1].contact.available, 1);
+        assert!(results.check_data.contact_list[1].contact.available);
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }

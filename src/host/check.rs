@@ -58,7 +58,7 @@ pub struct HostAvailable {
     pub name: StringValue<'static>,
     /// The host (un)availability
     #[serde(rename = "avail")]
-    pub available: u16,
+    pub available: bool,
 }
 
 /// Type that represents the &lt;cd&gt; tag for host check response
@@ -122,12 +122,12 @@ mod tests {
             result.check_data.host_list[0].host.name,
             "host1.eppdev-1.com".into()
         );
-        assert_eq!(result.check_data.host_list[0].host.available, 1);
+        assert!(result.check_data.host_list[0].host.available);
         assert_eq!(
             result.check_data.host_list[1].host.name,
             "ns1.testing.com".into()
         );
-        assert_eq!(result.check_data.host_list[1].host.available, 0);
+        assert!(!result.check_data.host_list[1].host.available);
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
