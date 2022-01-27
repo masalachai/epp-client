@@ -13,11 +13,11 @@ impl<'a> Command for DomainTransfer<'a> {
 }
 
 impl<'a> DomainTransfer<'a> {
-    pub fn new(name: &'a str, years: Option<u16>, auth_password: &'a str) -> Self {
+    pub fn new(name: &'a str, period: Option<Period>, auth_password: &'a str) -> Self {
         Self::build(
             "request",
             name,
-            years.map(Period::new),
+            period,
             Some(DomainAuthInfo::new(auth_password)),
         )
     }
@@ -131,7 +131,7 @@ pub struct DomainTransferResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::DomainTransfer;
+    use super::{DomainTransfer, Period};
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
@@ -141,7 +141,8 @@ mod tests {
     fn request_command() {
         let xml = get_xml("request/domain/transfer_request.xml").unwrap();
 
-        let object = DomainTransfer::new("testing.com", Some(1), "epP4uthd#v");
+        let object =
+            DomainTransfer::new("testing.com", Some(Period::years(1).unwrap()), "epP4uthd#v");
 
         let serialized =
             <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)

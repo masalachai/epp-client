@@ -55,7 +55,7 @@ pub struct DomainCreate<'a> {
 impl<'a> DomainCreate<'a> {
     pub fn new(
         name: &'a str,
-        period: u16,
+        period: Period,
         ns: Option<HostList<'a>>,
         registrant_id: Option<&'a str>,
         auth_password: &'a str,
@@ -65,7 +65,7 @@ impl<'a> DomainCreate<'a> {
             domain: DomainCreateRequestData {
                 xmlns: XMLNS,
                 name: name.into(),
-                period: Period::new(period),
+                period,
                 ns,
                 registrant: registrant_id.map(|id| id.into()),
                 auth_info: DomainAuthInfo::new(auth_password),
@@ -103,7 +103,7 @@ pub struct DomainCreateResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::{DomainContact, DomainCreate, HostList};
+    use super::{DomainContact, DomainCreate, HostList, Period};
     use crate::common::{HostAddr, NoExtension};
     use crate::domain::{HostAttr, HostAttrList, HostObjList};
     use crate::request::Transaction;
@@ -131,7 +131,7 @@ mod tests {
 
         let object = DomainCreate::new(
             "eppdev-1.com",
-            1,
+            Period::years(1).unwrap(),
             None,
             Some("eppdev-contact-3"),
             "epP4uthd#v",
@@ -167,7 +167,7 @@ mod tests {
         let hosts = &["ns1.test.com".into(), "ns2.test.com".into()];
         let object = DomainCreate::new(
             "eppdev-1.com",
-            1,
+            Period::years(1).unwrap(),
             Some(HostList::HostObjList(HostObjList { hosts })),
             Some("eppdev-contact-3"),
             "epP4uthd#v",
@@ -216,7 +216,7 @@ mod tests {
 
         let object = DomainCreate::new(
             "eppdev-2.com",
-            1,
+            Period::years(1).unwrap(),
             Some(HostList::HostAttrList(HostAttrList { hosts })),
             Some("eppdev-contact-3"),
             "epP4uthd#v",

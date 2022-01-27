@@ -14,14 +14,14 @@ impl<'a> Command for DomainRenew<'a> {
 }
 
 impl<'a> DomainRenew<'a> {
-    pub fn new(name: &'a str, current_expiry_date: NaiveDate, years: u16) -> Self {
+    pub fn new(name: &'a str, current_expiry_date: NaiveDate, period: Period) -> Self {
         let exp_date_str = current_expiry_date.format("%Y-%m-%d").to_string().into();
         Self {
             domain: DomainRenewRequestData {
                 xmlns: XMLNS,
                 name: name.into(),
                 current_expiry_date: exp_date_str,
-                period: Period::new(years),
+                period,
             },
         }
     }
@@ -76,7 +76,7 @@ pub struct DomainRenewResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::DomainRenew;
+    use super::{DomainRenew, Period};
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
@@ -88,7 +88,7 @@ mod tests {
         let xml = get_xml("request/domain/renew.xml").unwrap();
 
         let exp_date = NaiveDate::from_ymd(2022, 7, 23);
-        let object = DomainRenew::new("eppdev.com", exp_date, 1);
+        let object = DomainRenew::new("eppdev.com", exp_date, Period::years(1).unwrap());
 
         let serialized =
             <DomainRenew as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
