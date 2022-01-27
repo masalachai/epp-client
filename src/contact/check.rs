@@ -2,11 +2,16 @@ use std::fmt::Debug;
 
 /// Types for EPP contact check request
 use super::XMLNS;
-use crate::common::{NoExtension, StringValue};
+use crate::common::{CheckResponse, NoExtension, StringValue};
 use crate::request::{Command, Transaction};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 impl<'a> Transaction<NoExtension> for ContactCheck<'a> {}
+
+impl<'a> Command for ContactCheck<'a> {
+    type Response = CheckResponse;
+    const COMMAND: &'static str = "check";
+}
 
 // Request
 
@@ -40,50 +45,6 @@ impl<'a> ContactCheck<'a> {
     }
 }
 
-impl<'a> Command for ContactCheck<'a> {
-    type Response = ContactCheckResponse;
-    const COMMAND: &'static str = "check";
-}
-
-// Response
-
-/// Type that represents the &lt;id&gt; tag for contact check response
-#[derive(Deserialize, Debug)]
-pub struct ContactAvailable {
-    /// The text of the &lt;id&gt; tag
-    #[serde(rename = "$value")]
-    pub id: StringValue<'static>,
-    /// The avail attr on the &lt;id&gt; tag
-    #[serde(rename = "avail")]
-    pub available: bool,
-}
-
-/// Type that represents the &lt;cd&gt; tag for contact check response
-#[derive(Deserialize, Debug)]
-pub struct ContactCheckResponseDataItem {
-    /// Data under the &lt;id&gt; tag
-    #[serde(rename = "id")]
-    pub contact: ContactAvailable,
-    /// The reason for (un)availability
-    pub reason: Option<StringValue<'static>>,
-}
-
-/// Type that represents the &lt;chkData&gt; tag for contact check response
-#[derive(Deserialize, Debug)]
-pub struct ContactCheckResponseData {
-    /// Data under the &lt;cd&gt; tag
-    #[serde(rename = "cd")]
-    pub contact_list: Vec<ContactCheckResponseDataItem>,
-}
-
-/// Type that represents the &lt;resData&gt; tag for contact check response
-#[derive(Deserialize, Debug)]
-pub struct ContactCheckResponse {
-    /// Data under the &lt;chkData&gt; tag
-    #[serde(rename = "chkData")]
-    pub check_data: ContactCheckResponseData,
-}
-
 #[cfg(test)]
 mod tests {
     use super::ContactCheck;
@@ -114,15 +75,15 @@ mod tests {
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(
-            results.check_data.contact_list[0].contact.id,
+            results.check_data.list[0].resource.id,
             "eppdev-contact-1".into()
         );
-        assert!(!results.check_data.contact_list[0].contact.available);
+        assert!(!results.check_data.list[0].resource.available);
         assert_eq!(
-            results.check_data.contact_list[1].contact.id,
+            results.check_data.list[1].resource.id,
             "eppdev-contact-2".into()
         );
-        assert!(results.check_data.contact_list[1].contact.available);
+        assert!(results.check_data.list[1].resource.available);
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
