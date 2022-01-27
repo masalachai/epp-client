@@ -79,16 +79,10 @@ mod tests {
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(
-            result.check_data.list[0].resource.id,
-            "host1.eppdev-1.com".into()
-        );
-        assert!(result.check_data.list[0].resource.available);
-        assert_eq!(
-            result.check_data.list[1].resource.id,
-            "ns1.testing.com".into()
-        );
-        assert!(!result.check_data.list[1].resource.available);
+        assert_eq!(result.list[0].id, "host1.eppdev-1.com");
+        assert!(result.list[0].available);
+        assert_eq!(result.list[1].id, "ns1.testing.com");
+        assert!(!result.list[1].available);
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
