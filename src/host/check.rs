@@ -3,7 +3,7 @@
 use std::fmt::Debug;
 
 use super::XMLNS;
-use crate::common::{NoExtension, StringValue};
+use crate::common::{NoExtension, StringValue, Available};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
@@ -50,23 +50,12 @@ pub struct HostCheck<'a> {
 
 // Response
 
-/// Type that represents the &lt;name&gt; tag for host check response
-#[derive(Deserialize, Debug)]
-pub struct HostAvailable {
-    /// The host name
-    #[serde(rename = "$value")]
-    pub name: StringValue<'static>,
-    /// The host (un)availability
-    #[serde(rename = "avail")]
-    pub available: bool,
-}
-
 /// Type that represents the &lt;cd&gt; tag for host check response
 #[derive(Deserialize, Debug)]
 pub struct HostCheckDataItem {
     /// Data under the &lt;name&gt; tag
     #[serde(rename = "name")]
-    pub host: HostAvailable,
+    pub host: Available,
     /// The reason for (un)availability
     pub reason: Option<StringValue<'static>>,
 }

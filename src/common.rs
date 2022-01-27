@@ -39,6 +39,17 @@ impl Extension for NoExtension {
     type Response = NoExtension;
 }
 
+/// Type that represents the &lt;name&gt; tag for host check response
+#[derive(Deserialize, Debug)]
+pub struct Available {
+    /// The resource name
+    #[serde(rename = "$value")]
+    pub name: StringValue<'static>,
+    /// The resource (un)availability
+    #[serde(rename = "avail")]
+    pub available: bool,
+}
+
 /// The <option> type in EPP XML login requests
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename = "options")]

@@ -1,7 +1,7 @@
 //! Types for EPP domain check request
 
 use super::XMLNS;
-use crate::common::{NoExtension, StringValue};
+use crate::common::{NoExtension, StringValue, Available};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
@@ -46,23 +46,12 @@ pub struct DomainCheck<'a> {
 
 // Response
 
-/// Type that represents the &lt;name&gt; tag for domain check response
-#[derive(Deserialize, Debug)]
-pub struct DomainAvailable {
-    /// The domain name
-    #[serde(rename = "$value")]
-    pub name: StringValue<'static>,
-    /// The domain (un)availability
-    #[serde(rename = "avail")]
-    pub available: bool,
-}
-
 /// Type that represents the &lt;cd&gt; tag for domain check response
 #[derive(Deserialize, Debug)]
 pub struct DomainCheckResponseDataItem {
     /// Data under the &lt;name&gt; tag
     #[serde(rename = "name")]
-    pub domain: DomainAvailable,
+    pub domain: Available,
     /// The reason for (un)availability
     pub reason: Option<StringValue<'static>>,
 }
