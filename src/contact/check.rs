@@ -17,32 +17,39 @@ impl<'a> Command for ContactCheck<'a> {
 
 /// Type that represents the &lt;check&gt; command for contact transactions
 #[derive(Serialize, Debug)]
-pub struct ContactList<'a> {
+struct ContactList<'a> {
     /// The XML namespace for the contact &lt;check&gt;
     #[serde(rename = "xmlns:contact")]
     xmlns: &'a str,
     /// The list of contact ids to check for availability
     #[serde(rename = "contact:id")]
-    pub contact_ids: Vec<StringValue<'a>>,
+    contact_ids: Vec<StringValue<'a>>,
 }
 
 #[derive(Serialize, Debug)]
-/// The &lt;command&gt; type for contact check command
-pub struct ContactCheck<'a> {
+struct SerializeContactCheck<'a> {
     /// The &lt;check&gt; tag for the contact check command
     #[serde(rename = "contact:check")]
     list: ContactList<'a>,
 }
 
-impl<'a> ContactCheck<'a> {
-    pub fn new(contact_ids: &'a [&'a str]) -> Self {
+impl<'a> From<ContactCheck<'a>> for SerializeContactCheck<'a> {
+    fn from(check: ContactCheck<'a>) -> Self {
         Self {
             list: ContactList {
                 xmlns: XMLNS,
-                contact_ids: contact_ids.iter().map(|&id| id.into()).collect(),
+                contact_ids: check.contact_ids.iter().map(|&id| id.into()).collect(),
             },
         }
     }
+}
+
+/// The EPP `check` command for contacts
+#[derive(Clone, Debug, Serialize)]
+#[serde(into = "SerializeContactCheck")]
+pub struct ContactCheck<'a> {
+    /// The list of contact IDs to be checked
+    pub contact_ids: &'a [&'a str],
 }
 
 #[cfg(test)]
@@ -56,7 +63,9 @@ mod tests {
     #[test]
     fn command() {
         let xml = get_xml("request/contact/check.xml").unwrap();
-        let object = ContactCheck::new(&["eppdev-contact-1", "eppdev-contact-2"]);
+        let object = ContactCheck {
+            contact_ids: &["eppdev-contact-1", "eppdev-contact-2"],
+        };
         let serialized =
             <ContactCheck as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
                 .unwrap();

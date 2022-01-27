@@ -64,9 +64,9 @@
 //!
 //! // Make a domain check call, which returns an object of type EppDomainCheckResponse
 //! // that contains the result of the call
-//! let domain_check = DomainCheck::new(
-//!     vec!["eppdev.com", "eppdev.net"],
-//! );
+//! let domain_check = DomainCheck {
+//!     domains: &["eppdev.com", "eppdev.net"],
+//! };
 //!
 //! let response = client.transact(&domain_check, "transaction-id").await.unwrap();
 //!
