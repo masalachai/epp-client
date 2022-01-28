@@ -138,14 +138,14 @@ impl<IO: AsyncRead + AsyncWrite + Unpin> EppClient<IO> {
         Ok(GreetingDocument::deserialize(&response)?.data)
     }
 
-    pub async fn transact<'a, C: 'a, E: 'a>(
+    pub async fn transact<'c, 'e, C, E>(
         &mut self,
-        data: impl Into<RequestData<'a, C, E>> + 'a,
+        data: impl Into<RequestData<'c, 'e, C, E>>,
         id: &str,
     ) -> Result<Response<C::Response, E::Response>, Error>
     where
-        C: Transaction<E> + Command,
-        E: Extension,
+        C: Transaction<E> + Command + 'c,
+        E: Extension + 'e,
     {
         let data = data.into();
         let epp_xml = <C as Transaction<E>>::serialize_request(data.command, data.extension, id)?;
@@ -176,13 +176,13 @@ impl<IO: AsyncRead + AsyncWrite + Unpin> EppClient<IO> {
     }
 }
 
-pub struct RequestData<'a, C, E> {
-    command: &'a C,
-    extension: Option<&'a E>,
+pub struct RequestData<'c, 'e, C, E> {
+    command: &'c C,
+    extension: Option<&'e E>,
 }
 
-impl<'a, C: Command> From<&'a C> for RequestData<'a, C, NoExtension> {
-    fn from(command: &'a C) -> Self {
+impl<'c, C: Command> From<&'c C> for RequestData<'c, 'static, C, NoExtension> {
+    fn from(command: &'c C) -> Self {
         Self {
             command,
             extension: None,
@@ -190,8 +190,8 @@ impl<'a, C: Command> From<&'a C> for RequestData<'a, C, NoExtension> {
     }
 }
 
-impl<'a, C: Command, E: Extension> From<(&'a C, &'a E)> for RequestData<'a, C, E> {
-    fn from((command, extension): (&'a C, &'a E)) -> Self {
+impl<'c, 'e, C: Command, E: Extension> From<(&'c C, &'e E)> for RequestData<'c, 'e, C, E> {
+    fn from((command, extension): (&'c C, &'e E)) -> Self {
         Self {
             command,
             extension: Some(extension),

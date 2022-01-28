@@ -25,29 +25,29 @@ pub const XMLNS: &str = "http://www.verisign-grs.com/epp/namestoreExt-1.1";
 
 // Contact
 
-impl<'a> Transaction<NameStore<'a>> for ContactCheck<'a> {}
-impl<'a> Transaction<NameStore<'a>> for ContactCreate<'a> {}
-impl<'a> Transaction<NameStore<'a>> for ContactDelete<'a> {}
-impl<'a> Transaction<NameStore<'a>> for ContactInfo<'a> {}
-impl<'a> Transaction<NameStore<'a>> for ContactUpdate<'a> {}
+impl Transaction<NameStore<'_>> for ContactCheck<'_> {}
+impl Transaction<NameStore<'_>> for ContactCreate<'_> {}
+impl Transaction<NameStore<'_>> for ContactDelete<'_> {}
+impl Transaction<NameStore<'_>> for ContactInfo<'_> {}
+impl Transaction<NameStore<'_>> for ContactUpdate<'_> {}
 
 // Domain
 
-impl<'a> Transaction<NameStore<'a>> for DomainCheck<'a> {}
-impl<'a> Transaction<NameStore<'a>> for DomainCreate<'a> {}
-impl<'a> Transaction<NameStore<'a>> for DomainDelete<'a> {}
-impl<'a> Transaction<NameStore<'a>> for DomainInfo<'a> {}
-impl<'a> Transaction<NameStore<'a>> for DomainRenew<'a> {}
-impl<'a> Transaction<NameStore<'a>> for DomainTransfer<'a> {}
-impl<'a> Transaction<NameStore<'a>> for DomainUpdate<'a> {}
+impl Transaction<NameStore<'_>> for DomainCheck<'_> {}
+impl Transaction<NameStore<'_>> for DomainCreate<'_> {}
+impl Transaction<NameStore<'_>> for DomainDelete<'_> {}
+impl Transaction<NameStore<'_>> for DomainInfo<'_> {}
+impl Transaction<NameStore<'_>> for DomainRenew<'_> {}
+impl Transaction<NameStore<'_>> for DomainTransfer<'_> {}
+impl Transaction<NameStore<'_>> for DomainUpdate<'_> {}
 
 // Host
 
-impl<'a> Transaction<NameStore<'a>> for HostCheck<'a> {}
-impl<'a> Transaction<NameStore<'a>> for HostCreate<'a> {}
-impl<'a> Transaction<NameStore<'a>> for HostDelete<'a> {}
-impl<'a> Transaction<NameStore<'a>> for HostInfo<'a> {}
-impl<'a> Transaction<NameStore<'a>> for HostUpdate<'a> {}
+impl Transaction<NameStore<'_>> for HostCheck<'_> {}
+impl Transaction<NameStore<'_>> for HostCreate<'_> {}
+impl Transaction<NameStore<'_>> for HostDelete<'_> {}
+impl Transaction<NameStore<'_>> for HostInfo<'_> {}
+impl Transaction<NameStore<'_>> for HostUpdate<'_> {}
 
 impl<'a> NameStore<'a> {
     /// Create a new RGP restore report request

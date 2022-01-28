@@ -13,7 +13,7 @@ use super::namestore::{NameStore, NameStoreData};
 
 pub const XMLNS: &str = "http://www.verisign.com/epp/sync-1.0";
 
-impl<'a> Transaction<Update> for DomainUpdate<'a> {}
+impl Transaction<Update> for DomainUpdate<'_> {}
 
 impl Extension for Update {
     type Response = NoExtension;
