@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::str;
+use std::time::Duration;
 
 use regex::Regex;
 use tokio_test::io::Builder;
@@ -86,7 +87,10 @@ async fn client() {
     ])
     .build();
 
-    let mut client = EppClient::new("test".into(), stream).await.unwrap();
+    let mut client = EppClient::new("test".into(), stream, Duration::from_secs(5))
+        .await
+        .unwrap();
+
     assert_eq!(client.xml_greeting(), xml("response/greeting.xml"));
     client
         .transact(

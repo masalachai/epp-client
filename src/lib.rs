@@ -41,6 +41,7 @@
 //! ```no_run
 //! use std::collections::HashMap;
 //! use std::net::ToSocketAddrs;
+//! use std::time::Duration;
 //!
 //! use epp_client::EppClient;
 //! use epp_client::domain::DomainCheck;
@@ -54,7 +55,8 @@
 //! // Create an instance of EppClient
 //! let host = "example.com";
 //! let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
-//! let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None).await {
+//! let timeout = Duration::from_secs(5);
+//! let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None, timeout).await {
 //!     Ok(client) => client,
 //!     Err(e) => panic!("Failed to create EppClient: {}",  e)
 //! };
