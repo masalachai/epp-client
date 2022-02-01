@@ -12,8 +12,9 @@ use crate::response::ResponseStatus;
 /// Error enum holding the possible error types
 #[derive(Debug)]
 pub enum Error {
-    Io(std::io::Error),
     Command(ResponseStatus),
+    Io(std::io::Error),
+    Timeout,
     Xml(Box<dyn StdError + Send + Sync>),
     Other(Box<dyn StdError + Send + Sync>),
 }
@@ -23,10 +24,11 @@ impl StdError for Error {}
 impl Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::Io(e) => write!(f, "I/O error: {}", e),
             Error::Command(e) => {
                 write!(f, "command error: {}", e.result.message)
             }
+            Error::Io(e) => write!(f, "I/O error: {}", e),
+            Error::Timeout => write!(f, "timeout"),
             Error::Xml(e) => write!(f, "(de)serialization error: {}", e),
             Error::Other(e) => write!(f, "error: {}", e),
         }

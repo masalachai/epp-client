@@ -5,6 +5,7 @@
 //! ```no_run
 //! use std::collections::HashMap;
 //! use std::net::ToSocketAddrs;
+//! use std::time::Duration;
 //!
 //! use epp_client::EppClient;
 //! use epp_client::domain::DomainCheck;
@@ -16,7 +17,8 @@
 //! // Create an instance of EppClient
 //! let host = "example.com";
 //! let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
-//! let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None).await {
+//! let timeout = Duration::from_secs(5);
+//! let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None, timeout).await {
 //!     Ok(client) => client,
 //!     Err(e) => panic!("Failed to create EppClient: {}",  e)
 //! };
@@ -37,6 +39,7 @@ use std::convert::TryInto;
 use std::io;
 use std::net::SocketAddr;
 use std::sync::Arc;
+use std::time::Duration;
 
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
@@ -49,7 +52,7 @@ use tokio_rustls::TlsConnector;
 use tracing::info;
 
 use crate::common::{Certificate, NoExtension, PrivateKey};
-use crate::connection::EppConnection;
+use crate::connection::{self, EppConnection};
 use crate::error::Error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
 use crate::request::{Command, Extension, Transaction};
@@ -69,7 +72,8 @@ impl EppClient<TlsStream<TcpStream>> {
     ///
     /// The `registry` is used as a name in internal logging; `addr` provides the address to
     /// connect to, `hostname` is sent as the TLS server name indication and `identity` provides
-    /// optional TLS client authentication. Uses rustls as the TLS implementation.
+    /// optional TLS client authentication (using) rustls as the TLS implementation.
+    /// The `timeout` limits the time spent on any underlying network operations.
     ///
     /// Alternatively, use `EppClient::new()` with any established `AsyncRead + AsyncWrite + Unpin`
     /// implementation.
@@ -78,6 +82,7 @@ impl EppClient<TlsStream<TcpStream>> {
         addr: SocketAddr,
         hostname: &str,
         identity: Option<(Vec<Certificate>, PrivateKey)>,
+        timeout: Duration,
     ) -> Result<Self, Error> {
         info!("Connecting to server: {:?}", addr);
 
@@ -115,17 +120,17 @@ impl EppClient<TlsStream<TcpStream>> {
         })?;
 
         let connector = TlsConnector::from(Arc::new(config));
-        let tcp = TcpStream::connect(&addr).await?;
-        let stream = connector.connect(domain, tcp).await?;
-        Self::new(registry, stream).await
+        let future = connector.connect(domain, TcpStream::connect(&addr).await?);
+        let stream = connection::timeout(timeout, future).await?;
+        Self::new(registry, stream, timeout).await
     }
 }
 
 impl<IO: AsyncRead + AsyncWrite + Unpin> EppClient<IO> {
     /// Create an `EppClient` from an already established connection
-    pub async fn new(registry: String, stream: IO) -> Result<Self, Error> {
+    pub async fn new(registry: String, stream: IO, timeout: Duration) -> Result<Self, Error> {
         Ok(Self {
-            connection: EppConnection::new(registry, stream).await?,
+            connection: EppConnection::new(registry, stream, timeout).await?,
         })
     }
 
