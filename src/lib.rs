@@ -35,59 +35,8 @@
 //!
 //! ## Operation
 //!
-//! Once the config is set correctly, you can create a mut variable of type [`EppClient`] to transact
-//! with the domain registry
-//!
-//! ```no_run
-//! use std::collections::HashMap;
-//! use std::net::ToSocketAddrs;
-//! use std::time::Duration;
-//!
-//! use epp_client::EppClient;
-//! use epp_client::domain::DomainCheck;
-//! use epp_client::common::NoExtension;
-//! use epp_client::login::Login;
-//! use epp_client::logout::Logout;
-//!
-//! #[tokio::main]
-//! async fn main() {
-//!
-//! // Create an instance of EppClient
-//! let host = "example.com";
-//! let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
-//! let timeout = Duration::from_secs(5);
-//! let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None, timeout).await {
-//!     Ok(client) => client,
-//!     Err(e) => panic!("Failed to create EppClient: {}",  e)
-//! };
-//!
-//! let login = Login::new("username", "password", None);
-//! client.transact(&login, "transaction-id").await.unwrap();
-//!
-//! // Make a domain check call, which returns an object of type EppDomainCheckResponse
-//! // that contains the result of the call
-//! let domain_check = DomainCheck {
-//!     domains: &["eppdev.com", "eppdev.net"],
-//! };
-//!
-//! let response = client.transact(&domain_check, "transaction-id").await.unwrap();
-//!
-//! // print the availability results
-//! response.res_data.unwrap().list
-//!     .iter()
-//!     .for_each(|chk| println!("Domain: {}, Available: {}", chk.id, chk.available));
-//!
-//! // Close the connection
-//! client.transact(&Logout, "transaction-id").await.unwrap();
-//! }
-//! ```
-//!
-//! The output would look similar to the following
-//!
-//! ```text
-//! Domain: eppdev.com, Available: 1
-//! Domain: eppdev.net, Available: 1
-//! ```
+//! Typically, you will start by initializing an [`EppClient`] instance, which will connect to the EPP server.
+//! From there, you can submit requests using [`EppClient::transact()`].
 
 pub mod client;
 pub mod common;
