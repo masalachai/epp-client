@@ -33,7 +33,7 @@ pub struct GMonthDay {
 }
 
 // Taken from https://github.com/lumeohq/xsd-parser-rs/blob/main/xsd-types/src/types/gmonthday.rs
-/// Represents a gMonthDay type https://www.w3.org/TR/xmlschema-2/#gMonthDay
+/// Represents a gMonthDay type <https://www.w3.org/TR/xmlschema-2/#gMonthDay>
 impl GMonthDay {
     pub fn new(month: u8, day: u8, timezone: Option<FixedOffset>) -> Result<Self, String> {
         if !(1..=12).contains(&month) {
