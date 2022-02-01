@@ -2,41 +2,59 @@
 //!
 //! ## Description
 //!
-//! epp-client is a client library for Internet domain registration and management for domain registrars.
-//!
-//! It supports the following basic Domain, Contact, Host, and Message management calls, with plans to add more calls
-//! and other EPP extensions in the future, and to eventually be RFC compliant with the EPP protocol.
-//!
-//! - Domain Check - [`EppDomainCheck`](epp/request/domain/check/type.EppDomainCheck.html)
-//! - Domain Create - [`EppDomainCreate`](epp/request/domain/create/type.EppDomainCreate.html)
-//! - Domain Info - [`EppDomainInfo`](epp/request/domain/info/type.EppDomainInfo.html)
-//! - Domain Update - [`EppDomainUpdate`](epp/request/domain/update/type.EppDomainUpdate.html)
-//! - Domain Delete - [`EppDomainDelete`](epp/request/domain/delete/type.EppDomainDelete.html)
-//! - Domain Renew - [`EppDomainRenew`](epp/request/domain/renew/type.EppDomainRenew.html)
-//! - Domain Transfer - [`EppDomainTransferRequest`](epp/request/domain/transfer/type.EppDomainTransferRequest.html)
-//!
-//! - Contact Check - [`EppContactCheck`](epp/request/contact/check/type.EppContactCheck.html)
-//! - Contact Create - [`EppContactCreate`](epp/request/contact/create/type.EppContactCreate.html)
-//! - Contact Info - [`EppContactInfo`](epp/request/contact/info/type.EppContactInfo.html)
-//! - Contact Update - [`EppContactUpdate`](epp/request/contact/update/type.EppContactUpdate.html)
-//! - Contact Delete - [`EppContactDelete`](epp/request/contact/delete/type.EppContactDelete.html)
-//!
-//! - Host Check - [`EppHostCheck`](epp/request/host/check/type.EppHostCheck.html)
-//! - Host Create - [`EppHostCreate`](epp/request/host/create/type.EppHostCreate.html)
-//! - Host Info - [`EppHostInfo`](epp/request/host/info/type.EppHostInfo.html)
-//! - Host Update - [`EppHostUpdate`](epp/request/host/update/type.EppHostUpdate.html)
-//! - Host Delete - [`EppHostDelete`](epp/request/host/delete/type.EppHostDelete.html)
-//!
-//! - Message Poll - [`EppMessagePoll`](epp/request/message/poll/type.EppMessagePoll.html)
-//! - Message Ack - [`EppMessageAck`](epp/request/message/ack/type.EppMessageAck.html)
-//!
-//! - RGP Restore Request - [`EppDomainRgpRestoreRequest`](epp/request/domain/rgp/request/type.EppDomainRgpRestoreRequest.html)
-//! - RGP Restore Report - [`EppDomainRgpRestoreReport`](epp/request/domain/rgp/report/type.EppDomainRgpRestoreReport.html)
-//!
-//! ## Operation
+//! epp-client is a client library for Internet domain registration and management for domain
+//! registrars ([RFC 5730](https://tools.ietf.org/html/rfc5730)). It supports the following basic
+//! management requests.
 //!
 //! Typically, you will start by initializing an [`EppClient`] instance, which will connect to the EPP server.
 //! From there, you can submit requests using [`EppClient::transact()`].
+//!
+//! ## Core requests
+//!
+//! - [`message::MessagePoll`]
+//! - [`message::MessageAck`]
+//!
+//! ## Domains
+//!
+//! Specified in [RFC 5731](https://tools.ietf.org/html/rfc5731).
+//!
+//! - [`domain::DomainCheck`]
+//! - [`domain::DomainCreate`]
+//! - [`domain::DomainInfo`]
+//! - [`domain::DomainUpdate`]
+//! - [`domain::DomainRenew`]
+//! - [`domain::DomainTransfer`]
+//! - [`domain::DomainDelete`]
+//!
+//! ## Contacts
+//!
+//! Specified in [RFC 5732](https://tools.ietf.org/html/rfc5732).
+//!
+//! - [`contact::ContactCheck`]
+//! - [`contact::ContactCreate`]
+//! - [`contact::ContactInfo`]
+//! - [`contact::ContactUpdate`]
+//! - [`contact::ContactDelete`]
+//!
+//! ## Hosts
+//!
+//! Specified in [RFC 5733](https://tools.ietf.org/html/rfc5733).
+//!
+//! - [`host::HostCheck`]
+//! - [`host::HostCreate`]
+//! - [`host::HostInfo`]
+//! - [`host::HostUpdate`]
+//! - [`host::HostDelete`]
+//!
+//! ## Extensions
+//!
+//! - [`extensions::rgp::report::RgpRestoreReport`]
+//! - [`extensions::rgp::request::RgpRestoreRequest`]
+//! - [`extensions::namestore::NameStore`]
+//! - [`extensions::consolidate::Update`]
+//!
+//! ## Operation
+//!
 
 pub mod client;
 pub mod common;
