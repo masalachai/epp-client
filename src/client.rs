@@ -1,40 +1,3 @@
-//! Manages sending/receiving EppObject request and responses to the registry connection
-//!
-//! ## Example
-//!
-//! ```no_run
-//! use std::collections::HashMap;
-//! use std::net::ToSocketAddrs;
-//! use std::time::Duration;
-//!
-//! use epp_client::EppClient;
-//! use epp_client::domain::DomainCheck;
-//! use epp_client::common::NoExtension;
-//!
-//! #[tokio::main]
-//! async fn main() {
-//!
-//! // Create an instance of EppClient
-//! let host = "example.com";
-//! let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
-//! let timeout = Duration::from_secs(5);
-//! let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None, timeout).await {
-//!     Ok(client) => client,
-//!     Err(e) => panic!("Failed to create EppClient: {}",  e)
-//! };
-//!
-//! // Make a EPP Hello call to the registry
-//! let greeting = client.hello().await.unwrap();
-//! println!("{:?}", greeting);
-//!
-//! // Execute an EPP Command against the registry with distinct request and response objects
-//! let domain_check = DomainCheck { domains: &["eppdev.com", "eppdev.net"] };
-//! let response = client.transact(&domain_check, "transaction-id").await.unwrap();
-//! println!("{:?}", response);
-//!
-//! }
-//! ```
-
 use std::convert::TryInto;
 use std::io;
 use std::net::SocketAddr;
@@ -59,9 +22,52 @@ use crate::request::{Command, Extension, Transaction};
 use crate::response::Response;
 use crate::xml::EppXml;
 
-/// Instances of the EppClient type are used to transact with the registry.
+/// An `EppClient` provides an interface to sending EPP requests to a registry
+///
 /// Once initialized, the EppClient instance can serialize EPP requests to XML and send them
-/// to the registry and deserialize the XML responses from the registry to local types
+/// to the registry and deserialize the XML responses from the registry to local types.
+///
+/// # Examples
+///
+/// ```no_run
+/// # use std::collections::HashMap;
+/// # use std::net::ToSocketAddrs;
+/// # use std::time::Duration;
+/// #
+/// use epp_client::EppClient;
+/// use epp_client::domain::DomainCheck;
+/// use epp_client::common::NoExtension;
+///
+/// # #[tokio::main]
+/// # async fn main() {
+/// // Create an instance of EppClient
+/// let host = "example.com";
+/// let addr = (host, 7000).to_socket_addrs().unwrap().next().unwrap();
+/// let timeout = Duration::from_secs(5);
+/// let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None, timeout).await {
+///     Ok(client) => client,
+///     Err(e) => panic!("Failed to create EppClient: {}",  e)
+/// };
+///
+/// // Make a EPP Hello call to the registry
+/// let greeting = client.hello().await.unwrap();
+/// println!("{:?}", greeting);
+///
+/// // Execute an EPP Command against the registry with distinct request and response objects
+/// let domain_check = DomainCheck { domains: &["eppdev.com", "eppdev.net"] };
+/// let response = client.transact(&domain_check, "transaction-id").await.unwrap();
+/// response.res_data.unwrap().list
+///     .iter()
+///     .for_each(|chk| println!("Domain: {}, Available: {}", chk.id, chk.available));
+/// # }
+/// ```
+///
+/// The output would look like this:
+///
+/// ```text
+/// Domain: eppdev.com, Available: 1
+/// Domain: eppdev.net, Available: 1
+/// ```
 pub struct EppClient<IO> {
     connection: EppConnection<IO>,
 }
