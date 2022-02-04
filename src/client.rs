@@ -4,17 +4,18 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 
-use tokio::io::{AsyncRead, AsyncWrite};
+use async_trait::async_trait;
 use tokio::net::TcpStream;
 #[cfg(feature = "tokio-rustls")]
 use tokio_rustls::client::TlsStream;
 #[cfg(feature = "tokio-rustls")]
-use tokio_rustls::rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore};
+use tokio_rustls::rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore, ServerName};
 #[cfg(feature = "tokio-rustls")]
 use tokio_rustls::TlsConnector;
 use tracing::info;
 
 use crate::common::{Certificate, NoExtension, PrivateKey};
+pub use crate::connection::Connector;
 use crate::connection::{self, EppConnection};
 use crate::error::Error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
@@ -68,12 +69,12 @@ use crate::xml::EppXml;
 /// Domain: eppdev.com, Available: 1
 /// Domain: eppdev.net, Available: 1
 /// ```
-pub struct EppClient<IO> {
-    connection: EppConnection<IO>,
+pub struct EppClient<C: Connector> {
+    connection: EppConnection<C>,
 }
 
 #[cfg(feature = "tokio-rustls")]
-impl EppClient<TlsStream<TcpStream>> {
+impl EppClient<RustlsConnector> {
     /// Connect to the specified `addr` and `hostname` over TLS
     ///
     /// The `registry` is used as a name in internal logging; `addr` provides the address to
@@ -91,52 +92,16 @@ impl EppClient<TlsStream<TcpStream>> {
         timeout: Duration,
     ) -> Result<Self, Error> {
         info!("Connecting to server: {:?}", addr);
-
-        let mut roots = RootCertStore::empty();
-        roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
-            OwnedTrustAnchor::from_subject_spki_name_constraints(
-                ta.subject,
-                ta.spki,
-                ta.name_constraints,
-            )
-        }));
-
-        let builder = ClientConfig::builder()
-            .with_safe_defaults()
-            .with_root_certificates(roots);
-
-        let config = match identity {
-            Some((certs, key)) => {
-                let certs = certs
-                    .into_iter()
-                    .map(|cert| tokio_rustls::rustls::Certificate(cert.0))
-                    .collect();
-                builder
-                    .with_single_cert(certs, tokio_rustls::rustls::PrivateKey(key.0))
-                    .map_err(|e| Error::Other(e.into()))?
-            }
-            None => builder.with_no_client_auth(),
-        };
-
-        let domain = hostname.try_into().map_err(|_| {
-            io::Error::new(
-                io::ErrorKind::InvalidInput,
-                format!("Invalid domain: {}", hostname),
-            )
-        })?;
-
-        let connector = TlsConnector::from(Arc::new(config));
-        let future = connector.connect(domain, TcpStream::connect(&addr).await?);
-        let stream = connection::timeout(timeout, future).await?;
-        Self::new(registry, stream, timeout).await
+        let connector = RustlsConnector::new(addr, hostname, identity)?;
+        Self::new(connector, registry, timeout).await
     }
 }
 
-impl<IO: AsyncRead + AsyncWrite + Unpin> EppClient<IO> {
+impl<C: Connector> EppClient<C> {
     /// Create an `EppClient` from an already established connection
-    pub async fn new(registry: String, stream: IO, timeout: Duration) -> Result<Self, Error> {
+    pub async fn new(connector: C, registry: String, timeout: Duration) -> Result<Self, Error> {
         Ok(Self {
-            connection: EppConnection::new(registry, stream, timeout).await?,
+            connection: EppConnection::new(connector, registry, timeout).await?,
         })
     }
 
@@ -149,21 +114,22 @@ impl<IO: AsyncRead + AsyncWrite + Unpin> EppClient<IO> {
         Ok(GreetingDocument::deserialize(&response)?.data)
     }
 
-    pub async fn transact<'c, 'e, C, E>(
+    pub async fn transact<'c, 'e, Cmd, Ext>(
         &mut self,
-        data: impl Into<RequestData<'c, 'e, C, E>>,
+        data: impl Into<RequestData<'c, 'e, Cmd, Ext>>,
         id: &str,
-    ) -> Result<Response<C::Response, E::Response>, Error>
+    ) -> Result<Response<Cmd::Response, Ext::Response>, Error>
     where
-        C: Transaction<E> + Command + 'c,
-        E: Extension + 'e,
+        Cmd: Transaction<Ext> + Command + 'c,
+        Ext: Extension + 'e,
     {
         let data = data.into();
-        let epp_xml = <C as Transaction<E>>::serialize_request(data.command, data.extension, id)?;
+        let epp_xml =
+            <Cmd as Transaction<Ext>>::serialize_request(data.command, data.extension, id)?;
 
         let response = self.connection.transact(&epp_xml).await?;
 
-        C::deserialize_response(&response)
+        Cmd::deserialize_response(&response)
     }
 
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
@@ -207,5 +173,71 @@ impl<'c, 'e, C: Command, E: Extension> From<(&'c C, &'e E)> for RequestData<'c, 
             command,
             extension: Some(extension),
         }
+    }
+}
+
+#[cfg(feature = "tokio-rustls")]
+pub struct RustlsConnector {
+    inner: TlsConnector,
+    domain: ServerName,
+    addr: SocketAddr,
+}
+
+impl RustlsConnector {
+    pub fn new(
+        addr: SocketAddr,
+        hostname: &str,
+        identity: Option<(Vec<Certificate>, PrivateKey)>,
+    ) -> Result<Self, Error> {
+        let mut roots = RootCertStore::empty();
+        roots.add_server_trust_anchors(webpki_roots::TLS_SERVER_ROOTS.0.iter().map(|ta| {
+            OwnedTrustAnchor::from_subject_spki_name_constraints(
+                ta.subject,
+                ta.spki,
+                ta.name_constraints,
+            )
+        }));
+
+        let builder = ClientConfig::builder()
+            .with_safe_defaults()
+            .with_root_certificates(roots);
+
+        let config = match identity {
+            Some((certs, key)) => {
+                let certs = certs
+                    .into_iter()
+                    .map(|cert| tokio_rustls::rustls::Certificate(cert.0))
+                    .collect();
+                builder
+                    .with_single_cert(certs, tokio_rustls::rustls::PrivateKey(key.0))
+                    .map_err(|e| Error::Other(e.into()))?
+            }
+            None => builder.with_no_client_auth(),
+        };
+
+        let domain = hostname.try_into().map_err(|_| {
+            io::Error::new(
+                io::ErrorKind::InvalidInput,
+                format!("Invalid domain: {}", hostname),
+            )
+        })?;
+
+        Ok(Self {
+            inner: TlsConnector::from(Arc::new(config)),
+            domain,
+            addr,
+        })
+    }
+}
+
+#[cfg(feature = "tokio-rustls")]
+#[async_trait]
+impl Connector for RustlsConnector {
+    type Connection = TlsStream<TcpStream>;
+
+    async fn connect(&self, timeout: Duration) -> Result<Self::Connection, Error> {
+        let stream = TcpStream::connect(&self.addr).await?;
+        let future = self.inner.connect(self.domain.clone(), stream);
+        connection::timeout(timeout, future).await
     }
 }

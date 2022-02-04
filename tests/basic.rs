@@ -3,6 +3,7 @@ use std::io::{self, Read, Write};
 use std::str;
 use std::time::Duration;
 
+use async_trait::async_trait;
 use regex::Regex;
 use tokio_test::io::Builder;
 
@@ -78,16 +79,26 @@ fn build_stream(units: &[&str]) -> Builder {
 #[tokio::test]
 async fn client() {
     let _guard = log_to_stdout();
-    let stream = build_stream(&[
-        "response/greeting.xml",
-        "request/login.xml",
-        "response/login.xml",
-        "request/domain/check.xml",
-        "response/domain/check.xml",
-    ])
-    .build();
 
-    let mut client = EppClient::new("test".into(), stream, Duration::from_secs(5))
+    struct FakeConnector;
+
+    #[async_trait]
+    impl epp_client::client::Connector for FakeConnector {
+        type Connection = tokio_test::io::Mock;
+
+        async fn connect(&self, _: Duration) -> Result<Self::Connection, epp_client::Error> {
+            Ok(build_stream(&[
+                "response/greeting.xml",
+                "request/login.xml",
+                "response/login.xml",
+                "request/domain/check.xml",
+                "response/domain/check.xml",
+            ])
+            .build())
+        }
+    }
+
+    let mut client = EppClient::new(FakeConnector, "test".into(), Duration::from_secs(5))
         .await
         .unwrap();
 
