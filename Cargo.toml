@@ -11,6 +11,7 @@ repository = "https://github.com/masalachai/epp-client"
 default = ["tokio-rustls"]
 
 [dependencies]
+async-trait = "0.1.52"
 celes = "2.1"
 chrono = "0.4"
 quick-xml = { version = "0.22", features = [ "serialize" ] }

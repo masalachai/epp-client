@@ -5,28 +5,29 @@ use std::future::Future;
 use std::time::Duration;
 use std::{io, str, u32};
 
+use async_trait::async_trait;
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tracing::{debug, info};
 
 use crate::error::Error;
 
 /// EPP Connection struct with some metadata for the connection
-pub(crate) struct EppConnection<IO> {
+pub(crate) struct EppConnection<C: Connector> {
     registry: String,
-    stream: IO,
+    stream: C::Connection,
     pub greeting: String,
     timeout: Duration,
 }
 
-impl<IO: AsyncRead + AsyncWrite + Unpin> EppConnection<IO> {
+impl<C: Connector> EppConnection<C> {
     pub(crate) async fn new(
+        connector: C,
         registry: String,
-        stream: IO,
         timeout: Duration,
     ) -> Result<Self, Error> {
         let mut this = Self {
             registry,
-            stream,
+            stream: connector.connect(timeout).await?,
             greeting: String::new(),
             timeout,
         };
@@ -117,4 +118,11 @@ pub(crate) async fn timeout<T, E: Into<Error>>(
         Ok(Err(e)) => Err(e.into()),
         Err(_) => Err(Error::Timeout),
     }
+}
+
+#[async_trait]
+pub trait Connector {
+    type Connection: AsyncRead + AsyncWrite + Unpin;
+
+    async fn connect(&self, timeout: Duration) -> Result<Self::Connection, Error>;
 }
