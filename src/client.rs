@@ -148,6 +148,10 @@ impl<C: Connector> EppClient<C> {
         GreetingDocument::deserialize(&self.connection.greeting).map(|obj| obj.data)
     }
 
+    pub async fn reconnect(&mut self) -> Result<(), Error> {
+        self.connection.reconnect().await
+    }
+
     pub async fn shutdown(mut self) -> Result<(), Error> {
         self.connection.shutdown().await
     }
