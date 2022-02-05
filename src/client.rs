@@ -180,6 +180,19 @@ impl<'c, 'e, C: Command, E: Extension> From<(&'c C, &'e E)> for RequestData<'c, 
     }
 }
 
+// Manual impl because this does not depend on whether `C` and `E` are `Clone`
+impl<'c, 'e, C, E> Clone for RequestData<'c, 'e, C, E> {
+    fn clone(&self) -> Self {
+        Self {
+            command: self.command,
+            extension: self.extension,
+        }
+    }
+}
+
+// Manual impl because this does not depend on whether `C` and `E` are `Copy`
+impl<'c, 'e, C, E> Copy for RequestData<'c, 'e, C, E> {}
+
 #[cfg(feature = "tokio-rustls")]
 pub struct RustlsConnector {
     inner: TlsConnector,
