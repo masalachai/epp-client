@@ -12,7 +12,7 @@ use tokio_rustls::client::TlsStream;
 use tokio_rustls::rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore, ServerName};
 #[cfg(feature = "tokio-rustls")]
 use tokio_rustls::TlsConnector;
-use tracing::info;
+use tracing::{error, info};
 
 use crate::common::{Certificate, NoExtension, PrivateKey};
 pub use crate::connection::Connector;
@@ -129,7 +129,13 @@ impl<C: Connector> EppClient<C> {
 
         let response = self.connection.transact(&epp_xml).await?;
 
-        Cmd::deserialize_response(&response)
+        match Cmd::deserialize_response(&response) {
+            Ok(response) => Ok(response),
+            Err(e) => {
+                error!(%response, "Failed to deserialize response: {}", e);
+                Err(e)
+            }
+        }
     }
 
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
