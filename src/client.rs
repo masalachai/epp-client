@@ -163,6 +163,7 @@ impl<C: Connector> EppClient<C> {
     }
 }
 
+#[derive(Debug)]
 pub struct RequestData<'c, 'e, C, E> {
     command: &'c C,
     extension: Option<&'e E>,
