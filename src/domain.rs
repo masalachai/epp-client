@@ -1,8 +1,10 @@
 use std::borrow::Cow;
+use std::net::IpAddr;
+use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
-use crate::common::{HostAddr, StringValue};
+use crate::common::{serialize_host_addrs_option, HostAddr, StringValue};
 use crate::Error;
 
 pub mod check;
@@ -35,8 +37,34 @@ pub struct HostAttr<'a> {
     #[serde(rename = "domain:hostName", alias = "hostName")]
     pub name: StringValue<'a>,
     /// The &lt;hostAddr&gt; tags
-    #[serde(rename = "domain:hostAddr", alias = "hostAddr")]
-    pub addresses: Option<Vec<HostAddr<'a>>>,
+    #[serde(
+        rename = "domain:hostAddr",
+        alias = "hostAddr",
+        serialize_with = "serialize_host_addrs_option",
+        deserialize_with = "deserialize_host_addrs_option"
+    )]
+    pub addresses: Option<Vec<IpAddr>>,
+}
+
+fn deserialize_host_addrs_option<'de, D>(de: D) -> Result<Option<Vec<IpAddr>>, D::Error>
+where
+    D: serde::de::Deserializer<'de>,
+{
+    let addrs = Option::<Vec<HostAddr<'static>>>::deserialize(de)?;
+    let addrs = match addrs {
+        Some(addrs) => addrs,
+        None => return Ok(None),
+    };
+
+    let result = addrs
+        .into_iter()
+        .map(|addr| IpAddr::from_str(&addr.address))
+        .collect::<Result<_, _>>();
+
+    match result {
+        Ok(addrs) => Ok(Some(addrs)),
+        Err(e) => Err(serde::de::Error::custom(format!("{}", e))),
+    }
 }
 
 /// The list of &lt;hostAttr&gt; types for domain transactions. Typically under an &lt;ns&gt; tag

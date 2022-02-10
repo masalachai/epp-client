@@ -104,11 +104,12 @@ pub struct DomainCreateResponse {
 #[cfg(test)]
 mod tests {
     use super::{DomainContact, DomainCreate, HostList, Period};
-    use crate::common::{HostAddr, NoExtension};
+    use crate::common::NoExtension;
     use crate::domain::{HostAttr, HostAttrList, HostObjList};
     use crate::request::Transaction;
     use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use std::net::IpAddr;
 
     #[test]
     fn command() {
@@ -208,8 +209,8 @@ mod tests {
             HostAttr {
                 name: "ns2.eppdev-1.com".into(),
                 addresses: Some(vec![
-                    HostAddr::new_v4("177.232.12.58"),
-                    HostAddr::new_v6("2404:6800:4001:801::200e"),
+                    IpAddr::from([177, 232, 12, 58]),
+                    IpAddr::from([0x2404, 0x6800, 0x4001, 0x801, 0, 0, 0, 0x200e]),
                 ]),
             },
         ];

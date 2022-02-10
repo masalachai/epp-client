@@ -1,5 +1,8 @@
 //! Types for EPP host info request
 
+use std::net::IpAddr;
+use std::str::FromStr;
+
 use super::XMLNS;
 use crate::common::{HostAddr, NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
@@ -57,8 +60,8 @@ pub struct HostInfoResponseData {
     #[serde(rename = "status")]
     pub statuses: Vec<ObjectStatus<'static>>,
     /// The list of host IP addresses
-    #[serde(rename = "addr")]
-    pub addresses: Vec<HostAddr<'static>>,
+    #[serde(rename = "addr", deserialize_with = "deserialize_host_addrs")]
+    pub addresses: Vec<IpAddr>,
     /// The epp user to whom the host belongs
     #[serde(rename = "clID")]
     pub client_id: StringValue<'static>,
@@ -79,6 +82,18 @@ pub struct HostInfoResponseData {
     pub transferred_at: Option<StringValue<'static>>,
 }
 
+fn deserialize_host_addrs<'de, D>(de: D) -> Result<Vec<IpAddr>, D::Error>
+where
+    D: serde::de::Deserializer<'de>,
+{
+    let addrs = Vec::<HostAddr<'static>>::deserialize(de)?;
+    addrs
+        .into_iter()
+        .map(|addr| IpAddr::from_str(&addr.address))
+        .collect::<Result<_, _>>()
+        .map_err(|e| serde::de::Error::custom(format!("{}", e)))
+}
+
 /// Type that represents the &lt;resData&gt; tag for host info response
 #[derive(Deserialize, Debug)]
 pub struct HostInfoResponse {
@@ -89,7 +104,7 @@ pub struct HostInfoResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::HostInfo;
+    use super::{HostInfo, IpAddr};
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
@@ -122,20 +137,12 @@ mod tests {
         assert_eq!(result.info_data.roid, "UNDEF-ROID".into());
         assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
         assert_eq!(
-            *(result.info_data.addresses[0].ip_version.as_ref().unwrap()),
-            "v4".to_string()
+            result.info_data.addresses[0],
+            IpAddr::from([29, 245, 122, 14])
         );
         assert_eq!(
-            result.info_data.addresses[0].address,
-            "29.245.122.14".to_string()
-        );
-        assert_eq!(
-            *(result.info_data.addresses[1].ip_version.as_ref().unwrap()),
-            "v6".to_string()
-        );
-        assert_eq!(
-            result.info_data.addresses[1].address,
-            "2404:6800:4001:0801:0000:0000:0000:200e".to_string()
+            result.info_data.addresses[1],
+            IpAddr::from([0x2404, 0x6800, 0x4001, 0x801, 0, 0, 0, 0x200e])
         );
         assert_eq!(result.info_data.client_id, "eppdev".into());
         assert_eq!(result.info_data.creator_id, "creator".into());
