@@ -1,7 +1,9 @@
 //! Types for EPP host update request
 
+use std::net::IpAddr;
+
 use super::XMLNS;
-use crate::common::{HostAddr, NoExtension, ObjectStatus, StringValue};
+use crate::common::{serialize_host_addrs_option, NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
 use serde::Serialize;
 
@@ -53,8 +55,8 @@ pub struct HostChangeInfo<'a> {
 #[derive(Serialize, Debug)]
 pub struct HostAddRemove<'a> {
     /// The IP addresses to be added to or removed from the host
-    #[serde(rename = "host:addr")]
-    pub addresses: Option<&'a [HostAddr<'a>]>,
+    #[serde(rename = "host:addr", serialize_with = "serialize_host_addrs_option")]
+    pub addresses: Option<&'a [IpAddr]>,
     /// The statuses to be added to or removed from the host
     #[serde(rename = "host:status")]
     pub statuses: Option<&'a [ObjectStatus<'a>]>,
@@ -90,8 +92,9 @@ pub struct HostUpdate<'a> {
 
 #[cfg(test)]
 mod tests {
+    use super::IpAddr;
     use super::{HostAddRemove, HostChangeInfo, HostUpdate};
-    use crate::common::{HostAddr, NoExtension, ObjectStatus};
+    use crate::common::{NoExtension, ObjectStatus};
     use crate::request::Transaction;
     use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
@@ -100,7 +103,9 @@ mod tests {
     fn command() {
         let xml = get_xml("request/host/update.xml").unwrap();
 
-        let addr = &[HostAddr::new("v6", "2404:6800:4001:801::200e")];
+        let addr = &[IpAddr::from([
+            0x2404, 0x6800, 0x4001, 0x801, 0, 0, 0, 0x200e,
+        ])];
 
         let add = HostAddRemove {
             addresses: Some(addr),

@@ -1,7 +1,8 @@
 //! Common data types included in EPP Requests and Responses
 
-use std::{borrow::Cow, fmt::Display};
+use std::{borrow::Cow, fmt::Display, net::IpAddr};
 
+use serde::ser::SerializeSeq;
 use serde::{Deserialize, Serialize};
 
 use crate::request::Extension;
@@ -148,37 +149,42 @@ pub struct Services<'a> {
 
 /// The &lt;hostAddr&gt; types domain or host transactions
 #[derive(Serialize, Deserialize, Debug)]
-pub struct HostAddr<'a> {
+pub(crate) struct HostAddr<'a> {
     #[serde(rename = "ip")]
     pub ip_version: Option<Cow<'a, str>>,
     #[serde(rename = "$value")]
     pub address: Cow<'a, str>,
 }
 
-impl<'a> HostAddr<'a> {
-    /// Creates a 'v4' type HostAddr (mostly useful when you don't want to include an 'ip' attr in the XML)
-    pub fn new(ip_version: &'a str, address: &'a str) -> Self {
+impl From<&IpAddr> for HostAddr<'static> {
+    fn from(addr: &IpAddr) -> Self {
         Self {
-            ip_version: Some(ip_version.into()),
-            address: address.into(),
+            ip_version: Some(match addr {
+                IpAddr::V4(_) => "v4".into(),
+                IpAddr::V6(_) => "v6".into(),
+            }),
+            address: addr.to_string().into(),
         }
     }
+}
 
-    /// Creates a 'v4' type HostAddr
-    pub fn new_v4(address: &'a str) -> HostAddr {
-        HostAddr {
-            ip_version: Some("v4".into()),
-            address: address.into(),
-        }
-    }
+pub(crate) fn serialize_host_addrs_option<T: AsRef<[IpAddr]>, S>(
+    addrs: &Option<T>,
+    ser: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: serde::ser::Serializer,
+{
+    let addrs = match addrs {
+        Some(addrs) => addrs.as_ref(),
+        None => return ser.serialize_none(),
+    };
 
-    /// Creates a 'v6' type HostAddr
-    pub fn new_v6(address: &'a str) -> HostAddr {
-        HostAddr {
-            ip_version: Some("v6".into()),
-            address: address.into(),
-        }
+    let mut seq = ser.serialize_seq(Some(addrs.len()))?;
+    for addr in addrs {
+        seq.serialize_element(&HostAddr::from(addr))?;
     }
+    seq.end()
 }
 
 /// The &lt;status&gt; type on contact transactions

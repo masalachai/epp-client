@@ -1,7 +1,9 @@
 //! Types for EPP host create request
 
+use std::net::IpAddr;
+
 use super::XMLNS;
-use crate::common::{HostAddr, NoExtension, StringValue};
+use crate::common::{serialize_host_addrs_option, NoExtension, StringValue};
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +15,7 @@ impl<'a> Command for HostCreate<'a> {
 }
 
 impl<'a> HostCreate<'a> {
-    pub fn new(host: &'a str, addresses: Option<&'a [HostAddr]>) -> Self {
+    pub fn new(host: &'a str, addresses: Option<&'a [IpAddr]>) -> Self {
         Self {
             host: HostCreateRequestData {
                 xmlns: XMLNS,
@@ -36,8 +38,8 @@ pub struct HostCreateRequestData<'a> {
     #[serde(rename = "host:name")]
     pub name: StringValue<'a>,
     /// The list of IP addresses for the host
-    #[serde(rename = "host:addr")]
-    pub addresses: Option<&'a [HostAddr<'a>]>,
+    #[serde(rename = "host:addr", serialize_with = "serialize_host_addrs_option")]
+    pub addresses: Option<&'a [IpAddr]>,
 }
 
 #[derive(Serialize, Debug)]
@@ -70,8 +72,8 @@ pub struct HostCreateResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::HostCreate;
-    use crate::common::{HostAddr, NoExtension};
+    use super::{HostCreate, IpAddr};
+    use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
@@ -81,8 +83,8 @@ mod tests {
         let xml = get_xml("request/host/create.xml").unwrap();
 
         let addresses = &[
-            HostAddr::new("v4", "29.245.122.14"),
-            HostAddr::new("v6", "2404:6800:4001:801::200e"),
+            IpAddr::from([29, 245, 122, 14]),
+            IpAddr::from([0x2404, 0x6800, 0x4001, 0x801, 0, 0, 0, 0x200e]),
         ];
 
         let object = HostCreate::new("host1.eppdev-1.com", Some(addresses));

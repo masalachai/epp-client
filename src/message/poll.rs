@@ -55,6 +55,7 @@ mod tests {
     use crate::request::Transaction;
     use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SVTRID};
+    use std::net::IpAddr;
 
     #[test]
     fn command() {
@@ -142,7 +143,10 @@ mod tests {
 
             assert_eq!(host.roid, "1234".into());
             assert!(host.statuses.iter().any(|s| s.status == "ok"));
-            assert!(host.addresses.iter().any(|a| a.address == *"1.1.1.1"));
+            assert!(host
+                .addresses
+                .iter()
+                .any(|a| a == &IpAddr::from([1, 1, 1, 1])));
             assert_eq!(host.client_id, "1234".into());
             assert_eq!(host.creator_id, "user".into());
             assert_eq!(host.created_at, "2021-12-01T22:40:48Z".into());
