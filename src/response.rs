@@ -1,7 +1,9 @@
 //! Types for EPP responses
 
-use serde::{de::DeserializeOwned, Deserialize};
 use std::fmt::{self, Debug};
+
+use chrono::{DateTime, Utc};
+use serde::{de::DeserializeOwned, Deserialize};
 
 use crate::common::StringValue;
 use crate::xml::EppXml;
@@ -184,7 +186,7 @@ pub struct MessageQueue {
     pub id: String,
     /// The message date
     #[serde(rename = "qDate")]
-    pub date: Option<StringValue<'static>>,
+    pub date: Option<DateTime<Utc>>,
     /// The message text
     #[serde(rename = "msg")]
     pub message: Option<StringValue<'static>>,

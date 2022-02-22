@@ -1,10 +1,11 @@
 //! Types for EPP domain create request
 
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use super::{DomainAuthInfo, DomainContact, HostList, Period, XMLNS};
 use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
-
-use serde::{Deserialize, Serialize};
 
 impl<'a> Transaction<NoExtension> for DomainCreate<'a> {}
 
@@ -87,10 +88,10 @@ pub struct DomainCreateResponseData {
     pub name: StringValue<'static>,
     /// The creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue<'static>,
+    pub created_at: DateTime<Utc>,
     /// The expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: Option<StringValue<'static>>,
+    pub expiring_at: Option<DateTime<Utc>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain create response
@@ -103,13 +104,16 @@ pub struct DomainCreateResponse {
 
 #[cfg(test)]
 mod tests {
+    use std::net::IpAddr;
+
+    use chrono::{TimeZone, Utc};
+
     use super::{DomainContact, DomainCreate, HostList, Period};
     use crate::common::NoExtension;
     use crate::domain::{HostAttr, HostAttrList, HostObjList};
     use crate::request::Transaction;
     use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
-    use std::net::IpAddr;
 
     #[test]
     fn command() {
@@ -244,11 +248,11 @@ mod tests {
         assert_eq!(result.create_data.name, "eppdev-2.com".into());
         assert_eq!(
             result.create_data.created_at,
-            "2021-07-25T18:11:35.0Z".into()
+            Utc.ymd(2021, 7, 25).and_hms(18, 11, 35)
         );
         assert_eq!(
             *result.create_data.expiring_at.as_ref().unwrap(),
-            "2022-07-25T18:11:34.0Z".into()
+            Utc.ymd(2022, 7, 25).and_hms(18, 11, 34)
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
