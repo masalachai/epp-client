@@ -1,5 +1,6 @@
 //! Common data types included in EPP Requests and Responses
 
+use std::ops::Deref;
 use std::{borrow::Cow, fmt::Display, net::IpAddr};
 
 use serde::ser::SerializeSeq;
@@ -13,6 +14,20 @@ pub(crate) const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
 /// for tags rather than attributes
 #[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct StringValue<'a>(Cow<'a, str>);
+
+impl Deref for StringValue<'_> {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        self.0.as_ref()
+    }
+}
+
+impl<'a> AsRef<str> for StringValue<'a> {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
 
 impl Display for StringValue<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
