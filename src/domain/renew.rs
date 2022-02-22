@@ -1,10 +1,11 @@
 //! Types for EPP domain renew request
 
+use chrono::{DateTime, NaiveDate, Utc};
+use serde::{Deserialize, Serialize};
+
 use super::{Period, XMLNS};
 use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
-use chrono::NaiveDate;
-use serde::{Deserialize, Serialize};
 
 impl<'a> Transaction<NoExtension> for DomainRenew<'a> {}
 
@@ -63,7 +64,7 @@ pub struct DomainRenewResponseData {
     pub name: StringValue<'static>,
     /// The new expiry date after renewal
     #[serde(rename = "exDate")]
-    pub expiring_at: Option<StringValue<'static>>,
+    pub expiring_at: Option<DateTime<Utc>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain renew response
@@ -81,7 +82,8 @@ mod tests {
     use crate::request::Transaction;
     use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
-    use chrono::NaiveDate;
+
+    use chrono::{NaiveDate, TimeZone, Utc};
 
     #[test]
     fn command() {
@@ -110,7 +112,7 @@ mod tests {
         assert_eq!(result.renew_data.name, "eppdev-1.com".into());
         assert_eq!(
             *result.renew_data.expiring_at.as_ref().unwrap(),
-            "2024-07-23T15:31:20.0Z".into()
+            Utc.ymd(2024, 7, 23).and_hms(15, 31, 20)
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

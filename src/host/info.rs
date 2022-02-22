@@ -3,10 +3,12 @@
 use std::net::IpAddr;
 use std::str::FromStr;
 
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use super::XMLNS;
 use crate::common::{HostAddr, NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
-use serde::{Deserialize, Serialize};
 
 impl<'a> Transaction<NoExtension> for HostInfo<'a> {}
 
@@ -70,16 +72,16 @@ pub struct HostInfoResponseData {
     pub creator_id: StringValue<'static>,
     /// The host creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue<'static>,
+    pub created_at: DateTime<Utc>,
     /// The epp user that last updated the host
     #[serde(rename = "upID")]
     pub updater_id: Option<StringValue<'static>>,
     /// The host last update date
     #[serde(rename = "upDate")]
-    pub updated_at: Option<StringValue<'static>>,
+    pub updated_at: Option<DateTime<Utc>>,
     /// The host transfer date
     #[serde(rename = "trDate")]
-    pub transferred_at: Option<StringValue<'static>>,
+    pub transferred_at: Option<DateTime<Utc>>,
 }
 
 fn deserialize_host_addrs<'de, D>(de: D) -> Result<Vec<IpAddr>, D::Error>
@@ -104,6 +106,8 @@ pub struct HostInfoResponse {
 
 #[cfg(test)]
 mod tests {
+    use chrono::{TimeZone, Utc};
+
     use super::{HostInfo, IpAddr};
     use crate::common::NoExtension;
     use crate::request::Transaction;
@@ -146,14 +150,17 @@ mod tests {
         );
         assert_eq!(result.info_data.client_id, "eppdev".into());
         assert_eq!(result.info_data.creator_id, "creator".into());
-        assert_eq!(result.info_data.created_at, "2021-07-26T05:28:55.0Z".into());
+        assert_eq!(
+            result.info_data.created_at,
+            Utc.ymd(2021, 7, 26).and_hms(5, 28, 55)
+        );
         assert_eq!(
             *(result.info_data.updater_id.as_ref().unwrap()),
             "creator".into()
         );
         assert_eq!(
-            *(result.info_data.updated_at.as_ref().unwrap()),
-            "2021-07-26T05:28:55.0Z".into()
+            result.info_data.updated_at,
+            Some(Utc.ymd(2021, 7, 26).and_hms(5, 28, 55))
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

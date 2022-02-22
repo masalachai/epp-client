@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::common::{Options, ServiceExtension, Services, StringValue, EPP_XMLNS};
@@ -286,7 +287,7 @@ pub struct Greeting {
     pub service_id: String,
     /// The date from the EPP server
     #[serde(rename = "svDate")]
-    pub service_date: String,
+    pub service_date: DateTime<Utc>,
     /// Data under the <svcMenu> element
     #[serde(rename = "svcMenu")]
     pub svc_menu: ServiceMenu,
@@ -305,6 +306,8 @@ impl EppXml for GreetingDocument {}
 
 #[cfg(test)]
 mod tests {
+    use chrono::{TimeZone, Utc};
+
     use super::{ExpiryType, GreetingDocument, HelloDocument, Relative};
     use crate::tests::get_xml;
     use crate::xml::EppXml;
@@ -323,7 +326,10 @@ mod tests {
         let object = GreetingDocument::deserialize(xml.as_str()).unwrap();
 
         assert_eq!(object.data.service_id, "ISPAPI EPP Server");
-        assert_eq!(object.data.service_date, "2021-07-25T14:51:17.0Z");
+        assert_eq!(
+            object.data.service_date,
+            Utc.ymd(2021, 7, 25).and_hms(14, 51, 17)
+        );
         assert_eq!(object.data.svc_menu.options.version, "1.0".into());
         assert_eq!(object.data.svc_menu.options.lang, "en".into());
         assert_eq!(object.data.svc_menu.services.obj_uris.len(), 4);

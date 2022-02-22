@@ -2,10 +2,12 @@
 
 use std::net::IpAddr;
 
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use super::XMLNS;
 use crate::common::{serialize_host_addrs_option, NoExtension, StringValue};
 use crate::request::{Command, Transaction};
-use serde::{Deserialize, Serialize};
 
 impl<'a> Transaction<NoExtension> for HostCreate<'a> {}
 
@@ -59,7 +61,7 @@ pub struct HostCreateData {
     pub name: StringValue<'static>,
     /// The host creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue<'static>,
+    pub created_at: DateTime<Utc>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for host check response
@@ -72,6 +74,8 @@ pub struct HostCreateResponse {
 
 #[cfg(test)]
 mod tests {
+    use chrono::{TimeZone, Utc};
+
     use super::{HostCreate, IpAddr};
     use crate::common::NoExtension;
     use crate::request::Transaction;
@@ -109,7 +113,7 @@ mod tests {
         assert_eq!(result.create_data.name, "host2.eppdev-1.com".into());
         assert_eq!(
             result.create_data.created_at,
-            "2021-07-26T05:28:55.0Z".into()
+            Utc.ymd(2021, 7, 26).and_hms(5, 28, 55)
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

@@ -1,9 +1,11 @@
 //! Types for EPP contact info request
 
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use super::{ContactAuthInfo, Phone, PostalInfo, XMLNS};
 use crate::common::{NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
-use serde::{Deserialize, Serialize};
 
 impl<'a> Transaction<NoExtension> for ContactInfo<'a> {}
 
@@ -77,16 +79,16 @@ pub struct ContactInfoData<'a> {
     pub creator_id: StringValue<'a>,
     /// The creation date
     #[serde(rename = "crDate")]
-    pub created_at: StringValue<'a>,
+    pub created_at: DateTime<Utc>,
     /// The epp user who last updated the contact
     #[serde(rename = "upID")]
     pub updater_id: Option<StringValue<'a>>,
     /// The last update date
     #[serde(rename = "upDate")]
-    pub updated_at: Option<StringValue<'a>>,
+    pub updated_at: Option<DateTime<Utc>>,
     /// The contact transfer date
     #[serde(rename = "trDate")]
-    pub transferred_at: Option<StringValue<'a>>,
+    pub transferred_at: Option<DateTime<Utc>>,
     /// The contact auth info
     #[serde(rename = "authInfo")]
     pub auth_info: Option<ContactAuthInfo<'a>>,
@@ -102,6 +104,8 @@ pub struct ContactInfoResponse {
 
 #[cfg(test)]
 mod tests {
+    use chrono::{TimeZone, Utc};
+
     use super::ContactInfo;
     use crate::common::NoExtension;
     use crate::request::Transaction;
@@ -166,14 +170,17 @@ mod tests {
         assert_eq!(result.info_data.email, "contact@eppdev.net".into());
         assert_eq!(result.info_data.client_id, "eppdev".into());
         assert_eq!(result.info_data.creator_id, "SYSTEM".into());
-        assert_eq!(result.info_data.created_at, "2021-07-23T13:09:09.0Z".into());
+        assert_eq!(
+            result.info_data.created_at,
+            Utc.ymd(2021, 7, 23).and_hms(13, 9, 9)
+        );
         assert_eq!(
             *(result.info_data.updater_id.as_ref().unwrap()),
             "SYSTEM".into()
         );
         assert_eq!(
-            *(result.info_data.updated_at.as_ref().unwrap()),
-            "2021-07-23T13:09:09.0Z".into()
+            result.info_data.updated_at,
+            Some(Utc.ymd(2021, 7, 23).and_hms(13, 9, 9))
         );
         assert_eq!((*auth_info).password, "eppdev-387323".into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());

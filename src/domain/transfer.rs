@@ -1,9 +1,11 @@
 //! Types for EPP domain transfer request
 
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use super::{DomainAuthInfo, Period, XMLNS};
 use crate::common::{NoExtension, StringValue};
 use crate::request::{Command, Transaction};
-use serde::{Deserialize, Serialize};
 
 impl<'a> Transaction<NoExtension> for DomainTransfer<'a> {}
 
@@ -109,16 +111,16 @@ pub struct DomainTransferResponseData {
     pub requester_id: StringValue<'static>,
     /// The transfer rquest date
     #[serde(rename = "reDate")]
-    pub requested_at: StringValue<'static>,
+    pub requested_at: DateTime<Utc>,
     /// The epp user who should acknowledge the transfer request
     #[serde(rename = "acID")]
     pub ack_id: StringValue<'static>,
     /// THe date by which the acknowledgment should be made
     #[serde(rename = "acDate")]
-    pub ack_by: StringValue<'static>,
+    pub ack_by: DateTime<Utc>,
     /// The domain expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: Option<StringValue<'static>>,
+    pub expiring_at: Option<DateTime<Utc>>,
 }
 
 /// Type that represents the &lt;resData&gt; tag for domain transfer response
@@ -131,6 +133,8 @@ pub struct DomainTransferResponse {
 
 #[cfg(test)]
 mod tests {
+    use chrono::{TimeZone, Utc};
+
     use super::{DomainTransfer, Period};
     use crate::common::NoExtension;
     use crate::request::Transaction;
@@ -225,13 +229,16 @@ mod tests {
         assert_eq!(result.transfer_data.requester_id, "eppdev".into());
         assert_eq!(
             result.transfer_data.requested_at,
-            "2021-07-23T15:31:21.0Z".into()
+            Utc.ymd(2021, 7, 23).and_hms(15, 31, 21),
         );
         assert_eq!(result.transfer_data.ack_id, "ClientY".into());
-        assert_eq!(result.transfer_data.ack_by, "2021-07-28T15:31:21.0Z".into());
         assert_eq!(
-            *result.transfer_data.expiring_at.as_ref().unwrap(),
-            "2022-07-02T14:53:19.0Z".into()
+            result.transfer_data.ack_by,
+            Utc.ymd(2021, 7, 28).and_hms(15, 31, 21)
+        );
+        assert_eq!(
+            result.transfer_data.expiring_at,
+            Some(Utc.ymd(2022, 7, 2).and_hms(14, 53, 19)),
         );
         assert_eq!(*object.tr_ids.client_tr_id.as_ref().unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
@@ -292,13 +299,16 @@ mod tests {
         assert_eq!(result.transfer_data.requester_id, "eppdev".into());
         assert_eq!(
             result.transfer_data.requested_at,
-            "2021-07-23T15:31:21.0Z".into()
+            Utc.ymd(2021, 7, 23).and_hms(15, 31, 21)
         );
         assert_eq!(result.transfer_data.ack_id, "ClientY".into());
-        assert_eq!(result.transfer_data.ack_by, "2021-07-28T15:31:21.0Z".into());
         assert_eq!(
-            *result.transfer_data.expiring_at.as_ref().unwrap(),
-            "2022-07-02T14:53:19.0Z".into()
+            result.transfer_data.ack_by,
+            Utc.ymd(2021, 7, 28).and_hms(15, 31, 21)
+        );
+        assert_eq!(
+            result.transfer_data.expiring_at,
+            Some(Utc.ymd(2022, 7, 2).and_hms(14, 53, 19))
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

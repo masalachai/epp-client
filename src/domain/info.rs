@@ -1,9 +1,11 @@
 //! Types for EPP domain info request
 
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
 use super::{DomainAuthInfo, DomainContact, HostAttr, XMLNS};
 use crate::common::{NoExtension, ObjectStatus, StringValue};
 use crate::request::{Command, Transaction};
-use serde::{Deserialize, Serialize};
 
 impl<'a> Transaction<NoExtension> for DomainInfo<'a> {}
 
@@ -102,19 +104,19 @@ pub struct DomainInfoResponseData {
     pub creator_id: Option<StringValue<'static>>,
     /// The domain creation date
     #[serde(rename = "crDate")]
-    pub created_at: Option<StringValue<'static>>,
+    pub created_at: Option<DateTime<Utc>>,
     /// The domain expiry date
     #[serde(rename = "exDate")]
-    pub expiring_at: Option<StringValue<'static>>,
+    pub expiring_at: Option<DateTime<Utc>>,
     /// The epp user who last updated the domain
     #[serde(rename = "upID")]
     pub updater_id: Option<StringValue<'static>>,
     /// The domain last updated date
     #[serde(rename = "upDate")]
-    pub updated_at: Option<StringValue<'static>>,
+    pub updated_at: Option<DateTime<Utc>>,
     /// The domain transfer date
     #[serde(rename = "trDate")]
-    pub transferred_at: Option<StringValue<'static>>,
+    pub transferred_at: Option<DateTime<Utc>>,
     /// The domain auth info
     #[serde(rename = "authInfo")]
     pub auth_info: Option<DomainAuthInfo<'static>>,
@@ -135,6 +137,7 @@ mod tests {
     use crate::request::Transaction;
     use crate::response::ResultCode;
     use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use chrono::{TimeZone, Utc};
 
     #[test]
     fn command() {
@@ -188,7 +191,7 @@ mod tests {
         );
         assert_eq!(
             *result.info_data.created_at.as_ref().unwrap(),
-            "2021-07-23T15:31:20.0Z".into()
+            Utc.ymd(2021, 7, 23).and_hms(15, 31, 20)
         );
         assert_eq!(
             *result.info_data.updater_id.as_ref().unwrap(),
@@ -196,11 +199,11 @@ mod tests {
         );
         assert_eq!(
             *result.info_data.updated_at.as_ref().unwrap(),
-            "2021-07-23T15:31:21.0Z".into()
+            Utc.ymd(2021, 7, 23).and_hms(15, 31, 21)
         );
         assert_eq!(
             *result.info_data.expiring_at.as_ref().unwrap(),
-            "2023-07-23T15:31:20.0Z".into()
+            Utc.ymd(2023, 7, 23).and_hms(15, 31, 20)
         );
         assert_eq!((*auth_info).password, "epP4uthd#v".into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
