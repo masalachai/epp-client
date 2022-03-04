@@ -18,6 +18,8 @@ pub(crate) struct EppConnection<C: Connector> {
     stream: C::Connection,
     pub greeting: String,
     timeout: Duration,
+    // Whether the connection is in a good state to start sending a request
+    ready: bool,
 }
 
 impl<C: Connector> EppConnection<C> {
@@ -32,9 +34,11 @@ impl<C: Connector> EppConnection<C> {
             connector,
             greeting: String::new(),
             timeout,
+            ready: false,
         };
 
         this.greeting = this.get_epp_response().await?;
+        this.ready = true;
         Ok(this)
     }
 
@@ -87,18 +91,25 @@ impl<C: Connector> EppConnection<C> {
             }
         }
 
+        self.ready = true;
         Ok(String::from_utf8(buf)?)
     }
 
     pub(crate) async fn reconnect(&mut self) -> Result<(), Error> {
+        self.ready = false;
         self.stream = self.connector.connect(self.timeout).await?;
         self.greeting = self.get_epp_response().await?;
+        self.ready = true;
         Ok(())
     }
 
     /// Sends an EPP XML request to the registry and return the response
     /// receieved to the request
     pub(crate) async fn transact(&mut self, content: &str) -> Result<String, Error> {
+        if !self.ready {
+            self.reconnect().await?;
+        }
+
         debug!("{}: request: {}", self.registry, content);
         self.send_epp_request(content).await?;
 
@@ -111,7 +122,7 @@ impl<C: Connector> EppConnection<C> {
     /// Closes the socket and shuts the connection
     pub(crate) async fn shutdown(&mut self) -> Result<(), Error> {
         info!("{}: Closing connection", self.registry);
-
+        self.ready = false;
         timeout(self.timeout, self.stream.shutdown()).await?;
         Ok(())
     }
