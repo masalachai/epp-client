@@ -109,7 +109,7 @@ impl<C: Connector> EppClient<C> {
     pub async fn hello(&mut self) -> Result<Greeting, Error> {
         let hello_xml = HelloDocument::default().serialize()?;
 
-        let response = self.connection.transact(&hello_xml).await?;
+        let response = self.connection.transact(&hello_xml)?.await?;
 
         Ok(GreetingDocument::deserialize(&response)?.data)
     }
@@ -127,7 +127,7 @@ impl<C: Connector> EppClient<C> {
         let epp_xml =
             <Cmd as Transaction<Ext>>::serialize_request(data.command, data.extension, id)?;
 
-        let response = self.connection.transact(&epp_xml).await?;
+        let response = self.connection.transact(&epp_xml)?.await?;
 
         match Cmd::deserialize_response(&response) {
             Ok(response) => Ok(response),
@@ -141,7 +141,7 @@ impl<C: Connector> EppClient<C> {
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
     /// Not recommended for direct use but sometimes can be useful for debugging
     pub async fn transact_xml(&mut self, xml: &str) -> Result<String, Error> {
-        self.connection.transact(xml).await
+        self.connection.transact(xml)?.await
     }
 
     /// Returns the greeting received on establishment of the connection in raw xml form

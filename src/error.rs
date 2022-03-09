@@ -1,5 +1,6 @@
 //! Error types to wrap internal errors and make EPP errors easier to read
 
+use std::array::TryFromSliceError;
 use std::error::Error as StdError;
 use std::fmt::{self, Display};
 use std::io;
@@ -67,6 +68,12 @@ impl From<FromUtf8Error> for Error {
 
 impl From<Utf8Error> for Error {
     fn from(e: Utf8Error) -> Self {
+        Self::Other(e.into())
+    }
+}
+
+impl From<TryFromSliceError> for Error {
+    fn from(e: TryFromSliceError) -> Self {
         Self::Other(e.into())
     }
 }
