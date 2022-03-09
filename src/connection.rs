@@ -96,6 +96,7 @@ impl<C: Connector> EppConnection<C> {
     }
 
     pub(crate) async fn reconnect(&mut self) -> Result<(), Error> {
+        debug!("{}: reconnecting", self.registry);
         self.ready = false;
         self.stream = self.connector.connect(self.timeout).await?;
         self.greeting = self.get_epp_response().await?;
@@ -107,6 +108,7 @@ impl<C: Connector> EppConnection<C> {
     /// receieved to the request
     pub(crate) async fn transact(&mut self, content: &str) -> Result<String, Error> {
         if !self.ready {
+            debug!("{}: connection not ready", self.registry);
             self.reconnect().await?;
         }
 
