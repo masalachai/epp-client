@@ -15,7 +15,7 @@ use crate::error::Error;
 
 /// EPP Connection struct with some metadata for the connection
 pub(crate) struct EppConnection<C: Connector> {
-    registry: String,
+    pub registry: String,
     connector: C,
     stream: C::Connection,
     pub greeting: String,
@@ -74,7 +74,6 @@ impl<C: Connector> EppConnection<C> {
 
     /// Sends an EPP XML request to the registry and returns the response
     pub(crate) fn transact<'a>(&'a mut self, command: &str) -> Result<RequestFuture<'a, C>, Error> {
-        debug!("{}: request: {}", self.registry, command);
         let new = RequestState::new(command)?;
 
         // If we have a request currently in flight, finish that first

@@ -12,7 +12,7 @@ use tokio_rustls::client::TlsStream;
 use tokio_rustls::rustls::{ClientConfig, OwnedTrustAnchor, RootCertStore, ServerName};
 #[cfg(feature = "tokio-rustls")]
 use tokio_rustls::TlsConnector;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use crate::common::{Certificate, NoExtension, PrivateKey};
 pub use crate::connection::Connector;
@@ -105,11 +105,13 @@ impl<C: Connector> EppClient<C> {
         })
     }
 
-    /// Executes an EPP Hello call and returns the response as an `Greeting`
+    /// Executes an EPP Hello call and returns the response as a `Greeting`
     pub async fn hello(&mut self) -> Result<Greeting, Error> {
         let hello_xml = HelloDocument::default().serialize()?;
 
+        debug!("{}: hello: {}", self.connection.registry, &hello_xml);
         let response = self.connection.transact(&hello_xml)?.await?;
+        debug!("{}: greeting: {}", self.connection.registry, &response);
 
         Ok(GreetingDocument::deserialize(&response)?.data)
     }
@@ -127,7 +129,9 @@ impl<C: Connector> EppClient<C> {
         let epp_xml =
             <Cmd as Transaction<Ext>>::serialize_request(data.command, data.extension, id)?;
 
+        debug!("{}: request: {}", self.connection.registry, &epp_xml);
         let response = self.connection.transact(&epp_xml)?.await?;
+        debug!("{}: response: {}", self.connection.registry, &response);
 
         match Cmd::deserialize_response(&response) {
             Ok(response) => Ok(response),
