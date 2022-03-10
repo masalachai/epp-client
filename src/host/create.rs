@@ -80,24 +80,17 @@ mod tests {
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/host/create.xml").unwrap();
-
         let addresses = &[
             IpAddr::from([29, 245, 122, 14]),
             IpAddr::from([0x2404, 0x6800, 0x4001, 0x801, 0, 0, 0, 0x200e]),
         ];
 
         let object = HostCreate::new("host1.eppdev-1.com", Some(addresses));
-
-        let serialized =
-            <HostCreate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/host/create.xml", &object);
     }
 
     #[test]

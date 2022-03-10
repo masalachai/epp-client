@@ -97,12 +97,10 @@ mod tests {
     use crate::common::{NoExtension, ObjectStatus};
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/host/update.xml").unwrap();
-
         let addr = &[IpAddr::from([
             0x2404, 0x6800, 0x4001, 0x801, 0, 0, 0, 0x200e,
         ])];
@@ -129,11 +127,7 @@ mod tests {
             name: "host2.eppdev-1.com".into(),
         });
 
-        let serialized =
-            <HostUpdate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/host/update.xml", &object);
     }
 
     #[test]

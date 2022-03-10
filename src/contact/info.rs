@@ -110,19 +110,12 @@ mod tests {
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/contact/info.xml").unwrap();
-
         let object = ContactInfo::new("eppdev-contact-3", "eppdev-387323");
-
-        let serialized =
-            <ContactInfo as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/contact/info.xml", &object);
     }
 
     #[test]

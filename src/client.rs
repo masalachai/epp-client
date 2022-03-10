@@ -126,11 +126,11 @@ impl<C: Connector> EppClient<C> {
         Ext: Extension + 'e,
     {
         let data = data.into();
-        let epp_xml =
-            <Cmd as Transaction<Ext>>::serialize_request(data.command, data.extension, id)?;
+        let document = <Cmd as Transaction<Ext>>::command(data.command, data.extension, id);
+        let xml = document.serialize()?;
 
-        debug!("{}: request: {}", self.connection.registry, &epp_xml);
-        let response = self.connection.transact(&epp_xml)?.await?;
+        debug!("{}: request: {}", self.connection.registry, &xml);
+        let response = self.connection.transact(&xml)?.await?;
         debug!("{}: response: {}", self.connection.registry, &response);
 
         match Cmd::deserialize_response(&response) {
@@ -169,8 +169,8 @@ impl<C: Connector> EppClient<C> {
 
 #[derive(Debug)]
 pub struct RequestData<'c, 'e, C, E> {
-    command: &'c C,
-    extension: Option<&'e E>,
+    pub(crate) command: &'c C,
+    pub(crate) extension: Option<&'e E>,
 }
 
 impl<'c, C: Command> From<&'c C> for RequestData<'c, 'static, C, NoExtension> {

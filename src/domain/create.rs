@@ -113,12 +113,10 @@ mod tests {
     use crate::domain::{HostAttr, HostAttrList, HostObjList};
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/domain/create.xml").unwrap();
-
         let contacts = &[
             DomainContact {
                 contact_type: "admin".into(),
@@ -143,17 +141,11 @@ mod tests {
             Some(contacts),
         );
 
-        let serialized =
-            <DomainCreate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/create.xml", &object);
     }
 
     #[test]
     fn command_with_host_obj() {
-        let xml = get_xml("request/domain/create_with_host_obj.xml").unwrap();
-
         let contacts = &[
             DomainContact {
                 contact_type: "admin".into(),
@@ -179,17 +171,11 @@ mod tests {
             Some(contacts),
         );
 
-        let serialized =
-            <DomainCreate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/create_with_host_obj.xml", &object);
     }
 
     #[test]
     fn command_with_host_attr() {
-        let xml = get_xml("request/domain/create_with_host_attr.xml").unwrap();
-
         let contacts = &[
             DomainContact {
                 contact_type: "admin".into(),
@@ -228,11 +214,7 @@ mod tests {
             Some(contacts),
         );
 
-        let serialized =
-            <DomainCreate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/create_with_host_attr.xml", &object);
     }
 
     #[test]

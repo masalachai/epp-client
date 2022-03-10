@@ -23,15 +23,12 @@ mod tests {
     use super::Logout;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/logout.xml").unwrap();
         let object = Logout;
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/logout.xml", &object);
     }
 
     #[test]

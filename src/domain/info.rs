@@ -136,20 +136,13 @@ mod tests {
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
     use chrono::{TimeZone, Utc};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/domain/info.xml").unwrap();
-
         let object = DomainInfo::new("eppdev.com", Some("2fooBAR"));
-
-        let serialized =
-            <DomainInfo as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/info.xml", &object);
     }
 
     #[test]

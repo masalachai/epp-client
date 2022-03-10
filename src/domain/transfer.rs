@@ -139,72 +139,37 @@ mod tests {
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn request_command() {
-        let xml = get_xml("request/domain/transfer_request.xml").unwrap();
-
         let object =
             DomainTransfer::new("testing.com", Some(Period::years(1).unwrap()), "epP4uthd#v");
-
-        let serialized =
-            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/transfer_request.xml", &object);
     }
 
     #[test]
     fn approve_command() {
-        let xml = get_xml("request/domain/transfer_approve.xml").unwrap();
-
         let object = DomainTransfer::approve("testing.com");
-
-        let serialized =
-            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/transfer_approve.xml", &object);
     }
 
     #[test]
     fn reject_command() {
-        let xml = get_xml("request/domain/transfer_reject.xml").unwrap();
-
         let object = DomainTransfer::reject("testing.com");
-
-        let serialized =
-            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/transfer_reject.xml", &object);
     }
 
     #[test]
     fn cancel_command() {
-        let xml = get_xml("request/domain/transfer_cancel.xml").unwrap();
-
         let object = DomainTransfer::cancel("testing.com");
-
-        let serialized =
-            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/transfer_cancel.xml", &object);
     }
 
     #[test]
     fn query_command() {
-        let xml = get_xml("request/domain/transfer_query.xml").unwrap();
-
         let object = DomainTransfer::query("testing.com", "epP4uthd#v");
-
-        let serialized =
-            <DomainTransfer as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/transfer_query.xml", &object);
     }
 
     #[test]

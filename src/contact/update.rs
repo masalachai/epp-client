@@ -112,12 +112,10 @@ mod tests {
     use crate::contact::Address;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/contact/update.xml").unwrap();
-
         let mut object = ContactUpdate::new("eppdev-contact-3");
 
         let street = &["58", "Orchid Road"];
@@ -135,11 +133,7 @@ mod tests {
         }];
         object.remove(remove_statuses);
 
-        let serialized =
-            <ContactUpdate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/contact/update.xml", &object);
     }
 
     #[test]

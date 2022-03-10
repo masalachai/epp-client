@@ -118,13 +118,10 @@ mod tests {
     use super::{GMonthDay, Update};
     use crate::domain::update::{DomainChangeInfo, DomainUpdate};
     use crate::extensions::consolidate::UpdateWithNameStore;
-    use crate::request::Transaction;
-    use crate::tests::{get_xml, CLTRID};
+    use crate::tests::assert_serialized;
 
     #[test]
     fn command() {
-        let xml = get_xml("request/extensions/consolidate.xml").unwrap();
-
         let exp = GMonthDay::new(5, 31, None).unwrap();
 
         let consolidate_ext = Update::new(exp);
@@ -136,20 +133,14 @@ mod tests {
             auth_info: None,
         });
 
-        let serialized = <DomainUpdate as Transaction<Update>>::serialize_request(
-            &object,
-            Some(&consolidate_ext),
-            CLTRID,
-        )
-        .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized(
+            "request/extensions/consolidate.xml",
+            (&object, &consolidate_ext),
+        );
     }
 
     #[test]
     fn command_with_namestore() {
-        let xml = get_xml("request/extensions/consolidate_namestore.xml").unwrap();
-
         let exp = GMonthDay::new(5, 31, None).unwrap();
 
         let consolidate_ext = UpdateWithNameStore::new(exp, "com");
@@ -161,13 +152,9 @@ mod tests {
             auth_info: None,
         });
 
-        let serialized = <DomainUpdate as Transaction<UpdateWithNameStore>>::serialize_request(
-            &object,
-            Some(&consolidate_ext),
-            CLTRID,
-        )
-        .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized(
+            "request/extensions/consolidate_namestore.xml",
+            (&object, &consolidate_ext),
+        );
     }
 }

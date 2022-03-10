@@ -54,20 +54,15 @@ mod tests {
     use crate::message::poll::MessageData;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SVTRID};
 
     use chrono::{TimeZone, Utc};
     use std::net::IpAddr;
 
     #[test]
     fn command() {
-        let xml = get_xml("request/message/poll.xml").unwrap();
-
         let object = MessagePoll::default();
-
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/message/poll.xml", &object);
     }
 
     #[test]

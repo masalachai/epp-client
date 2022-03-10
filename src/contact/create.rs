@@ -106,12 +106,10 @@ mod tests {
     use crate::contact::Address;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/contact/create.xml").unwrap();
-
         let street = &["58", "Orchid Road"];
         let address = Address::new(street, "Paris", "Paris", "392374", "FR".parse().unwrap());
         let postal_info = PostalInfo::new("int", "John Doe", "Acme Widgets", address);
@@ -129,11 +127,7 @@ mod tests {
         );
         object.set_fax(fax);
 
-        let serialized =
-            <ContactCreate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/contact/create.xml", &object);
     }
 
     #[test]
