@@ -1,7 +1,14 @@
 //! Module for automated tests
 
-use regex::Regex;
 use std::{error::Error, fs::File, io::Read};
+
+use regex::Regex;
+
+use crate::{
+    client::RequestData,
+    request::{Command, Extension, Transaction},
+    xml::EppXml,
+};
 
 pub(crate) const RESOURCES_DIR: &str = "./tests/resources";
 pub(crate) const CLTRID: &str = "cltrid:1626454866";
@@ -26,4 +33,18 @@ pub(crate) fn get_xml(path: &str) -> Result<String, Box<dyn Error>> {
         );
     }
     Ok(buf)
+}
+
+pub(crate) fn assert_serialized<'c, 'e, Cmd, Ext>(
+    path: &str,
+    req: impl Into<RequestData<'c, 'e, Cmd, Ext>>,
+) where
+    Cmd: Transaction<Ext> + Command + 'c,
+    Ext: Extension + 'e,
+{
+    let expected = get_xml(path).unwrap();
+    let req = req.into();
+    let document = <Cmd as Transaction<Ext>>::command(req.command, req.extension, CLTRID);
+    let actual = EppXml::serialize(&document).unwrap();
+    assert_eq!(expected, actual);
 }

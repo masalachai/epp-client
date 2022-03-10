@@ -60,21 +60,14 @@ mod tests {
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/host/check.xml").unwrap();
-
         let object = HostCheck {
             hosts: &["ns1.eppdev-1.com", "host1.eppdev-1.com"],
         };
-
-        let serialized =
-            <HostCheck as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/host/check.xml", &object);
     }
 
     #[test]

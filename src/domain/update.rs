@@ -105,12 +105,10 @@ mod tests {
     use crate::common::{NoExtension, ObjectStatus};
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/domain/update.xml").unwrap();
-
         let mut object = DomainUpdate::new("eppdev.com");
 
         let statuses = &[ObjectStatus {
@@ -142,12 +140,7 @@ mod tests {
         object.add(add);
         object.remove(remove);
         object.info(change_info);
-
-        let serialized =
-            <DomainUpdate as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/update.xml", &object);
     }
 
     #[test]

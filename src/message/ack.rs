@@ -36,17 +36,12 @@ mod tests {
     use super::MessageAck;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/message/ack.xml").unwrap();
-
         let object = MessageAck::new(12345);
-
-        let serialized = object.serialize_request(None, CLTRID).unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/message/ack.xml", &object);
     }
 
     #[test]

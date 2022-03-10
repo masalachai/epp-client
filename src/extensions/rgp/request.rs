@@ -72,12 +72,10 @@ mod tests {
     use crate::domain::update::{DomainChangeInfo, DomainUpdate};
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn request_command() {
-        let xml = get_xml("request/extensions/rgp_restore_request.xml").unwrap();
-
         let domain_restore_request = Update {
             data: RgpRestoreRequest::default(),
         };
@@ -91,15 +89,10 @@ mod tests {
 
         object.info(change_info);
 
-        let serialized =
-            <DomainUpdate as Transaction<Update<RgpRestoreRequest>>>::serialize_request(
-                &object,
-                Some(&domain_restore_request),
-                CLTRID,
-            )
-            .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized(
+            "request/extensions/rgp_restore_request.xml",
+            (&object, &domain_restore_request),
+        );
     }
 
     #[test]

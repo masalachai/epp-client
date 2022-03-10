@@ -15,17 +15,17 @@ pub const EPP_LANG: &str = "en";
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
 pub trait Transaction<Ext: Extension>: Command + Sized {
-    fn serialize_request(
-        &self,
-        extension: Option<&Ext>,
-        client_tr_id: &str,
-    ) -> Result<String, Error> {
-        <CommandDocument<Self, Ext> as EppXml>::serialize(&CommandDocument::new(CommandWrapper {
+    fn command<'c, 'e: 'c, 'i: 'c>(
+        &'c self,
+        extension: Option<&'e Ext>,
+        client_tr_id: &'i str,
+    ) -> CommandDocument<'c, Self, Ext> {
+        CommandDocument::new(CommandWrapper {
             command: Self::COMMAND,
             data: self,
             extension,
             client_tr_id: client_tr_id.into(),
-        }))
+        })
     }
 
     fn deserialize_response(

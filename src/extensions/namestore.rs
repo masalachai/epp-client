@@ -98,26 +98,20 @@ mod tests {
     use super::NameStore;
     use crate::domain::check::DomainCheck;
     use crate::request::Transaction;
-    use crate::tests::{get_xml, CLTRID};
+    use crate::tests::{assert_serialized, get_xml};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/extensions/namestore.xml").unwrap();
-
         let namestore_ext = NameStore::new("com");
 
         let object = DomainCheck {
             domains: &["example1.com", "example2.com", "example3.com"],
         };
 
-        let serialized = <DomainCheck as Transaction<NameStore>>::serialize_request(
-            &object,
-            Some(&namestore_ext),
-            CLTRID,
-        )
-        .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized(
+            "request/extensions/namestore.xml",
+            (&object, &namestore_ext),
+        );
     }
 
     #[test]

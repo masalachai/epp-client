@@ -81,22 +81,15 @@ mod tests {
     use crate::common::NoExtension;
     use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
 
     use chrono::{NaiveDate, TimeZone, Utc};
 
     #[test]
     fn command() {
-        let xml = get_xml("request/domain/renew.xml").unwrap();
-
         let exp_date = NaiveDate::from_ymd(2022, 7, 23);
         let object = DomainRenew::new("eppdev.com", exp_date, Period::years(1).unwrap());
-
-        let serialized =
-            <DomainRenew as Transaction<NoExtension>>::serialize_request(&object, None, CLTRID)
-                .unwrap();
-
-        assert_eq!(xml, serialized);
+        assert_serialized("request/domain/renew.xml", &object);
     }
 
     #[test]
