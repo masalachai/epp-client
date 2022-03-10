@@ -5,9 +5,10 @@ use std::time::Duration;
 
 use async_trait::async_trait;
 use regex::Regex;
+use tokio::time::timeout;
 use tokio_test::io::Builder;
 
-use epp_client::domain::check::DomainCheck;
+use epp_client::domain::{DomainCheck, DomainContact, DomainCreate, Period};
 use epp_client::login::Login;
 use epp_client::response::ResultCode;
 use epp_client::EppClient;
@@ -130,4 +131,111 @@ async fn client() {
 
     let result = rsp.res_data().unwrap();
     assert_eq!(result.list[0].id, "eppdev.com");
+}
+
+#[tokio::test]
+async fn dropped() {
+    let _guard = log_to_stdout();
+
+    struct FakeConnector;
+
+    #[async_trait]
+    impl epp_client::client::Connector for FakeConnector {
+        type Connection = tokio_test::io::Mock;
+
+        async fn connect(&self, _: Duration) -> Result<Self::Connection, epp_client::Error> {
+            let mut builder = Builder::new();
+
+            let buf = xml("response/greeting.xml");
+            builder.read(&len_bytes(&buf)).read(buf.as_bytes());
+
+            let buf = xml("request/login.xml");
+            builder.write(&len_bytes(&buf)).write(buf.as_bytes());
+
+            let buf = xml("response/login.xml");
+            builder.read(&len_bytes(&buf)).read(buf.as_bytes());
+
+            let buf = xml("request/domain/check.xml");
+            builder.write(&len_bytes(&buf)).write(buf.as_bytes());
+
+            // We add a wait here. We're going to timeout below as a way of dropping the future.
+            builder.wait(Duration::from_millis(100));
+
+            let buf = xml("response/domain/check.xml");
+            builder.read(&len_bytes(&buf)).read(buf.as_bytes());
+
+            let buf = xml("request/domain/create.xml");
+            builder.write(&len_bytes(&buf)).write(buf.as_bytes());
+
+            let buf = xml("response/domain/create.xml");
+            builder.read(&len_bytes(&buf)).read(buf.as_bytes());
+
+            Ok(builder.build())
+        }
+    }
+
+    let mut client = EppClient::new(FakeConnector, "test".into(), Duration::from_secs(5))
+        .await
+        .unwrap();
+
+    assert_eq!(client.xml_greeting(), xml("response/greeting.xml"));
+    let rsp = client
+        .transact(
+            &Login::new(
+                "username",
+                "password",
+                Some(&["http://schema.ispapi.net/epp/xml/keyvalue-1.0"]),
+            ),
+            CLTRID,
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(rsp.result.code, ResultCode::CommandCompletedSuccessfully);
+
+    // Here, we add a 10ms timeout on the entire transaction. The mock stream
+    // specifies that the caller will have to wait for 100ms after sending
+    // the request before the response is returned. When `timeout()` returns
+    // `Err(Elapsed)`, the `RequestFuture` inside the `Timeout` future is dropped,
+    // leaving a half-finished request in the `EppConnection`.
+    timeout(
+        Duration::from_millis(10),
+        client.transact(
+            &DomainCheck {
+                domains: &["eppdev.com", "eppdev.net"],
+            },
+            CLTRID,
+        ),
+    )
+    .await
+    .unwrap_err();
+
+    let contacts = &[
+        DomainContact {
+            contact_type: "admin".into(),
+            id: "eppdev-contact-3".into(),
+        },
+        DomainContact {
+            contact_type: "tech".into(),
+            id: "eppdev-contact-3".into(),
+        },
+        DomainContact {
+            contact_type: "billing".into(),
+            id: "eppdev-contact-3".into(),
+        },
+    ];
+
+    // Then, we start another request (of a different type). This should push through the
+    // remainder of the in-flight request before starting the new one, and succeed.
+    let create = DomainCreate::new(
+        "eppdev-1.com",
+        Period::years(1).unwrap(),
+        None,
+        Some("eppdev-contact-3"),
+        "epP4uthd#v",
+        Some(contacts),
+    );
+
+    let rsp = client.transact(&create, CLTRID).await.unwrap();
+    assert_eq!(rsp.result.code, ResultCode::CommandCompletedSuccessfully);
 }
