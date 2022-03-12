@@ -133,10 +133,8 @@ pub struct DomainInfoResponse {
 #[cfg(test)]
 mod tests {
     use super::DomainInfo;
-    use crate::common::NoExtension;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
     use chrono::{TimeZone, Utc};
 
     #[test]
@@ -147,9 +145,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/domain/info.xml").unwrap();
-        let object =
-            <DomainInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
+        let object = response_from_file::<DomainInfo>("response/domain/info.xml");
 
         let result = object.res_data().unwrap();
         let auth_info = result.info_data.auth_info.as_ref().unwrap();
@@ -205,7 +201,6 @@ mod tests {
 
     #[test]
     fn response_alt() {
-        let xml = get_xml("response/domain/info_alt.xml").unwrap();
-        <DomainInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
+        response_from_file::<DomainInfo>("response/domain/info_alt.xml");
     }
 }

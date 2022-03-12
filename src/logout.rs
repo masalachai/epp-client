@@ -21,9 +21,8 @@ pub struct Logout;
 #[cfg(test)]
 mod tests {
     use super::Logout;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SVTRID};
 
     #[test]
     fn command() {
@@ -33,8 +32,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/logout.xml").unwrap();
-        let object = Logout::deserialize_response(xml.as_str()).unwrap();
+        let object = response_from_file::<Logout>("response/logout.xml");
 
         assert_eq!(
             object.result.code,

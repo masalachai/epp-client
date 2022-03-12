@@ -102,10 +102,9 @@ pub struct DomainUpdate<'a> {
 #[cfg(test)]
 mod tests {
     use super::{DomainAddRemove, DomainAuthInfo, DomainChangeInfo, DomainContact, DomainUpdate};
-    use crate::common::{NoExtension, ObjectStatus};
-    use crate::request::Transaction;
+    use crate::common::ObjectStatus;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -145,9 +144,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/domain/update.xml").unwrap();
-        let object =
-            <DomainUpdate as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
+        let object = response_from_file::<DomainUpdate>("response/domain/update.xml");
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());

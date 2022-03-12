@@ -136,10 +136,8 @@ mod tests {
     use chrono::{TimeZone, Utc};
 
     use super::{DomainTransfer, Period};
-    use crate::common::NoExtension;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn request_command() {
@@ -174,10 +172,7 @@ mod tests {
 
     #[test]
     fn request_response() {
-        let xml = get_xml("response/domain/transfer_request.xml").unwrap();
-        let object =
-            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
-                .unwrap();
+        let object = response_from_file::<DomainTransfer>("response/domain/transfer_request.xml");
 
         let result = object.res_data().unwrap();
 
@@ -211,10 +206,7 @@ mod tests {
 
     #[test]
     fn approve_response() {
-        let xml = get_xml("response/domain/transfer_approve.xml").unwrap();
-        let object =
-            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
-                .unwrap();
+        let object = response_from_file::<DomainTransfer>("response/domain/transfer_approve.xml");
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -224,10 +216,7 @@ mod tests {
 
     #[test]
     fn reject_response() {
-        let xml = get_xml("response/domain/transfer_reject.xml").unwrap();
-        let object =
-            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
-                .unwrap();
+        let object = response_from_file::<DomainTransfer>("response/domain/transfer_reject.xml");
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -237,10 +226,7 @@ mod tests {
 
     #[test]
     fn cancel_response() {
-        let xml = get_xml("response/domain/transfer_cancel.xml").unwrap();
-        let object =
-            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
-                .unwrap();
+        let object = response_from_file::<DomainTransfer>("response/domain/transfer_cancel.xml");
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
@@ -250,10 +236,7 @@ mod tests {
 
     #[test]
     fn query_response() {
-        let xml = get_xml("response/domain/transfer_query.xml").unwrap();
-        let object =
-            <DomainTransfer as Transaction<NoExtension>>::deserialize_response(xml.as_str())
-                .unwrap();
+        let object = response_from_file::<DomainTransfer>("response/domain/transfer_query.xml");
 
         let result = object.res_data().unwrap();
 

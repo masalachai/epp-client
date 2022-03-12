@@ -97,8 +97,7 @@ pub struct NameStoreData<'a> {
 mod tests {
     use super::NameStore;
     use crate::domain::check::DomainCheck;
-    use crate::request::Transaction;
-    use crate::tests::{assert_serialized, get_xml};
+    use crate::tests::{assert_serialized, response_from_file_with_ext};
 
     #[test]
     fn command() {
@@ -116,13 +115,10 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/extensions/namestore.xml").unwrap();
-
-        let object =
-            <DomainCheck as Transaction<NameStore>>::deserialize_response(xml.as_str()).unwrap();
-
+        let object = response_from_file_with_ext::<DomainCheck, NameStore>(
+            "response/extensions/namestore.xml",
+        );
         let ext = object.extension.unwrap();
-
         assert_eq!(ext.data.subproduct, "com".into());
     }
 }

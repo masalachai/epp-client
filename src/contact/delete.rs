@@ -45,10 +45,8 @@ impl<'a> ContactDelete<'a> {
 #[cfg(test)]
 mod tests {
     use super::ContactDelete;
-    use crate::common::NoExtension;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -58,11 +56,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/contact/delete.xml").unwrap();
-        let object =
-            <ContactDelete as Transaction<NoExtension>>::deserialize_response(xml.as_str())
-                .unwrap();
-
+        let object = response_from_file::<ContactDelete>("response/contact/delete.xml");
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());

@@ -107,10 +107,8 @@ mod tests {
     use chrono::{TimeZone, Utc};
 
     use super::ContactInfo;
-    use crate::common::NoExtension;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -120,9 +118,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/contact/info.xml").unwrap();
-        let object =
-            <ContactInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
+        let object = response_from_file::<ContactInfo>("response/contact/info.xml");
 
         let result = object.res_data().unwrap();
         let fax = result.info_data.fax.as_ref().unwrap();

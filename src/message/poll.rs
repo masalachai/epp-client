@@ -52,9 +52,8 @@ pub struct MessagePollResponse {
 mod tests {
     use super::MessagePoll;
     use crate::message::poll::MessageData;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SVTRID};
 
     use chrono::{TimeZone, Utc};
     use std::net::IpAddr;
@@ -67,9 +66,7 @@ mod tests {
 
     #[test]
     fn domain_transfer_response() {
-        let xml = get_xml("response/message/poll_domain_transfer.xml").unwrap();
-        let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
-
+        let object = response_from_file::<MessagePoll>("response/message/poll_domain_transfer.xml");
         let result = object.res_data().unwrap();
         let msg = object.message_queue().unwrap();
 
@@ -110,9 +107,7 @@ mod tests {
 
     #[test]
     fn host_info_response() {
-        let xml = get_xml("response/message/poll_host_info.xml").unwrap();
-        let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
-
+        let object = response_from_file::<MessagePoll>("response/message/poll_host_info.xml");
         let result = object.res_data().unwrap();
         let msg = object.message_queue().unwrap();
 
@@ -159,9 +154,7 @@ mod tests {
 
     #[test]
     fn message_only_response() {
-        let xml = get_xml("response/message/poll_message_only.xml").unwrap();
-        let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
-
+        let object = response_from_file::<MessagePoll>("response/message/poll_message_only.xml");
         let msg = object.message_queue().unwrap();
 
         assert_eq!(
@@ -187,8 +180,7 @@ mod tests {
 
     #[test]
     fn empty_queue_response() {
-        let xml = get_xml("response/message/poll_empty_queue.xml").unwrap();
-        let object = MessagePoll::deserialize_response(xml.as_str()).unwrap();
+        let object = response_from_file::<MessagePoll>("response/message/poll_empty_queue.xml");
 
         assert_eq!(
             object.result.code,

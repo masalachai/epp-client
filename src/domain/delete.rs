@@ -45,10 +45,8 @@ pub struct DomainDelete<'a> {
 #[cfg(test)]
 mod tests {
     use super::DomainDelete;
-    use crate::common::NoExtension;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -58,9 +56,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/domain/delete.xml").unwrap();
-        let object =
-            <DomainDelete as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
+        let object = response_from_file::<DomainDelete>("response/domain/delete.xml");
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
