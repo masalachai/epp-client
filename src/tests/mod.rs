@@ -6,7 +6,7 @@ use regex::Regex;
 
 use crate::{
     client::RequestData,
-    request::{Command, Extension, Transaction},
+    request::{Command, CommandDocument, Extension, Transaction},
     xml::EppXml,
 };
 
@@ -44,7 +44,7 @@ pub(crate) fn assert_serialized<'c, 'e, Cmd, Ext>(
 {
     let expected = get_xml(path).unwrap();
     let req = req.into();
-    let document = <Cmd as Transaction<Ext>>::command(req.command, req.extension, CLTRID);
+    let document = CommandDocument::new(req.command, req.extension, CLTRID);
     let actual = EppXml::serialize(&document).unwrap();
     assert_eq!(expected, actual);
 }
