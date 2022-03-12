@@ -70,9 +70,8 @@ mod tests {
     use super::{RgpRestoreRequest, Update};
     use crate::domain::info::DomainInfo;
     use crate::domain::update::{DomainChangeInfo, DomainUpdate};
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file_with_ext, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn request_command() {
@@ -97,13 +96,9 @@ mod tests {
 
     #[test]
     fn request_response() {
-        let xml = get_xml("response/extensions/rgp_restore.xml").unwrap();
-        let object =
-            <DomainUpdate as Transaction<Update<RgpRestoreRequest>>>::deserialize_response(
-                xml.as_str(),
-            )
-            .unwrap();
-
+        let object = response_from_file_with_ext::<DomainUpdate, Update<RgpRestoreRequest>>(
+            "response/extensions/rgp_restore.xml",
+        );
         let ext = object.extension.unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
@@ -114,12 +109,9 @@ mod tests {
 
     #[test]
     fn domain_info_request_response() {
-        let xml = get_xml("response/extensions/domain_info_rgp.xml").unwrap();
-        let object = <DomainInfo as Transaction<Update<RgpRestoreRequest>>>::deserialize_response(
-            xml.as_str(),
-        )
-        .unwrap();
-
+        let object = response_from_file_with_ext::<DomainInfo, Update<RgpRestoreRequest>>(
+            "response/extensions/domain_info_rgp.xml",
+        );
         let ext = object.extension.unwrap();
 
         assert_eq!(ext.data.rgp_status[0].status, "addPeriod");

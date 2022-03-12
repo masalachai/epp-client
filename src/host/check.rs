@@ -57,10 +57,8 @@ pub struct HostCheck<'a> {
 #[cfg(test)]
 mod tests {
     use super::HostCheck;
-    use crate::common::NoExtension;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -72,10 +70,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/host/check.xml").unwrap();
-        let object =
-            <HostCheck as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
-
+        let object = response_from_file::<HostCheck>("response/host/check.xml");
         let result = object.res_data().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);

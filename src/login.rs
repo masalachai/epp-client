@@ -67,9 +67,8 @@ impl<'a> Command for Login<'a> {
 #[cfg(test)]
 mod tests {
     use super::Login;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -80,9 +79,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/login.xml").unwrap();
-        let object = Login::deserialize_response(xml.as_str()).unwrap();
-
+        let object = response_from_file::<Login>("response/login.xml");
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());

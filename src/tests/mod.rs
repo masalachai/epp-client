@@ -6,7 +6,9 @@ use regex::Regex;
 
 use crate::{
     client::RequestData,
+    common::NoExtension,
     request::{Command, CommandDocument, Extension, Transaction},
+    response::{Response, ResponseDocument},
     xml::EppXml,
 };
 
@@ -47,4 +49,27 @@ pub(crate) fn assert_serialized<'c, 'e, Cmd, Ext>(
     let document = CommandDocument::new(req.command, req.extension, CLTRID);
     let actual = EppXml::serialize(&document).unwrap();
     assert_eq!(expected, actual);
+}
+
+pub(crate) fn response_from_file<'c, Cmd>(
+    path: &str,
+) -> Response<Cmd::Response, <NoExtension as Extension>::Response>
+where
+    Cmd: Transaction<NoExtension> + Command + 'c,
+{
+    response_from_file_with_ext::<Cmd, NoExtension>(path)
+}
+
+pub(crate) fn response_from_file_with_ext<Cmd, Ext>(
+    path: &str,
+) -> Response<Cmd::Response, Ext::Response>
+where
+    Cmd: Transaction<NoExtension> + Command,
+    Ext: Extension,
+{
+    let xml = get_xml(path).unwrap();
+    let rsp =
+        <ResponseDocument<Cmd::Response, Ext::Response> as EppXml>::deserialize(&xml).unwrap();
+    assert!(rsp.data.result.code.is_success());
+    rsp.data
 }

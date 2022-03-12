@@ -108,11 +108,10 @@ pub struct ContactUpdate<'a> {
 #[cfg(test)]
 mod tests {
     use super::{ContactUpdate, Phone, PostalInfo};
-    use crate::common::{NoExtension, ObjectStatus};
+    use crate::common::ObjectStatus;
     use crate::contact::Address;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -138,11 +137,7 @@ mod tests {
 
     #[test]
     fn contact_update() {
-        let xml = get_xml("response/contact/update.xml").unwrap();
-        let object =
-            <ContactUpdate as Transaction<NoExtension>>::deserialize_response(xml.as_str())
-                .unwrap();
-
+        let object = response_from_file::<ContactUpdate>("response/contact/update.xml");
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
         assert_eq!(object.result.message, SUCCESS_MSG.into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());

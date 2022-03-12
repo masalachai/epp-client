@@ -109,10 +109,8 @@ mod tests {
     use chrono::{TimeZone, Utc};
 
     use super::{HostInfo, IpAddr};
-    use crate::common::NoExtension;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -122,10 +120,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/host/info.xml").unwrap();
-        let object =
-            <HostInfo as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
-
+        let object = response_from_file::<HostInfo>("response/host/info.xml");
         let result = object.res_data().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);

@@ -78,10 +78,8 @@ pub struct DomainRenewResponse {
 #[cfg(test)]
 mod tests {
     use super::{DomainRenew, Period};
-    use crate::common::NoExtension;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, CLTRID, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
     use chrono::{NaiveDate, TimeZone, Utc};
 
@@ -94,9 +92,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/domain/renew.xml").unwrap();
-        let object =
-            <DomainRenew as Transaction<NoExtension>>::deserialize_response(xml.as_str()).unwrap();
+        let object = response_from_file::<DomainRenew>("response/domain/renew.xml");
 
         let result = object.res_data().unwrap();
 

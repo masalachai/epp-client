@@ -34,9 +34,8 @@ impl<'a> MessageAck<'a> {
 #[cfg(test)]
 mod tests {
     use super::MessageAck;
-    use crate::request::Transaction;
     use crate::response::ResultCode;
-    use crate::tests::{assert_serialized, get_xml, SUCCESS_MSG, SVTRID};
+    use crate::tests::{assert_serialized, response_from_file, SUCCESS_MSG, SVTRID};
 
     #[test]
     fn command() {
@@ -46,9 +45,7 @@ mod tests {
 
     #[test]
     fn response() {
-        let xml = get_xml("response/message/ack.xml").unwrap();
-        let object = MessageAck::deserialize_response(xml.as_str()).unwrap();
-
+        let object = response_from_file::<MessageAck>("response/message/ack.xml");
         let msg = object.message_queue().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
