@@ -19,7 +19,7 @@ pub use crate::connection::Connector;
 use crate::connection::{self, EppConnection};
 use crate::error::Error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
-use crate::request::{Command, Extension, Transaction};
+use crate::request::{Command, CommandDocument, Extension, Transaction};
 use crate::response::Response;
 use crate::xml::EppXml;
 
@@ -126,7 +126,7 @@ impl<C: Connector> EppClient<C> {
         Ext: Extension + 'e,
     {
         let data = data.into();
-        let document = <Cmd as Transaction<Ext>>::command(data.command, data.extension, id);
+        let document = CommandDocument::new(data.command, data.extension, id);
         let xml = document.serialize()?;
 
         debug!("{}: request: {}", self.connection.registry, &xml);

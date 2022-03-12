@@ -15,19 +15,6 @@ pub const EPP_LANG: &str = "en";
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
 pub trait Transaction<Ext: Extension>: Command + Sized {
-    fn command<'c, 'e: 'c, 'i: 'c>(
-        &'c self,
-        extension: Option<&'e Ext>,
-        client_tr_id: &'i str,
-    ) -> CommandDocument<'c, Self, Ext> {
-        CommandDocument::new(CommandWrapper {
-            command: Self::COMMAND,
-            data: self,
-            extension,
-            client_tr_id: client_tr_id.into(),
-        })
-    }
-
     fn deserialize_response(
         epp_xml: &str,
     ) -> Result<Response<Self::Response, Ext::Response>, Error> {
@@ -55,7 +42,7 @@ pub trait Extension: Serialize + Debug {
 #[derive(Debug, PartialEq)]
 /// Type corresponding to the &lt;command&gt; tag in an EPP XML request
 /// with an &lt;extension&gt; tag
-pub struct CommandWrapper<'a, D, E> {
+struct CommandWrapper<'a, D, E> {
     pub command: &'static str,
     /// The instance that will be used to populate the &lt;command&gt; tag
     pub data: &'a D,
@@ -80,16 +67,25 @@ impl<'a, D: Serialize, E: Serialize> Serialize for CommandWrapper<'a, D, E> {
 
 #[derive(Debug, PartialEq, Serialize)]
 #[serde(rename = "epp")]
-pub struct CommandDocument<'a, D, E> {
+pub(crate) struct CommandDocument<'a, Cmd, Ext> {
     xmlns: &'static str,
-    command: CommandWrapper<'a, D, E>,
+    command: CommandWrapper<'a, Cmd, Ext>,
 }
 
-impl<'a, D, E> CommandDocument<'a, D, E> {
-    pub fn new(command: CommandWrapper<'a, D, E>) -> Self {
+impl<'a, Cmd, Ext> CommandDocument<'a, Cmd, Ext> {
+    pub(crate) fn new(data: &'a Cmd, extension: Option<&'a Ext>, client_tr_id: &'a str) -> Self
+    where
+        Cmd: Transaction<Ext>,
+        Ext: Extension,
+    {
         Self {
             xmlns: EPP_XMLNS,
-            command,
+            command: CommandWrapper {
+                command: Cmd::COMMAND,
+                data,
+                extension,
+                client_tr_id: client_tr_id.into(),
+            },
         }
     }
 }
