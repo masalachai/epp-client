@@ -3,10 +3,9 @@
 use std::fmt::{self, Debug};
 
 use chrono::{DateTime, Utc};
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::Deserialize;
 
 use crate::common::StringValue;
-use crate::xml::EppXml;
 
 /// Type corresponding to the <undef> tag an EPP response XML
 #[derive(Deserialize, Debug, PartialEq)]
@@ -218,16 +217,12 @@ pub struct ResponseDocument<D, E> {
     pub data: Response<D, E>,
 }
 
-impl<D: DeserializeOwned, E: DeserializeOwned> EppXml for ResponseDocument<D, E> {}
-
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(rename = "epp")]
 pub struct ResultDocument {
     #[serde(rename = "response")]
     pub data: ResponseStatus,
 }
-
-impl EppXml for ResultDocument {}
 
 #[derive(Deserialize, Debug, PartialEq)]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
@@ -261,12 +256,12 @@ impl<T, E> Response<T, E> {
 mod tests {
     use super::{ResultCode, ResultDocument};
     use crate::tests::{get_xml, CLTRID, SVTRID};
-    use crate::xml::EppXml;
+    use crate::xml;
 
     #[test]
     fn error() {
         let xml = get_xml("response/error.xml").unwrap();
-        let object = ResultDocument::deserialize(xml.as_str()).unwrap();
+        let object = xml::deserialize::<ResultDocument>(xml.as_str()).unwrap();
 
         assert_eq!(object.data.result.code, ResultCode::ObjectDoesNotExist);
         assert_eq!(object.data.result.message, "Object does not exist".into());

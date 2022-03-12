@@ -9,7 +9,7 @@ use crate::{
     common::NoExtension,
     request::{Command, CommandDocument, Extension, Transaction},
     response::{Response, ResponseDocument},
-    xml::EppXml,
+    xml,
 };
 
 pub(crate) const RESOURCES_DIR: &str = "./tests/resources";
@@ -47,8 +47,7 @@ pub(crate) fn assert_serialized<'c, 'e, Cmd, Ext>(
     let expected = get_xml(path).unwrap();
     let req = req.into();
     let document = CommandDocument::new(req.command, req.extension, CLTRID);
-    let actual = EppXml::serialize(&document).unwrap();
-    assert_eq!(expected, actual);
+    assert_eq!(expected, xml::serialize(&document).unwrap());
 }
 
 pub(crate) fn response_from_file<'c, Cmd>(
@@ -68,8 +67,7 @@ where
     Ext: Extension,
 {
     let xml = get_xml(path).unwrap();
-    let rsp =
-        <ResponseDocument<Cmd::Response, Ext::Response> as EppXml>::deserialize(&xml).unwrap();
+    let rsp = xml::deserialize::<ResponseDocument<Cmd::Response, Ext::Response>>(&xml).unwrap();
     assert!(rsp.data.result.code.is_success());
     rsp.data
 }
