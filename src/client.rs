@@ -21,7 +21,7 @@ use crate::error::Error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
 use crate::request::{Command, CommandDocument, Extension, Transaction};
 use crate::response::{Response, ResponseDocument, ResponseStatus};
-use crate::xml::EppXml;
+use crate::xml;
 
 /// An `EppClient` provides an interface to sending EPP requests to a registry
 ///
@@ -107,13 +107,13 @@ impl<C: Connector> EppClient<C> {
 
     /// Executes an EPP Hello call and returns the response as a `Greeting`
     pub async fn hello(&mut self) -> Result<Greeting, Error> {
-        let hello_xml = HelloDocument::default().serialize()?;
+        let xml = xml::serialize(&HelloDocument::default())?;
 
-        debug!("{}: hello: {}", self.connection.registry, &hello_xml);
-        let response = self.connection.transact(&hello_xml)?.await?;
+        debug!("{}: hello: {}", self.connection.registry, &xml);
+        let response = self.connection.transact(&xml)?.await?;
         debug!("{}: greeting: {}", self.connection.registry, &response);
 
-        Ok(GreetingDocument::deserialize(&response)?.data)
+        Ok(xml::deserialize::<GreetingDocument>(&response)?.data)
     }
 
     pub async fn transact<'c, 'e, Cmd, Ext>(
@@ -127,14 +127,13 @@ impl<C: Connector> EppClient<C> {
     {
         let data = data.into();
         let document = CommandDocument::new(data.command, data.extension, id);
-        let xml = document.serialize()?;
+        let xml = xml::serialize(&document)?;
 
         debug!("{}: request: {}", self.connection.registry, &xml);
         let response = self.connection.transact(&xml)?.await?;
         debug!("{}: response: {}", self.connection.registry, &response);
 
-        let rsp =
-            <ResponseDocument<Cmd::Response, Ext::Response> as EppXml>::deserialize(&response)?;
+        let rsp = xml::deserialize::<ResponseDocument<Cmd::Response, Ext::Response>>(&response)?;
         if rsp.data.result.code.is_success() {
             return Ok(rsp.data);
         }
@@ -161,7 +160,7 @@ impl<C: Connector> EppClient<C> {
 
     /// Returns the greeting received on establishment of the connection as an `Greeting`
     pub fn greeting(&self) -> Result<Greeting, Error> {
-        GreetingDocument::deserialize(&self.connection.greeting).map(|obj| obj.data)
+        xml::deserialize::<GreetingDocument>(&self.connection.greeting).map(|obj| obj.data)
     }
 
     pub async fn reconnect(&mut self) -> Result<(), Error> {

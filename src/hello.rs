@@ -4,7 +4,6 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::common::{Options, ServiceExtension, Services, StringValue, EPP_XMLNS};
-use crate::xml::EppXml;
 
 // Request
 
@@ -26,8 +25,6 @@ impl Default for HelloDocument {
         }
     }
 }
-
-impl EppXml for HelloDocument {}
 
 // Response
 
@@ -302,20 +299,18 @@ pub struct GreetingDocument {
     pub data: Greeting,
 }
 
-impl EppXml for GreetingDocument {}
-
 #[cfg(test)]
 mod tests {
     use chrono::{TimeZone, Utc};
 
     use super::{ExpiryType, GreetingDocument, HelloDocument, Relative};
     use crate::tests::get_xml;
-    use crate::xml::EppXml;
+    use crate::xml;
 
     #[test]
     fn hello() {
         let xml = get_xml("request/hello.xml").unwrap();
-        let serialized = HelloDocument::default().serialize().unwrap();
+        let serialized = xml::serialize(&HelloDocument::default()).unwrap();
 
         assert_eq!(xml, serialized);
     }
@@ -323,7 +318,7 @@ mod tests {
     #[test]
     fn greeting() {
         let xml = get_xml("response/greeting.xml").unwrap();
-        let object = GreetingDocument::deserialize(xml.as_str()).unwrap();
+        let object = xml::deserialize::<GreetingDocument>(xml.as_str()).unwrap();
 
         assert_eq!(object.data.service_id, "ISPAPI EPP Server");
         assert_eq!(

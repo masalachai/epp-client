@@ -3,10 +3,7 @@
 use serde::{de::DeserializeOwned, ser::SerializeStruct, ser::Serializer, Serialize};
 use std::fmt::Debug;
 
-use crate::{
-    common::{StringValue, EPP_XMLNS},
-    xml::EppXml,
-};
+use crate::common::{StringValue, EPP_XMLNS};
 
 pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
@@ -73,5 +70,3 @@ impl<'a, Cmd, Ext> CommandDocument<'a, Cmd, Ext> {
         }
     }
 }
-
-impl<'a, D: Serialize, E: Serialize> EppXml for CommandDocument<'a, D, E> {}
