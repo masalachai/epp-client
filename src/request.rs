@@ -5,30 +5,14 @@ use std::fmt::Debug;
 
 use crate::{
     common::{StringValue, EPP_XMLNS},
-    response::{Response, ResponseDocument, ResponseStatus},
     xml::EppXml,
-    Error,
 };
 
 pub const EPP_VERSION: &str = "1.0";
 pub const EPP_LANG: &str = "en";
 
 /// Trait to set correct value for xml tags when tags are being generated from generic types
-pub trait Transaction<Ext: Extension>: Command + Sized {
-    fn deserialize_response(
-        epp_xml: &str,
-    ) -> Result<Response<Self::Response, Ext::Response>, Error> {
-        let rsp =
-            <ResponseDocument<Self::Response, Ext::Response> as EppXml>::deserialize(epp_xml)?;
-        match rsp.data.result.code.is_success() {
-            true => Ok(rsp.data),
-            false => Err(crate::error::Error::Command(ResponseStatus {
-                result: rsp.data.result,
-                tr_ids: rsp.data.tr_ids,
-            })),
-        }
-    }
-}
+pub trait Transaction<Ext: Extension>: Command + Sized {}
 
 pub trait Command: Serialize + Debug {
     type Response: DeserializeOwned + Debug;
