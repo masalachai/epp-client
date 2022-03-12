@@ -20,7 +20,7 @@ use crate::connection::{self, EppConnection};
 use crate::error::Error;
 use crate::hello::{Greeting, GreetingDocument, HelloDocument};
 use crate::request::{Command, CommandDocument, Extension, Transaction};
-use crate::response::Response;
+use crate::response::{Response, ResponseDocument, ResponseStatus};
 use crate::xml::EppXml;
 
 /// An `EppClient` provides an interface to sending EPP requests to a registry
@@ -133,13 +133,19 @@ impl<C: Connector> EppClient<C> {
         let response = self.connection.transact(&xml)?.await?;
         debug!("{}: response: {}", self.connection.registry, &response);
 
-        match Cmd::deserialize_response(&response) {
-            Ok(response) => Ok(response),
-            Err(e) => {
-                error!(%response, "Failed to deserialize response: {}", e);
-                Err(e)
-            }
+        let rsp =
+            <ResponseDocument<Cmd::Response, Ext::Response> as EppXml>::deserialize(&response)?;
+        if rsp.data.result.code.is_success() {
+            return Ok(rsp.data);
         }
+
+        let err = crate::error::Error::Command(ResponseStatus {
+            result: rsp.data.result,
+            tr_ids: rsp.data.tr_ids,
+        });
+
+        error!(%response, "Failed to deserialize response for transaction: {}", err);
+        Err(err)
     }
 
     /// Accepts raw EPP XML and returns the raw EPP XML response to it.
