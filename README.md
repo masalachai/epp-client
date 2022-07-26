@@ -43,7 +43,7 @@ to eventually be RFC compliant with the EPP protocol.
 Just add the following to your project's `Cargo.toml`
 
 ```toml
-epp-client = "0.3"
+epp-client = "0.4"
 ```
 
 ## Operation
@@ -51,88 +51,42 @@ epp-client = "0.3"
 You can create a mut variable of type `EppClient` with the domain registry config.
 
 ```rust
-use std::collections::HashMap;
+use std::net::ToSocketAddrs;
+use std::time::Duration;
 
-use epp_client::config::{EppClientConfig, RegistryConfig};
 use epp_client::EppClient;
-use epp_client::domain::check::DomainCheck;
-use epp_client::common::NoExtension;
+use epp_client::domain::DomainCheck;
 use epp_client::login::Login;
-use epp_client::logout::Logout;
 
 #[tokio::main]
 async fn main() {
-    // Configure the client to connect to one of more registries
-    let mut registry: HashMap<String, RegistryConfig> = HashMap::new();
-    registry.insert(
-        "registry_name".to_owned(),
-        RegistryConfig {
-            host: "example.com".to_owned(),
-            port: 700,
-            tls_files: None,
-        },
-    );
-    let config = EppClientConfig { registry };
-
-    // Create an instance of EppClient, passing the config and the registry you want to connect to
-    let mut client = match EppClient::new(&config, "registry_name").await {
+    // Create an instance of EppClient
+    let host = "example.com";
+    let addr = (host, 700).to_socket_addrs().unwrap().next().unwrap();
+    let timeout = Duration::from_secs(5);
+    let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None, timeout).await {
         Ok(client) => client,
         Err(e) => panic!("Failed to create EppClient: {}",  e)
     };
 
-    let login = Login::<NoExtension>::new("username", "password", None);
-    client.transact(login, "transaction-id").await.unwrap();
+    let login = Login::new("username", "password", None);
+    client.transact(&login, "transaction-id").await.unwrap();
 
-    // Create an DomainCheck instance
-    let domain_check = DomainCheck::<NoExtension>::new(
-        vec!["eppdev-100.com", "eppdev-100.net"],
-    );
+    // Execute an EPP Command against the registry with distinct request and response objects
+    let domain_check = DomainCheck { domains: &["eppdev.com", "eppdev.net"] };
+    let response = client.transact(&domain_check, "transaction-id").await.unwrap();
 
-    // send it to the registry and receive a response of type EppDomainCheckResponse
-    let response = client.transact(domain_check, "transaction-id").await.unwrap();
-
-    println!("{:?}", response);
-
-    let logout = Logout::<NoExtension>::new();
-    client.transact(logout, "transaction-id").await.unwrap();
+    response.res_data.unwrap().list
+        .iter()
+        .for_each(|chk| println!("Domain: {}, Available: {}", chk.id, chk.available));
 }
 ```
 
-The output would look similar to the following:
+The output would look like this:
 
-```
+```text
 Domain: eppdev.com, Available: 1
 Domain: eppdev.net, Available: 1
-```
-
-You may also choose to store your configuration in something like a toml file:
-
-```toml
-[registry.verisign]
-host = 'epp.verisign-grs.com'
-port = 700
-username = 'username'
-password = 'password'
-# service extensions
-ext_uris = []
-
-[registry.verisign.tls_files]
-# the full client certificate chain in PEM format
-cert_chain = '/path/to/certificate/chain/pemfile'
-# the RSA private key for your certificate
-key = '/path/to/private/key/pemfile'
-```
-
-```rust
-use epp_client::config::{EppClientConfig};
-
-#[tokio::main]
-async fn main() {
-    // parse EppClientConfig from toml file
-    let config_path = Path::new("../secrets/epp-client.toml");
-    let config: EppClientConfig =
-        toml::from_str(&fs::read_to_string(config_path).await.unwrap()).unwrap();
-}
 ```
 
 ## Request

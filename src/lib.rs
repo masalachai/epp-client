@@ -55,6 +55,44 @@
 //!
 //! ## Operation
 //!
+//! ```no_run
+//! use std::net::ToSocketAddrs;
+//! use std::time::Duration;
+//!
+//! use epp_client::EppClient;
+//! use epp_client::domain::DomainCheck;
+//! use epp_client::login::Login;
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     // Create an instance of EppClient
+//!     let host = "example.com";
+//!     let addr = (host, 700).to_socket_addrs().unwrap().next().unwrap();
+//!     let timeout = Duration::from_secs(5);
+//!     let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None, timeout).await {
+//!         Ok(client) => client,
+//!         Err(e) => panic!("Failed to create EppClient: {}",  e)
+//!     };
+//!
+//!     let login = Login::new("username", "password", None);
+//!     client.transact(&login, "transaction-id").await.unwrap();
+//!
+//!     // Execute an EPP Command against the registry with distinct request and response objects
+//!     let domain_check = DomainCheck { domains: &["eppdev.com", "eppdev.net"] };
+//!     let response = client.transact(&domain_check, "transaction-id").await.unwrap();
+//!
+//!     response.res_data.unwrap().list
+//!         .iter()
+//!         .for_each(|chk| println!("Domain: {}, Available: {}", chk.id, chk.available));
+//! }
+//! ```
+//!
+//! The output would look similar to the following
+//!
+//! ```text
+//! Domain: eppdev.com, Available: 1
+//! Domain: eppdev.net, Available: 1
+//! ```
 
 pub mod client;
 pub mod common;

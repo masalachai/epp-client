@@ -83,6 +83,7 @@ steps:
       branch:
         - 0.2
         - 0.3
+        - 0.4
       event: push
 
   - name: notify

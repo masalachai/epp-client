@@ -2,5 +2,5 @@
 **/target
 **/certs
 /config
-/epp-client/examples
+/examples
 Cargo.lock
