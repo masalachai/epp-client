@@ -19,14 +19,14 @@ pub struct MessageAck<'a> {
     op: &'a str,
     /// The ID of the message to be acknowledged
     #[serde(rename = "msgID")]
-    message_id: String,
+    message_id: &'a str,
 }
 
 impl<'a> MessageAck<'a> {
-    pub fn new(message_id: u32) -> Self {
+    pub fn new(message_id: &'a str) -> Self {
         Self {
             op: "ack",
-            message_id: message_id.to_string(),
+            message_id,
         }
     }
 }
@@ -39,7 +39,7 @@ mod tests {
 
     #[test]
     fn command() {
-        let object = MessageAck::new(12345);
+        let object = MessageAck::new("12345");
         assert_serialized("request/message/ack.xml", &object);
     }
 
