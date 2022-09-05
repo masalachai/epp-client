@@ -19,6 +19,9 @@ pub struct Login<'a> {
     /// The password to use for the login
     #[serde(rename = "pw", default)]
     password: StringValue<'a>,
+    /// A new password which should be set
+    #[serde(rename = "newPW", default, skip_serializing_if = "Option::is_none")]
+    new_password: Option<StringValue<'a>>,
     /// Data under the <options> tag
     options: Options<'a>,
     /// Data under the <svcs> tag
@@ -27,12 +30,13 @@ pub struct Login<'a> {
 }
 
 impl<'a> Login<'a> {
-    pub fn new(username: &'a str, password: &'a str, ext_uris: Option<&'_ [&'a str]>) -> Self {
+    pub fn new(username: &'a str, password: &'a str, new_password: Option<&'a str>, ext_uris: Option<&'_ [&'a str]>) -> Self {
         let ext_uris = ext_uris.map(|uris| uris.iter().map(|&u| u.into()).collect());
 
         Self {
             username: username.into(),
             password: password.into(),
+            new_password: new_password.map(Into::into),
             options: Options {
                 version: EPP_VERSION.into(),
                 lang: EPP_LANG.into(),
@@ -73,7 +77,7 @@ mod tests {
     #[test]
     fn command() {
         let ext_uris = Some(&["http://schema.ispapi.net/epp/xml/keyvalue-1.0"][..]);
-        let object = Login::new("username", "password", ext_uris);
+        let object = Login::new("username", "password", Some("new-password"), ext_uris);
         assert_serialized("request/login.xml", &object);
     }
 
