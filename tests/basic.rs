@@ -109,6 +109,7 @@ async fn client() {
             &Login::new(
                 "username",
                 "password",
+                None,
                 Some(&["http://schema.ispapi.net/epp/xml/keyvalue-1.0"]),
             ),
             CLTRID,
@@ -184,6 +185,7 @@ async fn dropped() {
             &Login::new(
                 "username",
                 "password",
+                None,
                 Some(&["http://schema.ispapi.net/epp/xml/keyvalue-1.0"]),
             ),
             CLTRID,
