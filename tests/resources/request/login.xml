@@ -4,6 +4,7 @@
         <login>
             <clID>username</clID>
             <pw>password</pw>
+            <newPW>new-password</newPW>
             <options>
                 <version>1.0</version>
                 <lang>en</lang>
