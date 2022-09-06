@@ -30,7 +30,12 @@ pub struct Login<'a> {
 }
 
 impl<'a> Login<'a> {
-    pub fn new(username: &'a str, password: &'a str, new_password: Option<&'a str>, ext_uris: Option<&'_ [&'a str]>) -> Self {
+    pub fn new(
+        username: &'a str,
+        password: &'a str,
+        new_password: Option<&'a str>,
+        ext_uris: Option<&'_ [&'a str]>,
+    ) -> Self {
         let ext_uris = ext_uris.map(|uris| uris.iter().map(|&u| u.into()).collect());
 
         Self {
