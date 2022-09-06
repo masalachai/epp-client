@@ -74,7 +74,7 @@
 //!         Err(e) => panic!("Failed to create EppClient: {}",  e)
 //!     };
 //!
-//!     let login = Login::new("username", "password", None);
+//!     let login = Login::new("username", "password", None, None);
 //!     client.transact(&login, "transaction-id").await.unwrap();
 //!
 //!     // Execute an EPP Command against the registry with distinct request and response objects
