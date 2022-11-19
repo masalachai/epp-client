@@ -161,7 +161,7 @@ mod tests {
         assert_eq!(result.info_data.creator_id, "SYSTEM".into());
         assert_eq!(
             result.info_data.created_at,
-            Utc.ymd(2021, 7, 23).and_hms(13, 9, 9)
+            Utc.with_ymd_and_hms(2021, 7, 23, 13, 9, 9).unwrap(),
         );
         assert_eq!(
             *(result.info_data.updater_id.as_ref().unwrap()),
@@ -169,7 +169,7 @@ mod tests {
         );
         assert_eq!(
             result.info_data.updated_at,
-            Some(Utc.ymd(2021, 7, 23).and_hms(13, 9, 9))
+            Utc.with_ymd_and_hms(2021, 7, 23, 13, 9, 9).single()
         );
         assert_eq!((*auth_info).password, "eppdev-387323".into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());

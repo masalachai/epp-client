@@ -140,7 +140,7 @@ mod tests {
         assert_eq!(result.info_data.creator_id, "creator".into());
         assert_eq!(
             result.info_data.created_at,
-            Utc.ymd(2021, 7, 26).and_hms(5, 28, 55)
+            Utc.with_ymd_and_hms(2021, 7, 26, 5, 28, 55).unwrap()
         );
         assert_eq!(
             *(result.info_data.updater_id.as_ref().unwrap()),
@@ -148,7 +148,7 @@ mod tests {
         );
         assert_eq!(
             result.info_data.updated_at,
-            Some(Utc.ymd(2021, 7, 26).and_hms(5, 28, 55))
+            Utc.with_ymd_and_hms(2021, 7, 26, 5, 28, 55).single()
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

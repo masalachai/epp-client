@@ -226,11 +226,11 @@ mod tests {
         assert_eq!(result.create_data.name, "eppdev-2.com".into());
         assert_eq!(
             result.create_data.created_at,
-            Utc.ymd(2021, 7, 25).and_hms(18, 11, 35)
+            Utc.with_ymd_and_hms(2021, 7, 25, 18, 11, 35).unwrap()
         );
         assert_eq!(
             *result.create_data.expiring_at.as_ref().unwrap(),
-            Utc.ymd(2022, 7, 25).and_hms(18, 11, 34)
+            Utc.with_ymd_and_hms(2022, 7, 25, 18, 11, 34).unwrap()
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

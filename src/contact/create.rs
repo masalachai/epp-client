@@ -138,7 +138,7 @@ mod tests {
         assert_eq!(results.create_data.id, "eppdev-contact-4".into());
         assert_eq!(
             results.create_data.created_at,
-            Utc.ymd(2021, 7, 25).and_hms(16, 5, 32)
+            Utc.with_ymd_and_hms(2021, 7, 25, 16, 5, 32).unwrap(),
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
