@@ -85,7 +85,7 @@ mod tests {
 
     #[test]
     fn command() {
-        let exp_date = NaiveDate::from_ymd(2022, 7, 23);
+        let exp_date = NaiveDate::from_ymd_opt(2022, 7, 23).unwrap();
         let object = DomainRenew::new("eppdev.com", exp_date, Period::years(1).unwrap());
         assert_serialized("request/domain/renew.xml", &object);
     }
@@ -101,7 +101,7 @@ mod tests {
         assert_eq!(result.renew_data.name, "eppdev-1.com".into());
         assert_eq!(
             *result.renew_data.expiring_at.as_ref().unwrap(),
-            Utc.ymd(2024, 7, 23).and_hms(15, 31, 20)
+            Utc.with_ymd_and_hms(2024, 7, 23, 15, 31, 20).unwrap()
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

@@ -180,7 +180,7 @@ mod tests {
         );
         assert_eq!(
             *result.info_data.created_at.as_ref().unwrap(),
-            Utc.ymd(2021, 7, 23).and_hms(15, 31, 20)
+            Utc.with_ymd_and_hms(2021, 7, 23, 15, 31, 20).unwrap()
         );
         assert_eq!(
             *result.info_data.updater_id.as_ref().unwrap(),
@@ -188,11 +188,11 @@ mod tests {
         );
         assert_eq!(
             *result.info_data.updated_at.as_ref().unwrap(),
-            Utc.ymd(2021, 7, 23).and_hms(15, 31, 21)
+            Utc.with_ymd_and_hms(2021, 7, 23, 15, 31, 21).unwrap()
         );
         assert_eq!(
             *result.info_data.expiring_at.as_ref().unwrap(),
-            Utc.ymd(2023, 7, 23).and_hms(15, 31, 20)
+            Utc.with_ymd_and_hms(2023, 7, 23, 15, 31, 20).unwrap()
         );
         assert_eq!((*auth_info).password, "epP4uthd#v".into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());

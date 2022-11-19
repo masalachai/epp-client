@@ -189,16 +189,16 @@ mod tests {
         assert_eq!(result.transfer_data.requester_id, "eppdev".into());
         assert_eq!(
             result.transfer_data.requested_at,
-            Utc.ymd(2021, 7, 23).and_hms(15, 31, 21),
+            Utc.with_ymd_and_hms(2021, 7, 23, 15, 31, 21).unwrap(),
         );
         assert_eq!(result.transfer_data.ack_id, "ClientY".into());
         assert_eq!(
             result.transfer_data.ack_by,
-            Utc.ymd(2021, 7, 28).and_hms(15, 31, 21)
+            Utc.with_ymd_and_hms(2021, 7, 28, 15, 31, 21).unwrap()
         );
         assert_eq!(
             result.transfer_data.expiring_at,
-            Some(Utc.ymd(2022, 7, 2).and_hms(14, 53, 19)),
+            Utc.with_ymd_and_hms(2022, 7, 2, 14, 53, 19).single(),
         );
         assert_eq!(*object.tr_ids.client_tr_id.as_ref().unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
@@ -247,16 +247,16 @@ mod tests {
         assert_eq!(result.transfer_data.requester_id, "eppdev".into());
         assert_eq!(
             result.transfer_data.requested_at,
-            Utc.ymd(2021, 7, 23).and_hms(15, 31, 21)
+            Utc.with_ymd_and_hms(2021, 7, 23, 15, 31, 21).unwrap()
         );
         assert_eq!(result.transfer_data.ack_id, "ClientY".into());
         assert_eq!(
             result.transfer_data.ack_by,
-            Utc.ymd(2021, 7, 28).and_hms(15, 31, 21)
+            Utc.with_ymd_and_hms(2021, 7, 28, 15, 31, 21).unwrap()
         );
         assert_eq!(
             result.transfer_data.expiring_at,
-            Some(Utc.ymd(2022, 7, 2).and_hms(14, 53, 19))
+            Utc.with_ymd_and_hms(2022, 7, 2, 14, 53, 19).single()
         );
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());

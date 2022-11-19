@@ -80,7 +80,10 @@ mod tests {
         );
         assert_eq!(msg.count, 5);
         assert_eq!(msg.id, "12345".to_string());
-        assert_eq!(msg.date, Some(Utc.ymd(2021, 7, 23).and_hms(19, 12, 43)));
+        assert_eq!(
+            msg.date,
+            Utc.with_ymd_and_hms(2021, 7, 23, 19, 12, 43).single()
+        );
         assert_eq!(
             *(msg.message.as_ref().unwrap()),
             "Transfer requested.".into()
@@ -90,12 +93,18 @@ mod tests {
             assert_eq!(tr.name, "eppdev-transfer.com".into());
             assert_eq!(tr.transfer_status, "pending".into());
             assert_eq!(tr.requester_id, "eppdev".into());
-            assert_eq!(tr.requested_at, Utc.ymd(2021, 7, 23).and_hms(15, 31, 21));
+            assert_eq!(
+                tr.requested_at,
+                Utc.with_ymd_and_hms(2021, 7, 23, 15, 31, 21).unwrap()
+            );
             assert_eq!(tr.ack_id, "ClientY".into());
-            assert_eq!(tr.ack_by, Utc.ymd(2021, 7, 28).and_hms(15, 31, 21));
+            assert_eq!(
+                tr.ack_by,
+                Utc.with_ymd_and_hms(2021, 7, 28, 15, 31, 21).unwrap()
+            );
             assert_eq!(
                 tr.expiring_at,
-                Some(Utc.ymd(2022, 7, 2).and_hms(14, 53, 19))
+                Utc.with_ymd_and_hms(2022, 7, 2, 14, 53, 19).single()
             );
         } else {
             panic!("Wrong type");
@@ -121,7 +130,10 @@ mod tests {
         );
         assert_eq!(msg.count, 4);
         assert_eq!(msg.id, "12345".to_string());
-        assert_eq!(msg.date, Some(Utc.ymd(2022, 1, 2).and_hms(11, 30, 45)));
+        assert_eq!(
+            msg.date,
+            Utc.with_ymd_and_hms(2022, 1, 2, 11, 30, 45).single()
+        );
         assert_eq!(
             *(msg.message.as_ref().unwrap()),
             "Unused objects policy".into()
@@ -138,11 +150,14 @@ mod tests {
                 .any(|a| a == &IpAddr::from([1, 1, 1, 1])));
             assert_eq!(host.client_id, "1234".into());
             assert_eq!(host.creator_id, "user".into());
-            assert_eq!(host.created_at, Utc.ymd(2021, 12, 1).and_hms(22, 40, 48));
+            assert_eq!(
+                host.created_at,
+                Utc.with_ymd_and_hms(2021, 12, 1, 22, 40, 48).unwrap()
+            );
             assert_eq!(host.updater_id, Some("user".into()));
             assert_eq!(
                 host.updated_at,
-                Some(Utc.ymd(2021, 12, 1).and_hms(22, 40, 48))
+                Utc.with_ymd_and_hms(2021, 12, 1, 22, 40, 48).single()
             );
         } else {
             panic!("Wrong type");
@@ -168,7 +183,10 @@ mod tests {
 
         assert_eq!(msg.count, 4);
         assert_eq!(msg.id, "12346".to_string());
-        assert_eq!(msg.date, Some(Utc.ymd(2000, 6, 8).and_hms(22, 10, 0)));
+        assert_eq!(
+            msg.date,
+            Utc.with_ymd_and_hms(2000, 6, 8, 22, 10, 0).single()
+        );
         assert_eq!(
             *(msg.message.as_ref().unwrap()),
             "Credit balance low.".into()

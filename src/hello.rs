@@ -323,7 +323,7 @@ mod tests {
         assert_eq!(object.data.service_id, "ISPAPI EPP Server");
         assert_eq!(
             object.data.service_date,
-            Utc.ymd(2021, 7, 25).and_hms(14, 51, 17)
+            Utc.with_ymd_and_hms(2021, 7, 25, 14, 51, 17).unwrap()
         );
         assert_eq!(object.data.svc_menu.options.version, "1.0".into());
         assert_eq!(object.data.svc_menu.options.lang, "en".into());
