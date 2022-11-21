@@ -2,10 +2,10 @@
 //!
 //! https://www.verisign.com/assets/epp-sdk/verisign_epp-extension_low-balance_v01.html
 
-use serde::Deserialize;
+use instant_xml::FromXml;
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
+#[derive(Clone, Debug, FromXml, PartialEq)]
+#[xml(ns(XMLNS), rename = "pollData", rename_all = "camelCase")]
 pub struct LowBalance {
     pub registrar_name: String,
     pub credit_limit: String,
@@ -13,24 +13,28 @@ pub struct LowBalance {
     pub available_credit: String,
 }
 
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, FromXml, PartialEq)]
+#[xml(ns(XMLNS), rename = "creditThreshold")]
 pub struct Threshold {
+    #[xml(attribute)]
     pub r#type: ThresholdType,
-    #[serde(rename = "$value")]
+    #[xml(direct)]
     pub value: String,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[derive(Clone, Copy, Debug, FromXml, PartialEq)]
+#[xml(scalar, rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum ThresholdType {
     Fixed,
     Percent,
 }
 
+const XMLNS: &str = "http://www.verisign.com/epp/lowbalance-poll-1.0";
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::message::poll::{MessageData, MessagePollResponse};
+    use crate::message::poll::MessagePollResponse;
     use crate::message::MessagePoll;
     use crate::response::ResultCode;
     use crate::tests::{response_from_file, CLTRID, SVTRID};
@@ -40,10 +44,8 @@ mod tests {
         let object = response_from_file::<MessagePoll>("response/message/poll_low_balance.xml");
         dbg!(&object);
 
-        let low_balance = match object.res_data {
-            Some(MessagePollResponse {
-                message_data: MessageData::LowBalance(low_balance),
-            }) => low_balance,
+        let low_balance = match object.res_data() {
+            Some(MessagePollResponse::LowBalance(low_balance)) => low_balance,
             _ => panic!("Unexpected message data"),
         };
 
@@ -64,10 +66,10 @@ mod tests {
         );
         assert_eq!(
             object.result.message,
-            "Command completed successfully; ack to dequeue".into()
+            "Command completed successfully; ack to dequeue"
         );
 
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

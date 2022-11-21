@@ -3,12 +3,13 @@
 use std::{error::Error, fs::File, io::Read};
 
 use regex::Regex;
+use similar_asserts::assert_eq;
 
 use crate::{
     client::RequestData,
     common::NoExtension,
-    request::{Command, CommandDocument, Extension, Transaction},
-    response::{Response, ResponseDocument},
+    request::{Command, CommandWrapper, Extension, Transaction},
+    response::Response,
     xml,
 };
 
@@ -46,8 +47,8 @@ pub(crate) fn assert_serialized<'c, 'e, Cmd, Ext>(
 {
     let expected = get_xml(path).unwrap();
     let req = req.into();
-    let document = CommandDocument::new(req.command, req.extension, CLTRID);
-    assert_eq!(expected, xml::serialize(&document).unwrap());
+    let document = CommandWrapper::new(req.command, req.extension, CLTRID);
+    assert_eq!(expected, xml::serialize(document).unwrap());
 }
 
 pub(crate) fn response_from_file<'c, Cmd>(
@@ -67,7 +68,8 @@ where
     Ext: Extension,
 {
     let xml = get_xml(path).unwrap();
-    let rsp = xml::deserialize::<ResponseDocument<Cmd::Response, Ext::Response>>(&xml).unwrap();
-    assert!(rsp.data.result.code.is_success());
-    rsp.data
+    dbg!(&xml);
+    let rsp = xml::deserialize::<Response<Cmd::Response, Ext::Response>>(&xml).unwrap();
+    assert!(rsp.result.code.is_success());
+    rsp
 }

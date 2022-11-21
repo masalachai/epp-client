@@ -3,25 +3,24 @@
 use std::net::IpAddr;
 
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use instant_xml::{FromXml, ToXml};
 
-use super::XMLNS;
-use crate::common::{serialize_host_addrs_option, NoExtension, StringValue};
+use super::{serialize_host_addrs_option, XMLNS};
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
 
 impl<'a> Transaction<NoExtension> for HostCreate<'a> {}
 
 impl<'a> Command for HostCreate<'a> {
-    type Response = HostCreateResponse;
+    type Response = HostCreateData;
     const COMMAND: &'static str = "create";
 }
 
 impl<'a> HostCreate<'a> {
-    pub fn new(host: &'a str, addresses: Option<&'a [IpAddr]>) -> Self {
+    pub fn new(name: &'a str, addresses: Option<&'a [IpAddr]>) -> Self {
         Self {
-            host: HostCreateRequestData {
-                xmlns: XMLNS,
-                name: host.into(),
+            host: HostCreateRequest {
+                name,
                 addresses,
             },
         }
@@ -31,45 +30,35 @@ impl<'a> HostCreate<'a> {
 // Request
 
 /// Type for data under the host &lt;create&gt; tag
-#[derive(Serialize, Debug)]
-pub struct HostCreateRequestData<'a> {
-    /// XML namespace for host commands
-    #[serde(rename = "xmlns:host")]
-    xmlns: &'a str,
+#[derive(Debug, ToXml)]
+#[xml(rename = "create", ns(XMLNS))]
+pub struct HostCreateRequest<'a> {
     /// The name of the host to be created
-    #[serde(rename = "host:name")]
-    pub name: StringValue<'a>,
+    pub name: &'a str,
     /// The list of IP addresses for the host
-    #[serde(rename = "host:addr", serialize_with = "serialize_host_addrs_option")]
+    #[xml(serialize_with = "serialize_host_addrs_option")]
     pub addresses: Option<&'a [IpAddr]>,
 }
 
-#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;create&gt; command for hosts
+#[derive(Debug, ToXml)]
+#[xml(rename = "create", ns(EPP_XMLNS))]
 pub struct HostCreate<'a> {
     /// The instance holding the data for the host to be created
-    #[serde(rename = "host:create")]
-    host: HostCreateRequestData<'a>,
+    host: HostCreateRequest<'a>,
 }
 
 // Response
 
 /// Type that represents the &lt;creData&gt; tag for host create response
-#[derive(Deserialize, Debug)]
+#[derive(Debug, FromXml)]
+#[xml(rename = "creData", ns(XMLNS))]
 pub struct HostCreateData {
     /// The host name
-    pub name: StringValue<'static>,
+    pub name: String,
     /// The host creation date
-    #[serde(rename = "crDate")]
+    #[xml(rename = "crDate")]
     pub created_at: DateTime<Utc>,
-}
-
-/// Type that represents the &lt;resData&gt; tag for host check response
-#[derive(Deserialize, Debug)]
-pub struct HostCreateResponse {
-    /// Data under the &lt;creData&gt; tag
-    #[serde(rename = "creData")]
-    pub create_data: HostCreateData,
 }
 
 #[cfg(test)]
@@ -97,13 +86,13 @@ mod tests {
         let result = object.res_data().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(result.create_data.name, "host2.eppdev-1.com".into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(result.name, "host2.eppdev-1.com");
         assert_eq!(
-            result.create_data.created_at,
+            result.created_at,
             Utc.with_ymd_and_hms(2021, 7, 26, 5, 28, 55).unwrap()
         );
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

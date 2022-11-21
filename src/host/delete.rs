@@ -1,9 +1,10 @@
 //! Types for EPP host delete request
 
+use instant_xml::ToXml;
+
 use super::XMLNS;
-use crate::common::{NoExtension, StringValue};
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
-use serde::Serialize;
 
 impl<'a> Transaction<NoExtension> for HostDelete<'a> {}
 
@@ -15,31 +16,25 @@ impl<'a> Command for HostDelete<'a> {
 impl<'a> HostDelete<'a> {
     pub fn new(name: &'a str) -> Self {
         Self {
-            host: HostDeleteRequestData {
-                xmlns: XMLNS,
-                name: name.into(),
-            },
+            host: HostDeleteRequest { name },
         }
     }
 }
 
 /// Type for data under the host &lt;delete&gt; tag
-#[derive(Serialize, Debug)]
-pub struct HostDeleteRequestData<'a> {
-    /// XML namespace for host commands
-    #[serde(rename = "xmlns:host")]
-    xmlns: &'a str,
+#[derive(Debug, ToXml)]
+#[xml(rename = "delete", ns(XMLNS))]
+pub struct HostDeleteRequest<'a> {
     /// The host to be deleted
-    #[serde(rename = "host:name")]
-    name: StringValue<'a>,
+    name: &'a str,
 }
 
-#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;delete&gt; command for hosts
+#[derive(Debug, ToXml)]
+#[xml(rename = "delete", ns(EPP_XMLNS))]
 pub struct HostDelete<'a> {
     /// The instance holding the data for the host to be deleted
-    #[serde(rename = "host:delete")]
-    host: HostDeleteRequestData<'a>,
+    host: HostDeleteRequest<'a>,
 }
 
 #[cfg(test)]
@@ -58,8 +53,8 @@ mod tests {
     fn response() {
         let object = response_from_file::<HostDelete>("response/host/delete.xml");
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

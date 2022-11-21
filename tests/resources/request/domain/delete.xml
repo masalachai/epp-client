@@ -2,9 +2,9 @@
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <command>
         <delete>
-            <domain:delete xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
-                <domain:name>eppdev.com</domain:name>
-            </domain:delete>
+            <delete xmlns="urn:ietf:params:xml:ns:domain-1.0">
+                <name>eppdev.com</name>
+            </delete>
         </delete>
         <clTRID>cltrid:1626454866</clTRID>
     </command>

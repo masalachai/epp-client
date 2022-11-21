@@ -21,15 +21,6 @@
                 <host:upDate>2021-12-01T22:40:48Z</host:upDate>
             </host:infData>
         </resData>
-        <extension>
-            <changePoll:changeData state="before" xmlns:changePoll="urn:ietf:params:xml:ns:changePoll-1.0">
-                <changePoll:operation op="purge">delete</changePoll:operation>
-                <changePoll:date>2022-01-02T11:30:45Z</changePoll:date>
-                <changePoll:svTRID>1234</changePoll:svTRID>
-                <changePoll:who>regy_batch</changePoll:who>
-                <changePoll:reason>Unused objects policy</changePoll:reason>
-            </changePoll:changeData>
-        </extension>
         <trID>
             <clTRID>cltrid:1626454866</clTRID>
             <svTRID>RO-6879-1627224678242975</svTRID>

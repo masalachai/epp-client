@@ -3,13 +3,13 @@
 use std::fmt;
 
 use chrono::FixedOffset;
-use serde::Serialize;
+use instant_xml::ToXml;
 
-use crate::common::{NoExtension, StringValue};
+use crate::common::NoExtension;
 use crate::domain::update::DomainUpdate;
 use crate::request::{Extension, Transaction};
 
-use super::namestore::{NameStore, NameStoreData};
+use super::namestore::NameStore;
 
 pub const XMLNS: &str = "http://www.verisign.com/epp/sync-1.0";
 
@@ -70,47 +70,35 @@ impl Update {
     /// Create a new sync update request
     pub fn new(expiration: GMonthDay) -> Self {
         Self {
-            data: UpdateData {
-                xmlns: XMLNS,
-                exp: expiration.to_string().into(),
-            },
+            exp: expiration.to_string(),
         }
     }
 }
 
-impl UpdateWithNameStore<'_> {
+impl<'a> UpdateWithNameStore<'a> {
     /// Create a new sync update with namestore request
-    pub fn new(expiration: GMonthDay, subproduct: &str) -> Self {
+    pub fn new(expiration: GMonthDay, subproduct: &'a str) -> Self {
         Self {
-            sync: Update::new(expiration).data,
-            namestore: NameStoreData::new(subproduct),
+            sync: Update::new(expiration),
+            namestore: NameStore::new(subproduct),
         }
     }
 }
 
-#[derive(Debug, Serialize)]
-pub struct Update {
-    #[serde(rename = "sync:update")]
-    pub data: UpdateData,
-}
-
-#[derive(Debug, Serialize)]
+#[derive(Debug, ToXml)]
+#[xml(inline)]
 pub struct UpdateWithNameStore<'a> {
-    #[serde(rename = "sync:update")]
-    pub sync: UpdateData,
-    #[serde(rename = "namestoreExt:namestoreExt")]
-    pub namestore: NameStoreData<'a>,
+    pub sync: Update,
+    pub namestore: NameStore<'a>,
 }
 
-#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;consolidate&gt; extension
-pub struct UpdateData {
-    /// XML namespace for the consolidate extension
-    #[serde(rename = "xmlns:sync")]
-    pub xmlns: &'static str,
+#[derive(Debug, ToXml)]
+#[xml(rename = "update", ns(XMLNS))]
+pub struct Update {
     /// The expiry date of the domain
-    #[serde(rename = "sync:expMonthDay")]
-    pub exp: StringValue<'static>,
+    #[xml(rename = "expMonthDay")]
+    pub exp: String,
 }
 
 #[cfg(test)]

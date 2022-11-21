@@ -2,9 +2,9 @@
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <command>
         <delete>
-            <contact:delete xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
-                <contact:id>eppdev-contact-3</contact:id>
-            </contact:delete>
+            <delete xmlns="urn:ietf:params:xml:ns:contact-1.0">
+                <id>eppdev-contact-3</id>
+            </delete>
         </delete>
         <clTRID>cltrid:1626454866</clTRID>
     </command>

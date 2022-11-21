@@ -1,57 +1,72 @@
 //! Types for EPP host check request
 
-use std::fmt::Debug;
+use std::fmt::{self, Debug};
+
+use instant_xml::{FromXml, Serializer, ToXml};
 
 use super::XMLNS;
-use crate::common::{CheckResponse, NoExtension, StringValue};
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
-use serde::Serialize;
 
 impl<'a> Transaction<NoExtension> for HostCheck<'a> {}
 
 impl<'a> Command for HostCheck<'a> {
-    type Response = CheckResponse;
+    type Response = CheckData;
     const COMMAND: &'static str = "check";
 }
 
 // Request
 
 /// Type for data under the host &lt;check&gt; tag
-#[derive(Serialize, Debug)]
-struct HostList<'a> {
-    /// XML namespace for host commands
-    #[serde(rename = "xmlns:host")]
-    xmlns: &'a str,
+#[derive(Debug, ToXml)]
+#[xml(rename = "check", ns(XMLNS))]
+struct HostCheckData<'a> {
     /// List of hosts to be checked for availability
-    #[serde(rename = "host:name")]
-    hosts: Vec<StringValue<'a>>,
+    name: &'a [&'a str],
 }
 
-#[derive(Serialize, Debug)]
-/// Type for EPP XML &lt;check&gt; command for hosts
-struct SerializeHostCheck<'a> {
-    /// The instance holding the list of hosts to be checked
-    #[serde(rename = "host:check")]
-    list: HostList<'a>,
-}
-
-impl<'a> From<HostCheck<'a>> for SerializeHostCheck<'a> {
-    fn from(check: HostCheck<'a>) -> Self {
-        Self {
-            list: HostList {
-                xmlns: XMLNS,
-                hosts: check.hosts.iter().map(|&id| id.into()).collect(),
-            },
-        }
-    }
+fn serialize_hosts<W: fmt::Write + ?Sized>(
+    hosts: &[&str],
+    serializer: &mut Serializer<W>,
+) -> Result<(), instant_xml::Error> {
+    HostCheckData { name: hosts }.serialize(None, serializer)
 }
 
 /// The EPP `check` command for hosts
-#[derive(Clone, Debug, Serialize)]
-#[serde(into = "SerializeHostCheck")]
+#[derive(Clone, Debug, ToXml)]
+#[xml(rename = "check", ns(EPP_XMLNS))]
 pub struct HostCheck<'a> {
     /// The list of hosts to be checked
+    #[xml(serialize_with = "serialize_hosts")]
     pub hosts: &'a [&'a str],
+}
+
+// Response
+
+#[derive(Debug, FromXml)]
+#[xml(rename = "name", ns(XMLNS))]
+pub struct Checked {
+    #[xml(attribute, rename = "avail")]
+    pub available: bool,
+    #[xml(attribute)]
+    pub reason: Option<String>,
+    #[xml(direct)]
+    pub id: String,
+}
+
+#[derive(Debug, FromXml)]
+#[xml(rename = "cd", ns(XMLNS))]
+pub struct CheckedHost {
+    /// Data under the &lt;cd&gt; tag
+    #[xml(rename = "cd")]
+    pub inner: Checked,
+}
+
+/// Type that represents the &lt;chkData&gt; tag for host check response
+#[derive(Debug, FromXml)]
+#[xml(rename = "chkData", ns(XMLNS))]
+pub struct CheckData {
+    pub list: Vec<CheckedHost>,
 }
 
 #[cfg(test)]
@@ -74,12 +89,12 @@ mod tests {
         let result = object.res_data().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(result.list[0].id, "host1.eppdev-1.com");
-        assert!(result.list[0].available);
-        assert_eq!(result.list[1].id, "ns1.testing.com");
-        assert!(!result.list[1].available);
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(result.list[0].inner.id, "host1.eppdev-1.com");
+        assert!(result.list[0].inner.available);
+        assert_eq!(result.list[1].inner.id, "ns1.testing.com");
+        assert!(!result.list[1].inner.available);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

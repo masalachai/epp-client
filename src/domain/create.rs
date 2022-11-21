@@ -1,10 +1,10 @@
 //! Types for EPP domain create request
 
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use instant_xml::{FromXml, ToXml};
 
-use super::{DomainAuthInfo, DomainContact, HostList, Period, XMLNS};
-use crate::common::{NoExtension, StringValue};
+use super::{DomainAuthInfo, DomainContact, HostInfo, NameServers, Period, XMLNS};
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
 
 impl<'a> Transaction<NoExtension> for DomainCreate<'a> {}
@@ -17,39 +17,31 @@ impl<'a> Command for DomainCreate<'a> {
 // Request
 
 /// Type for elements under the domain &lt;create&gt; tag
-#[derive(Serialize, Debug)]
+#[derive(Debug, ToXml)]
+#[xml(rename = "create", ns(XMLNS))]
 pub struct DomainCreateRequestData<'a> {
-    /// XML namespace for domain commands
-    #[serde(rename = "xmlns:domain")]
-    pub xmlns: &'a str,
     /// The domain name
-    #[serde(rename = "domain:name")]
-    pub name: StringValue<'a>,
+    pub name: &'a str,
     /// The period of registration
-    #[serde(rename = "domain:period")]
     pub period: Period,
     /// The list of nameserver hosts
     /// either of type `HostObjList` or `HostAttrList`
-    #[serde(rename = "domain:ns")]
-    pub ns: Option<HostList<'a>>,
+    pub ns: Option<NameServers<'a>>,
     /// The domain registrant
-    #[serde(rename = "domain:registrant")]
-    pub registrant: Option<StringValue<'a>>,
+    pub registrant: Option<&'a str>,
     /// The list of contacts for the domain
-    #[serde(rename = "domain:contact")]
     pub contacts: Option<&'a [DomainContact<'a>]>,
     /// The auth info for the domain
-    #[serde(rename = "domain:authInfo")]
     pub auth_info: DomainAuthInfo<'a>,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Debug, ToXml)]
 /// Type for EPP XML &lt;create&gt; command for domains
+#[xml(rename = "create", ns(EPP_XMLNS))]
 pub struct DomainCreate<'a> {
     /// The data for the domain to be created with
     /// T being the type of nameserver list (`HostObjList` or `HostAttrList`)
     /// to be supplied
-    #[serde(rename = "domain:create")]
     pub domain: DomainCreateRequestData<'a>,
 }
 
@@ -57,18 +49,17 @@ impl<'a> DomainCreate<'a> {
     pub fn new(
         name: &'a str,
         period: Period,
-        ns: Option<HostList<'a>>,
-        registrant_id: Option<&'a str>,
+        ns: Option<&'a [HostInfo<'a>]>,
+        registrant: Option<&'a str>,
         auth_password: &'a str,
         contacts: Option<&'a [DomainContact<'a>]>,
     ) -> Self {
         Self {
             domain: DomainCreateRequestData {
-                xmlns: XMLNS,
-                name: name.into(),
+                name,
                 period,
-                ns,
-                registrant: registrant_id.map(|id| id.into()),
+                ns: ns.map(|ns| NameServers { ns: ns.to_vec() }),
+                registrant,
                 auth_info: DomainAuthInfo::new(auth_password),
                 contacts,
             },
@@ -79,27 +70,17 @@ impl<'a> DomainCreate<'a> {
 // Response
 
 /// Type that represents the &lt;chkData&gt; tag for domain create response
-#[derive(Deserialize, Debug)]
-pub struct DomainCreateResponseData {
-    /// XML namespace for domain response data
-    #[serde(rename = "xmlns:domain")]
-    pub xmlns: String,
+#[derive(Debug, FromXml)]
+#[xml(rename = "creData", ns(XMLNS))]
+pub struct DomainCreateResponse {
     /// The domain name
-    pub name: StringValue<'static>,
+    pub name: String,
     /// The creation date
-    #[serde(rename = "crDate")]
+    #[xml(rename = "crDate")]
     pub created_at: DateTime<Utc>,
     /// The expiry date
-    #[serde(rename = "exDate")]
+    #[xml(rename = "exDate")]
     pub expiring_at: Option<DateTime<Utc>>,
-}
-
-/// Type that represents the &lt;resData&gt; tag for domain create response
-#[derive(Deserialize, Debug)]
-pub struct DomainCreateResponse {
-    /// Data under the &lt;chkData&gt; tag
-    #[serde(rename = "creData")]
-    pub create_data: DomainCreateResponseData,
 }
 
 #[cfg(test)]
@@ -108,8 +89,8 @@ mod tests {
 
     use chrono::{TimeZone, Utc};
 
-    use super::{DomainContact, DomainCreate, HostList, Period};
-    use crate::domain::{HostAttr, HostAttrList, HostObjList};
+    use super::{DomainContact, DomainCreate, Period};
+    use crate::domain::{HostAttr, HostInfo, HostObj};
     use crate::response::ResultCode;
     use crate::tests::{assert_serialized, response_from_file, CLTRID, SUCCESS_MSG, SVTRID};
 
@@ -159,11 +140,18 @@ mod tests {
             },
         ];
 
-        let hosts = &["ns1.test.com".into(), "ns2.test.com".into()];
+        let hosts = &[
+            HostInfo::Obj(HostObj {
+                name: "ns1.test.com".into(),
+            }),
+            HostInfo::Obj(HostObj {
+                name: "ns2.test.com".into(),
+            }),
+        ];
         let object = DomainCreate::new(
             "eppdev-1.com",
             Period::years(1).unwrap(),
-            Some(HostList::HostObjList(HostObjList { hosts })),
+            Some(hosts),
             Some("eppdev-contact-3"),
             "epP4uthd#v",
             Some(contacts),
@@ -190,23 +178,23 @@ mod tests {
         ];
 
         let hosts = &[
-            HostAttr {
+            HostInfo::Attr(HostAttr {
                 name: "ns1.eppdev-1.com".into(),
                 addresses: None,
-            },
-            HostAttr {
+            }),
+            HostInfo::Attr(HostAttr {
                 name: "ns2.eppdev-1.com".into(),
                 addresses: Some(vec![
                     IpAddr::from([177, 232, 12, 58]),
                     IpAddr::from([0x2404, 0x6800, 0x4001, 0x801, 0, 0, 0, 0x200e]),
                 ]),
-            },
+            }),
         ];
 
         let object = DomainCreate::new(
             "eppdev-2.com",
             Period::years(1).unwrap(),
-            Some(HostList::HostAttrList(HostAttrList { hosts })),
+            Some(hosts),
             Some("eppdev-contact-3"),
             "epP4uthd#v",
             Some(contacts),
@@ -222,17 +210,17 @@ mod tests {
         let result = object.res_data().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(result.create_data.name, "eppdev-2.com".into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(result.name, "eppdev-2.com");
         assert_eq!(
-            result.create_data.created_at,
+            result.created_at,
             Utc.with_ymd_and_hms(2021, 7, 25, 18, 11, 35).unwrap()
         );
         assert_eq!(
-            *result.create_data.expiring_at.as_ref().unwrap(),
+            *result.expiring_at.as_ref().unwrap(),
             Utc.with_ymd_and_hms(2022, 7, 25, 18, 11, 34).unwrap()
         );
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

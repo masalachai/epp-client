@@ -14,7 +14,7 @@ default = ["tokio-rustls"]
 async-trait = "0.1.52"
 celes = "2.1"
 chrono = { version = "0.4.23", features = ["serde"] }
-quick-xml = { version = "0.26", features = [ "serialize" ] }
+instant-xml = { version = "0.1", features = ["chrono"] }
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.0", features = ["io-util", "net", "time"] }
 tokio-rustls = { version = "0.23", optional = true }
@@ -26,3 +26,4 @@ regex = "1.5"
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 tokio-test = "0.4"
 tracing-subscriber = "0.3.3"
+similar-asserts = "1.4.2"

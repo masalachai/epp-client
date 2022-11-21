@@ -1,8 +1,9 @@
 //! Types for EPP message ack request
 
-use crate::common::NoExtension;
+use instant_xml::ToXml;
+
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
-use serde::Serialize;
 
 impl<'a> Transaction<NoExtension> for MessageAck<'a> {}
 
@@ -11,14 +12,16 @@ impl<'a> Command for MessageAck<'a> {
     const COMMAND: &'static str = "poll";
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Debug, ToXml)]
 /// Type for EPP XML &lt;poll&gt; command for message ack
+#[xml(rename = "poll", ns(EPP_XMLNS))]
 pub struct MessageAck<'a> {
     /// The type of operation to perform
     /// The value is "ack" for message acknowledgement
+    #[xml(attribute)]
     op: &'a str,
     /// The ID of the message to be acknowledged
-    #[serde(rename = "msgID")]
+    #[xml(rename = "msgID", attribute)]
     message_id: &'a str,
 }
 
@@ -49,9 +52,9 @@ mod tests {
         let msg = object.message_queue().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
         assert_eq!(msg.count, 4);
         assert_eq!(msg.id, "12345".to_string());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

@@ -3,43 +3,44 @@
 use std::fmt::{self, Debug};
 
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use instant_xml::{FromXml, Kind};
 
-use crate::common::StringValue;
+use crate::common::EPP_XMLNS;
 
 /// Type corresponding to the <undef> tag an EPP response XML
-#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "undef", ns(EPP_XMLNS))]
 pub struct Undef;
 
 /// Type corresponding to the <value> tag under <extValue> in an EPP response XML
-#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "value", ns(EPP_XMLNS))]
 pub struct ResultValue {
-    /// The XML namespace for the <value> tag
-    #[serde(rename = "xmlns:epp")]
-    xmlns: String,
     /// The <undef> element
     pub undef: Undef,
 }
 
 /// Type corresponding to the <extValue> tag in an EPP response XML
-#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "extValue", ns(EPP_XMLNS))]
 pub struct ExtValue {
     /// Data under the <value> tag
     pub value: ResultValue,
     /// Data under the <reason> tag
-    pub reason: StringValue<'static>,
+    pub reason: String,
 }
 
 /// Type corresponding to the <result> tag in an EPP response XML
-#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "result", ns(EPP_XMLNS))]
 pub struct EppResult {
     /// The result code
+    #[xml(attribute)]
     pub code: ResultCode,
     /// The result message
-    #[serde(rename = "msg")]
-    pub message: StringValue<'static>,
+    #[xml(rename = "msg")]
+    pub message: String,
     /// Data under the <extValue> tag
-    #[serde(rename = "extValue")]
     pub ext_value: Option<ExtValue>,
 }
 
@@ -136,13 +137,37 @@ impl ResultCode {
     }
 }
 
-impl<'de> Deserialize<'de> for ResultCode {
-    fn deserialize<D>(deserializer: D) -> Result<ResultCode, D::Error>
-    where
-        D: serde::de::Deserializer<'de>,
-    {
-        deserializer.deserialize_u16(ResultCodeVisitor)
+impl<'xml> FromXml<'xml> for ResultCode {
+    fn matches(id: instant_xml::Id<'_>, field: Option<instant_xml::Id<'_>>) -> bool {
+        match field {
+            Some(field) => id == field,
+            None => false,
+        }
     }
+
+    fn deserialize<'cx>(
+        into: &mut Self::Accumulator,
+        field: &'static str,
+        deserializer: &mut instant_xml::Deserializer<'cx, 'xml>,
+    ) -> Result<(), instant_xml::Error> {
+        let mut value = None;
+        u16::deserialize(&mut value, field, deserializer)?;
+        if let Some(value) = value {
+            *into = match ResultCode::from_u16(value) {
+                Some(value) => Some(value),
+                None => {
+                    return Err(instant_xml::Error::UnexpectedValue(format!(
+                        "unexpected result code '{value}'"
+                    )))
+                }
+            };
+        }
+
+        Ok(())
+    }
+
+    type Accumulator = Option<Self>;
+    const KIND: instant_xml::Kind = Kind::Scalar;
 }
 
 struct ResultCodeVisitor;
@@ -166,71 +191,82 @@ impl<'de> serde::de::Visitor<'de> for ResultCodeVisitor {
 }
 
 /// Type corresponding to the <trID> tag in an EPP response XML
-#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "trID", ns(EPP_XMLNS))]
 pub struct ResponseTRID {
     /// The client TRID
-    #[serde(rename = "clTRID")]
-    pub client_tr_id: Option<StringValue<'static>>,
+    #[xml(rename = "clTRID")]
+    pub client_tr_id: Option<String>,
     /// The server TRID
-    #[serde(rename = "svTRID")]
-    pub server_tr_id: StringValue<'static>,
+    #[xml(rename = "svTRID")]
+    pub server_tr_id: String,
 }
 
 /// Type corresponding to the <msgQ> tag in an EPP response XML
-#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "msgQ", ns(EPP_XMLNS))]
 pub struct MessageQueue {
     /// The message count
+    #[xml(attribute)]
     pub count: u32,
     /// The message ID
+    #[xml(attribute)]
     pub id: String,
     /// The message date
-    #[serde(rename = "qDate")]
+    #[xml(rename = "qDate")]
     pub date: Option<DateTime<Utc>>,
     /// The message text
-    #[serde(rename = "msg")]
-    pub message: Option<StringValue<'static>>,
+    #[xml(rename = "msg")]
+    pub message: Option<Message>,
 }
 
-#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "msg", ns(EPP_XMLNS))]
+pub struct Message {
+    #[xml(attribute)]
+    pub lang: Option<String>,
+    #[xml(direct)]
+    pub text: String,
+}
+
+#[derive(Debug, FromXml, PartialEq)]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// containing an &lt;extension&gt; tag
+#[xml(rename = "response", ns(EPP_XMLNS))]
 pub struct Response<D, E> {
     /// Data under the <result> tag
     pub result: EppResult,
     /// Data under the <msgQ> tag
-    #[serde(rename = "msgQ")]
+    #[xml(rename = "msgQ")]
     pub message_queue: Option<MessageQueue>,
-    #[serde(rename = "resData")]
     /// Data under the &lt;resData&gt; tag
-    pub res_data: Option<D>,
+    pub res_data: Option<ResponseData<D>>,
     /// Data under the &lt;extension&gt; tag
-    pub extension: Option<E>,
+    pub extension: Option<Extension<E>>,
     /// Data under the <trID> tag
-    #[serde(rename = "trID")]
     pub tr_ids: ResponseTRID,
 }
 
-#[derive(Deserialize, Debug, Eq, PartialEq)]
-#[serde(rename = "epp")]
-pub struct ResponseDocument<D, E> {
-    #[serde(rename = "response")]
-    pub data: Response<D, E>,
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "resData", ns(EPP_XMLNS))]
+pub struct ResponseData<D> {
+    data: D,
 }
 
-#[derive(Debug, Deserialize, Eq, PartialEq)]
-#[serde(rename = "epp")]
-pub struct ResultDocument {
-    #[serde(rename = "response")]
-    pub data: ResponseStatus,
+impl<D> ResponseData<D> {
+    pub fn into_inner(self) -> D {
+        self.data
+    }
 }
 
-#[derive(Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, FromXml, PartialEq)]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// without <msgQ> or &lt;resData&gt; sections. Generally used for error handling
+#[xml(rename = "response", ns(EPP_XMLNS))]
 pub struct ResponseStatus {
     /// Data under the <result> tag
     pub result: EppResult,
-    #[serde(rename = "trID")]
+    #[xml(rename = "trID")]
     /// Data under the <trID> tag
     pub tr_ids: ResponseTRID,
 }
@@ -239,10 +275,18 @@ impl<T, E> Response<T, E> {
     /// Returns the data under the corresponding &lt;resData&gt; from the EPP XML
     pub fn res_data(&self) -> Option<&T> {
         match &self.res_data {
-            Some(res_data) => Some(res_data),
+            Some(res_data) => Some(&res_data.data),
             None => None,
         }
     }
+
+    pub fn extension(&self) -> Option<&E> {
+        match &self.extension {
+            Some(extension) => Some(&extension.data),
+            None => None,
+        }
+    }
+
     /// Returns the data under the corresponding <msgQ> from the EPP XML
     pub fn message_queue(&self) -> Option<&MessageQueue> {
         match &self.message_queue {
@@ -252,24 +296,30 @@ impl<T, E> Response<T, E> {
     }
 }
 
+#[derive(Debug, Eq, FromXml, PartialEq)]
+#[xml(rename = "extension", ns(EPP_XMLNS))]
+pub struct Extension<E> {
+    pub data: E,
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{ResultCode, ResultDocument};
+    use super::{ResponseStatus, ResultCode};
     use crate::tests::{get_xml, CLTRID, SVTRID};
     use crate::xml;
 
     #[test]
     fn error() {
         let xml = get_xml("response/error.xml").unwrap();
-        let object = xml::deserialize::<ResultDocument>(xml.as_str()).unwrap();
+        let object = xml::deserialize::<ResponseStatus>(xml.as_str()).unwrap();
 
-        assert_eq!(object.data.result.code, ResultCode::ObjectDoesNotExist);
-        assert_eq!(object.data.result.message, "Object does not exist".into());
+        assert_eq!(object.result.code, ResultCode::ObjectDoesNotExist);
+        assert_eq!(object.result.message, "Object does not exist");
         assert_eq!(
-            object.data.result.ext_value.unwrap().reason,
-            "545 Object not found".into()
+            object.result.ext_value.unwrap().reason,
+            "545 Object not found"
         );
-        assert_eq!(object.data.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.data.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

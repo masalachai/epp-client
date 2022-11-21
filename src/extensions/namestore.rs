@@ -2,10 +2,9 @@
 
 use std::borrow::Cow;
 
-use serde::{Deserialize, Serialize};
+use instant_xml::{FromXml, ToXml};
 
 use crate::{
-    common::StringValue,
     contact::{
         check::ContactCheck, create::ContactCreate, delete::ContactDelete, info::ContactInfo,
         update::ContactUpdate,
@@ -51,22 +50,9 @@ impl Transaction<NameStore<'_>> for HostUpdate<'_> {}
 
 impl<'a> NameStore<'a> {
     /// Create a new RGP restore report request
-    pub fn new(subproduct: &str) -> NameStore {
+    pub fn new(subproduct: &'a str) -> NameStore {
         NameStore {
-            data: NameStoreData {
-                xmlns: XMLNS.into(),
-                subproduct: subproduct.to_owned().into(),
-            },
-        }
-    }
-}
-
-impl<'a> NameStoreData<'a> {
-    /// Create a new RGP restore report request
-    pub fn new(subproduct: &str) -> Self {
-        Self {
-            xmlns: XMLNS.into(),
-            subproduct: subproduct.to_owned().into(),
+            subproduct: subproduct.into(),
         }
     }
 }
@@ -75,22 +61,13 @@ impl<'a> Extension for NameStore<'a> {
     type Response = NameStore<'static>;
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename = "namestoreExt:namestoreExt")]
-pub struct NameStore<'a> {
-    #[serde(rename = "namestoreExt:namestoreExt", alias = "namestoreExt")]
-    pub data: NameStoreData<'a>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Debug, FromXml, ToXml)]
 /// Type for EPP XML &lt;namestoreExt&gt; extension
-pub struct NameStoreData<'a> {
-    /// XML namespace for the RGP restore extension
-    #[serde(rename = "xmlns:namestoreExt", alias = "xmlns")]
-    pub xmlns: Cow<'a, str>,
+#[xml(rename = "namestoreExt", ns(XMLNS))]
+pub struct NameStore<'a> {
     /// The object holding the list of domains to be checked
-    #[serde(rename = "namestoreExt:subProduct", alias = "subProduct")]
-    pub subproduct: StringValue<'a>,
+    #[xml(rename = "subProduct")]
+    pub subproduct: Cow<'a, str>,
 }
 
 #[cfg(test)]
@@ -118,7 +95,7 @@ mod tests {
         let object = response_from_file_with_ext::<DomainCheck, NameStore>(
             "response/extensions/namestore.xml",
         );
-        let ext = object.extension.unwrap();
-        assert_eq!(ext.data.subproduct, "com".into());
+        let ext = object.extension().unwrap();
+        assert_eq!(ext.subproduct, "com");
     }
 }

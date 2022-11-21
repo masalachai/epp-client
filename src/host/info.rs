@@ -4,26 +4,23 @@ use std::net::IpAddr;
 use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use instant_xml::{FromXml, ToXml};
 
-use super::XMLNS;
-use crate::common::{HostAddr, NoExtension, ObjectStatus, StringValue};
+use super::{HostAddr, Status, XMLNS};
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
 
 impl<'a> Transaction<NoExtension> for HostInfo<'a> {}
 
 impl<'a> Command for HostInfo<'a> {
-    type Response = HostInfoResponse;
+    type Response = HostInfoResponseData;
     const COMMAND: &'static str = "info";
 }
 
 impl<'a> HostInfo<'a> {
     pub fn new(name: &'a str) -> Self {
         Self {
-            info: HostInfoRequestData {
-                xmlns: XMLNS,
-                name: name.into(),
-            },
+            info: HostInfoRequestData { name },
         }
     }
 }
@@ -31,78 +28,91 @@ impl<'a> HostInfo<'a> {
 // Request
 
 /// Type for data under the host &lt;info&gt; tag
-#[derive(Serialize, Debug)]
+#[derive(Debug, ToXml)]
+#[xml(rename = "info", ns(XMLNS))]
 pub struct HostInfoRequestData<'a> {
-    /// XML namespace for host commands
-    #[serde(rename = "xmlns:host")]
-    xmlns: &'a str,
     /// The name of the host to be queried
-    #[serde(rename = "host:name")]
-    name: StringValue<'a>,
+    name: &'a str,
 }
 
-#[derive(Serialize, Debug)]
 /// Type for EPP XML &lt;info&gt; command for hosts
+#[derive(Debug, ToXml)]
+#[xml(rename = "info", ns(EPP_XMLNS))]
 pub struct HostInfo<'a> {
     /// The instance holding the data for the host query
-    #[serde(rename = "host:info")]
+    #[xml(rename = "host:info")]
     info: HostInfoRequestData<'a>,
 }
 
 // Response
 
 /// Type that represents the &lt;infData&gt; tag for host info response
-#[derive(Deserialize, Debug)]
+#[derive(Debug, FromXml)]
+#[xml(rename = "infData", ns(XMLNS))]
 pub struct HostInfoResponseData {
     /// The host name
-    pub name: StringValue<'static>,
+    pub name: String,
     /// The host ROID
-    pub roid: StringValue<'static>,
+    pub roid: String,
     /// The list of host statuses
-    #[serde(rename = "status")]
-    pub statuses: Vec<ObjectStatus<'static>>,
+    #[xml(rename = "status")]
+    pub statuses: Vec<Status<'static>>,
     /// The list of host IP addresses
-    #[serde(rename = "addr", deserialize_with = "deserialize_host_addrs")]
+    #[xml(rename = "addr", deserialize_with = "deserialize_host_addrs")]
     pub addresses: Vec<IpAddr>,
     /// The epp user to whom the host belongs
-    #[serde(rename = "clID")]
-    pub client_id: StringValue<'static>,
+    #[xml(rename = "clID")]
+    pub client_id: String,
     /// THe epp user that created the host
-    #[serde(rename = "crID")]
-    pub creator_id: StringValue<'static>,
+    #[xml(rename = "crID")]
+    pub creator_id: String,
     /// The host creation date
-    #[serde(rename = "crDate")]
+    #[xml(rename = "crDate")]
     pub created_at: DateTime<Utc>,
     /// The epp user that last updated the host
-    #[serde(rename = "upID")]
-    pub updater_id: Option<StringValue<'static>>,
+    #[xml(rename = "upID")]
+    pub updater_id: Option<String>,
     /// The host last update date
-    #[serde(rename = "upDate")]
+    #[xml(rename = "upDate")]
     pub updated_at: Option<DateTime<Utc>>,
     /// The host transfer date
-    #[serde(rename = "trDate")]
+    #[xml(rename = "trDate")]
     pub transferred_at: Option<DateTime<Utc>>,
 }
 
-fn deserialize_host_addrs<'de, D>(de: D) -> Result<Vec<IpAddr>, D::Error>
-where
-    D: serde::de::Deserializer<'de>,
-{
-    let addrs = Vec::<HostAddr<'static>>::deserialize(de)?;
-    addrs
-        .into_iter()
-        .map(|addr| IpAddr::from_str(&addr.address))
-        .collect::<Result<_, _>>()
-        .map_err(|e| serde::de::Error::custom(format!("{}", e)))
+fn deserialize_host_addrs(
+    into: &mut Vec<IpAddr>,
+    field: &'static str,
+    deserializer: &mut instant_xml::de::Deserializer<'_, '_>,
+) -> Result<(), instant_xml::Error> {
+    let mut addrs = Vec::new();
+    Vec::<HostAddr<'static>>::deserialize(&mut addrs, field, deserializer)?;
+
+    for addr in addrs {
+        match IpAddr::from_str(&addr.address) {
+            Ok(ip) => into.push(ip),
+            Err(_) => {
+                return Err(instant_xml::Error::UnexpectedValue(format!(
+                    "invalid IP address '{}'",
+                    &addr.address
+                )))
+            }
+        }
+    }
+
+    Ok(())
 }
 
+/*
 /// Type that represents the &lt;resData&gt; tag for host info response
-#[derive(Deserialize, Debug)]
+#[derive(Debug, FromXml)]
+#[xml(rename = "infData", ns(XMLNS))]
 pub struct HostInfoResponse {
     /// Data under the &lt;infData&gt; tag
-    #[serde(rename = "infData")]
+    #[xml(rename = "infData")]
     pub info_data: HostInfoResponseData,
 }
+*/
 
 #[cfg(test)]
 mod tests {
@@ -124,33 +134,27 @@ mod tests {
         let result = object.res_data().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(result.info_data.name, "host2.eppdev-1.com".into());
-        assert_eq!(result.info_data.roid, "UNDEF-ROID".into());
-        assert_eq!(result.info_data.statuses[0].status, "ok".to_string());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(result.name, "host2.eppdev-1.com");
+        assert_eq!(result.roid, "UNDEF-ROID");
+        assert_eq!(result.statuses[0].status, "ok".to_string());
+        assert_eq!(result.addresses[0], IpAddr::from([29, 245, 122, 14]));
         assert_eq!(
-            result.info_data.addresses[0],
-            IpAddr::from([29, 245, 122, 14])
-        );
-        assert_eq!(
-            result.info_data.addresses[1],
+            result.addresses[1],
             IpAddr::from([0x2404, 0x6800, 0x4001, 0x801, 0, 0, 0, 0x200e])
         );
-        assert_eq!(result.info_data.client_id, "eppdev".into());
-        assert_eq!(result.info_data.creator_id, "creator".into());
+        assert_eq!(result.client_id, "eppdev");
+        assert_eq!(result.creator_id, "creator");
         assert_eq!(
-            result.info_data.created_at,
+            result.created_at,
             Utc.with_ymd_and_hms(2021, 7, 26, 5, 28, 55).unwrap()
         );
+        assert_eq!(*(result.updater_id.as_ref().unwrap()), "creator");
         assert_eq!(
-            *(result.info_data.updater_id.as_ref().unwrap()),
-            "creator".into()
-        );
-        assert_eq!(
-            result.info_data.updated_at,
+            result.updated_at,
             Utc.with_ymd_and_hms(2021, 7, 26, 5, 28, 55).single()
         );
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

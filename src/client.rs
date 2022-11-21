@@ -18,9 +18,9 @@ use crate::common::{Certificate, NoExtension, PrivateKey};
 pub use crate::connection::Connector;
 use crate::connection::{self, EppConnection};
 use crate::error::Error;
-use crate::hello::{Greeting, GreetingDocument, HelloDocument};
-use crate::request::{Command, CommandDocument, Extension, Transaction};
-use crate::response::{Response, ResponseDocument, ResponseStatus};
+use crate::hello::{Greeting, Hello};
+use crate::request::{Command, CommandWrapper, Extension, Transaction};
+use crate::response::{Response, ResponseStatus};
 use crate::xml;
 
 /// An `EppClient` provides an interface to sending EPP requests to a registry
@@ -35,9 +35,9 @@ use crate::xml;
 /// # use std::net::ToSocketAddrs;
 /// # use std::time::Duration;
 /// #
-/// use epp_client::EppClient;
-/// use epp_client::domain::DomainCheck;
-/// use epp_client::common::NoExtension;
+/// use instant_epp::EppClient;
+/// use instant_epp::domain::DomainCheck;
+/// use instant_epp::common::NoExtension;
 ///
 /// # #[tokio::main]
 /// # async fn main() {
@@ -55,9 +55,12 @@ use crate::xml;
 /// // Execute an EPP Command against the registry with distinct request and response objects
 /// let domain_check = DomainCheck { domains: &["eppdev.com", "eppdev.net"] };
 /// let response = client.transact(&domain_check, "transaction-id").await.unwrap();
-/// response.res_data.unwrap().list
+/// response
+///     .res_data()
+///     .unwrap()
+///     .list
 ///     .iter()
-///     .for_each(|chk| println!("Domain: {}, Available: {}", chk.id, chk.available));
+///     .for_each(|chk| println!("Domain: {}, Available: {}", chk.inner.id, chk.inner.available));
 /// # }
 /// ```
 ///
@@ -103,13 +106,13 @@ impl<C: Connector> EppClient<C> {
 
     /// Executes an EPP Hello call and returns the response as a `Greeting`
     pub async fn hello(&mut self) -> Result<Greeting, Error> {
-        let xml = xml::serialize(&HelloDocument::default())?;
+        let xml = xml::serialize(Hello)?;
 
         debug!("{}: hello: {}", self.connection.registry, &xml);
         let response = self.connection.transact(&xml)?.await?;
         debug!("{}: greeting: {}", self.connection.registry, &response);
 
-        Ok(xml::deserialize::<GreetingDocument>(&response)?.data)
+        xml::deserialize::<Greeting>(&response)
     }
 
     pub async fn transact<'c, 'e, Cmd, Ext>(
@@ -122,29 +125,28 @@ impl<C: Connector> EppClient<C> {
         Ext: Extension + 'e,
     {
         let data = data.into();
-        let document = CommandDocument::new(data.command, data.extension, id);
+        let document = CommandWrapper::new(data.command, data.extension, id);
         let xml = xml::serialize(&document)?;
 
         debug!("{}: request: {}", self.connection.registry, &xml);
         let response = self.connection.transact(&xml)?.await?;
         debug!("{}: response: {}", self.connection.registry, &response);
 
-        let rsp =
-            match xml::deserialize::<ResponseDocument<Cmd::Response, Ext::Response>>(&response) {
-                Ok(rsp) => rsp,
-                Err(e) => {
-                    error!(%response, "failed to deserialize response for transaction: {e}");
-                    return Err(e);
-                }
-            };
+        let rsp = match xml::deserialize::<Response<Cmd::Response, Ext::Response>>(&response) {
+            Ok(rsp) => rsp,
+            Err(e) => {
+                error!(%response, "failed to deserialize response for transaction: {e}");
+                return Err(e);
+            }
+        };
 
-        if rsp.data.result.code.is_success() {
-            return Ok(rsp.data);
+        if rsp.result.code.is_success() {
+            return Ok(rsp);
         }
 
         let err = crate::error::Error::Command(Box::new(ResponseStatus {
-            result: rsp.data.result,
-            tr_ids: rsp.data.tr_ids,
+            result: rsp.result,
+            tr_ids: rsp.tr_ids,
         }));
 
         error!(%response, "Failed to deserialize response for transaction: {}", err);
@@ -164,7 +166,7 @@ impl<C: Connector> EppClient<C> {
 
     /// Returns the greeting received on establishment of the connection as an `Greeting`
     pub fn greeting(&self) -> Result<Greeting, Error> {
-        xml::deserialize::<GreetingDocument>(&self.connection.greeting).map(|obj| obj.data)
+        xml::deserialize::<Greeting>(&self.connection.greeting)
     }
 
     pub async fn reconnect(&mut self) -> Result<(), Error> {

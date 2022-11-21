@@ -1,9 +1,10 @@
 //! Types for EPP contact delete request
 
+use instant_xml::ToXml;
+
 use super::XMLNS;
-use crate::common::{NoExtension, StringValue};
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
-use serde::Serialize;
 
 impl<'a> Transaction<NoExtension> for ContactDelete<'a> {}
 
@@ -13,31 +14,25 @@ impl<'a> Command for ContactDelete<'a> {
 }
 
 /// Type containing the data for the &lt;delete&gt; tag for contacts
-#[derive(Serialize, Debug)]
-pub struct ContactDeleteRequestData<'a> {
-    /// XML namespace for the &lt;delete&gt; command for contacts
-    #[serde(rename = "xmlns:contact")]
-    xmlns: &'a str,
+#[derive(Debug, ToXml)]
+#[xml(rename = "delete", ns(XMLNS))]
+pub struct ContactDeleteRequest<'a> {
     /// The id of the contact to be deleted
-    #[serde(rename = "contact:id")]
-    id: StringValue<'a>,
+    id: &'a str,
 }
 
-#[derive(Serialize, Debug)]
 /// The &lt;delete&gt; type for the contact delete EPP command
+#[derive(Debug, ToXml)]
+#[xml(rename = "delete", ns(EPP_XMLNS))]
 pub struct ContactDelete<'a> {
-    #[serde(rename = "contact:delete")]
     /// The data for the &lt;delete&gt; tag for a contact delete command
-    contact: ContactDeleteRequestData<'a>,
+    contact: ContactDeleteRequest<'a>,
 }
 
 impl<'a> ContactDelete<'a> {
     pub fn new(id: &'a str) -> Self {
         Self {
-            contact: ContactDeleteRequestData {
-                xmlns: XMLNS,
-                id: id.into(),
-            },
+            contact: ContactDeleteRequest { id },
         }
     }
 }
@@ -58,8 +53,8 @@ mod tests {
     fn response() {
         let object = response_from_file::<ContactDelete>("response/contact/delete.xml");
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

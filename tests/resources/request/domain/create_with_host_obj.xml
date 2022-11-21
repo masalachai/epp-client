@@ -2,21 +2,21 @@
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <command>
         <create>
-            <domain:create xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
-                <domain:name>eppdev-1.com</domain:name>
-                <domain:period unit="y">1</domain:period>
-                <domain:ns>
-                    <domain:hostObj>ns1.test.com</domain:hostObj>
-                    <domain:hostObj>ns2.test.com</domain:hostObj>
-                </domain:ns>
-                <domain:registrant>eppdev-contact-3</domain:registrant>
-                <domain:contact type="admin">eppdev-contact-3</domain:contact>
-                <domain:contact type="tech">eppdev-contact-3</domain:contact>
-                <domain:contact type="billing">eppdev-contact-3</domain:contact>
-                <domain:authInfo>
-                    <domain:pw>epP4uthd#v</domain:pw>
-                </domain:authInfo>
-            </domain:create>
+            <create xmlns="urn:ietf:params:xml:ns:domain-1.0">
+                <name>eppdev-1.com</name>
+                <period unit="y">1</period>
+                <ns>
+                    <hostObj>ns1.test.com</hostObj>
+                    <hostObj>ns2.test.com</hostObj>
+                </ns>
+                <registrant>eppdev-contact-3</registrant>
+                <contact type="admin">eppdev-contact-3</contact>
+                <contact type="tech">eppdev-contact-3</contact>
+                <contact type="billing">eppdev-contact-3</contact>
+                <authInfo>
+                    <pw>epP4uthd#v</pw>
+                </authInfo>
+            </create>
         </create>
         <clTRID>cltrid:1626454866</clTRID>
     </command>

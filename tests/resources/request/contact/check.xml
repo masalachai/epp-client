@@ -2,10 +2,10 @@
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <command>
         <check>
-            <contact:check xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
-                <contact:id>eppdev-contact-1</contact:id>
-                <contact:id>eppdev-contact-2</contact:id>
-            </contact:check>
+            <check xmlns="urn:ietf:params:xml:ns:contact-1.0">
+                <id>eppdev-contact-1</id>
+                <id>eppdev-contact-2</id>
+            </check>
         </check>
         <clTRID>cltrid:1626454866</clTRID>
     </command>

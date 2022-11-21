@@ -2,18 +2,18 @@
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <command>
         <update>
-            <host:update xmlns:host="urn:ietf:params:xml:ns:host-1.0">
-                <host:name>host1.eppdev-1.com</host:name>
-                <host:add>
-                    <host:addr ip="v6">2404:6800:4001:801::200e</host:addr>
-                </host:add>
-                <host:rem>
-                    <host:status s="clientDeleteProhibited"/>
-                </host:rem>
-                <host:chg>
-                    <host:name>host2.eppdev-1.com</host:name>
-                </host:chg>
-            </host:update>
+            <update xmlns="urn:ietf:params:xml:ns:host-1.0">
+                <name>host1.eppdev-1.com</name>
+                <add>
+                    <addr ip="v6">2404:6800:4001:801::200e</addr>
+                </add>
+                <rem>
+                    <status s="clientDeleteProhibited"></status>
+                </rem>
+                <chg>
+                    <name>host2.eppdev-1.com</name>
+                </chg>
+            </update>
         </update>
         <clTRID>cltrid:1626454866</clTRID>
     </command>

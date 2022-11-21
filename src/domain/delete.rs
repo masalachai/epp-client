@@ -1,9 +1,10 @@
 //! Types for EPP domain delete request
 
+use instant_xml::ToXml;
+
 use super::XMLNS;
-use crate::common::{NoExtension, StringValue};
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
-use serde::Serialize;
 
 impl<'a> Transaction<NoExtension> for DomainDelete<'a> {}
 
@@ -15,30 +16,24 @@ impl<'a> Command for DomainDelete<'a> {
 impl<'a> DomainDelete<'a> {
     pub fn new(name: &'a str) -> Self {
         Self {
-            domain: DomainDeleteRequestData {
-                xmlns: XMLNS,
-                name: name.into(),
-            },
+            domain: DomainDeleteRequestData { name },
         }
     }
 }
 
 /// Type for &lt;name&gt; element under the domain &lt;delete&gt; tag
-#[derive(Serialize, Debug)]
+#[derive(Debug, ToXml)]
+#[xml(rename = "delete", ns(XMLNS))]
 pub struct DomainDeleteRequestData<'a> {
-    /// XML namespace for domain commands
-    #[serde(rename = "xmlns:domain")]
-    xmlns: &'a str,
     /// The domain to be deleted
-    #[serde(rename = "domain:name")]
-    name: StringValue<'a>,
+    name: &'a str,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Debug, ToXml)]
 /// Type for EPP XML &lt;delete&gt; command for domains
+#[xml(rename = "delete", ns(EPP_XMLNS))]
 pub struct DomainDelete<'a> {
     /// The data under the &lt;delete&gt; tag for domain deletion
-    #[serde(rename = "domain:delete")]
     domain: DomainDeleteRequestData<'a>,
 }
 
@@ -59,8 +54,8 @@ mod tests {
         let object = response_from_file::<DomainDelete>("response/domain/delete.xml");
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

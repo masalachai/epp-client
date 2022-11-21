@@ -2,18 +2,18 @@
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <command>
         <update>
-            <domain:update xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
-                <domain:name>eppdev.com</domain:name>
-                <domain:chg/>
-            </domain:update>
+            <update xmlns="urn:ietf:params:xml:ns:domain-1.0">
+                <name>eppdev.com</name>
+                <chg></chg>
+            </update>
         </update>
         <extension>
-            <sync:update xmlns:sync="http://www.verisign.com/epp/sync-1.0">
-                <sync:expMonthDay>--05-31</sync:expMonthDay>
-            </sync:update>
-            <namestoreExt:namestoreExt xmlns:namestoreExt="http://www.verisign-grs.com/epp/namestoreExt-1.1">
-                <namestoreExt:subProduct>com</namestoreExt:subProduct>
-            </namestoreExt:namestoreExt>
+            <update xmlns="http://www.verisign.com/epp/sync-1.0">
+                <expMonthDay>--05-31</expMonthDay>
+            </update>
+            <namestoreExt xmlns="http://www.verisign-grs.com/epp/namestoreExt-1.1">
+                <subProduct>com</subProduct>
+            </namestoreExt>
         </extension>
         <clTRID>cltrid:1626454866</clTRID>
     </command>

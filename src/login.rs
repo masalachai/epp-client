@@ -1,31 +1,32 @@
 use std::fmt::Debug;
 
-use serde::Serialize;
+use instant_xml::ToXml;
 
 use crate::{
-    common::{NoExtension, Options, ServiceExtension, Services, StringValue},
+    common::{NoExtension, Options, ServiceExtension, Services, EPP_XMLNS},
     contact, domain, host,
     request::{Command, Transaction, EPP_LANG, EPP_VERSION},
 };
 
 impl<'a> Transaction<NoExtension> for Login<'a> {}
 
-#[derive(Serialize, Debug, Eq, PartialEq)]
 /// Type corresponding to the &lt;login&gt; tag in an EPP XML login request
+#[derive(Debug, Eq, PartialEq, ToXml)]
+#[xml(rename = "login", ns(EPP_XMLNS))]
 pub struct Login<'a> {
     /// The username to use for the login
-    #[serde(rename(serialize = "clID", deserialize = "clID"))]
-    username: StringValue<'a>,
+    #[xml(rename = "clID")]
+    username: &'a str,
     /// The password to use for the login
-    #[serde(rename = "pw", default)]
-    password: StringValue<'a>,
+    #[xml(rename = "pw")]
+    password: &'a str,
     /// A new password which should be set
-    #[serde(rename = "newPW", default, skip_serializing_if = "Option::is_none")]
-    new_password: Option<StringValue<'a>>,
+    #[xml(rename = "newPW")]
+    new_password: Option<&'a str>,
     /// Data under the <options> tag
     options: Options<'a>,
     /// Data under the <svcs> tag
-    #[serde(rename = "svcs")]
+    #[xml(rename = "svcs")]
     services: Services<'a>,
 }
 
@@ -39,9 +40,9 @@ impl<'a> Login<'a> {
         let ext_uris = ext_uris.map(|uris| uris.iter().map(|&u| u.into()).collect());
 
         Self {
-            username: username.into(),
-            password: password.into(),
-            new_password: new_password.map(Into::into),
+            username,
+            password,
+            new_password,
             options: Options {
                 version: EPP_VERSION.into(),
                 lang: EPP_LANG.into(),
@@ -90,8 +91,8 @@ mod tests {
     fn response() {
         let object = response_from_file::<Login>("response/login.xml");
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

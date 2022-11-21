@@ -1,68 +1,78 @@
 //! Types for EPP RGP restore request
 
+use instant_xml::{FromXml, ToXml};
+
 use crate::{
     domain::{info::DomainInfo, update::DomainUpdate},
     request::{Extension, Transaction},
 };
 
-use serde::{Deserialize, Serialize};
-
-use super::{Update, XMLNS};
+use super::XMLNS;
 
 impl<'a> Transaction<Update<RgpRestoreRequest<'a>>> for DomainUpdate<'a> {}
 
 impl<'a> Transaction<Update<RgpRestoreRequest<'a>>> for DomainInfo<'a> {}
 
 impl<'a> Extension for Update<RgpRestoreRequest<'a>> {
-    type Response = Update<RgpRequestResponse>;
+    type Response = RgpRequestResponse;
 }
 
 // Request
 
-/// Type corresponding to the &lt;restore&gt; tag for an rgp restore request
-#[derive(Serialize, Debug)]
-pub struct RgpRestoreRequestData<'a> {
-    /// The value of the op attribute in the &lt;restore&gt; tag
-    pub op: &'a str,
+#[derive(Debug, FromXml, ToXml)]
+#[xml(rename = "update", ns(XMLNS))]
+pub struct Update<T> {
+    pub data: T,
 }
 
-#[derive(Serialize, Debug)]
-/// Type for EPP XML &lt;check&gt; command for domains
+/// Type corresponding to the &lt;restore&gt; tag for an rgp restore request
+#[derive(Debug, ToXml)]
+#[xml(rename = "restore", ns(XMLNS))]
 pub struct RgpRestoreRequest<'a> {
-    /// XML namespace for the RGP restore extension
-    #[serde(rename = "xmlns:rgp")]
-    xmlns: &'a str,
-    /// The object holding the list of domains to be checked
-    #[serde(rename = "rgp:restore")]
-    restore: RgpRestoreRequestData<'a>,
+    /// The value of the op attribute in the &lt;restore&gt; tag
+    #[xml(attribute)]
+    pub op: &'a str,
 }
 
 impl Default for RgpRestoreRequest<'static> {
     fn default() -> Self {
-        Self {
-            xmlns: XMLNS,
-            restore: RgpRestoreRequestData { op: "request" },
-        }
+        Self { op: "request" }
     }
 }
 
 // Response
 
 /// Type that represents the &lt;rgpStatus&gt; tag for domain rgp restore request response
-#[derive(Deserialize, Debug)]
+#[derive(Debug, FromXml)]
+#[xml(rename = "rgpStatus", ns(XMLNS))]
 pub struct RgpStatus {
     /// The domain RGP status
-    #[serde(rename = "s")]
+    #[xml(rename = "s", attribute)]
     pub status: String,
 }
 
-#[derive(Deserialize, Debug)]
-#[serde(rename = "upData")]
+#[derive(Debug, FromXml)]
+#[xml(rename = "upData", ns(XMLNS))]
 /// Type that represents the &lt;resData&gt; tag for domain transfer response
-pub struct RgpRequestResponse {
+pub struct RgpRequestUpdateResponse {
     /// Data under the &lt;rgpStatus&gt; tag
-    #[serde(rename = "rgpStatus")]
     pub rgp_status: Vec<RgpStatus>,
+}
+
+#[derive(Debug, FromXml)]
+#[xml(rename = "infData", ns(XMLNS))]
+/// Type that represents the &lt;resData&gt; tag for domain transfer response
+pub struct RgpRequestInfoResponse {
+    /// Data under the &lt;rgpStatus&gt; tag
+    pub rgp_status: Vec<RgpStatus>,
+}
+
+/// Type that represents the &lt;resData&gt; tag for domain transfer response
+#[derive(Debug, FromXml)]
+#[xml(forward)]
+pub enum RgpRequestResponse {
+    Update(RgpRequestUpdateResponse),
+    Info(RgpRequestInfoResponse),
 }
 
 #[cfg(test)]
@@ -70,6 +80,7 @@ mod tests {
     use super::{RgpRestoreRequest, Update};
     use crate::domain::info::DomainInfo;
     use crate::domain::update::{DomainChangeInfo, DomainUpdate};
+    use crate::extensions::rgp::request::RgpRequestResponse;
     use crate::response::ResultCode;
     use crate::tests::{assert_serialized, response_from_file_with_ext, SUCCESS_MSG, SVTRID};
 
@@ -102,9 +113,15 @@ mod tests {
         let ext = object.extension.unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(ext.data.rgp_status[0].status, "pendingRestore".to_string());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+
+        let data = match ext.data {
+            RgpRequestResponse::Update(data) => data,
+            _ => panic!("Unexpected response type"),
+        };
+
+        assert_eq!(data.rgp_status[0].status, "pendingRestore".to_string());
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 
     #[test]
@@ -114,7 +131,12 @@ mod tests {
         );
         let ext = object.extension.unwrap();
 
-        assert_eq!(ext.data.rgp_status[0].status, "addPeriod");
-        assert_eq!(ext.data.rgp_status[1].status, "renewPeriod");
+        let data = match ext.data {
+            RgpRequestResponse::Info(data) => data,
+            _ => panic!("Unexpected response type"),
+        };
+
+        assert_eq!(data.rgp_status[0].status, "addPeriod");
+        assert_eq!(data.rgp_status[1].status, "renewPeriod");
     }
 }

@@ -1,9 +1,9 @@
 use std::fmt::Debug;
 
-use serde::{Deserialize, Serialize};
+use instant_xml::{FromXml, ToXml};
 
 use crate::{
-    common::NoExtension,
+    common::{NoExtension, EPP_XMLNS},
     request::{Command, Transaction},
 };
 
@@ -14,8 +14,9 @@ impl Command for Logout {
     const COMMAND: &'static str = "logout";
 }
 
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, FromXml, PartialEq, ToXml)]
 /// Type corresponding to the &lt;logout&gt; tag in an EPP XML logout request
+#[xml(rename = "logout", ns(EPP_XMLNS))]
 pub struct Logout;
 
 #[cfg(test)]
@@ -40,9 +41,9 @@ mod tests {
         );
         assert_eq!(
             object.result.message,
-            "Command completed successfully; ending session".into()
+            "Command completed successfully; ending session"
         );
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

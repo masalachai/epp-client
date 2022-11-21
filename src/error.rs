@@ -28,10 +28,10 @@ impl Display for Error {
             Error::Command(e) => {
                 write!(f, "command error: {}", e.result.message)
             }
-            Error::Io(e) => write!(f, "I/O error: {}", e),
+            Error::Io(e) => write!(f, "I/O error: {e}"),
             Error::Timeout => write!(f, "timeout"),
-            Error::Xml(e) => write!(f, "(de)serialization error: {}", e),
-            Error::Other(e) => write!(f, "error: {}", e),
+            Error::Xml(e) => write!(f, "(de)serialization error: {e}"),
+            Error::Other(e) => write!(f, "error: {e}"),
         }
     }
 }

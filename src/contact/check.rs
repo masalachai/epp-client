@@ -1,55 +1,70 @@
-use std::fmt::Debug;
+//! Types for EPP contact check request
 
-/// Types for EPP contact check request
+use std::fmt::{self, Debug};
+
+use instant_xml::{FromXml, Serializer, ToXml};
+
 use super::XMLNS;
-use crate::common::{CheckResponse, NoExtension, StringValue};
+use crate::common::{NoExtension, EPP_XMLNS};
 use crate::request::{Command, Transaction};
-use serde::Serialize;
 
 impl<'a> Transaction<NoExtension> for ContactCheck<'a> {}
 
 impl<'a> Command for ContactCheck<'a> {
-    type Response = CheckResponse;
+    type Response = CheckData;
     const COMMAND: &'static str = "check";
 }
 
 // Request
 
 /// Type that represents the &lt;check&gt; command for contact transactions
-#[derive(Serialize, Debug)]
+#[derive(Debug, ToXml)]
+#[xml(rename = "check", ns(XMLNS))]
 struct ContactList<'a> {
-    /// The XML namespace for the contact &lt;check&gt;
-    #[serde(rename = "xmlns:contact")]
-    xmlns: &'a str,
     /// The list of contact ids to check for availability
-    #[serde(rename = "contact:id")]
-    contact_ids: Vec<StringValue<'a>>,
+    id: &'a [&'a str],
 }
 
-#[derive(Serialize, Debug)]
-struct SerializeContactCheck<'a> {
-    /// The &lt;check&gt; tag for the contact check command
-    #[serde(rename = "contact:check")]
-    list: ContactList<'a>,
-}
-
-impl<'a> From<ContactCheck<'a>> for SerializeContactCheck<'a> {
-    fn from(check: ContactCheck<'a>) -> Self {
-        Self {
-            list: ContactList {
-                xmlns: XMLNS,
-                contact_ids: check.contact_ids.iter().map(|&id| id.into()).collect(),
-            },
-        }
-    }
+fn serialize_contacts<W: fmt::Write + ?Sized>(
+    ids: &[&str],
+    serializer: &mut Serializer<W>,
+) -> Result<(), instant_xml::Error> {
+    ContactList { id: ids }.serialize(None, serializer)
 }
 
 /// The EPP `check` command for contacts
-#[derive(Clone, Debug, Serialize)]
-#[serde(into = "SerializeContactCheck")]
+#[derive(Clone, Debug, ToXml)]
+#[xml(rename = "check", ns(EPP_XMLNS))]
 pub struct ContactCheck<'a> {
-    /// The list of contact IDs to be checked
+    #[xml(serialize_with = "serialize_contacts")]
     pub contact_ids: &'a [&'a str],
+}
+
+// Response
+
+#[derive(Debug, FromXml)]
+#[xml(rename = "id", ns(XMLNS))]
+pub struct Checked {
+    #[xml(attribute, rename = "avail")]
+    pub available: bool,
+    #[xml(attribute)]
+    pub reason: Option<String>,
+    #[xml(direct)]
+    pub id: String,
+}
+
+#[derive(Debug, FromXml)]
+#[xml(rename = "cd", ns(XMLNS))]
+pub struct CheckedContact {
+    /// Data under the &lt;cd&gt; tag
+    pub inner: Checked,
+}
+
+/// Type that represents the &lt;chkData&gt; tag for host check response
+#[derive(Debug, FromXml)]
+#[xml(rename = "chkData", ns(XMLNS))]
+pub struct CheckData {
+    pub list: Vec<CheckedContact>,
 }
 
 #[cfg(test)]
@@ -72,12 +87,12 @@ mod tests {
         let results = object.res_data().unwrap();
 
         assert_eq!(object.result.code, ResultCode::CommandCompletedSuccessfully);
-        assert_eq!(object.result.message, SUCCESS_MSG.into());
-        assert_eq!(results.list[0].id, "eppdev-contact-1");
-        assert!(!results.list[0].available);
-        assert_eq!(results.list[1].id, "eppdev-contact-2");
-        assert!(results.list[1].available);
-        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
-        assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
+        assert_eq!(object.result.message, SUCCESS_MSG);
+        assert_eq!(results.list[0].inner.id, "eppdev-contact-1");
+        assert!(!results.list[0].inner.available);
+        assert_eq!(results.list[1].inner.id, "eppdev-contact-2");
+        assert!(results.list[1].inner.available);
+        assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID);
+        assert_eq!(object.tr_ids.server_tr_id, SVTRID);
     }
 }

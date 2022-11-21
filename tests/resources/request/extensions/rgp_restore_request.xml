@@ -2,15 +2,15 @@
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <command>
         <update>
-            <domain:update xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
-                <domain:name>eppdev.com</domain:name>
-                <domain:chg/>
-            </domain:update>
+            <update xmlns="urn:ietf:params:xml:ns:domain-1.0">
+                <name>eppdev.com</name>
+                <chg></chg>
+            </update>
         </update>
         <extension>
-            <rgp:update xmlns:rgp="urn:ietf:params:xml:ns:rgp-1.0">
-                <rgp:restore op="request"/>
-            </rgp:update>
+            <update xmlns="urn:ietf:params:xml:ns:rgp-1.0">
+                <restore op="request"></restore>
+            </update>
         </extension>
         <clTRID>cltrid:1626454866</clTRID>
     </command>

@@ -2,12 +2,12 @@
 <epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
     <command>
         <info>
-            <domain:info xmlns:domain="urn:ietf:params:xml:ns:domain-1.0">
-                <domain:name hosts="all">eppdev.com</domain:name>
-                <domain:authInfo>
-                    <domain:pw>2fooBAR</domain:pw>
-                </domain:authInfo>
-            </domain:info>
+            <info xmlns="urn:ietf:params:xml:ns:domain-1.0">
+                <name hosts="all">eppdev.com</name>
+                <authInfo>
+                    <pw>2fooBAR</pw>
+                </authInfo>
+            </info>
         </info>
         <clTRID>cltrid:1626454866</clTRID>
     </command>
