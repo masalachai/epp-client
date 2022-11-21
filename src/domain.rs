@@ -132,6 +132,31 @@ impl Period {
     }
 }
 
+pub const ONE_YEAR: Period = Period {
+    unit: 'y',
+    length: 1,
+};
+
+pub const TWO_YEARS: Period = Period {
+    unit: 'y',
+    length: 2,
+};
+
+pub const THREE_YEARS: Period = Period {
+    unit: 'y',
+    length: 3,
+};
+
+pub const ONE_MONTH: Period = Period {
+    unit: 'm',
+    length: 1,
+};
+
+pub const SIX_MONTHS: Period = Period {
+    unit: 'm',
+    length: 6,
+};
+
 /// The &lt;authInfo&gt; tag for domain and contact transactions
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DomainAuthInfo<'a> {
