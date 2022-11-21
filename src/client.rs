@@ -138,10 +138,10 @@ impl<C: Connector> EppClient<C> {
             return Ok(rsp.data);
         }
 
-        let err = crate::error::Error::Command(ResponseStatus {
+        let err = crate::error::Error::Command(Box::new(ResponseStatus {
             result: rsp.data.result,
             tr_ids: rsp.data.tr_ids,
-        });
+        }));
 
         error!(%response, "Failed to deserialize response for transaction: {}", err);
         Err(err)
