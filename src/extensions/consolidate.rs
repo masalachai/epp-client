@@ -25,7 +25,7 @@ impl Extension for UpdateWithNameStore<'_> {
     type Response = NameStore<'static>;
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Eq, Debug)]
 pub struct GMonthDay {
     pub month: u8,
     pub day: u8,

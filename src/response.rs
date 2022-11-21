@@ -8,11 +8,11 @@ use serde::Deserialize;
 use crate::common::StringValue;
 
 /// Type corresponding to the <undef> tag an EPP response XML
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 pub struct Undef;
 
 /// Type corresponding to the <value> tag under <extValue> in an EPP response XML
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 pub struct ResultValue {
     /// The XML namespace for the <value> tag
     #[serde(rename = "xmlns:epp")]
@@ -22,7 +22,7 @@ pub struct ResultValue {
 }
 
 /// Type corresponding to the <extValue> tag in an EPP response XML
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 pub struct ExtValue {
     /// Data under the <value> tag
     pub value: ResultValue,
@@ -31,7 +31,7 @@ pub struct ExtValue {
 }
 
 /// Type corresponding to the <result> tag in an EPP response XML
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 pub struct EppResult {
     /// The result code
     pub code: ResultCode,
@@ -44,7 +44,7 @@ pub struct EppResult {
 }
 
 /// Response codes as enumerated in section 3 of RFC 5730
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum ResultCode {
     CommandCompletedSuccessfully = 1000,
     CommandCompletedSuccessfullyActionPending = 1001,
@@ -166,7 +166,7 @@ impl<'de> serde::de::Visitor<'de> for ResultCodeVisitor {
 }
 
 /// Type corresponding to the <trID> tag in an EPP response XML
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 pub struct ResponseTRID {
     /// The client TRID
     #[serde(rename = "clTRID")]
@@ -177,7 +177,7 @@ pub struct ResponseTRID {
 }
 
 /// Type corresponding to the <msgQ> tag in an EPP response XML
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 pub struct MessageQueue {
     /// The message count
     pub count: u32,
@@ -191,7 +191,7 @@ pub struct MessageQueue {
     pub message: Option<StringValue<'static>>,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// containing an &lt;extension&gt; tag
 pub struct Response<D, E> {
@@ -210,21 +210,21 @@ pub struct Response<D, E> {
     pub tr_ids: ResponseTRID,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 #[serde(rename = "epp")]
 pub struct ResponseDocument<D, E> {
     #[serde(rename = "response")]
     pub data: Response<D, E>,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, Eq, PartialEq)]
 #[serde(rename = "epp")]
 pub struct ResultDocument {
     #[serde(rename = "response")]
     pub data: ResponseStatus,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
 /// Type corresponding to the &lt;response&gt; tag in an EPP response XML
 /// without <msgQ> or &lt;resData&gt; sections. Generally used for error handling
 pub struct ResponseStatus {
