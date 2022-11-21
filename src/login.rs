@@ -10,7 +10,7 @@ use crate::{
 
 impl<'a> Transaction<NoExtension> for Login<'a> {}
 
-#[derive(Serialize, Debug, PartialEq)]
+#[derive(Serialize, Debug, Eq, PartialEq)]
 /// Type corresponding to the &lt;login&gt; tag in an EPP XML login request
 pub struct Login<'a> {
     /// The username to use for the login

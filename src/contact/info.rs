@@ -171,7 +171,7 @@ mod tests {
             result.info_data.updated_at,
             Utc.with_ymd_and_hms(2021, 7, 23, 13, 9, 9).single()
         );
-        assert_eq!((*auth_info).password, "eppdev-387323".into());
+        assert_eq!(auth_info.password, "eppdev-387323".into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }
