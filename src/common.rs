@@ -12,7 +12,7 @@ pub(crate) const EPP_XMLNS: &str = "urn:ietf:params:xml:ns:epp-1.0";
 
 /// Wraps String for easier serialization to and from values that are inner text
 /// for tags rather than attributes
-#[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(Default, Serialize, Deserialize, Debug, Eq, PartialEq, Clone)]
 pub struct StringValue<'a>(Cow<'a, str>);
 
 impl Deref for StringValue<'_> {
@@ -47,7 +47,7 @@ impl From<String> for StringValue<'static> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 /// An empty placeholder tag. To be refactored to something more compliant later.
 pub struct NoExtension;
 
@@ -123,7 +123,7 @@ impl From<DeserializedCheckResponse> for CheckResponse {
 }
 
 /// The <option> type in EPP XML login requests
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 #[serde(rename = "options")]
 pub struct Options<'a> {
     /// The EPP version being used
@@ -143,7 +143,7 @@ impl<'a> Options<'a> {
 }
 
 /// The <svcExtension> type in EPP XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 #[serde(rename = "svcExtension")]
 pub struct ServiceExtension<'a> {
     /// The service extension URIs being represented by <extURI> in EPP XML
@@ -152,7 +152,7 @@ pub struct ServiceExtension<'a> {
 }
 
 /// The <svcs> type in EPP XML
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 pub struct Services<'a> {
     /// The service URIs being used by this EPP session represented by <objURI> in EPP XML
     #[serde(rename = "objURI")]

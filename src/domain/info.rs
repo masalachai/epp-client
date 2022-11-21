@@ -150,7 +150,7 @@ mod tests {
         let result = object.res_data().unwrap();
         let auth_info = result.info_data.auth_info.as_ref().unwrap();
         let ns_list = result.info_data.ns.as_ref().unwrap();
-        let ns = (*ns_list).host_obj.as_ref().unwrap();
+        let ns = ns_list.host_obj.as_ref().unwrap();
         let hosts = result.info_data.hosts.as_ref().unwrap();
         let statuses = result.info_data.statuses.as_ref().unwrap();
         let registrant = result.info_data.registrant.as_ref().unwrap();
@@ -194,7 +194,7 @@ mod tests {
             *result.info_data.expiring_at.as_ref().unwrap(),
             Utc.with_ymd_and_hms(2023, 7, 23, 15, 31, 20).unwrap()
         );
-        assert_eq!((*auth_info).password, "epP4uthd#v".into());
+        assert_eq!(auth_info.password, "epP4uthd#v".into());
         assert_eq!(object.tr_ids.client_tr_id.unwrap(), CLTRID.into());
         assert_eq!(object.tr_ids.server_tr_id, SVTRID.into());
     }

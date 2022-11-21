@@ -14,7 +14,7 @@ impl Command for Logout {
     const COMMAND: &'static str = "logout";
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
 /// Type corresponding to the &lt;logout&gt; tag in an EPP XML logout request
 pub struct Logout;
 
