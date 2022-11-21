@@ -33,10 +33,10 @@ impl Default for MessagePoll<'static> {
 #[derive(Deserialize, Debug)]
 pub enum MessageData {
     /// Data under the &lt;domain:trnData&gt; tag
-    #[serde(rename = "domain:trnData")]
+    #[serde(rename = "trnData")]
     DomainTransfer(DomainTransferResponseData),
     /// Data under the &lt;host:infData&gt; tag
-    #[serde(rename = "host:infData")]
+    #[serde(rename = "infData")]
     HostInfo(HostInfoResponseData),
 }
 
@@ -44,7 +44,7 @@ pub enum MessageData {
 #[derive(Deserialize, Debug)]
 pub struct MessagePollResponse {
     /// Data under the &lt;trnData&gt; tag
-    #[serde(alias = "trnData", alias = "infData")]
+    #[serde(rename = "trnData", alias = "infData")]
     pub message_data: MessageData,
 }
 
