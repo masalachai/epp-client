@@ -13,7 +13,7 @@ use crate::response::ResponseStatus;
 /// Error enum holding the possible error types
 #[derive(Debug)]
 pub enum Error {
-    Command(ResponseStatus),
+    Command(Box<ResponseStatus>),
     Io(std::io::Error),
     Timeout,
     Xml(Box<dyn StdError + Send + Sync>),
