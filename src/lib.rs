@@ -66,10 +66,8 @@
 //! #[tokio::main]
 //! async fn main() {
 //!     // Create an instance of EppClient
-//!     let host = "example.com";
-//!     let addr = (host, 700).to_socket_addrs().unwrap().next().unwrap();
 //!     let timeout = Duration::from_secs(5);
-//!     let mut client = match EppClient::connect("registry_name".to_string(), addr, host, None, timeout).await {
+//!     let mut client = match EppClient::connect("registry_name".to_string(), ("example.com".to_owned(), 7000), None, timeout).await {
 //!         Ok(client) => client,
 //!         Err(e) => panic!("Failed to create EppClient: {}",  e)
 //!     };
