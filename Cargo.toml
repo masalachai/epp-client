@@ -1,7 +1,7 @@
 [package]
 name = "epp-client"
 version = "0.6.0"
-edition = "2018"
+edition = "2021"
 license = "MIT"
 description = "EPP (Extensible Provisioning Protocol) Client Library for Domain Registration and Management"
 repository = "https://github.com/masalachai/epp-client"
