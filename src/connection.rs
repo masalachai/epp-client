@@ -1,6 +1,5 @@
 //! Manages registry connections and reading/writing to them
 
-use std::convert::TryInto;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};
