@@ -129,7 +129,15 @@ impl<C: Connector> EppClient<C> {
         let response = self.connection.transact(&xml)?.await?;
         debug!("{}: response: {}", self.connection.registry, &response);
 
-        let rsp = xml::deserialize::<ResponseDocument<Cmd::Response, Ext::Response>>(&response)?;
+        let rsp =
+            match xml::deserialize::<ResponseDocument<Cmd::Response, Ext::Response>>(&response) {
+                Ok(rsp) => rsp,
+                Err(e) => {
+                    error!(%response, "failed to deserialize response for transaction: {e}");
+                    return Err(e);
+                }
+            };
+
         if rsp.data.result.code.is_success() {
             return Ok(rsp.data);
         }
