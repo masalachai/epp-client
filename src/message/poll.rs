@@ -1,5 +1,6 @@
 use crate::common::NoExtension;
 use crate::domain::transfer::DomainTransferResponseData;
+use crate::extensions::low_balance::LowBalance;
 use crate::host::info::HostInfoResponseData;
 use crate::request::{Command, Transaction};
 use serde::{Deserialize, Serialize};
@@ -38,13 +39,16 @@ pub enum MessageData {
     /// Data under the &lt;host:infData&gt; tag
     #[serde(rename = "infData")]
     HostInfo(HostInfoResponseData),
+    /// Data under the &lt;lowbalance&gt; tag
+    #[serde(rename = "pollData")]
+    LowBalance(LowBalance),
 }
 
 /// Type that represents the &lt;resData&gt; tag for message poll response
 #[derive(Deserialize, Debug)]
 pub struct MessagePollResponse {
     /// Data under the &lt;trnData&gt; tag
-    #[serde(rename = "trnData", alias = "infData")]
+    #[serde(rename = "trnData", alias = "infData", alias = "pollData")]
     pub message_data: MessageData,
 }
 

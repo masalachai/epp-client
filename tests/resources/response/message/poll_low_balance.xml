@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+  <response>
+    <result code="1301">
+      <msg>Command completed successfully; ack to dequeue</msg>
+    </result>
+    <msgQ count="41" id="123456789">
+      <qDate>2023-01-02T05:02:37Z</qDate>
+      <msg>Low Account Balance(COM/NET)</msg>
+    </msgQ>
+    <resData>
+      <lowbalance-poll:pollData xmlns:lowbalance-poll="http://www.verisign.com/epp/lowbalance-poll-1.0">
+        <lowbalance-poll:registrarName>Foobar, Inc.</lowbalance-poll:registrarName>
+        <lowbalance-poll:creditLimit>0</lowbalance-poll:creditLimit>
+        <lowbalance-poll:creditThreshold type="FIXED">500</lowbalance-poll:creditThreshold>
+        <lowbalance-poll:availableCredit>491.31</lowbalance-poll:availableCredit>
+      </lowbalance-poll:pollData>
+    </resData>
+    <trID>
+      <clTRID>cltrid:1626454866</clTRID>
+      <svTRID>RO-6879-1627224678242975</svTRID>
+    </trID>
+  </response>
+</epp>
