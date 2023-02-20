@@ -107,6 +107,7 @@ pub mod xml;
 
 pub mod extensions {
     pub mod consolidate;
+    pub mod low_balance;
     pub mod namestore;
     pub mod rgp;
 }
