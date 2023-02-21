@@ -31,6 +31,7 @@ impl Default for MessagePoll<'static> {
 // Response
 
 /// Type that represents the &lt;trnData&gt; tag for message poll response
+#[non_exhaustive]
 #[derive(Deserialize, Debug)]
 pub enum MessageData {
     /// Data under the &lt;domain:trnData&gt; tag
