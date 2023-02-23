@@ -19,10 +19,7 @@ impl<'a> Command for HostCreate<'a> {
 impl<'a> HostCreate<'a> {
     pub fn new(name: &'a str, addresses: Option<&'a [IpAddr]>) -> Self {
         Self {
-            host: HostCreateRequest {
-                name,
-                addresses,
-            },
+            host: HostCreateRequest { name, addresses },
         }
     }
 }

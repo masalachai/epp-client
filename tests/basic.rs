@@ -8,10 +8,11 @@ use regex::Regex;
 use tokio::time::timeout;
 use tokio_test::io::Builder;
 
-use epp_client::domain::{DomainCheck, DomainContact, DomainCreate, Period};
-use epp_client::login::Login;
-use epp_client::response::ResultCode;
-use epp_client::EppClient;
+use instant_epp::client::{Connector, EppClient};
+use instant_epp::domain::{DomainCheck, DomainContact, DomainCreate, Period};
+use instant_epp::login::Login;
+use instant_epp::response::ResultCode;
+use instant_epp::Error;
 
 const CLTRID: &str = "cltrid:1626454866";
 
@@ -84,10 +85,10 @@ async fn client() {
     struct FakeConnector;
 
     #[async_trait]
-    impl epp_client::client::Connector for FakeConnector {
+    impl Connector for FakeConnector {
         type Connection = tokio_test::io::Mock;
 
-        async fn connect(&self, _: Duration) -> Result<Self::Connection, epp_client::Error> {
+        async fn connect(&self, _: Duration) -> Result<Self::Connection, Error> {
             Ok(build_stream(&[
                 "response/greeting.xml",
                 "request/login.xml",
@@ -141,10 +142,10 @@ async fn dropped() {
     struct FakeConnector;
 
     #[async_trait]
-    impl epp_client::client::Connector for FakeConnector {
+    impl Connector for FakeConnector {
         type Connection = tokio_test::io::Mock;
 
-        async fn connect(&self, _: Duration) -> Result<Self::Connection, epp_client::Error> {
+        async fn connect(&self, _: Duration) -> Result<Self::Connection, Error> {
             let mut builder = Builder::new();
 
             let buf = xml("response/greeting.xml");

@@ -59,9 +59,9 @@
 //! use std::net::ToSocketAddrs;
 //! use std::time::Duration;
 //!
-//! use epp_client::EppClient;
-//! use epp_client::domain::check::DomainCheck;
-//! use epp_client::login::Login;
+//! use instant_epp::EppClient;
+//! use instant_epp::domain::check::DomainCheck;
+//! use instant_epp::login::Login;
 //!
 //! #[tokio::main]
 //! async fn main() {

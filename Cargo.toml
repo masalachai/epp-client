@@ -1,11 +1,11 @@
 [package]
-name = "epp-client"
-version = "0.7.0"
+name = "instant-epp"
+version = "0.1.0"
 edition = "2021"
 rust-version = "1.59"
 license = "MIT"
-description = "EPP (Extensible Provisioning Protocol) Client Library for Domain Registration and Management"
-repository = "https://github.com/masalachai/epp-client"
+description = "EPP (Extensible Provisioning Protocol) client library"
+repository = "https://github.com/InstantDomain/instant-epp"
 
 [features]
 default = ["tokio-rustls"]

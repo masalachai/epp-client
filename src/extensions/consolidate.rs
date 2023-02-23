@@ -86,7 +86,7 @@ impl<'a> UpdateWithNameStore<'a> {
 }
 
 #[derive(Debug, ToXml)]
-#[xml(inline)]
+#[xml(transparent)]
 pub struct UpdateWithNameStore<'a> {
     pub sync: Update,
     pub namestore: NameStore<'a>,
