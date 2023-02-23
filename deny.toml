@@ -1,0 +1,15 @@
+[licenses]
+allow-osi-fsf-free = "either"
+copyleft = "deny"
+allow = ["MPL-2.0"]
+
+[advisories]
+ignore = ["RUSTSEC-2020-0071"]
+unsound = "deny"
+unmaintained = "deny"
+yanked = "deny"
+
+[[licenses.clarify]]
+name = "ring"
+expression = "ISC AND MIT AND OpenSSL"
+license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
