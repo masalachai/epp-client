@@ -47,7 +47,7 @@ fn xml(path: &str) -> String {
     let ws_regex = Regex::new(r"[\s]{2,}").unwrap();
     let end_regex = Regex::new(r"\?>").unwrap();
 
-    let mut f = File::open(format!("tests/resources/{}", path)).unwrap();
+    let mut f = File::open(format!("tests/resources/{path}")).unwrap();
     let mut buf = String::new();
     f.read_to_string(&mut buf).unwrap();
 

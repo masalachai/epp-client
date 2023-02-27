@@ -22,7 +22,7 @@ pub(crate) const SUCCESS_MSG: &str = "Command completed successfully";
 pub(crate) fn get_xml(path: &str) -> Result<String, Box<dyn Error>> {
     let ws_regex = Regex::new(r"[\s]{2,}")?;
 
-    let mut f = File::open(format!("{}/{}", RESOURCES_DIR, path))?;
+    let mut f = File::open(format!("{RESOURCES_DIR}/{path}"))?;
     let mut buf = String::new();
 
     f.read_to_string(&mut buf)?;
