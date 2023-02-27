@@ -10,7 +10,7 @@ use crate::request::{Command, Transaction};
 impl<'a> Transaction<NoExtension> for ContactCreate<'a> {}
 
 impl<'a> Command for ContactCreate<'a> {
-    type Response = ContactCreateData;
+    type Response = CreateData;
     const COMMAND: &'static str = "create";
 }
 
@@ -73,7 +73,7 @@ impl<'a> ContactCreate<'a> {
 /// Type that represents the &lt;creData&gt; tag for contact create response
 #[derive(Debug, FromXml)]
 #[xml(rename = "creData", ns(XMLNS))]
-pub struct ContactCreateData {
+pub struct CreateData {
     /// The contact id
     pub id: String,
     #[xml(rename = "crDate")]

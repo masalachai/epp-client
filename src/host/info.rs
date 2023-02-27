@@ -13,7 +13,7 @@ use crate::request::{Command, Transaction};
 impl<'a> Transaction<NoExtension> for HostInfo<'a> {}
 
 impl<'a> Command for HostInfo<'a> {
-    type Response = HostInfoResponseData;
+    type Response = InfoData;
     const COMMAND: &'static str = "info";
 }
 
@@ -49,7 +49,7 @@ pub struct HostInfo<'a> {
 /// Type that represents the &lt;infData&gt; tag for host info response
 #[derive(Debug, FromXml)]
 #[xml(rename = "infData", ns(XMLNS))]
-pub struct HostInfoResponseData {
+pub struct InfoData {
     /// The host name
     pub name: String,
     /// The host ROID

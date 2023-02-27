@@ -10,7 +10,7 @@ use crate::request::{Command, Transaction};
 impl<'a> Transaction<NoExtension> for ContactInfo<'a> {}
 
 impl<'a> Command for ContactInfo<'a> {
-    type Response = ContactInfoData;
+    type Response = InfoData;
     const COMMAND: &'static str = "info";
 }
 
@@ -50,7 +50,7 @@ impl<'a> ContactInfo<'a> {
 /// Type that represents the &lt;infData&gt; tag for contact check response
 #[derive(Debug, FromXml)]
 #[xml(rename = "infData", ns(XMLNS))]
-pub struct ContactInfoData {
+pub struct InfoData {
     /// The contact id
     pub id: String,
     /// The contact ROID

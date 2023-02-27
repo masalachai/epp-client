@@ -1,9 +1,9 @@
 use instant_xml::{FromXml, ToXml};
 
 use crate::common::{NoExtension, EPP_XMLNS};
-use crate::domain::transfer::DomainTransferResponseData;
+use crate::domain::transfer::TransferData;
 use crate::extensions::low_balance::LowBalance;
-use crate::host::info::HostInfoResponseData;
+use crate::host::info::InfoData;
 use crate::request::{Command, Transaction};
 
 impl<'a> Transaction<NoExtension> for MessagePoll<'a> {}
@@ -38,9 +38,9 @@ impl Default for MessagePoll<'static> {
 #[xml(forward)]
 pub enum MessagePollResponse {
     /// Data under the &lt;domain:trnData&gt; tag
-    DomainTransfer(DomainTransferResponseData),
+    DomainTransfer(TransferData),
     /// Data under the &lt;host:infData&gt; tag
-    HostInfo(HostInfoResponseData),
+    HostInfo(InfoData),
     /// Data under the &lt;lowbalance&gt; tag
     LowBalance(LowBalance),
 }

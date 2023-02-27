@@ -10,7 +10,7 @@ use crate::request::{Command, Transaction};
 impl<'a> Transaction<NoExtension> for DomainInfo<'a> {}
 
 impl<'a> Command for DomainInfo<'a> {
-    type Response = DomainInfoResponse;
+    type Response = InfoData;
     const COMMAND: &'static str = "info";
 }
 
@@ -75,7 +75,7 @@ pub struct DomainNsList {
 /// Type that represents the &lt;infData&gt; tag for domain info response
 #[derive(Debug, FromXml)]
 #[xml(rename = "infData", ns(XMLNS))]
-pub struct DomainInfoResponse {
+pub struct InfoData {
     /// The domain name
     pub name: String,
     /// The domain ROID

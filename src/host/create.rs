@@ -12,7 +12,7 @@ use crate::request::{Command, Transaction};
 impl<'a> Transaction<NoExtension> for HostCreate<'a> {}
 
 impl<'a> Command for HostCreate<'a> {
-    type Response = HostCreateData;
+    type Response = CreateData;
     const COMMAND: &'static str = "create";
 }
 
@@ -50,7 +50,7 @@ pub struct HostCreate<'a> {
 /// Type that represents the &lt;creData&gt; tag for host create response
 #[derive(Debug, FromXml)]
 #[xml(rename = "creData", ns(XMLNS))]
-pub struct HostCreateData {
+pub struct CreateData {
     /// The host name
     pub name: String,
     /// The host creation date

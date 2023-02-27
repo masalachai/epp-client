@@ -10,7 +10,7 @@ use crate::request::{Command, Transaction};
 impl<'a> Transaction<NoExtension> for DomainTransfer<'a> {}
 
 impl<'a> Command for DomainTransfer<'a> {
-    type Response = DomainTransferResponseData;
+    type Response = TransferData;
     const COMMAND: &'static str = "transfer";
 }
 
@@ -96,7 +96,7 @@ pub struct DomainTransfer<'a> {
 /// Type that represents the &lt;trnData&gt; tag for domain transfer response
 #[derive(Debug, FromXml)]
 #[xml(rename = "trnData", ns(XMLNS))]
-pub struct DomainTransferResponseData {
+pub struct TransferData {
     /// The domain name
     pub name: String,
     /// The domain transfer status

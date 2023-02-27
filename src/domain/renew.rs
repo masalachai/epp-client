@@ -10,7 +10,7 @@ use crate::request::{Command, Transaction};
 impl<'a> Transaction<NoExtension> for DomainRenew<'a> {}
 
 impl<'a> Command for DomainRenew<'a> {
-    type Response = DomainRenewResponse;
+    type Response = RenewData;
     const COMMAND: &'static str = "renew";
 }
 
@@ -55,7 +55,7 @@ pub struct DomainRenew<'a> {
 /// Type that represents the &lt;renData&gt; tag for domain renew response
 #[derive(Debug, FromXml)]
 #[xml(rename = "renData", ns(XMLNS))]
-pub struct DomainRenewResponse {
+pub struct RenewData {
     /// The name of the domain
     pub name: String,
     /// The new expiry date after renewal
