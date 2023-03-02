@@ -1,98 +1,36 @@
-//! # EPP (Extensible Provisioning Protocol) Client Library for Domain Registration and Management.
+//! # EPP (Extensible Provisioning Protocol) client library for async Rust
 //!
 //! ## Description
 //!
-//! epp-client is a client library for Internet domain registration and management for domain
-//! registrars ([RFC 5730](https://tools.ietf.org/html/rfc5730)). It supports the following basic
-//! management requests.
+//! instant-epp is a client library written in Rust for Internet domain registration and management
+//! for domain registrars. We have implemented support for the following standards:
 //!
-//! Typically, you will start by initializing an [`EppClient`] instance, which will connect to the EPP server.
-//! From there, you can submit requests using [`EppClient::transact()`].
+//! - [RFC 5730](https://tools.ietf.org/html/rfc5730) - Extensible Provisioning Protocol (EPP)
+//! - [RFC 5731](https://tools.ietf.org/html/rfc5731) - Extensible Provisioning Protocol (EPP) Domain Name Mapping
+//! - [RFC 5732](https://tools.ietf.org/html/rfc5732) - Extensible Provisioning Protocol (EPP) Host Mapping
+//! - [RFC 5733](https://tools.ietf.org/html/rfc5733) - Extensible Provisioning Protocol (EPP) Contact Mapping
+//! - [RFC 5734](https://tools.ietf.org/html/rfc5734) - Extensible Provisioning Protocol (EPP) Transport over TCP
+//! - [RFC 3915](https://tools.ietf.org/html/rfc3915) - Domain Registry Grace Period Mapping
+//! - [ConsoliDate mapping](https://www.verisign.com/assets/consolidate-mapping.txt)
+//! - [Namestore Extension Mapping](https://www.verisign.com/assets/epp-sdk/verisign_epp-extension_namestoreext_v01.html)
+//! - [Low Balance Mapping](https://www.verisign.com/assets/epp-sdk/verisign_epp-extension_low-balance_v01.html)
 //!
-//! ## Core requests
+//! This library is used in production with at [Instant Domains](https://instantdomains.com/).
 //!
-//! - [`message::MessagePoll`]
-//! - [`message::MessageAck`]
+//! ## History
 //!
-//! ## Domains
+//! instant-epp was originally created by [@masalachai](https://github.com/masalachai) as
+//! [epp-client](https://github.com/masalachai/epp-client) in the summer of 2021. By fall, Instant
+//! Domains employees started contributing to the project. In February of 2023, after most of the
+//! contributions to epp-client had come from Instant Domains for the intervening years, we decided
+//! to fork the project, replacing its dependency on quick-xml with
+//! [instant-xml](https://github.com/InstantDomain/instant-xml/) in the process. Many thanks to
+//! @masalachai for starting epp-client!
 //!
-//! Specified in [RFC 5731](https://tools.ietf.org/html/rfc5731).
+//! ## Getting started
 //!
-//! - [`domain::DomainCheck`]
-//! - [`domain::DomainCreate`]
-//! - [`domain::DomainInfo`]
-//! - [`domain::DomainUpdate`]
-//! - [`domain::DomainRenew`]
-//! - [`domain::DomainTransfer`]
-//! - [`domain::DomainDelete`]
-//!
-//! ## Contacts
-//!
-//! Specified in [RFC 5732](https://tools.ietf.org/html/rfc5732).
-//!
-//! - [`contact::ContactCheck`]
-//! - [`contact::ContactCreate`]
-//! - [`contact::ContactInfo`]
-//! - [`contact::ContactUpdate`]
-//! - [`contact::ContactDelete`]
-//!
-//! ## Hosts
-//!
-//! Specified in [RFC 5733](https://tools.ietf.org/html/rfc5733).
-//!
-//! - [`host::HostCheck`]
-//! - [`host::HostCreate`]
-//! - [`host::HostInfo`]
-//! - [`host::HostUpdate`]
-//! - [`host::HostDelete`]
-//!
-//! ## Extensions
-//!
-//! - [`extensions::rgp::report::RgpRestoreReport`]
-//! - [`extensions::rgp::request::RgpRestoreRequest`]
-//! - [`extensions::namestore::NameStore`]
-//! - [`extensions::consolidate::Update`]
-//!
-//! ## Operation
-//!
-//! ```no_run
-//! use std::net::ToSocketAddrs;
-//! use std::time::Duration;
-//!
-//! use instant_epp::EppClient;
-//! use instant_epp::domain::check::DomainCheck;
-//! use instant_epp::login::Login;
-//!
-//! #[tokio::main]
-//! async fn main() {
-//!     // Create an instance of EppClient
-//!     let timeout = Duration::from_secs(5);
-//!     let mut client = match EppClient::connect("registry_name".to_string(), ("example.com".to_owned(), 7000), None, timeout).await {
-//!         Ok(client) => client,
-//!         Err(e) => panic!("Failed to create EppClient: {}",  e)
-//!     };
-//!
-//!     let login = Login::new("username", "password", None, None);
-//!     client.transact(&login, "transaction-id").await.unwrap();
-//!
-//!     // Execute an EPP Command against the registry with distinct request and response objects
-//!     let domain_check = DomainCheck { domains: &["eppdev.com", "eppdev.net"] };
-//!     let response = client.transact(&domain_check, "transaction-id").await.unwrap();
-//!
-//!     response.res_data()
-//!         .unwrap()
-//!         .list
-//!         .iter()
-//!         .for_each(|chk| println!("Domain: {}, Available: {}", chk.inner.id, chk.inner.available));
-//! }
-//! ```
-//!
-//! The output would look similar to the following
-//!
-//! ```text
-//! Domain: eppdev.com, Available: 1
-//! Domain: eppdev.net, Available: 1
-//! ```
+//! You will usually want to start by initializing an [`EppClient`]. Refer to the example code
+//! on that type for more information.
 
 pub mod client;
 pub mod common;

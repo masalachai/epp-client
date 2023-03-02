@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.59"
 license = "MIT"
-description = "EPP (Extensible Provisioning Protocol) client library"
+description = "EPP client library for async Rust"
 repository = "https://github.com/InstantDomain/instant-epp"
 
 [features]
