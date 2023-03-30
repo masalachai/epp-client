@@ -37,10 +37,10 @@ impl<'a> Login<'a> {
         ext_uris: Option<&'_ [&'a str]>,
     ) -> Self {
         let svc_ext = match ext_uris {
-            Some(uris) if ! uris.is_empty() => Some(ServiceExtension {
-                ext_uris: Some(uris.iter().map(|&u| u.into()).collect())
+            Some(uris) if !uris.is_empty() => Some(ServiceExtension {
+                ext_uris: Some(uris.iter().map(|&u| u.into()).collect()),
             }),
-            _ => None
+            _ => None,
         };
 
         Self {
@@ -57,7 +57,7 @@ impl<'a> Login<'a> {
                     contact::XMLNS.into(),
                     domain::XMLNS.into(),
                 ],
-                svc_ext
+                svc_ext,
             },
         }
     }
