@@ -19,7 +19,7 @@ serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.0", features = ["io-util", "net", "time"] }
 tokio-rustls = { version = "0.23", optional = true }
 tracing = "0.1.29"
-webpki-roots = "0.22.1"
+webpki-roots = "1.0.10"
 
 [dev-dependencies]
 regex = "1.5"
